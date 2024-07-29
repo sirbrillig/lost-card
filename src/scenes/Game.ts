@@ -28,6 +28,8 @@ export class Game extends Scene {
 	}
 
 	create() {
+		this.physics.world.createDebugGraphic();
+
 		const map = this.make.tilemap({ key: "map" });
 		const tileset = map.addTilesetImage("outside", "overworld_tiles");
 		if (!tileset) {
@@ -81,9 +83,35 @@ export class Game extends Scene {
 		return this.characterSpeed;
 	}
 
+	setPlayerSpriteSize() {
+		if (this.framesSinceAttack > 0) {
+			const xOffset = (() => {
+				if (this.playerDirection === SpriteLeft) {
+					return -16;
+				}
+				if (this.playerDirection === SpriteRight) {
+					return 16;
+				}
+				return 0;
+			})();
+			const yOffset = (() => {
+				if (this.playerDirection === SpriteUp) {
+					return -16;
+				}
+				if (this.playerDirection === SpriteDown) {
+					return 16;
+				}
+				return 0;
+			})();
+			this.player.setSize(32, 32).setOffset(xOffset, yOffset);
+		} else {
+			this.player.setSize(15, 20).setOffset(1, 14);
+		}
+	}
+
 	createPlayer(): void {
 		this.player = this.physics.add.sprite(400, 350, "character", 0);
-		this.player.setSize(15, 20).setOffset(1, 14);
+		this.setPlayerSpriteSize();
 
 		const anims = this.anims;
 		anims.create({
@@ -286,6 +314,7 @@ export class Game extends Scene {
 	}
 
 	updatePlayer(): void {
+		this.setPlayerSpriteSize();
 		if (this.framesSincePlayerHit > 0) {
 			this.framesSincePlayerHit -= 1;
 			this.player.setVisible(
