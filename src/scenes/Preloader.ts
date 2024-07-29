@@ -35,6 +35,10 @@ export class Preloader extends Scene {
 			frameWidth: 16,
 			frameHeight: 32,
 		});
+		this.load.spritesheet("character_attack", "character_attack.png", {
+			frameWidth: 32,
+			frameHeight: 32,
+		});
 		this.load.spritesheet("logman", "log.png", {
 			frameWidth: 32,
 			frameHeight: 32,

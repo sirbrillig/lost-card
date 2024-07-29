@@ -113,26 +113,38 @@ export class Game extends Scene {
 
 		anims.create({
 			key: "character-down-attack",
-			frames: anims.generateFrameNumbers("character", { start: 5, end: 7 }),
-			frameRate: 20,
+			frames: anims.generateFrameNumbers("character_attack", {
+				start: 0,
+				end: 3,
+			}),
+			frameRate: 15,
 			repeat: 0,
 		});
 		anims.create({
 			key: "character-right-attack",
-			frames: anims.generateFrameNumbers("character", { start: 22, end: 24 }),
-			frameRate: 20,
+			frames: anims.generateFrameNumbers("character_attack", {
+				start: 8,
+				end: 11,
+			}),
+			frameRate: 15,
 			repeat: 0,
 		});
 		anims.create({
 			key: "character-up-attack",
-			frames: anims.generateFrameNumbers("character", { start: 39, end: 41 }),
-			frameRate: 20,
+			frames: anims.generateFrameNumbers("character_attack", {
+				start: 4,
+				end: 7,
+			}),
+			frameRate: 15,
 			repeat: 0,
 		});
 		anims.create({
 			key: "character-left-attack",
-			frames: anims.generateFrameNumbers("character", { start: 56, end: 58 }),
-			frameRate: 20,
+			frames: anims.generateFrameNumbers("character_attack", {
+				start: 12,
+				end: 15,
+			}),
+			frameRate: 15,
 			repeat: 0,
 		});
 
@@ -281,11 +293,10 @@ export class Game extends Scene {
 			return;
 		}
 
-		if (this.framesSinceAttack > 0) {
-			// Stop moving if attacking
-			this.player.body.setVelocityY(0);
-			this.player.body.setVelocityX(0);
+		this.player.body.setVelocity(0);
+		this.player.setVisible(true);
 
+		if (this.framesSinceAttack > 0) {
 			this.framesSinceAttack -= 1;
 			const playerDirection = this.playerDirection;
 			switch (playerDirection) {
@@ -305,11 +316,8 @@ export class Game extends Scene {
 			return;
 		}
 		if (this.cursors.space.isDown && this.framesSinceAttack === 0) {
-			this.framesSinceAttack = 50;
+			this.framesSinceAttack = 20;
 		}
-
-		this.player.body.setVelocity(0);
-		this.player.setVisible(true);
 
 		if (this.cursors.left.isDown) {
 			this.player.body.setVelocityX(-this.getPlayerSpeed());
@@ -344,6 +352,8 @@ export class Game extends Scene {
 	setPlayerIdleFrame() {
 		// If the player stops moving, stop animations and reset the image to an idle frame in the correct direction.
 		this.player.anims.stop();
+		// Reset the player sprite sheet to the walking one in case it was in some other sheet.
+		this.player.anims.startAnimation("character-down-walk");
 		switch (this.playerDirection) {
 			case SpriteLeft:
 				this.player.setFrame(51);
