@@ -1,12 +1,25 @@
 import { Scene } from "phaser";
 
+// 0 is up, 1 is right, 2 is down, 3 is left
+const SpriteUp = 0;
+const SpriteRight = 1;
+const SpriteDown = 2;
+const SpriteLeft = 3;
+type SpriteDirection =
+	| typeof SpriteUp
+	| typeof SpriteRight
+	| typeof SpriteDown
+	| typeof SpriteLeft;
+
 export class Game extends Scene {
 	cursors: Phaser.Types.Input.Keyboard.CursorKeys;
 	player: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
 	enemies: Phaser.Physics.Arcade.Group;
 	characterSpeed: number = 80;
 	enemySpeed: number = 60;
-	framesSincePlayerHit: number;
+	framesSincePlayerHit: number = 0;
+	framesSinceAttack: number = 0;
+	playerDirection: SpriteDirection = 2;
 	landLayer: Phaser.Tilemaps.TilemapLayer;
 	objectLayer: Phaser.Tilemaps.TilemapLayer;
 
@@ -98,6 +111,31 @@ export class Game extends Scene {
 			repeat: -1,
 		});
 
+		anims.create({
+			key: "character-down-attack",
+			frames: anims.generateFrameNumbers("character", { start: 5, end: 7 }),
+			frameRate: 20,
+			repeat: 0,
+		});
+		anims.create({
+			key: "character-right-attack",
+			frames: anims.generateFrameNumbers("character", { start: 22, end: 24 }),
+			frameRate: 20,
+			repeat: 0,
+		});
+		anims.create({
+			key: "character-up-attack",
+			frames: anims.generateFrameNumbers("character", { start: 39, end: 41 }),
+			frameRate: 20,
+			repeat: 0,
+		});
+		anims.create({
+			key: "character-left-attack",
+			frames: anims.generateFrameNumbers("character", { start: 56, end: 58 }),
+			frameRate: 20,
+			repeat: 0,
+		});
+
 		this.physics.add.collider(this.player, this.landLayer);
 		this.physics.add.collider(this.player, this.objectLayer);
 		this.player.setCollideWorldBounds(true);
@@ -154,6 +192,11 @@ export class Game extends Scene {
 		enemy: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody
 	): void {
 		if (this.framesSincePlayerHit > 0) {
+			return;
+		}
+
+		if (this.framesSinceAttack > 0) {
+			enemy.destroy();
 			return;
 		}
 
@@ -236,7 +279,33 @@ export class Game extends Scene {
 			return;
 		}
 
-		const prevVelocity = this.player.body.velocity.clone();
+		if (this.framesSinceAttack > 0) {
+			// Stop moving if attacking
+			this.player.body.setVelocityY(0);
+			this.player.body.setVelocityX(0);
+
+			this.framesSinceAttack -= 1;
+			const playerDirection = this.playerDirection;
+			switch (playerDirection) {
+				case 0:
+					this.player.anims.play("character-up-attack", true);
+					break;
+				case 1:
+					this.player.anims.play("character-right-attack", true);
+					break;
+				case 2:
+					this.player.anims.play("character-down-attack", true);
+					break;
+				case 3:
+					this.player.anims.play("character-left-attack", true);
+					break;
+			}
+			return;
+		}
+		if (this.cursors.space.isDown && this.framesSinceAttack === 0) {
+			this.framesSinceAttack = 50;
+		}
+
 		this.player.body.setVelocity(0);
 		this.player.setVisible(true);
 
@@ -255,24 +324,37 @@ export class Game extends Scene {
 
 		if (this.cursors.left.isDown) {
 			this.player.anims.play("character-left-walk", true);
+			this.playerDirection = SpriteLeft;
 		} else if (this.cursors.right.isDown) {
 			this.player.anims.play("character-right-walk", true);
+			this.playerDirection = SpriteRight;
 		} else if (this.cursors.down.isDown) {
 			this.player.anims.play("character-down-walk", true);
+			this.playerDirection = SpriteDown;
 		} else if (this.cursors.up.isDown) {
 			this.player.anims.play("character-up-walk", true);
+			this.playerDirection = SpriteUp;
 		} else {
-			this.player.anims.stop();
+			this.setPlayerIdleFrame();
+		}
+	}
 
-			if (prevVelocity.x < 0) {
+	setPlayerIdleFrame() {
+		// If the player stops moving, stop animations and reset the image to an idle frame in the correct direction.
+		this.player.anims.stop();
+		switch (this.playerDirection) {
+			case SpriteLeft:
 				this.player.setFrame(51);
-			} else if (prevVelocity.x > 0) {
+				return;
+			case SpriteRight:
 				this.player.setFrame(17);
-			} else if (prevVelocity.y < 0) {
+				return;
+			case SpriteUp:
 				this.player.setFrame(34);
-			} else if (prevVelocity.y > 0) {
+				return;
+			case SpriteDown:
 				this.player.setFrame(0);
-			}
+				return;
 		}
 	}
 }
