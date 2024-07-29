@@ -111,13 +111,14 @@ export class Game extends Scene {
 			repeat: -1,
 		});
 
+		const attackFrameRate = 10;
 		anims.create({
 			key: "character-down-attack",
 			frames: anims.generateFrameNumbers("character_attack", {
 				start: 0,
 				end: 3,
 			}),
-			frameRate: 15,
+			frameRate: attackFrameRate,
 			repeat: 0,
 		});
 		anims.create({
@@ -126,7 +127,7 @@ export class Game extends Scene {
 				start: 8,
 				end: 11,
 			}),
-			frameRate: 15,
+			frameRate: attackFrameRate,
 			repeat: 0,
 		});
 		anims.create({
@@ -135,7 +136,7 @@ export class Game extends Scene {
 				start: 4,
 				end: 7,
 			}),
-			frameRate: 15,
+			frameRate: attackFrameRate,
 			repeat: 0,
 		});
 		anims.create({
@@ -144,7 +145,7 @@ export class Game extends Scene {
 				start: 12,
 				end: 15,
 			}),
-			frameRate: 15,
+			frameRate: attackFrameRate,
 			repeat: 0,
 		});
 
@@ -298,6 +299,7 @@ export class Game extends Scene {
 
 		if (this.framesSinceAttack > 0) {
 			this.framesSinceAttack -= 1;
+
 			const playerDirection = this.playerDirection;
 			switch (playerDirection) {
 				case SpriteUp:
@@ -313,10 +315,16 @@ export class Game extends Scene {
 					this.player.anims.play("character-left-attack", true);
 					break;
 			}
+
+			// If the animation completes, stop the attack.
+			if (this.player.anims.getProgress() === 1) {
+				this.framesSinceAttack = 0;
+			}
+
 			return;
 		}
 		if (this.cursors.space.isDown && this.framesSinceAttack === 0) {
-			this.framesSinceAttack = 20;
+			this.framesSinceAttack = 40;
 		}
 
 		if (this.cursors.left.isDown) {
