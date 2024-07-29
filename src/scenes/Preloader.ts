@@ -31,11 +31,7 @@ export class Preloader extends Scene {
 		this.load.image("overworld_tiles", "Overworld.png");
 		this.load.tilemapTiledJSON("map", "overworld.json");
 
-		this.load.spritesheet("character", "character.png", {
-			frameWidth: 16,
-			frameHeight: 32,
-		});
-		this.load.spritesheet("character_attack", "character_attack.png", {
+		this.load.spritesheet("character", "character_sprite_sheet.png", {
 			frameWidth: 32,
 			frameHeight: 32,
 		});

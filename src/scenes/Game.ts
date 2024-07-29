@@ -14,6 +14,7 @@ type SpriteDirection =
 export class Game extends Scene {
 	cursors: Phaser.Types.Input.Keyboard.CursorKeys;
 	player: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
+	sword: Phaser.Physics.Arcade.Body;
 	enemies: Phaser.Physics.Arcade.Group;
 	characterSpeed: number = 80;
 	enemySpeed: number = 60;
@@ -57,7 +58,7 @@ export class Game extends Scene {
 		});
 
 		const camera = this.cameras.main;
-		camera.startFollow(this.player);
+		camera.startFollow(this.player, true, 0.2);
 		camera.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
 
 		if (!this.input.keyboard) {
@@ -83,8 +84,10 @@ export class Game extends Scene {
 		return this.characterSpeed;
 	}
 
-	setPlayerSpriteSize() {
+	setSwordHitbox() {
 		if (this.framesSinceAttack > 0) {
+			// Add hitbox for sword in direction of sprite
+
 			const xOffset = (() => {
 				if (this.playerDirection === SpriteLeft) {
 					return -16;
@@ -103,38 +106,40 @@ export class Game extends Scene {
 				}
 				return 0;
 			})();
-			this.player.setSize(32, 32).setOffset(xOffset, yOffset);
-		} else {
-			this.player.setSize(15, 20).setOffset(1, 14);
+			// FIXME
+			this.sword.position.x = this.player.x + xOffset;
+			this.sword.position.y = this.player.y + yOffset;
 		}
 	}
 
 	createPlayer(): void {
 		this.player = this.physics.add.sprite(400, 350, "character", 0);
-		this.setPlayerSpriteSize();
+		this.player.setSize(this.player.width * 0.55, this.player.height * 0.55);
+		this.sword = this.physics.add.body(400, 350, 24, 24);
+		this.setSwordHitbox();
 
 		const anims = this.anims;
 		anims.create({
 			key: "character-down-walk",
-			frames: anims.generateFrameNumbers("character", { start: 0, end: 3 }),
+			frames: anims.generateFrameNumbers("character", { start: 16, end: 19 }),
 			frameRate: 10,
 			repeat: -1,
 		});
 		anims.create({
 			key: "character-right-walk",
-			frames: anims.generateFrameNumbers("character", { start: 17, end: 20 }),
+			frames: anims.generateFrameNumbers("character", { start: 24, end: 27 }),
 			frameRate: 10,
 			repeat: -1,
 		});
 		anims.create({
 			key: "character-up-walk",
-			frames: anims.generateFrameNumbers("character", { start: 34, end: 37 }),
+			frames: anims.generateFrameNumbers("character", { start: 28, end: 31 }),
 			frameRate: 10,
 			repeat: -1,
 		});
 		anims.create({
 			key: "character-left-walk",
-			frames: anims.generateFrameNumbers("character", { start: 51, end: 54 }),
+			frames: anims.generateFrameNumbers("character", { start: 20, end: 23 }),
 			frameRate: 10,
 			repeat: -1,
 		});
@@ -142,7 +147,7 @@ export class Game extends Scene {
 		const attackFrameRate = 10;
 		anims.create({
 			key: "character-down-attack",
-			frames: anims.generateFrameNumbers("character_attack", {
+			frames: anims.generateFrameNumbers("character", {
 				start: 0,
 				end: 3,
 			}),
@@ -151,7 +156,7 @@ export class Game extends Scene {
 		});
 		anims.create({
 			key: "character-right-attack",
-			frames: anims.generateFrameNumbers("character_attack", {
+			frames: anims.generateFrameNumbers("character", {
 				start: 8,
 				end: 11,
 			}),
@@ -160,18 +165,18 @@ export class Game extends Scene {
 		});
 		anims.create({
 			key: "character-up-attack",
-			frames: anims.generateFrameNumbers("character_attack", {
-				start: 4,
-				end: 7,
+			frames: anims.generateFrameNumbers("character", {
+				start: 12,
+				end: 15,
 			}),
 			frameRate: attackFrameRate,
 			repeat: 0,
 		});
 		anims.create({
 			key: "character-left-attack",
-			frames: anims.generateFrameNumbers("character_attack", {
-				start: 12,
-				end: 15,
+			frames: anims.generateFrameNumbers("character", {
+				start: 4,
+				end: 7,
 			}),
 			frameRate: attackFrameRate,
 			repeat: 0,
@@ -314,7 +319,7 @@ export class Game extends Scene {
 	}
 
 	updatePlayer(): void {
-		this.setPlayerSpriteSize();
+		this.setSwordHitbox();
 		if (this.framesSincePlayerHit > 0) {
 			this.framesSincePlayerHit -= 1;
 			this.player.setVisible(
@@ -354,6 +359,7 @@ export class Game extends Scene {
 		}
 		if (this.cursors.space.isDown && this.framesSinceAttack === 0) {
 			this.framesSinceAttack = 40;
+			return;
 		}
 
 		if (this.cursors.left.isDown) {
@@ -389,20 +395,18 @@ export class Game extends Scene {
 	setPlayerIdleFrame() {
 		// If the player stops moving, stop animations and reset the image to an idle frame in the correct direction.
 		this.player.anims.stop();
-		// Reset the player sprite sheet to the walking one in case it was in some other sheet.
-		this.player.anims.startAnimation("character-down-walk");
 		switch (this.playerDirection) {
 			case SpriteLeft:
-				this.player.setFrame(51);
+				this.player.setFrame(20);
 				return;
 			case SpriteRight:
-				this.player.setFrame(17);
+				this.player.setFrame(24);
 				return;
 			case SpriteUp:
-				this.player.setFrame(34);
+				this.player.setFrame(28);
 				return;
 			case SpriteDown:
-				this.player.setFrame(0);
+				this.player.setFrame(16);
 				return;
 		}
 	}
