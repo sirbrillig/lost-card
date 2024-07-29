@@ -202,21 +202,21 @@ export class Game extends Scene {
 
 		// Bounce the player off the enemy in a random direction perpendicular to
 		// the movement of the enemy so we don't get hit again immediately.
-		const enemyDirection = this.getSpriteDirection(enemy.body);
+		const enemyDirection = this.getDirectionOfSpriteMovement(enemy.body);
 		const direction = Phaser.Math.Between(0, 1);
 		const bounceSpeed = this.getPlayerSpeed() * 4;
 		const bounceVelocity = direction === 1 ? bounceSpeed : -bounceSpeed;
 		switch (enemyDirection) {
-			case 0:
+			case SpriteUp:
 				player.body.setVelocityX(bounceVelocity);
 				break;
-			case 1:
+			case SpriteRight:
 				player.body.setVelocityY(bounceVelocity);
 				break;
-			case 2:
+			case SpriteDown:
 				player.body.setVelocityX(bounceVelocity);
 				break;
-			case 3:
+			case SpriteLeft:
 				player.body.setVelocityY(bounceVelocity);
 				break;
 		}
@@ -224,18 +224,20 @@ export class Game extends Scene {
 		this.framesSincePlayerHit = 10;
 	}
 
-	getSpriteDirection(body: Phaser.Physics.Arcade.Body): null | 0 | 1 | 2 | 3 {
+	getDirectionOfSpriteMovement(
+		body: Phaser.Physics.Arcade.Body
+	): null | SpriteDirection {
 		if (body.velocity.x > 0) {
-			return 1;
+			return SpriteRight;
 		}
 		if (body.velocity.x < 0) {
-			return 3;
+			return SpriteLeft;
 		}
 		if (body.velocity.y > 0) {
-			return 2;
+			return SpriteDown;
 		}
 		if (body.velocity.y < 0) {
-			return 0;
+			return SpriteUp;
 		}
 		return null;
 	}
@@ -245,25 +247,25 @@ export class Game extends Scene {
 
 		// If we are not moving, move in a random direction. If we are moving, keep
 		// moving in that direction.
-		const previousDirection = this.getSpriteDirection(body);
+		const previousDirection = this.getDirectionOfSpriteMovement(body);
 		const direction =
 			previousDirection === null
 				? Phaser.Math.Between(0, 3)
 				: previousDirection;
 		switch (direction) {
-			case 0:
+			case SpriteUp:
 				enemy.anims.play("logman-up-walk", true);
 				body.setVelocityY(-this.enemySpeed);
 				break;
-			case 1:
+			case SpriteRight:
 				enemy.anims.play("logman-right-walk", true);
 				body.setVelocityX(this.enemySpeed);
 				break;
-			case 2:
+			case SpriteDown:
 				enemy.anims.play("logman-down-walk", true);
 				body.setVelocityY(this.enemySpeed);
 				break;
-			case 3:
+			case SpriteLeft:
 				enemy.anims.play("logman-left-walk", true);
 				body.setVelocityX(-this.enemySpeed);
 				break;
@@ -287,16 +289,16 @@ export class Game extends Scene {
 			this.framesSinceAttack -= 1;
 			const playerDirection = this.playerDirection;
 			switch (playerDirection) {
-				case 0:
+				case SpriteUp:
 					this.player.anims.play("character-up-attack", true);
 					break;
-				case 1:
+				case SpriteRight:
 					this.player.anims.play("character-right-attack", true);
 					break;
-				case 2:
+				case SpriteDown:
 					this.player.anims.play("character-down-attack", true);
 					break;
-				case 3:
+				case SpriteLeft:
 					this.player.anims.play("character-left-attack", true);
 					break;
 			}
