@@ -150,7 +150,7 @@ export class Game extends Scene {
 
 	createPlayer(): void {
 		this.player = this.physics.add.sprite(400, 350, "character", 0);
-		this.player.setSize(this.player.width * 0.45, this.player.height * 0.45);
+		this.player.setSize(this.player.width * 0.35, this.player.height * 0.38);
 		const sword = this.physics.add.existing(
 			this.add.rectangle(400, 350, 20, 20)
 		);
@@ -268,7 +268,8 @@ export class Game extends Scene {
 			"logman",
 			0
 		);
-		creature.setSize(creature.width * 0.55, creature.height * 0.55);
+		creature.setSize(creature.width * 0.55, creature.height * 0.65);
+		creature.setOffset(creature.body.offset.x, creature.body.offset.y + 5);
 		this.enemies.add(creature);
 		this.physics.add.collider(creature, this.landLayer);
 		this.physics.add.collider(creature, this.objectLayer);
