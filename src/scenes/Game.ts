@@ -99,6 +99,25 @@ export class Game extends Scene {
 			this.physics.world.add(this.sword.body);
 			// Add hitbox for sword in direction of sprite
 
+			const width = (() => {
+				if (
+					this.playerDirection === SpriteLeft ||
+					this.playerDirection === SpriteRight
+				) {
+					return 15;
+				}
+				return 30;
+			})();
+			const height = (() => {
+				if (
+					this.playerDirection === SpriteUp ||
+					this.playerDirection === SpriteDown
+				) {
+					return 15;
+				}
+				return 30;
+			})();
+
 			const xOffset = (() => {
 				if (this.playerDirection === SpriteLeft) {
 					return -10;
@@ -118,6 +137,8 @@ export class Game extends Scene {
 				return 0;
 			})();
 
+			this.sword.body.setSize(width, height);
+
 			const playerX = this.player.x;
 			const playerY = this.player.y;
 			this.sword.x = playerX + xOffset;
@@ -129,7 +150,7 @@ export class Game extends Scene {
 
 	createPlayer(): void {
 		this.player = this.physics.add.sprite(400, 350, "character", 0);
-		this.player.setSize(this.player.width * 0.55, this.player.height * 0.55);
+		this.player.setSize(this.player.width * 0.45, this.player.height * 0.45);
 		const sword = this.physics.add.existing(
 			this.add.rectangle(400, 350, 20, 20)
 		);
