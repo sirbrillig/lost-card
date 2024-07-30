@@ -36,8 +36,8 @@ export class Game extends Scene {
 			return;
 		}
 
-		const landLayer = this.map.createLayer("Tile Layer 1", tileset, 0, 0);
-		const objectLayer = this.map.createLayer("Tile Layer 2", tileset, 0, 0);
+		const objectLayer = this.map.createLayer("TerrainLayer", tileset, 0, 0);
+		const landLayer = this.map.createLayer("ObjectsLayer", tileset, 0, 0);
 		if (!landLayer || !objectLayer) {
 			return;
 		}
@@ -256,7 +256,7 @@ export class Game extends Scene {
 		});
 
 		this.enemies = this.physics.add.group();
-		for (let x = 0; x < 2; x++) {
+		for (let x = 0; x < 10; x++) {
 			this.createEnemy();
 		}
 	}
