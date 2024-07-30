@@ -21,6 +21,7 @@ export class Game extends Scene {
 	framesSincePlayerHit: number = 0;
 	framesSinceAttack: number = 0;
 	playerDirection: SpriteDirection = SpriteDown;
+	map: Phaser.Tilemaps.Tilemap;
 	landLayer: Phaser.Tilemaps.TilemapLayer;
 	objectLayer: Phaser.Tilemaps.TilemapLayer;
 
@@ -29,16 +30,14 @@ export class Game extends Scene {
 	}
 
 	create() {
-		this.physics.world.createDebugGraphic();
-
-		const map = this.make.tilemap({ key: "map" });
-		const tileset = map.addTilesetImage("outside", "overworld_tiles");
+		this.map = this.make.tilemap({ key: "map" });
+		const tileset = this.map.addTilesetImage("outside", "overworld_tiles");
 		if (!tileset) {
 			return;
 		}
 
-		const landLayer = map.createLayer("Tile Layer 1", tileset, 0, 0);
-		const objectLayer = map.createLayer("Tile Layer 2", tileset, 0, 0);
+		const landLayer = this.map.createLayer("Tile Layer 1", tileset, 0, 0);
+		const objectLayer = this.map.createLayer("Tile Layer 2", tileset, 0, 0);
 		if (!landLayer || !objectLayer) {
 			return;
 		}
@@ -64,18 +63,21 @@ export class Game extends Scene {
 			this.playerHitEnemy(enemy);
 		});
 
-		const camera = this.cameras.main;
-		camera.startFollow(this.player, true, 0.2);
-		camera.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
-
 		if (!this.input.keyboard) {
-			return null;
+			throw new Error("No keyboard controls could be found");
 		}
-
 		this.cursors = this.input.keyboard.createCursorKeys();
 
+		this.setUpCamera();
+	}
+
+	setUpCamera(): void {
+		const camera = this.cameras.main;
+		camera.startFollow(this.player, true, 0.1);
+		camera.setZoom(2.5);
+
 		// Constrain the camera so that it isn't allowed to move outside the width/height of tilemap
-		camera.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
+		camera.setBounds(0, 0, this.map.widthInPixels, this.map.heightInPixels);
 	}
 
 	update() {
