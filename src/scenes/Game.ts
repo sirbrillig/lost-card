@@ -247,6 +247,7 @@ export class Game extends Scene {
 			"logman",
 			0
 		);
+		creature.setSize(creature.width * 0.55, creature.height * 0.55);
 		this.enemies.add(creature);
 		this.physics.add.collider(creature, this.landLayer);
 		this.physics.add.collider(creature, this.objectLayer);
