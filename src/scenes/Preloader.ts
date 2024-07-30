@@ -28,7 +28,7 @@ export class Preloader extends Scene {
 
 		this.load.image("logo", "logo.png");
 
-		this.load.image("overworld_tiles", "Overworld.png");
+		this.load.image("overworld_tiles", "overworld_extruded.png");
 		this.load.tilemapTiledJSON("map", "overworld.json");
 
 		this.load.spritesheet("character", "character_sprite_sheet.png", {
