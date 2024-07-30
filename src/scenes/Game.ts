@@ -94,7 +94,7 @@ export class Game extends Scene {
 	updateSwordHitbox() {
 		this.sword.body.setVelocity(0);
 		if (this.framesSinceAttack > 0) {
-			this.sword.setActive(true);
+			this.physics.world.add(this.sword.body);
 			// Add hitbox for sword in direction of sprite
 
 			const xOffset = (() => {
@@ -122,7 +122,7 @@ export class Game extends Scene {
 			this.sword.y = playerY + yOffset;
 			return;
 		}
-		this.sword.setActive(false);
+		this.physics.world.remove(this.sword.body);
 	}
 
 	createPlayer(): void {
@@ -131,6 +131,9 @@ export class Game extends Scene {
 		const sword = this.physics.add.existing(
 			this.add.rectangle(400, 350, 20, 20)
 		);
+		if (!isDynamicImage(sword)) {
+			throw new Error("Sword hitbox is not the right kind of object");
+		}
 		this.sword = sword;
 		this.updateSwordHitbox();
 
@@ -440,6 +443,13 @@ export class Game extends Scene {
 function isDynamicSprite(
 	obj: unknown
 ): obj is Phaser.Types.Physics.Arcade.SpriteWithDynamicBody {
-	const dynObj = obj as Phaser.Physics.Arcade.Body;
+	const dynObj = obj as Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
 	return "setVelocityX" in dynObj;
+}
+
+function isDynamicImage(
+	obj: unknown
+): obj is Phaser.Types.Physics.Arcade.ImageWithDynamicBody {
+	const dynObj = obj as Phaser.Types.Physics.Arcade.ImageWithDynamicBody;
+	return "body" in dynObj;
 }
