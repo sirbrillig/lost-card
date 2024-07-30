@@ -17,7 +17,7 @@ export class Game extends Scene {
 	sword: Phaser.Types.Physics.Arcade.ImageWithDynamicBody;
 	enemies: Phaser.Physics.Arcade.Group;
 	characterSpeed: number = 80;
-	enemySpeed: number = 60;
+	enemySpeed: number = 40;
 	framesSincePlayerHit: number = 0;
 	framesSinceAttack: number = 0;
 	playerDirection: SpriteDirection = SpriteDown;
