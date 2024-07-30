@@ -24,6 +24,7 @@ export class Game extends Scene {
 	map: Phaser.Tilemaps.Tilemap;
 	landLayer: Phaser.Tilemaps.TilemapLayer;
 	objectLayer: Phaser.Tilemaps.TilemapLayer;
+	foregroundObjectsLayer: Phaser.Tilemaps.TilemapLayer;
 
 	constructor() {
 		super("Game");
@@ -38,16 +39,25 @@ export class Game extends Scene {
 
 		const landLayer = this.map.createLayer("TerrainLayer", tileset, 0, 0);
 		const objectLayer = this.map.createLayer("ObjectsLayer", tileset, 0, 0);
-		if (!landLayer || !objectLayer) {
+		const foregroundObjectsLayer = this.map.createLayer(
+			"ForegroundObjects",
+			tileset,
+			0,
+			0
+		);
+		if (!landLayer || !objectLayer || !foregroundObjectsLayer) {
 			return;
 		}
 		this.landLayer = landLayer;
 		this.objectLayer = objectLayer;
+		this.foregroundObjectsLayer = foregroundObjectsLayer;
 
 		landLayer.setDepth(0);
-		objectLayer.setDepth(2);
+		objectLayer.setDepth(0);
+		foregroundObjectsLayer.setDepth(2);
 		landLayer.setCollisionByProperty({ collides: true });
 		objectLayer.setCollisionByProperty({ collides: true });
+		foregroundObjectsLayer.setCollisionByProperty({ collides: true });
 
 		this.createPlayer();
 		this.createEnemies();
@@ -152,7 +162,7 @@ export class Game extends Scene {
 
 	createPlayer(): void {
 		this.player = this.physics.add.sprite(400, 350, "character", 0);
-		this.player.setSize(this.player.width * 0.35, this.player.height * 0.38);
+		this.player.setSize(this.player.width * 0.35, this.player.height * 0.5);
 		this.player.setDepth(1);
 		const sword = this.physics.add.existing(
 			this.add.rectangle(400, 350, 20, 20)
@@ -229,6 +239,7 @@ export class Game extends Scene {
 
 		this.physics.add.collider(this.player, this.landLayer);
 		this.physics.add.collider(this.player, this.objectLayer);
+		this.physics.add.collider(this.player, this.foregroundObjectsLayer);
 		this.player.setCollideWorldBounds(true);
 	}
 
