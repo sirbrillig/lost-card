@@ -14,13 +14,13 @@ type SpriteDirection =
 export class Game extends Scene {
 	cursors: Phaser.Types.Input.Keyboard.CursorKeys;
 	player: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
-	sword: Phaser.Physics.Arcade.Body;
+	sword: Phaser.Types.Physics.Arcade.ImageWithDynamicBody;
 	enemies: Phaser.Physics.Arcade.Group;
 	characterSpeed: number = 80;
 	enemySpeed: number = 60;
 	framesSincePlayerHit: number = 0;
 	framesSinceAttack: number = 0;
-	playerDirection: SpriteDirection = 2;
+	playerDirection: SpriteDirection = SpriteDown;
 	landLayer: Phaser.Tilemaps.TilemapLayer;
 	objectLayer: Phaser.Tilemaps.TilemapLayer;
 
@@ -57,6 +57,13 @@ export class Game extends Scene {
 			}
 		});
 
+		this.physics.add.overlap(this.sword, this.enemies, (_, enemy) => {
+			if (!isDynamicSprite(enemy)) {
+				throw new Error("Enemy sprite is not valid for hitboxing with sword");
+			}
+			this.playerHitEnemy(enemy);
+		});
+
 		const camera = this.cameras.main;
 		camera.startFollow(this.player, true, 0.2);
 		camera.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
@@ -84,39 +91,48 @@ export class Game extends Scene {
 		return this.characterSpeed;
 	}
 
-	setSwordHitbox() {
+	updateSwordHitbox() {
+		this.sword.body.setVelocity(0);
 		if (this.framesSinceAttack > 0) {
+			this.sword.setActive(true);
 			// Add hitbox for sword in direction of sprite
 
 			const xOffset = (() => {
 				if (this.playerDirection === SpriteLeft) {
-					return -16;
+					return -10;
 				}
 				if (this.playerDirection === SpriteRight) {
-					return 16;
+					return 10;
 				}
 				return 0;
 			})();
 			const yOffset = (() => {
 				if (this.playerDirection === SpriteUp) {
-					return -16;
+					return -10;
 				}
 				if (this.playerDirection === SpriteDown) {
-					return 16;
+					return 10;
 				}
 				return 0;
 			})();
-			// FIXME
-			this.sword.position.x = this.player.x + xOffset;
-			this.sword.position.y = this.player.y + yOffset;
+
+			const playerX = this.player.x;
+			const playerY = this.player.y;
+			this.sword.x = playerX + xOffset;
+			this.sword.y = playerY + yOffset;
+			return;
 		}
+		this.sword.setActive(false);
 	}
 
 	createPlayer(): void {
 		this.player = this.physics.add.sprite(400, 350, "character", 0);
 		this.player.setSize(this.player.width * 0.55, this.player.height * 0.55);
-		this.sword = this.physics.add.body(400, 350, 24, 24);
-		this.setSwordHitbox();
+		const sword = this.physics.add.existing(
+			this.add.rectangle(400, 350, 20, 20)
+		);
+		this.sword = sword;
+		this.updateSwordHitbox();
 
 		const anims = this.anims;
 		anims.create({
@@ -233,16 +249,25 @@ export class Game extends Scene {
 		creature.setPushable(false);
 	}
 
-	enemyHitPlayer(
-		player: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody,
+	playerHitEnemy(
 		enemy: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody
 	): void {
 		if (this.framesSincePlayerHit > 0) {
 			return;
 		}
 
-		if (this.framesSinceAttack > 0) {
-			enemy.destroy();
+		if (this.framesSinceAttack === 0) {
+			return;
+		}
+
+		enemy.destroy();
+	}
+
+	enemyHitPlayer(
+		player: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody,
+		enemy: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody
+	): void {
+		if (this.framesSincePlayerHit > 0) {
 			return;
 		}
 
@@ -319,7 +344,7 @@ export class Game extends Scene {
 	}
 
 	updatePlayer(): void {
-		this.setSwordHitbox();
+		this.updateSwordHitbox();
 		if (this.framesSincePlayerHit > 0) {
 			this.framesSincePlayerHit -= 1;
 			this.player.setVisible(
