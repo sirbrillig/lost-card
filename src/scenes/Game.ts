@@ -74,7 +74,7 @@ export class Game extends Scene {
 	setUpCamera(): void {
 		const camera = this.cameras.main;
 		camera.startFollow(this.player, true, 0.1);
-		camera.setZoom(2.5);
+		camera.setZoom(5);
 
 		// Constrain the camera so that it isn't allowed to move outside the width/height of tilemap
 		camera.setBounds(0, 0, this.map.widthInPixels, this.map.heightInPixels);
