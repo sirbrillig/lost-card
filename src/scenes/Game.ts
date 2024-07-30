@@ -36,14 +36,16 @@ export class Game extends Scene {
 			return;
 		}
 
-		const objectLayer = this.map.createLayer("TerrainLayer", tileset, 0, 0);
-		const landLayer = this.map.createLayer("ObjectsLayer", tileset, 0, 0);
+		const landLayer = this.map.createLayer("TerrainLayer", tileset, 0, 0);
+		const objectLayer = this.map.createLayer("ObjectsLayer", tileset, 0, 0);
 		if (!landLayer || !objectLayer) {
 			return;
 		}
 		this.landLayer = landLayer;
 		this.objectLayer = objectLayer;
 
+		landLayer.setDepth(0);
+		objectLayer.setDepth(2);
 		landLayer.setCollisionByProperty({ collides: true });
 		objectLayer.setCollisionByProperty({ collides: true });
 
@@ -151,6 +153,7 @@ export class Game extends Scene {
 	createPlayer(): void {
 		this.player = this.physics.add.sprite(400, 350, "character", 0);
 		this.player.setSize(this.player.width * 0.35, this.player.height * 0.38);
+		this.player.setDepth(1);
 		const sword = this.physics.add.existing(
 			this.add.rectangle(400, 350, 20, 20)
 		);
