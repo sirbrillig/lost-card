@@ -57,7 +57,6 @@ export class Game extends Scene {
 		foregroundObjectsLayer.setDepth(2);
 		landLayer.setCollisionByProperty({ collides: true });
 		objectLayer.setCollisionByProperty({ collides: true });
-		foregroundObjectsLayer.setCollisionByProperty({ collides: true });
 
 		this.createPlayer();
 		this.createEnemies();
@@ -86,7 +85,7 @@ export class Game extends Scene {
 	setUpCamera(): void {
 		const camera = this.cameras.main;
 		camera.startFollow(this.player, true, 0.1);
-		camera.setZoom(5);
+		camera.setZoom(6);
 
 		// Constrain the camera so that it isn't allowed to move outside the width/height of tilemap
 		camera.setBounds(0, 0, this.map.widthInPixels, this.map.heightInPixels);
@@ -248,7 +247,6 @@ export class Game extends Scene {
 
 		this.physics.add.collider(this.player, this.landLayer);
 		this.physics.add.collider(this.player, this.objectLayer);
-		this.physics.add.collider(this.player, this.foregroundObjectsLayer);
 		this.player.setCollideWorldBounds(true);
 	}
 
