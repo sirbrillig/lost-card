@@ -161,7 +161,16 @@ export class Game extends Scene {
 	}
 
 	createPlayer(): void {
-		this.player = this.physics.add.sprite(400, 350, "character", 0);
+		const spawnPoint = this.map.findObject(
+			"MetaObjects",
+			(obj) => obj.name === "Start Point"
+		);
+		this.player = this.physics.add.sprite(
+			spawnPoint?.x ?? 400,
+			spawnPoint?.y ?? 350,
+			"character",
+			0
+		);
 		this.player.setSize(this.player.width * 0.35, this.player.height * 0.5);
 		this.player.setDepth(1);
 		const sword = this.physics.add.existing(
