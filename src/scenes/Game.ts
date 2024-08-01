@@ -102,10 +102,7 @@ export class Game extends Scene {
 			this.player.x + tileWidth,
 			this.player.y + tileHeight
 		);
-		if (room.x === undefined || room.y === undefined) {
-			throw new Error("Starting room has no position");
-		}
-		this.moveCameraToPosition(room.x, room.y);
+		this.moveCameraToRoom(room);
 
 		this.doors =
 			this.map.filterObjects("MetaObjects", (obj) => {
@@ -134,19 +131,23 @@ export class Game extends Scene {
 		// });
 	}
 
-	moveCameraToPosition(x: number, y: number) {
+	moveCameraToRoom(room: Phaser.Types.Tilemaps.TiledObject) {
 		const camera = this.cameras.main;
 		const zoomLevel = 6;
 		camera.setZoom(zoomLevel);
 
 		// This size is in-game pixels (corresponding to the tiles in the scene) that will be zoomed.
-		const room = this.getRoomForPoint(x, y);
-		if (!room.height || !room.width) {
-			throw new Error("Room has no size");
+		if (
+			room.x === undefined ||
+			room.y === undefined ||
+			!room.height ||
+			!room.width
+		) {
+			throw new Error("Cannot move camera: Room has no position or size");
 		}
 		const roomWidth = room.width;
 		const roomHeight = room.height;
-		camera.setBounds(x, y, roomWidth, roomHeight);
+		camera.setBounds(room.x, room.y, roomWidth, roomHeight);
 
 		// This size is the number of real screen pixels (not zoomed in-game pixels) to use to display the game.
 		camera.setSize(roomWidth * zoomLevel, roomHeight * zoomLevel);
@@ -207,11 +208,8 @@ export class Game extends Scene {
 
 		// if the player enters a door, move the camera to that room
 		const room = this.getRoomForPoint(this.player.x, this.player.y);
-		if (room.x === undefined || room.y === undefined) {
-			throw new Error("Room has no position");
-		}
 		console.log("moving camera to room", room);
-		this.moveCameraToPosition(room.x, room.y);
+		this.moveCameraToRoom(room);
 	}
 
 	getDoorDestinationCoordinates(
