@@ -230,7 +230,7 @@ export class Game extends Scene {
 			if (this.playerDirection === SpriteRight) {
 				return destinationTile.x + 18;
 			}
-			return destinationTile.x + 6;
+			return destinationTile.x + 8;
 		})();
 		const destinationY = (() => {
 			if (this.playerDirection === SpriteUp) {
