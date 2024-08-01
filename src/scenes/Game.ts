@@ -95,28 +95,31 @@ export class Game extends Scene {
 	}
 
 	setUpCamera(): void {
-		const camera = this.cameras.main;
 		// Focus the camera on the room that the player currently is in.
 		const tileWidth = 16;
 		const tileHeight = 16;
-		const [x, y] = this.getRoomCoodinatesForPoint(
+		const room = this.getRoomForPoint(
 			this.player.x + tileWidth,
 			this.player.y + tileHeight
 		);
-		this.moveCameraToPosition(x, y);
+		if (room.x === undefined || room.y === undefined) {
+			throw new Error("Starting room has no position");
+		}
+		this.moveCameraToPosition(room.x, room.y);
 
-		this.doors = this.map.filterObjects("MetaObjects", (obj) => {
-			if (!("properties" in obj)) {
-				return;
-			}
-			const destinationId = obj.properties.find(
-				(prop) => prop.name === "doorto"
-			)?.value;
-			if (!destinationId) {
-				return false;
-			}
-			return true;
-		});
+		this.doors =
+			this.map.filterObjects("MetaObjects", (obj) => {
+				if (!("properties" in obj)) {
+					return false;
+				}
+				const destinationId = obj.properties.find(
+					(prop) => prop.name === "doorto"
+				)?.value;
+				if (!destinationId) {
+					return false;
+				}
+				return true;
+			}) ?? [];
 		// this.doors.forEach((door) => {
 		// 	const doorX = door.x;
 		// 	const doorY = door.y - door.height;
@@ -131,30 +134,28 @@ export class Game extends Scene {
 		// });
 	}
 
-	moveCameraToRoomWithTile(tile: Phaser.Types.Tilemaps.TiledObject) {
-		const tileWidth = 16;
-		const [x, y] = this.getRoomCoodinatesForPoint(tile.x + tileWidth, tile.y);
-		this.moveCameraToPosition(x, y);
-	}
-
 	moveCameraToPosition(x: number, y: number) {
 		const camera = this.cameras.main;
-		camera.setZoom(6);
+		const zoomLevel = 6;
+		camera.setZoom(zoomLevel);
 
-		// This size s in-game pixels (corresponding to the tiles in the scene) that will be zoomed.
+		// This size is in-game pixels (corresponding to the tiles in the scene) that will be zoomed.
 		const room = this.getRoomForPoint(x, y);
+		if (!room.height || !room.width) {
+			throw new Error("Room has no size");
+		}
 		const roomWidth = room.width;
 		const roomHeight = room.height;
 		camera.setBounds(x, y, roomWidth, roomHeight);
 
 		// This size is the number of real screen pixels (not zoomed in-game pixels) to use to display the game.
-		camera.setSize(1150, 850);
+		camera.setSize(roomWidth * zoomLevel, roomHeight * zoomLevel);
 	}
 
 	getRoomForPoint(x: number, y: number): Phaser.Types.Tilemaps.TiledObject {
 		const rooms = this.map.filterObjects("MetaObjects", (obj) => {
 			if (!("properties" in obj)) {
-				return;
+				return false;
 			}
 			const roomName = obj.properties.find((prop) => prop.name === "room")
 				?.value;
@@ -165,6 +166,10 @@ export class Game extends Scene {
 		});
 		const room = rooms?.find((room) => {
 			if (
+				room.x !== undefined &&
+				room.y !== undefined &&
+				room.width &&
+				room.height &&
 				x >= room.x &&
 				x <= room.x + room.width &&
 				y >= room.y &&
@@ -179,16 +184,7 @@ export class Game extends Scene {
 		return room;
 	}
 
-	getRoomCoodinatesForPoint(x: number, y: number): [number, number] {
-		const roomWidth = 192;
-		const roomHeight = 144;
-		return [
-			Math.floor(x / roomWidth) * roomWidth,
-			Math.floor(y / roomHeight) * roomHeight,
-		];
-	}
-
-	handleCollideDoor(door) {
+	handleCollideDoor(door: Phaser.Types.Tilemaps.TiledObject) {
 		const destinationId = door.properties.find((prop) => prop.name === "doorto")
 			?.value;
 		if (!destinationId) {
@@ -204,29 +200,48 @@ export class Game extends Scene {
 		console.log("moving to tile", destinationTile);
 
 		// if the player enters a door, teleport them just past the corresponding door
-		const oneTileDistance = 5;
-		const destinationX = (() => {
-			if (this.playerDirection === SpriteLeft) {
-				return destinationTile.x - oneTileDistance;
-			}
-			if (this.playerDirection === SpriteRight) {
-				return destinationTile.x + oneTileDistance * 3;
-			}
-			return this.player.x;
-		})();
-		const destinationY = (() => {
-			if (this.playerDirection === SpriteUp) {
-				return destinationTile.y - oneTileDistance * 3;
-			}
-			if (this.playerDirection === SpriteDown) {
-				return destinationTile.y + oneTileDistance;
-			}
-			return this.player.y;
-		})();
+		const [destinationX, destinationY] =
+			this.getDoorDestinationCoordinates(destinationTile);
+		console.log("moving player to point", destinationX, destinationY);
 		this.movePlayerToPoint(destinationX, destinationY);
 
 		// if the player enters a door, move the camera to that room
-		this.moveCameraToRoomWithTile(destinationTile);
+		const room = this.getRoomForPoint(this.player.x, this.player.y);
+		if (room.x === undefined || room.y === undefined) {
+			throw new Error("Room has no position");
+		}
+		console.log("moving camera to room", room);
+		this.moveCameraToPosition(room.x, room.y);
+	}
+
+	getDoorDestinationCoordinates(
+		destinationTile: Phaser.Types.Tilemaps.TiledObject
+	): [number, number] {
+		if (destinationTile.x == undefined || destinationTile.y === undefined) {
+			throw new Error("Destination tile has no position");
+		}
+		// If the player enters a door, teleport them just past the corresponding
+		// door. That way they won't trigger the door on the other side and end up
+		// in a loop.
+		const destinationX = (() => {
+			if (this.playerDirection === SpriteLeft) {
+				return destinationTile.x - 6;
+			}
+			if (this.playerDirection === SpriteRight) {
+				return destinationTile.x + 18;
+			}
+			return destinationTile.x + 6;
+		})();
+		const destinationY = (() => {
+			if (this.playerDirection === SpriteUp) {
+				return destinationTile.y - 18;
+			}
+			if (this.playerDirection === SpriteDown) {
+				return destinationTile.y + 6;
+			}
+			return destinationTile.y - 6;
+		})();
+		return [destinationX, destinationY];
 	}
 
 	update() {
@@ -240,9 +255,17 @@ export class Game extends Scene {
 
 	maybeChangeRoom() {
 		const touchingDoor = this.doors.find((door) => {
+			if (
+				door.x === undefined ||
+				door.y === undefined ||
+				!door.height ||
+				!door.width
+			) {
+				throw new Error("Door has no position");
+			}
 			// Note: for reasons I don't understand, door.x and door.y are the
-			// lower-right corner of the tile so we have to adjust them to get the
-			// upper-right coordinates.
+			// lower-left corner of the tile so we have to adjust them to get the
+			// upper-left coordinates.
 			const doorX = door.x;
 			const doorY = door.y - door.height;
 			if (
