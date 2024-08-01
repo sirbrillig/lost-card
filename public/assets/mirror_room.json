@@ -101,6 +101,12 @@
                  "height":144,
                  "id":15,
                  "name":"MK1",
+                 "properties":[
+                        {
+                         "name":"room",
+                         "type":"string",
+                         "value":"MK1"
+                        }],
                  "rotation":0,
                  "type":"",
                  "visible":true,
@@ -112,6 +118,12 @@
                  "height":144,
                  "id":16,
                  "name":"MK2",
+                 "properties":[
+                        {
+                         "name":"room",
+                         "type":"string",
+                         "value":"MK2"
+                        }],
                  "rotation":0,
                  "type":"",
                  "visible":true,
@@ -126,7 +138,7 @@
          "y":0
         }],
  "nextlayerid":7,
- "nextobjectid":17,
+ "nextobjectid":18,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.0",

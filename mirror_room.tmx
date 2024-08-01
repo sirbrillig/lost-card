@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.0" orientation="orthogonal" renderorder="right-down" width="80" height="60" tilewidth="16" tileheight="16" infinite="0" nextlayerid="7" nextobjectid="17">
+<map version="1.10" tiledversion="1.11.0" orientation="orthogonal" renderorder="right-down" width="80" height="60" tilewidth="16" tileheight="16" infinite="0" nextlayerid="7" nextobjectid="18">
  <editorsettings>
   <export target="public/assets/mirror_room.json" format="json"/>
  </editorsettings>
@@ -7005,7 +7005,15 @@
     <property name="doorto" type="object" value="12"/>
    </properties>
   </object>
-  <object id="15" name="MK1" x="192" y="0" width="192" height="144"/>
-  <object id="16" name="MK2" x="0" y="0" width="192" height="144"/>
+  <object id="15" name="MK1" x="192" y="0" width="192" height="144">
+   <properties>
+    <property name="room" value="MK1"/>
+   </properties>
+  </object>
+  <object id="16" name="MK2" x="0" y="0" width="192" height="144">
+   <properties>
+    <property name="room" value="MK2"/>
+   </properties>
+  </object>
  </objectgroup>
 </map>

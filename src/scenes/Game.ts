@@ -96,7 +96,6 @@ export class Game extends Scene {
 
 	setUpCamera(): void {
 		const camera = this.cameras.main;
-		camera.setZoom(6);
 		// Focus the camera on the room that the player currently is in.
 		const tileWidth = 16;
 		const tileHeight = 16;
@@ -132,7 +131,44 @@ export class Game extends Scene {
 
 	moveCameraToPosition(x: number, y: number) {
 		const camera = this.cameras.main;
-		camera.setBounds(x, y, 190, 144);
+		camera.setZoom(6);
+
+		// This size s in-game pixels (corresponding to the tiles in the scene) that will be zoomed.
+		const room = this.getRoomForPoint(x, y);
+		const roomWidth = room.width;
+		const roomHeight = room.height;
+		camera.setBounds(x, y, roomWidth, roomHeight);
+
+		// This size is the number of real screen pixels (not zoomed in-game pixels) to use to display the game.
+		camera.setSize(1150, 1500);
+	}
+
+	getRoomForPoint(x: number, y: number): Phaser.Types.Tilemaps.TiledObject {
+		const rooms = this.map.filterObjects("MetaObjects", (obj) => {
+			if (!("properties" in obj)) {
+				return;
+			}
+			const roomName = obj.properties.find((prop) => prop.name === "room")
+				?.value;
+			if (!roomName) {
+				return false;
+			}
+			return true;
+		});
+		const room = rooms?.find((room) => {
+			if (
+				x >= room.x &&
+				x <= room.x + room.width &&
+				y >= room.y &&
+				y <= room.y + room.height
+			) {
+				return room;
+			}
+		});
+		if (!room) {
+			throw new Error(`No room found for position ${x},${y}`);
+		}
+		return room;
 	}
 
 	getRoomCoodinatesForPoint(x: number, y: number): [number, number] {
