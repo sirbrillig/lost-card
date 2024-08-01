@@ -22,44 +22,30 @@ export class Game extends Scene {
 	framesSinceAttack: number = 0;
 	playerDirection: SpriteDirection = SpriteDown;
 	map: Phaser.Tilemaps.Tilemap;
+
 	landLayer: Phaser.Tilemaps.TilemapLayer;
-	objectLayer: Phaser.Tilemaps.TilemapLayer;
-	foregroundObjectsLayer: Phaser.Tilemaps.TilemapLayer;
+	doorsLayer: Phaser.Tilemaps.TilemapLayer;
+	stuffLayer: Phaser.Tilemaps.TilemapLayer;
 
 	constructor() {
 		super("Game");
 	}
 
 	create() {
+		// this.physics.world.createDebugGraphic();
+
 		this.map = this.make.tilemap({ key: "map" });
-		const tileset = this.map.addTilesetImage("outside", "overworld_tiles");
+		const tileset = this.map.addTilesetImage("Final_Tileset", "dungeon_tiles");
 		if (!tileset) {
-			return;
+			throw new Error("Could not make tileset");
 		}
-
-		const landLayer = this.map.createLayer("TerrainLayer", tileset, 0, 0);
-		const objectLayer = this.map.createLayer("ObjectsLayer", tileset, 0, 0);
-		const foregroundObjectsLayer = this.map.createLayer(
-			"ForegroundObjects",
-			tileset,
-			0,
-			0
-		);
-		if (!landLayer || !objectLayer || !foregroundObjectsLayer) {
-			return;
-		}
-		this.landLayer = landLayer;
-		this.objectLayer = objectLayer;
-		this.foregroundObjectsLayer = foregroundObjectsLayer;
-
-		landLayer.setDepth(0);
-		objectLayer.setDepth(0);
-		foregroundObjectsLayer.setDepth(2);
-		landLayer.setCollisionByProperty({ collides: true });
-		objectLayer.setCollisionByProperty({ collides: true });
 
 		this.createPlayer();
 		this.createEnemies();
+
+		this.landLayer = this.createTileLayer("Background", tileset, 0);
+		this.doorsLayer = this.createTileLayer("Doors", tileset, 0);
+		this.stuffLayer = this.createTileLayer("Stuff", tileset, 0);
 
 		this.physics.add.collider(this.player, this.enemies, (player, enemy) => {
 			if (isDynamicSprite(player) && isDynamicSprite(enemy)) {
@@ -80,6 +66,22 @@ export class Game extends Scene {
 		this.cursors = this.input.keyboard.createCursorKeys();
 
 		this.setUpCamera();
+	}
+
+	createTileLayer(
+		layerName: string,
+		tileset: Phaser.Tilemaps.Tileset,
+		depth: number
+	): Phaser.Tilemaps.TilemapLayer {
+		const layer = this.map.createLayer(layerName, tileset, 0, 0);
+		if (!layer) {
+			throw new Error("Could not open tileset layers");
+		}
+		layer.setDepth(depth);
+		layer.setCollisionByProperty({ collides: true });
+		this.physics.add.collider(this.player, layer);
+		this.physics.add.collider(this.enemies, layer);
+		return layer;
 	}
 
 	setUpCamera(): void {
@@ -244,9 +246,6 @@ export class Game extends Scene {
 			frameRate: attackFrameRate,
 			repeat: 0,
 		});
-
-		this.physics.add.collider(this.player, this.landLayer);
-		this.physics.add.collider(this.player, this.objectLayer);
 		this.player.setCollideWorldBounds(true);
 	}
 
@@ -277,7 +276,7 @@ export class Game extends Scene {
 		});
 
 		this.enemies = this.physics.add.group();
-		for (let x = 0; x < 10; x++) {
+		for (let x = 0; x < 0; x++) {
 			this.createEnemy();
 		}
 	}
@@ -292,8 +291,6 @@ export class Game extends Scene {
 		creature.setSize(creature.width * 0.55, creature.height * 0.65);
 		creature.setOffset(creature.body.offset.x, creature.body.offset.y + 5);
 		this.enemies.add(creature);
-		this.physics.add.collider(creature, this.landLayer);
-		this.physics.add.collider(creature, this.objectLayer);
 		creature.setCollideWorldBounds(true);
 		creature.setPushable(false);
 	}

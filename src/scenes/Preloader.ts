@@ -28,8 +28,8 @@ export class Preloader extends Scene {
 
 		this.load.image("logo", "logo.png");
 
-		this.load.image("overworld_tiles", "overworld_extruded.png");
-		this.load.tilemapTiledJSON("map", "overworld.json");
+		this.load.image("dungeon_tiles", "Final_Tileset.png");
+		this.load.tilemapTiledJSON("map", "mirror_room.json");
 
 		this.load.spritesheet("character", "character_sprite_sheet.png", {
 			frameWidth: 32,
