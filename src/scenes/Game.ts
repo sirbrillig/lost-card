@@ -117,15 +117,23 @@ export class Game extends Scene {
 			}
 			return true;
 		});
+		// this.doors.forEach((door) => {
+		// 	const doorX = door.x;
+		// 	const doorY = door.y - door.height;
+		// 	const rect = this.add.rectangle(
+		// 		doorX,
+		// 		doorY,
+		// 		door.width,
+		// 		door.height,
+		// 		0xf00
+		// 	);
+		// 	rect.setOrigin(0, 0);
+		// });
 	}
 
 	moveCameraToRoomWithTile(tile: Phaser.Types.Tilemaps.TiledObject) {
 		const tileWidth = 16;
-		const tileHeight = 16;
-		const [x, y] = this.getRoomCoodinatesForPoint(
-			tile.x + tileWidth,
-			tile.y + tileHeight
-		);
+		const [x, y] = this.getRoomCoodinatesForPoint(tile.x + tileWidth, tile.y);
 		this.moveCameraToPosition(x, y);
 	}
 
@@ -140,7 +148,7 @@ export class Game extends Scene {
 		camera.setBounds(x, y, roomWidth, roomHeight);
 
 		// This size is the number of real screen pixels (not zoomed in-game pixels) to use to display the game.
-		camera.setSize(1150, 1500);
+		camera.setSize(1150, 850);
 	}
 
 	getRoomForPoint(x: number, y: number): Phaser.Types.Tilemaps.TiledObject {
@@ -193,6 +201,31 @@ export class Game extends Scene {
 		if (!destinationTile) {
 			throw new Error("Hit door without destination tile");
 		}
+		console.log("moving to tile", destinationTile);
+
+		// if the player enters a door, teleport them just past the corresponding door
+		const oneTileDistance = 5;
+		const destinationX = (() => {
+			if (this.playerDirection === SpriteLeft) {
+				return destinationTile.x - oneTileDistance;
+			}
+			if (this.playerDirection === SpriteRight) {
+				return destinationTile.x + oneTileDistance * 3;
+			}
+			return this.player.x;
+		})();
+		const destinationY = (() => {
+			if (this.playerDirection === SpriteUp) {
+				return destinationTile.y - oneTileDistance * 3;
+			}
+			if (this.playerDirection === SpriteDown) {
+				return destinationTile.y + oneTileDistance;
+			}
+			return this.player.y;
+		})();
+		this.movePlayerToPoint(destinationX, destinationY);
+
+		// if the player enters a door, move the camera to that room
 		this.moveCameraToRoomWithTile(destinationTile);
 	}
 
@@ -205,42 +238,24 @@ export class Game extends Scene {
 		this.updatePlayer();
 	}
 
-	updateRoomPosition() {
+	maybeChangeRoom() {
 		const touchingDoor = this.doors.find((door) => {
+			// Note: for reasons I don't understand, door.x and door.y are the
+			// lower-right corner of the tile so we have to adjust them to get the
+			// upper-right coordinates.
+			const doorX = door.x;
+			const doorY = door.y - door.height;
 			if (
-				this.player.x >= door.x &&
-				this.player.x < door.x + 16 &&
-				this.player.y >= door.y - 16 &&
-				this.player.y < door.y - 16 + 16
+				this.player.x >= doorX &&
+				this.player.x < doorX + door.width &&
+				this.player.y >= doorY &&
+				this.player.y < doorY + door.height
 			) {
 				return true;
 			}
 			return false;
 		});
-		// if the player enters a door, teleport them to the corresponding door
 		if (touchingDoor) {
-			const oneTileDistance = 16;
-			const destinationX = (() => {
-				if (this.playerDirection === SpriteLeft) {
-					return touchingDoor.x - oneTileDistance;
-				}
-				if (this.playerDirection === SpriteRight) {
-					return touchingDoor.x + oneTileDistance * 2;
-				}
-				return this.player.x;
-			})();
-			const destinationY = (() => {
-				if (this.playerDirection === SpriteUp) {
-					return touchingDoor.y - oneTileDistance;
-				}
-				if (this.playerDirection === SpriteDown) {
-					return touchingDoor.y + oneTileDistance * 2;
-				}
-				return this.player.y;
-			})();
-			this.movePlayerToPoint(destinationX, destinationY);
-
-			// if the player enters a door, move the camera to that room
 			this.handleCollideDoor(touchingDoor);
 		}
 	}
@@ -597,19 +612,19 @@ export class Game extends Scene {
 		if (this.cursors.left.isDown) {
 			this.player.anims.play("character-left-walk", true);
 			this.playerDirection = SpriteLeft;
-			this.updateRoomPosition();
+			this.maybeChangeRoom();
 		} else if (this.cursors.right.isDown) {
 			this.player.anims.play("character-right-walk", true);
 			this.playerDirection = SpriteRight;
-			this.updateRoomPosition();
+			this.maybeChangeRoom();
 		} else if (this.cursors.down.isDown) {
 			this.player.anims.play("character-down-walk", true);
 			this.playerDirection = SpriteDown;
-			this.updateRoomPosition();
+			this.maybeChangeRoom();
 		} else if (this.cursors.up.isDown) {
 			this.player.anims.play("character-up-walk", true);
 			this.playerDirection = SpriteUp;
-			this.updateRoomPosition();
+			this.maybeChangeRoom();
 		} else {
 			this.setPlayerIdleFrame();
 		}
