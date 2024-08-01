@@ -18,14 +18,17 @@ export class Game extends Scene {
 	enemies: Phaser.Physics.Arcade.Group;
 	characterSpeed: number = 80;
 	enemySpeed: number = 40;
+
 	framesSincePlayerHit: number = 0;
 	framesSinceAttack: number = 0;
 	playerDirection: SpriteDirection = SpriteDown;
-	map: Phaser.Tilemaps.Tilemap;
 
+	map: Phaser.Tilemaps.Tilemap;
 	landLayer: Phaser.Tilemaps.TilemapLayer;
 	doorsLayer: Phaser.Tilemaps.TilemapLayer;
 	stuffLayer: Phaser.Tilemaps.TilemapLayer;
+
+	doors: Phaser.Types.Tilemaps.TiledObject[];
 
 	constructor() {
 		super("Game");
@@ -60,6 +63,13 @@ export class Game extends Scene {
 			this.playerHitEnemy(enemy);
 		});
 
+		this.physics.add.overlap(this.player, this.enemies, (_, enemy) => {
+			if (!isDynamicSprite(enemy)) {
+				throw new Error("Enemy sprite is not valid for hitboxing with sword");
+			}
+			this.playerHitEnemy(enemy);
+		});
+
 		if (!this.input.keyboard) {
 			throw new Error("No keyboard controls could be found");
 		}
@@ -86,11 +96,68 @@ export class Game extends Scene {
 
 	setUpCamera(): void {
 		const camera = this.cameras.main;
-		camera.startFollow(this.player, true, 0.1);
 		camera.setZoom(6);
+		// Focus the camera on the room that the player currently is in.
+		const tileWidth = 16;
+		const tileHeight = 16;
+		const [x, y] = this.getRoomCoodinatesForPoint(
+			this.player.x + tileWidth,
+			this.player.y + tileHeight
+		);
+		this.moveCameraToPosition(x, y);
 
-		// Constrain the camera so that it isn't allowed to move outside the width/height of tilemap
-		camera.setBounds(0, 0, this.map.widthInPixels, this.map.heightInPixels);
+		this.doors = this.map.filterObjects("MetaObjects", (obj) => {
+			if (!("properties" in obj)) {
+				return;
+			}
+			const destinationId = obj.properties.find(
+				(prop) => prop.name === "doorto"
+			)?.value;
+			if (!destinationId) {
+				return false;
+			}
+			return true;
+		});
+	}
+
+	moveCameraToRoomWithTile(tile: Phaser.Types.Tilemaps.TiledObject) {
+		const tileWidth = 16;
+		const tileHeight = 16;
+		const [x, y] = this.getRoomCoodinatesForPoint(
+			tile.x + tileWidth,
+			tile.y + tileHeight
+		);
+		this.moveCameraToPosition(x, y);
+	}
+
+	moveCameraToPosition(x: number, y: number) {
+		const camera = this.cameras.main;
+		camera.setBounds(x, y, 190, 144);
+	}
+
+	getRoomCoodinatesForPoint(x: number, y: number): [number, number] {
+		const roomWidth = 192;
+		const roomHeight = 144;
+		return [
+			Math.floor(x / roomWidth) * roomWidth,
+			Math.floor(y / roomHeight) * roomHeight,
+		];
+	}
+
+	handleCollideDoor(door) {
+		const destinationId = door.properties.find((prop) => prop.name === "doorto")
+			?.value;
+		if (!destinationId) {
+			throw new Error("Hit door without destination id");
+		}
+		const destinationTile = this.map.findObject(
+			"MetaObjects",
+			(obj) => obj.id === destinationId
+		);
+		if (!destinationTile) {
+			throw new Error("Hit door without destination tile");
+		}
+		this.moveCameraToRoomWithTile(destinationTile);
 	}
 
 	update() {
@@ -100,6 +167,50 @@ export class Game extends Scene {
 			}
 		});
 		this.updatePlayer();
+	}
+
+	updateRoomPosition() {
+		const touchingDoor = this.doors.find((door) => {
+			if (
+				this.player.x >= door.x &&
+				this.player.x < door.x + 16 &&
+				this.player.y >= door.y - 16 &&
+				this.player.y < door.y - 16 + 16
+			) {
+				return true;
+			}
+			return false;
+		});
+		// if the player enters a door, teleport them to the corresponding door
+		if (touchingDoor) {
+			const oneTileDistance = 16;
+			const destinationX = (() => {
+				if (this.playerDirection === SpriteLeft) {
+					return touchingDoor.x - oneTileDistance;
+				}
+				if (this.playerDirection === SpriteRight) {
+					return touchingDoor.x + oneTileDistance * 2;
+				}
+				return this.player.x;
+			})();
+			const destinationY = (() => {
+				if (this.playerDirection === SpriteUp) {
+					return touchingDoor.y - oneTileDistance;
+				}
+				if (this.playerDirection === SpriteDown) {
+					return touchingDoor.y + oneTileDistance * 2;
+				}
+				return this.player.y;
+			})();
+			this.movePlayerToPoint(destinationX, destinationY);
+
+			// if the player enters a door, move the camera to that room
+			this.handleCollideDoor(touchingDoor);
+		}
+	}
+
+	movePlayerToPoint(x: number, y: number) {
+		this.player.setPosition(x, y);
 	}
 
 	getPlayerSpeed(): number {
@@ -172,7 +283,8 @@ export class Game extends Scene {
 			"character",
 			0
 		);
-		this.player.setSize(this.player.width * 0.35, this.player.height * 0.5);
+		this.player.setDisplaySize(24, 24);
+		this.player.setSize(this.player.width * 0.35, this.player.height * 0.35);
 		this.player.setDepth(1);
 		const sword = this.physics.add.existing(
 			this.add.rectangle(400, 350, 20, 20)
@@ -449,15 +561,19 @@ export class Game extends Scene {
 		if (this.cursors.left.isDown) {
 			this.player.anims.play("character-left-walk", true);
 			this.playerDirection = SpriteLeft;
+			this.updateRoomPosition();
 		} else if (this.cursors.right.isDown) {
 			this.player.anims.play("character-right-walk", true);
 			this.playerDirection = SpriteRight;
+			this.updateRoomPosition();
 		} else if (this.cursors.down.isDown) {
 			this.player.anims.play("character-down-walk", true);
 			this.playerDirection = SpriteDown;
+			this.updateRoomPosition();
 		} else if (this.cursors.up.isDown) {
 			this.player.anims.play("character-up-walk", true);
 			this.playerDirection = SpriteUp;
+			this.updateRoomPosition();
 		} else {
 			this.setPlayerIdleFrame();
 		}
