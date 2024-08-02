@@ -58,8 +58,8 @@
                  "type":"",
                  "visible":true,
                  "width":0,
-                 "x":528.514970783163,
-                 "y":113.187865909743
+                 "x":294.880788217186,
+                 "y":57.207059329142
                 }, 
                 {
                  "gid":1073,
@@ -395,6 +395,42 @@
                  "width":16,
                  "x":416,
                  "y":16
+                }, 
+                {
+                 "height":0,
+                 "id":45,
+                 "name":"MonsterA",
+                 "point":true,
+                 "properties":[
+                        {
+                         "name":"isMonster",
+                         "type":"bool",
+                         "value":true
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":207.928710156518,
+                 "y":172.512281503485
+                }, 
+                {
+                 "height":0,
+                 "id":46,
+                 "name":"MonsterA",
+                 "point":true,
+                 "properties":[
+                        {
+                         "name":"isMonster",
+                         "type":"bool",
+                         "value":true
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":207.357477436308,
+                 "y":203.358848394836
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -403,7 +439,7 @@
          "y":0
         }],
  "nextlayerid":7,
- "nextobjectid":45,
+ "nextobjectid":47,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.0",

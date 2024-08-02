@@ -182,6 +182,7 @@ export class Game extends Scene {
 				});
 			}
 		});
+		// TODO: hide all creatures too
 	}
 
 	getTilesInRoom(room: Phaser.Types.Tilemaps.TiledObject) {
@@ -512,18 +513,23 @@ export class Game extends Scene {
 		});
 
 		this.enemies = this.physics.add.group();
-		for (let x = 0; x < 0; x++) {
-			this.createEnemy();
-		}
+		const spawnPoints = this.map.filterObjects("MetaObjects", (obj) => {
+			const isMonster = obj.properties?.find(
+				(prop) => prop.name === "isMonster"
+			)?.value;
+			return isMonster === true;
+		});
+		spawnPoints?.forEach((point) => {
+			if (point.x !== undefined && point.y !== undefined) {
+				console.log("creating monster at", point.x, point.y);
+				this.createEnemy(point.x, point.y);
+			}
+		});
 	}
 
-	createEnemy(): void {
-		let creature = this.physics.add.sprite(
-			Phaser.Math.Between(10, 800),
-			Phaser.Math.Between(10, 600),
-			"logman",
-			0
-		);
+	createEnemy(x: number, y: number): void {
+		const creature = this.physics.add.sprite(x, y, "logman", 0);
+		creature.setDepth(1);
 		creature.setSize(creature.width * 0.55, creature.height * 0.65);
 		creature.setOffset(creature.body.offset.x, creature.body.offset.y + 5);
 		this.enemies.add(creature);
