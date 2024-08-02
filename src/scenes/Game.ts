@@ -148,9 +148,61 @@ export class Game extends Scene {
 		const roomWidth = room.width;
 		const roomHeight = room.height;
 		camera.setBounds(room.x, room.y, roomWidth, roomHeight);
+		camera.useBounds = false;
 
-		// This size is the number of real screen pixels (not zoomed in-game pixels) to use to display the game.
-		camera.setSize(roomWidth * zoomLevel, roomHeight * zoomLevel);
+		camera.startFollow(this.player);
+
+		this.hideAllRoomsExcept(room);
+	}
+
+	hideAllRoomsExcept(room: Phaser.Types.Tilemaps.TiledObject) {
+		const rooms =
+			this.map.filterObjects("MetaObjects", (obj) => {
+				if (!("properties" in obj)) {
+					return false;
+				}
+				const roomName = obj.properties.find((prop) => prop.name === "room")
+					?.value;
+				if (!roomName) {
+					return false;
+				}
+				return true;
+			}) ?? [];
+		rooms.forEach((obj) => {
+			const tiles = this.getTilesInRoom(obj);
+			if (obj.id === room.id) {
+				// show room
+				tiles.forEach((tile) => {
+					tile.visible = true;
+				});
+			} else {
+				// hide room
+				tiles.forEach((tile) => {
+					tile.visible = false;
+				});
+			}
+		});
+	}
+
+	getTilesInRoom(room: Phaser.Types.Tilemaps.TiledObject) {
+		const tiles: Phaser.Tilemaps.Tile[] = [];
+		this.map.getTileLayerNames().forEach(
+			(layer) =>
+				this.map
+					.getTilesWithinWorldXY(
+						room.x ?? 0,
+						room.y ?? 0,
+						room.width ?? 0,
+						room.height ?? 0,
+						undefined,
+						undefined,
+						layer
+					)
+					?.forEach((tile) => {
+						tiles.push(tile);
+					})
+		);
+		return tiles;
 	}
 
 	getRoomForPoint(x: number, y: number): Phaser.Types.Tilemaps.TiledObject {
