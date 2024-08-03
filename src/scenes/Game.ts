@@ -155,34 +155,47 @@ export class Game extends Scene {
 		this.hideAllRoomsExcept(room);
 	}
 
-	hideAllRoomsExcept(room: Phaser.Types.Tilemaps.TiledObject) {
-		const rooms =
-			this.map.filterObjects("MetaObjects", (obj) => {
-				if (!("properties" in obj)) {
-					return false;
-				}
-				const roomName = obj.properties.find((prop) => prop.name === "room")
-					?.value;
-				if (!roomName) {
-					return false;
-				}
-				return true;
-			}) ?? [];
-		rooms.forEach((obj) => {
-			const tiles = this.getTilesInRoom(obj);
-			if (obj.id === room.id) {
+	hideAllRoomsExcept(activeRoom: Phaser.Types.Tilemaps.TiledObject) {
+		const rooms = this.getRooms();
+		rooms.forEach((room) => {
+			const tiles = this.getTilesInRoom(room);
+			if (activeRoom.id === room.id) {
 				// show room
 				tiles.forEach((tile) => {
 					tile.visible = true;
+				});
+				this.getEnemiesInRoom(room).forEach((enemy) => {
+					enemy.setVisible(true);
 				});
 			} else {
 				// hide room
 				tiles.forEach((tile) => {
 					tile.visible = false;
 				});
+				this.getEnemiesInRoom(room).forEach((enemy) => {
+					enemy.setVisible(false);
+				});
 			}
 		});
-		// TODO: hide all creatures too
+	}
+
+	getEnemiesInRoom(
+		room: Phaser.Types.Tilemaps.TiledObject
+	): Phaser.GameObjects.GameObject[] {
+		return this.enemies.getChildren().filter((enemy) => {
+			const isIt = this.isEnemyInRoom(enemy, room);
+			return isIt;
+		});
+	}
+
+	isEnemyInRoom(
+		enemy: Phaser.GameObjects.GameObject,
+		room: Phaser.Types.Tilemaps.TiledObject
+	): boolean {
+		if (!isDynamicSprite(enemy)) {
+			throw new Error("Enemy is not dynamic");
+		}
+		return this.isPointInRoom(enemy.body.x, enemy.body.y, room);
 	}
 
 	getTilesInRoom(room: Phaser.Types.Tilemaps.TiledObject) {
@@ -206,29 +219,45 @@ export class Game extends Scene {
 		return tiles;
 	}
 
-	getRoomForPoint(x: number, y: number): Phaser.Types.Tilemaps.TiledObject {
-		const rooms = this.map.filterObjects("MetaObjects", (obj) => {
-			if (!("properties" in obj)) {
-				return false;
-			}
-			const roomName = obj.properties.find((prop) => prop.name === "room")
-				?.value;
-			if (!roomName) {
-				return false;
-			}
+	getRooms(): Phaser.Types.Tilemaps.TiledObject[] {
+		return (
+			this.map.filterObjects("MetaObjects", (obj) => {
+				if (!("properties" in obj)) {
+					return false;
+				}
+				const roomName = obj.properties.find((prop) => prop.name === "room")
+					?.value;
+				if (!roomName) {
+					return false;
+				}
+				return true;
+			}) ?? []
+		);
+	}
+
+	isPointInRoom(
+		x: number,
+		y: number,
+		room: Phaser.Types.Tilemaps.TiledObject
+	): boolean {
+		if (
+			room.x !== undefined &&
+			room.y !== undefined &&
+			room.width &&
+			room.height &&
+			x >= room.x &&
+			x <= room.x + room.width &&
+			y >= room.y &&
+			y <= room.y + room.height
+		) {
 			return true;
-		});
-		const room = rooms?.find((room) => {
-			if (
-				room.x !== undefined &&
-				room.y !== undefined &&
-				room.width &&
-				room.height &&
-				x >= room.x &&
-				x <= room.x + room.width &&
-				y >= room.y &&
-				y <= room.y + room.height
-			) {
+		}
+		return false;
+	}
+
+	getRoomForPoint(x: number, y: number): Phaser.Types.Tilemaps.TiledObject {
+		const room = this.getRooms().find((room) => {
+			if (this.isPointInRoom(x, y, room)) {
 				return room;
 			}
 		});
@@ -528,13 +557,13 @@ export class Game extends Scene {
 	}
 
 	createEnemy(x: number, y: number): void {
-		const creature = this.physics.add.sprite(x, y, "logman", 0);
-		creature.setDepth(1);
-		creature.setSize(creature.width * 0.55, creature.height * 0.65);
-		creature.setOffset(creature.body.offset.x, creature.body.offset.y + 5);
-		this.enemies.add(creature);
-		creature.setCollideWorldBounds(true);
-		creature.setPushable(false);
+		const enemy = this.physics.add.sprite(x, y, "logman", 0);
+		enemy.setDepth(1);
+		enemy.setSize(enemy.width * 0.55, enemy.height * 0.65);
+		enemy.setOffset(enemy.body.offset.x, enemy.body.offset.y + 5);
+		this.enemies.add(enemy);
+		enemy.setCollideWorldBounds(true);
+		enemy.setPushable(false);
 	}
 
 	playerHitEnemy(
