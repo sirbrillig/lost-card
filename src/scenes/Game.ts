@@ -558,12 +558,18 @@ export class Game extends Scene {
 		spawnPoints?.forEach((point) => {
 			if (point.x !== undefined && point.y !== undefined) {
 				console.log("creating monster at", point.x, point.y);
-				this.createEnemy(point.x, point.y);
+				const enemy = this.createEnemy(point.x, point.y);
+				const isBoss = point.properties.find(
+					(prop: { name: string }) => prop.name === "isBoss"
+				);
+				if (isBoss) {
+					enemy.setScale(3);
+				}
 			}
 		});
 	}
 
-	createEnemy(x: number, y: number): void {
+	createEnemy(x: number, y: number) {
 		const enemy = this.physics.add.sprite(x, y, "logman", 0);
 		enemy.setDepth(1);
 		enemy.setSize(enemy.width * 0.55, enemy.height * 0.65);
@@ -571,6 +577,7 @@ export class Game extends Scene {
 		this.enemies.add(enemy);
 		enemy.setCollideWorldBounds(true);
 		enemy.setPushable(false);
+		return enemy;
 	}
 
 	playerHitEnemy(

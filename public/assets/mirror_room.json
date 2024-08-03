@@ -431,6 +431,29 @@
                  "width":0,
                  "x":137.029279177768,
                  "y":187.730359892938
+                }, 
+                {
+                 "height":0,
+                 "id":47,
+                 "name":"BossA",
+                 "point":true,
+                 "properties":[
+                        {
+                         "name":"isBoss",
+                         "type":"bool",
+                         "value":true
+                        }, 
+                        {
+                         "name":"isMonster",
+                         "type":"bool",
+                         "value":true
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":528.019647242688,
+                 "y":58.0486715784773
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -439,7 +462,7 @@
          "y":0
         }],
  "nextlayerid":7,
- "nextobjectid":47,
+ "nextobjectid":48,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.0",
