@@ -7096,7 +7096,7 @@
    </properties>
    <point/>
   </object>
-  <object id="46" name="MonsterA" x="137.029" y="202.615">
+  <object id="46" name="MonsterA" x="137.029" y="187.73">
    <properties>
     <property name="isMonster" type="bool" value="true"/>
    </properties>

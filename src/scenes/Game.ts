@@ -153,6 +153,7 @@ export class Game extends Scene {
 					tile.visible = true;
 				});
 				this.getEnemiesInRoom(room).forEach((enemy) => {
+					enemy.setActive(true);
 					enemy.setVisible(true);
 				});
 			} else {
@@ -161,6 +162,7 @@ export class Game extends Scene {
 					tile.visible = false;
 				});
 				this.getEnemiesInRoom(room).forEach((enemy) => {
+					enemy.setActive(false);
 					enemy.setVisible(false);
 				});
 			}
@@ -636,6 +638,9 @@ export class Game extends Scene {
 	}
 
 	updateEnemy(enemy: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody): void {
+		if (!enemy.active) {
+			return;
+		}
 		const body = enemy.body;
 
 		// If we are not moving, move in a random direction. If we are moving, keep
