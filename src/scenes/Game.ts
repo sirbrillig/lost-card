@@ -106,29 +106,17 @@ export class Game extends Scene {
 
 		this.doors =
 			this.map.filterObjects("MetaObjects", (obj) => {
-				if (!("properties" in obj)) {
+				if (!isTilemapTile(obj)) {
 					return false;
 				}
 				const destinationId = obj.properties.find(
-					(prop) => prop.name === "doorto"
+					(prop: { name: string }) => prop.name === "doorto"
 				)?.value;
 				if (!destinationId) {
 					return false;
 				}
 				return true;
 			}) ?? [];
-		// this.doors.forEach((door) => {
-		// 	const doorX = door.x;
-		// 	const doorY = door.y - door.height;
-		// 	const rect = this.add.rectangle(
-		// 		doorX,
-		// 		doorY,
-		// 		door.width,
-		// 		door.height,
-		// 		0xf00
-		// 	);
-		// 	rect.setOrigin(0, 0);
-		// });
 	}
 
 	moveCameraToRoom(room: Phaser.Types.Tilemaps.TiledObject) {
@@ -181,20 +169,28 @@ export class Game extends Scene {
 
 	getEnemiesInRoom(
 		room: Phaser.Types.Tilemaps.TiledObject
-	): Phaser.GameObjects.GameObject[] {
-		return this.enemies.getChildren().filter((enemy) => {
-			const isIt = this.isEnemyInRoom(enemy, room);
-			return isIt;
-		});
+	): Phaser.Types.Physics.Arcade.SpriteWithDynamicBody[] {
+		return this.enemies
+			.getChildren()
+			.filter((enemy) => {
+				if (!isDynamicSprite(enemy)) {
+					return false;
+				}
+				return this.isEnemyInRoom(enemy, room);
+			})
+			.reduce((typedEnemies, enemy) => {
+				if (!isDynamicSprite(enemy)) {
+					return typedEnemies;
+				}
+				typedEnemies.push(enemy);
+				return typedEnemies;
+			}, [] as Phaser.Types.Physics.Arcade.SpriteWithDynamicBody[]);
 	}
 
 	isEnemyInRoom(
-		enemy: Phaser.GameObjects.GameObject,
+		enemy: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody,
 		room: Phaser.Types.Tilemaps.TiledObject
 	): boolean {
-		if (!isDynamicSprite(enemy)) {
-			throw new Error("Enemy is not dynamic");
-		}
 		return this.isPointInRoom(enemy.body.x, enemy.body.y, room);
 	}
 
@@ -219,19 +215,24 @@ export class Game extends Scene {
 		return tiles;
 	}
 
+	isMetaObjectRoom(obj: Phaser.GameObjects.GameObject): boolean {
+		if (!isTilemapTile(obj)) {
+			return false;
+		}
+		const roomName = obj.properties.find(
+			(prop: { name: string }) => prop.name === "room"
+		)?.value;
+		if (!roomName) {
+			return false;
+		}
+		return true;
+	}
+
 	getRooms(): Phaser.Types.Tilemaps.TiledObject[] {
 		return (
-			this.map.filterObjects("MetaObjects", (obj) => {
-				if (!("properties" in obj)) {
-					return false;
-				}
-				const roomName = obj.properties.find((prop) => prop.name === "room")
-					?.value;
-				if (!roomName) {
-					return false;
-				}
-				return true;
-			}) ?? []
+			this.map.filterObjects("MetaObjects", (obj) =>
+				this.isMetaObjectRoom(obj)
+			) ?? []
 		);
 	}
 
@@ -268,14 +269,15 @@ export class Game extends Scene {
 	}
 
 	handleCollideDoor(door: Phaser.Types.Tilemaps.TiledObject) {
-		const destinationId = door.properties.find((prop) => prop.name === "doorto")
-			?.value;
+		const destinationId = door.properties.find(
+			(prop: { name: string }) => prop.name === "doorto"
+		)?.value;
 		if (!destinationId) {
 			throw new Error("Hit door without destination id");
 		}
 		const destinationTile = this.map.findObject(
 			"MetaObjects",
-			(obj) => obj.id === destinationId
+			(obj: unknown) => getObjectId(obj) === destinationId
 		);
 		if (!destinationTile) {
 			throw new Error("Hit door without destination tile");
@@ -543,8 +545,11 @@ export class Game extends Scene {
 
 		this.enemies = this.physics.add.group();
 		const spawnPoints = this.map.filterObjects("MetaObjects", (obj) => {
+			if (!isTilemapTile(obj)) {
+				return false;
+			}
 			const isMonster = obj.properties?.find(
-				(prop) => prop.name === "isMonster"
+				(prop: { name: string }) => prop.name === "isMonster"
 			)?.value;
 			return isMonster === true;
 		});
@@ -770,4 +775,23 @@ function isDynamicImage(
 ): obj is Phaser.Types.Physics.Arcade.ImageWithDynamicBody {
 	const dynObj = obj as Phaser.Types.Physics.Arcade.ImageWithDynamicBody;
 	return "body" in dynObj;
+}
+
+function isTilemapTile(obj: unknown): obj is Phaser.Tilemaps.Tile {
+	const tile = obj as Phaser.Tilemaps.Tile;
+	return "properties" in tile;
+}
+
+type ObjectWithId = { id: number };
+
+function hasId(obj: unknown): obj is ObjectWithId {
+	const objWithId = obj as ObjectWithId;
+	return "id" in objWithId;
+}
+
+function getObjectId(obj: unknown): number {
+	if (!hasId(obj)) {
+		throw new Error("Object has no id");
+	}
+	return obj.id;
 }
