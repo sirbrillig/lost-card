@@ -286,9 +286,18 @@ export class Game extends Scene {
 		}
 		console.log("moving to tile", destinationTile);
 
+		const destinationDirection = door.properties.find(
+			(prop: { name: string }) => prop.name === "doordirection"
+		)?.value;
+		if (destinationDirection === undefined) {
+			throw new Error("Door has no destination direction");
+		}
+
 		// if the player enters a door, teleport them just past the corresponding door
-		const [destinationX, destinationY] =
-			this.getDoorDestinationCoordinates(destinationTile);
+		const [destinationX, destinationY] = this.getDoorDestinationCoordinates(
+			destinationTile,
+			destinationDirection
+		);
 		console.log("moving player to point", destinationX, destinationY);
 		this.movePlayerToPoint(destinationX, destinationY);
 
@@ -299,7 +308,8 @@ export class Game extends Scene {
 	}
 
 	getDoorDestinationCoordinates(
-		destinationTile: Phaser.Types.Tilemaps.TiledObject
+		destinationTile: Phaser.Types.Tilemaps.TiledObject,
+		destinationDirection: SpriteDirection
 	): [number, number] {
 		if (destinationTile.x == undefined || destinationTile.y === undefined) {
 			throw new Error("Destination tile has no position");
@@ -308,19 +318,19 @@ export class Game extends Scene {
 		// door. That way they won't trigger the door on the other side and end up
 		// in a loop.
 		const destinationX = (() => {
-			if (this.playerDirection === SpriteLeft) {
+			if (destinationDirection === SpriteLeft) {
 				return destinationTile.x - 6;
 			}
-			if (this.playerDirection === SpriteRight) {
+			if (destinationDirection === SpriteRight) {
 				return destinationTile.x + 18;
 			}
 			return destinationTile.x + 8;
 		})();
 		const destinationY = (() => {
-			if (this.playerDirection === SpriteUp) {
+			if (destinationDirection === SpriteUp) {
 				return destinationTile.y - 18;
 			}
-			if (this.playerDirection === SpriteDown) {
+			if (destinationDirection === SpriteDown) {
 				return destinationTile.y + 6;
 			}
 			return destinationTile.y - 6;

@@ -68,6 +68,11 @@
                  "name":"DoorMK1_MK2",
                  "properties":[
                         {
+                         "name":"doordirection",
+                         "type":"int",
+                         "value":3
+                        }, 
+                        {
                          "name":"doorto",
                          "type":"object",
                          "value":13
@@ -85,6 +90,11 @@
                  "id":13,
                  "name":"DoorMK2_MK1",
                  "properties":[
+                        {
+                         "name":"doordirection",
+                         "type":"int",
+                         "value":1
+                        }, 
                         {
                          "name":"doorto",
                          "type":"object",
@@ -155,6 +165,11 @@
                  "name":"DoorMK2_MK3",
                  "properties":[
                         {
+                         "name":"doordirection",
+                         "type":"int",
+                         "value":2
+                        }, 
+                        {
                          "name":"doorto",
                          "type":"object",
                          "value":27
@@ -173,6 +188,11 @@
                  "name":"DoorMK3_MK2",
                  "properties":[
                         {
+                         "name":"doordirection",
+                         "type":"int",
+                         "value":0
+                        }, 
+                        {
                          "name":"doorto",
                          "type":"object",
                          "value":26
@@ -190,6 +210,11 @@
                  "id":29,
                  "name":"DoorMK2_MK4",
                  "properties":[
+                        {
+                         "name":"doordirection",
+                         "type":"int",
+                         "value":0
+                        }, 
                         {
                          "name":"doorto",
                          "type":"object",
@@ -226,6 +251,11 @@
                  "name":"DoorMK4_MK2",
                  "properties":[
                         {
+                         "name":"doordirection",
+                         "type":"int",
+                         "value":2
+                        }, 
+                        {
                          "name":"doorto",
                          "type":"object",
                          "value":29
@@ -261,6 +291,11 @@
                  "name":"DoorMK4_MK5",
                  "properties":[
                         {
+                         "name":"doordirection",
+                         "type":"int",
+                         "value":3
+                        }, 
+                        {
                          "name":"doorto",
                          "type":"object",
                          "value":36
@@ -278,6 +313,11 @@
                  "id":36,
                  "name":"DoorMK5_MK4",
                  "properties":[
+                        {
+                         "name":"doordirection",
+                         "type":"int",
+                         "value":1
+                        }, 
                         {
                          "name":"doorto",
                          "type":"object",
@@ -314,6 +354,11 @@
                  "name":"DoorMK6_MK5",
                  "properties":[
                         {
+                         "name":"doordirection",
+                         "type":"int",
+                         "value":0
+                        }, 
+                        {
                          "name":"doorto",
                          "type":"object",
                          "value":40
@@ -331,6 +376,11 @@
                  "id":40,
                  "name":"DoorMK5_MK6",
                  "properties":[
+                        {
+                         "name":"doordirection",
+                         "type":"int",
+                         "value":2
+                        }, 
                         {
                          "name":"doorto",
                          "type":"object",
@@ -367,6 +417,11 @@
                  "name":"DoorMK8_MK7",
                  "properties":[
                         {
+                         "name":"doordirection",
+                         "type":"int",
+                         "value":2
+                        }, 
+                        {
                          "name":"doorto",
                          "type":"object",
                          "value":51
@@ -384,6 +439,11 @@
                  "id":44,
                  "name":"DoorMK5_MK7",
                  "properties":[
+                        {
+                         "name":"doordirection",
+                         "type":"int",
+                         "value":0
+                        }, 
                         {
                          "name":"doorto",
                          "type":"object",
@@ -477,6 +537,17 @@
                  "height":16,
                  "id":50,
                  "name":"DoorMK7_MK5",
+                 "properties":[
+                        {
+                         "name":"doordirection",
+                         "type":"int",
+                         "value":2
+                        }, 
+                        {
+                         "name":"doorto",
+                         "type":"object",
+                         "value":44
+                        }],
                  "rotation":0,
                  "type":"",
                  "visible":true,
@@ -490,6 +561,11 @@
                  "id":51,
                  "name":"DoorMK7_MK8",
                  "properties":[
+                        {
+                         "name":"doordirection",
+                         "type":"int",
+                         "value":0
+                        }, 
                         {
                          "name":"doorto",
                          "type":"object",

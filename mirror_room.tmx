@@ -6997,11 +6997,13 @@
   </object>
   <object id="12" name="DoorMK1_MK2" gid="1073" x="191.095" y="79.5348" width="16" height="16">
    <properties>
+    <property name="doordirection" type="int" value="3"/>
     <property name="doorto" type="object" value="13"/>
    </properties>
   </object>
   <object id="13" name="DoorMK2_MK1" gid="1032" x="175.901" y="79.8514" width="16" height="16">
    <properties>
+    <property name="doordirection" type="int" value="1"/>
     <property name="doorto" type="object" value="12"/>
    </properties>
   </object>
@@ -7022,16 +7024,19 @@
   </object>
   <object id="26" name="DoorMK2_MK3" gid="460" x="47.5759" y="143.886" width="16" height="16">
    <properties>
+    <property name="doordirection" type="int" value="2"/>
     <property name="doorto" type="object" value="27"/>
    </properties>
   </object>
   <object id="27" name="DoorMK3_MK2" gid="460" x="47.2706" y="160.681" width="16" height="16">
    <properties>
+    <property name="doordirection" type="int" value="0"/>
     <property name="doorto" type="object" value="26"/>
    </properties>
   </object>
   <object id="29" name="DoorMK2_MK4" gid="991" x="48.492" y="31.5129" width="16" height="16">
    <properties>
+    <property name="doordirection" type="int" value="0"/>
     <property name="doorto" type="object" value="33"/>
    </properties>
   </object>
@@ -7042,6 +7047,7 @@
   </object>
   <object id="33" name="DoorMK4_MK2" gid="1114" x="256.138" y="223.28" width="16" height="16">
    <properties>
+    <property name="doordirection" type="int" value="2"/>
     <property name="doorto" type="object" value="29"/>
    </properties>
   </object>
@@ -7052,11 +7058,13 @@
   </object>
   <object id="35" name="DoorMK4_MK5" gid="1073" x="112.215" y="192.707" width="16" height="16">
    <properties>
+    <property name="doordirection" type="int" value="3"/>
     <property name="doorto" type="object" value="36"/>
    </properties>
   </object>
   <object id="36" name="DoorMK5_MK4" gid="1032" x="447.577" y="79.716" width="16" height="16">
    <properties>
+    <property name="doordirection" type="int" value="1"/>
     <property name="doorto" type="object" value="35"/>
    </properties>
   </object>
@@ -7067,11 +7075,13 @@
   </object>
   <object id="39" name="DoorMK6_MK5" gid="991" x="416" y="160" width="16" height="16">
    <properties>
+    <property name="doordirection" type="int" value="0"/>
     <property name="doorto" type="object" value="40"/>
    </properties>
   </object>
   <object id="40" name="DoorMK5_MK6" gid="1114" x="416" y="144" width="16" height="16">
    <properties>
+    <property name="doordirection" type="int" value="2"/>
     <property name="doorto" type="object" value="39"/>
    </properties>
   </object>
@@ -7082,11 +7092,13 @@
   </object>
   <object id="43" name="DoorMK8_MK7" gid="1114" x="512" y="224" width="16" height="16">
    <properties>
+    <property name="doordirection" type="int" value="2"/>
     <property name="doorto" type="object" value="51"/>
    </properties>
   </object>
   <object id="44" name="DoorMK5_MK7" gid="991" x="416" y="16" width="16" height="16">
    <properties>
+    <property name="doordirection" type="int" value="0"/>
     <property name="doorto" type="object" value="50"/>
    </properties>
   </object>
@@ -7114,9 +7126,15 @@
     <property name="room" value="MK7"/>
    </properties>
   </object>
-  <object id="50" name="DoorMK7_MK5" gid="1114" x="608" y="160" width="16" height="16"/>
+  <object id="50" name="DoorMK7_MK5" gid="1114" x="608" y="160" width="16" height="16">
+   <properties>
+    <property name="doordirection" type="int" value="2"/>
+    <property name="doorto" type="object" value="44"/>
+   </properties>
+  </object>
   <object id="51" name="DoorMK7_MK8" gid="991" x="624" y="16" width="16" height="16">
    <properties>
+    <property name="doordirection" type="int" value="0"/>
     <property name="doorto" type="object" value="43"/>
    </properties>
   </object>
