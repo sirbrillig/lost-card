@@ -286,7 +286,7 @@ export class Game extends Scene {
 		}
 		console.log("moving to tile", destinationTile);
 
-		const destinationDirection = door.properties.find(
+		const destinationDirection = destinationTile.properties.find(
 			(prop: { name: string }) => prop.name === "doordirection"
 		)?.value;
 		if (destinationDirection === undefined) {
@@ -296,7 +296,7 @@ export class Game extends Scene {
 		// if the player enters a door, teleport them just past the corresponding door
 		const [destinationX, destinationY] = this.getDoorDestinationCoordinates(
 			destinationTile,
-			destinationDirection
+			invertSpriteDirection(destinationDirection)
 		);
 		console.log("moving player to point", destinationX, destinationY);
 		this.movePlayerToPoint(destinationX, destinationY);
@@ -816,4 +816,19 @@ function getObjectId(obj: unknown): number {
 		throw new Error("Object has no id");
 	}
 	return obj.id;
+}
+
+function invertSpriteDirection(direction: SpriteDirection): SpriteDirection {
+	switch (direction) {
+		case SpriteUp:
+			return SpriteDown;
+		case SpriteRight:
+			return SpriteLeft;
+		case SpriteDown:
+			return SpriteUp;
+		case SpriteLeft:
+			return SpriteRight;
+		default:
+			throw new Error(`Invalid sprite direction: ${direction}`);
+	}
 }
