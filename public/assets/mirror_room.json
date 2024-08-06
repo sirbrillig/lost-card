@@ -70,7 +70,7 @@
                         {
                          "name":"collides",
                          "type":"bool",
-                         "value":false
+                         "value":true
                         }, 
                         {
                          "name":"doordirection",
@@ -86,8 +86,8 @@
                  "type":"",
                  "visible":true,
                  "width":16,
-                 "x":191.094736175735,
-                 "y":79.5348336656854
+                 "x":192,
+                 "y":80
                 }, 
                 {
                  "gid":1032,
@@ -98,7 +98,7 @@
                         {
                          "name":"collides",
                          "type":"bool",
-                         "value":false
+                         "value":true
                         }, 
                         {
                          "name":"doordirection",
@@ -177,7 +177,7 @@
                         {
                          "name":"collides",
                          "type":"bool",
-                         "value":false
+                         "value":true
                         }, 
                         {
                          "name":"doordirection",
@@ -222,7 +222,7 @@
                         {
                          "name":"collides",
                          "type":"bool",
-                         "value":false
+                         "value":true
                         }, 
                         {
                          "name":"doordirection",
@@ -267,7 +267,7 @@
                         {
                          "name":"collides",
                          "type":"bool",
-                         "value":false
+                         "value":true
                         }, 
                         {
                          "name":"doordirection",
@@ -295,7 +295,7 @@
                         {
                          "name":"collides",
                          "type":"bool",
-                         "value":false
+                         "value":true
                         }, 
                         {
                          "name":"doordirection",
@@ -340,7 +340,7 @@
                         {
                          "name":"collides",
                          "type":"bool",
-                         "value":false
+                         "value":true
                         }, 
                         {
                          "name":"doordirection",
@@ -368,7 +368,7 @@
                         {
                          "name":"collides",
                          "type":"bool",
-                         "value":false
+                         "value":true
                         }, 
                         {
                          "name":"doordirection",
@@ -413,7 +413,7 @@
                         {
                          "name":"collides",
                          "type":"bool",
-                         "value":false
+                         "value":true
                         }, 
                         {
                          "name":"doordirection",
@@ -441,7 +441,7 @@
                         {
                          "name":"collides",
                          "type":"bool",
-                         "value":false
+                         "value":true
                         }, 
                         {
                          "name":"doordirection",
@@ -545,7 +545,7 @@
                         {
                          "name":"collides",
                          "type":"bool",
-                         "value":false
+                         "value":true
                         }, 
                         {
                          "name":"doordirection",
@@ -573,7 +573,7 @@
                         {
                          "name":"collides",
                          "type":"bool",
-                         "value":false
+                         "value":true
                         }, 
                         {
                          "name":"doordirection",
@@ -601,7 +601,7 @@
                         {
                          "name":"collides",
                          "type":"bool",
-                         "value":false
+                         "value":true
                         }, 
                         {
                          "name":"doordirection",
@@ -629,7 +629,7 @@
                         {
                          "name":"collides",
                          "type":"bool",
-                         "value":false
+                         "value":true
                         }, 
                         {
                          "name":"doordirection",
@@ -674,7 +674,7 @@
                         {
                          "name":"collides",
                          "type":"bool",
-                         "value":false
+                         "value":true
                         }, 
                         {
                          "name":"doordirection",
@@ -702,7 +702,7 @@
                         {
                          "name":"collides",
                          "type":"bool",
-                         "value":false
+                         "value":true
                         }, 
                         {
                          "name":"doordirection",
@@ -747,7 +747,7 @@
                         {
                          "name":"collides",
                          "type":"bool",
-                         "value":false
+                         "value":true
                         }, 
                         {
                          "name":"doordirection",
@@ -775,7 +775,7 @@
                         {
                          "name":"collides",
                          "type":"bool",
-                         "value":false
+                         "value":true
                         }, 
                         {
                          "name":"doordirection",
@@ -819,7 +819,7 @@
          "y":0
         }],
  "nextlayerid":7,
- "nextobjectid":63,
+ "nextobjectid":64,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.0",
@@ -9765,7 +9765,7 @@
                         {
                          "name":"collides",
                          "type":"bool",
-                         "value":false
+                         "value":true
                         }, 
                         {
                          "name":"doordirection",
@@ -9779,7 +9779,7 @@
                         {
                          "name":"collides",
                          "type":"bool",
-                         "value":false
+                         "value":true
                         }, 
                         {
                          "name":"doordirection",
@@ -9793,7 +9793,7 @@
                         {
                          "name":"collides",
                          "type":"bool",
-                         "value":false
+                         "value":true
                         }, 
                         {
                          "name":"doordirection",
@@ -9807,7 +9807,7 @@
                         {
                          "name":"collides",
                          "type":"bool",
-                         "value":false
+                         "value":true
                         }, 
                         {
                          "name":"doordirection",
@@ -9821,7 +9821,7 @@
                         {
                          "name":"collides",
                          "type":"bool",
-                         "value":false
+                         "value":true
                         }, 
                         {
                          "name":"doordirection",
@@ -10234,7 +10234,7 @@
                         {
                          "name":"collides",
                          "type":"bool",
-                         "value":false
+                         "value":true
                         }, 
                         {
                          "name":"doordirection",
@@ -10248,7 +10248,7 @@
                         {
                          "name":"collides",
                          "type":"bool",
-                         "value":false
+                         "value":true
                         }, 
                         {
                          "name":"doordirection",
@@ -10262,7 +10262,7 @@
                         {
                          "name":"collides",
                          "type":"bool",
-                         "value":false
+                         "value":true
                         }, 
                         {
                          "name":"doordirection",
@@ -10276,7 +10276,7 @@
                         {
                          "name":"collides",
                          "type":"bool",
-                         "value":false
+                         "value":true
                         }, 
                         {
                          "name":"doordirection",
@@ -10290,7 +10290,7 @@
                         {
                          "name":"collides",
                          "type":"bool",
-                         "value":false
+                         "value":true
                         }, 
                         {
                          "name":"doordirection",
@@ -10704,7 +10704,7 @@
                         {
                          "name":"collides",
                          "type":"bool",
-                         "value":false
+                         "value":true
                         }, 
                         {
                          "name":"doordirection",
@@ -10718,7 +10718,7 @@
                         {
                          "name":"collides",
                          "type":"bool",
-                         "value":false
+                         "value":true
                         }, 
                         {
                          "name":"doordirection",
@@ -10732,7 +10732,7 @@
                         {
                          "name":"collides",
                          "type":"bool",
-                         "value":false
+                         "value":true
                         }, 
                         {
                          "name":"doordirection",
@@ -10746,7 +10746,7 @@
                         {
                          "name":"collides",
                          "type":"bool",
-                         "value":false
+                         "value":true
                         }, 
                         {
                          "name":"doordirection",
@@ -10760,7 +10760,7 @@
                         {
                          "name":"collides",
                          "type":"bool",
-                         "value":false
+                         "value":true
                         }, 
                         {
                          "name":"doordirection",
@@ -11173,7 +11173,7 @@
                         {
                          "name":"collides",
                          "type":"bool",
-                         "value":false
+                         "value":true
                         }, 
                         {
                          "name":"doordirection",
@@ -11187,7 +11187,7 @@
                         {
                          "name":"collides",
                          "type":"bool",
-                         "value":false
+                         "value":true
                         }, 
                         {
                          "name":"doordirection",
@@ -11201,7 +11201,7 @@
                         {
                          "name":"collides",
                          "type":"bool",
-                         "value":false
+                         "value":true
                         }, 
                         {
                          "name":"doordirection",
@@ -11215,7 +11215,7 @@
                         {
                          "name":"collides",
                          "type":"bool",
-                         "value":false
+                         "value":true
                         }, 
                         {
                          "name":"doordirection",
@@ -11229,7 +11229,7 @@
                         {
                          "name":"collides",
                          "type":"bool",
-                         "value":false
+                         "value":true
                         }, 
                         {
                          "name":"doordirection",

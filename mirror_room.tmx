@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.0" orientation="orthogonal" renderorder="right-down" width="80" height="60" tilewidth="16" tileheight="16" infinite="0" nextlayerid="7" nextobjectid="63">
+<map version="1.10" tiledversion="1.11.0" orientation="orthogonal" renderorder="right-down" width="80" height="60" tilewidth="16" tileheight="16" infinite="0" nextlayerid="7" nextobjectid="64">
  <editorsettings>
   <export target="public/assets/mirror_room.json" format="json"/>
  </editorsettings>
@@ -4957,31 +4957,31 @@
   </tile>
   <tile id="990">
    <properties>
-    <property name="collides" type="bool" value="false"/>
+    <property name="collides" type="bool" value="true"/>
     <property name="doordirection" type="int" value="0"/>
    </properties>
   </tile>
   <tile id="991">
    <properties>
-    <property name="collides" type="bool" value="false"/>
+    <property name="collides" type="bool" value="true"/>
     <property name="doordirection" type="int" value="0"/>
    </properties>
   </tile>
   <tile id="992">
    <properties>
-    <property name="collides" type="bool" value="false"/>
+    <property name="collides" type="bool" value="true"/>
     <property name="doordirection" type="int" value="0"/>
    </properties>
   </tile>
   <tile id="993">
    <properties>
-    <property name="collides" type="bool" value="false"/>
+    <property name="collides" type="bool" value="true"/>
     <property name="doordirection" type="int" value="0"/>
    </properties>
   </tile>
   <tile id="994">
    <properties>
-    <property name="collides" type="bool" value="false"/>
+    <property name="collides" type="bool" value="true"/>
     <property name="doordirection" type="int" value="0"/>
    </properties>
   </tile>
@@ -5182,31 +5182,31 @@
   </tile>
   <tile id="1031">
    <properties>
-    <property name="collides" type="bool" value="false"/>
+    <property name="collides" type="bool" value="true"/>
     <property name="doordirection" type="int" value="1"/>
    </properties>
   </tile>
   <tile id="1032">
    <properties>
-    <property name="collides" type="bool" value="false"/>
+    <property name="collides" type="bool" value="true"/>
     <property name="doordirection" type="int" value="0"/>
    </properties>
   </tile>
   <tile id="1033">
    <properties>
-    <property name="collides" type="bool" value="false"/>
+    <property name="collides" type="bool" value="true"/>
     <property name="doordirection" type="int" value="0"/>
    </properties>
   </tile>
   <tile id="1034">
    <properties>
-    <property name="collides" type="bool" value="false"/>
+    <property name="collides" type="bool" value="true"/>
     <property name="doordirection" type="int" value="0"/>
    </properties>
   </tile>
   <tile id="1035">
    <properties>
-    <property name="collides" type="bool" value="false"/>
+    <property name="collides" type="bool" value="true"/>
     <property name="doordirection" type="int" value="0"/>
    </properties>
   </tile>
@@ -5407,31 +5407,31 @@
   </tile>
   <tile id="1072">
    <properties>
-    <property name="collides" type="bool" value="false"/>
+    <property name="collides" type="bool" value="true"/>
     <property name="doordirection" type="int" value="3"/>
    </properties>
   </tile>
   <tile id="1073">
    <properties>
-    <property name="collides" type="bool" value="false"/>
+    <property name="collides" type="bool" value="true"/>
     <property name="doordirection" type="int" value="0"/>
    </properties>
   </tile>
   <tile id="1074">
    <properties>
-    <property name="collides" type="bool" value="false"/>
+    <property name="collides" type="bool" value="true"/>
     <property name="doordirection" type="int" value="0"/>
    </properties>
   </tile>
   <tile id="1075">
    <properties>
-    <property name="collides" type="bool" value="false"/>
+    <property name="collides" type="bool" value="true"/>
     <property name="doordirection" type="int" value="0"/>
    </properties>
   </tile>
   <tile id="1076">
    <properties>
-    <property name="collides" type="bool" value="false"/>
+    <property name="collides" type="bool" value="true"/>
     <property name="doordirection" type="int" value="0"/>
    </properties>
   </tile>
@@ -5632,31 +5632,31 @@
   </tile>
   <tile id="1113">
    <properties>
-    <property name="collides" type="bool" value="false"/>
+    <property name="collides" type="bool" value="true"/>
     <property name="doordirection" type="int" value="2"/>
    </properties>
   </tile>
   <tile id="1114">
    <properties>
-    <property name="collides" type="bool" value="false"/>
+    <property name="collides" type="bool" value="true"/>
     <property name="doordirection" type="int" value="0"/>
    </properties>
   </tile>
   <tile id="1115">
    <properties>
-    <property name="collides" type="bool" value="false"/>
+    <property name="collides" type="bool" value="true"/>
     <property name="doordirection" type="int" value="0"/>
    </properties>
   </tile>
   <tile id="1116">
    <properties>
-    <property name="collides" type="bool" value="false"/>
+    <property name="collides" type="bool" value="true"/>
     <property name="doordirection" type="int" value="0"/>
    </properties>
   </tile>
   <tile id="1117">
    <properties>
-    <property name="collides" type="bool" value="false"/>
+    <property name="collides" type="bool" value="true"/>
     <property name="doordirection" type="int" value="0"/>
    </properties>
   </tile>
@@ -7155,7 +7155,7 @@
   <object id="5" name="Start Point" x="294.881" y="57.2071">
    <point/>
   </object>
-  <object id="12" name="DoorMK1_MK2" gid="1073" x="191.095" y="79.5348" width="16" height="16">
+  <object id="12" name="DoorMK1_MK2" gid="1073" x="192" y="80" width="16" height="16">
    <properties>
     <property name="doorto" type="object" value="13"/>
    </properties>

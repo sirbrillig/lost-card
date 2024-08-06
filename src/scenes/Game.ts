@@ -50,8 +50,14 @@ export class Game extends Scene {
 		this.createEnemies();
 
 		this.landLayer = this.createTileLayer("Background", tileset, 0);
+		this.setTileLayerCollisions(this.landLayer, this.player);
+		this.setTileLayerCollisions(this.landLayer, this.enemies);
 		this.doorsLayer = this.createTileLayer("Doors", tileset, 0);
+		// Enemies collide with doors but players can pass through them.
+		this.setTileLayerCollisions(this.doorsLayer, this.enemies);
 		this.stuffLayer = this.createTileLayer("Stuff", tileset, 0);
+		this.setTileLayerCollisions(this.stuffLayer, this.player);
+		this.setTileLayerCollisions(this.stuffLayer, this.enemies);
 
 		this.physics.add.collider(this.player, this.enemies, (player, enemy) => {
 			if (isDynamicSprite(player) && isDynamicSprite(enemy)) {
@@ -92,9 +98,15 @@ export class Game extends Scene {
 		}
 		layer.setDepth(depth);
 		layer.setCollisionByProperty({ collides: true });
-		this.physics.add.collider(this.player, layer);
-		this.physics.add.collider(this.enemies, layer);
 		return layer;
+	}
+
+	setTileLayerCollisions(
+		layer: Phaser.Tilemaps.TilemapLayer,
+		sprite: Phaser.Types.Physics.Arcade.ArcadeColliderType
+	) {
+		this.physics.add.collider(sprite, layer);
+		this.physics.add.collider(sprite, layer);
 	}
 
 	setUpCamera(): void {
