@@ -9,14 +9,17 @@ export type SpriteDirection =
 	| typeof SpriteDown
 	| typeof SpriteLeft;
 
-export interface HittableSprite
-	extends Phaser.Types.Physics.Arcade.SpriteWithDynamicBody {
+export interface HittableSprite {
 	hit(): void;
+	isHittable(): boolean;
 }
 
 export function isHittableSprite(obj: unknown): obj is HittableSprite {
 	const dynObj = obj as HittableSprite;
-	return "hit" in dynObj;
+	if ("hit" in dynObj || "isHittable" in dynObj) {
+		return true;
+	}
+	return false;
 }
 
 export function isDynamicSprite(

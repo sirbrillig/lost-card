@@ -5,9 +5,13 @@ import {
 	SpriteLeft,
 	getDirectionOfSpriteMovement,
 	isDynamicSprite,
+	HittableSprite,
 } from "../shared";
 
-export class MonsterA extends Phaser.Physics.Arcade.Sprite {
+export class MonsterA
+	extends Phaser.Physics.Arcade.Sprite
+	implements HittableSprite
+{
 	enemySpeed: number = 40;
 
 	constructor(scene: Phaser.Scene, x: number, y: number) {
@@ -66,5 +70,9 @@ export class MonsterA extends Phaser.Physics.Arcade.Sprite {
 
 	hit() {
 		this.destroy();
+	}
+
+	isHittable() {
+		return true;
 	}
 }

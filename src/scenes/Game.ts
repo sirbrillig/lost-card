@@ -610,15 +610,17 @@ export class Game extends Scene {
 	playerHitEnemy(
 		enemy: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody
 	): void {
+		// If the player is reeling from a hit, don't count their attacks.
 		if (this.framesSincePlayerHit > 0) {
 			return;
 		}
 
+		// If the player is not in the attack animation, do nothing.
 		if (this.framesSinceAttack === 0) {
 			return;
 		}
 
-		if (isHittableSprite(enemy)) {
+		if (isHittableSprite(enemy) && enemy.isHittable()) {
 			enemy.hit();
 		}
 	}
