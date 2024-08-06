@@ -1,5 +1,6 @@
 import { Scene } from "phaser";
 import { MonsterA } from "./MonsterA";
+import { BossA } from "./BossA";
 import {
 	SpriteUp,
 	SpriteRight,
@@ -581,12 +582,13 @@ export class Game extends Scene {
 		spawnPoints?.forEach((point) => {
 			if (point.x !== undefined && point.y !== undefined) {
 				console.log("creating monster at", point.x, point.y);
-				const enemy = this.createEnemy(point.x, point.y);
 				const isBoss = point.properties.find(
 					(prop: { name: string }) => prop.name === "isBoss"
 				);
 				if (isBoss) {
-					enemy.setScale(3);
+					this.createBoss(point.x, point.y);
+				} else {
+					this.createEnemy(point.x, point.y);
 				}
 			}
 		});
@@ -594,6 +596,12 @@ export class Game extends Scene {
 
 	createEnemy(x: number, y: number) {
 		const enemy = new MonsterA(this, x, y);
+		this.enemies.add(enemy);
+		return enemy;
+	}
+
+	createBoss(x: number, y: number) {
+		const enemy = new BossA(this, x, y);
 		this.enemies.add(enemy);
 		return enemy;
 	}
