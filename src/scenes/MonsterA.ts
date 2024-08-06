@@ -63,4 +63,8 @@ export class MonsterA extends Phaser.Physics.Arcade.Sprite {
 				break;
 		}
 	}
+
+	hit() {
+		this.destroy();
+	}
 }

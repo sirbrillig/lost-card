@@ -64,4 +64,8 @@ export class BossA extends Phaser.Physics.Arcade.Sprite {
 				break;
 		}
 	}
+
+	hit() {
+		// TODO
+	}
 }

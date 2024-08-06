@@ -13,6 +13,7 @@ import {
 	isTilemapTile,
 	getObjectId,
 	getDirectionOfSpriteMovement,
+	isHittableSprite,
 } from "../shared";
 
 export class Game extends Scene {
@@ -617,7 +618,9 @@ export class Game extends Scene {
 			return;
 		}
 
-		enemy.destroy();
+		if (isHittableSprite(enemy)) {
+			enemy.hit();
+		}
 	}
 
 	enemyHitPlayer(
