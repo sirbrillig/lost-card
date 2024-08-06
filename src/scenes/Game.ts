@@ -1,15 +1,18 @@
 import { Scene } from "phaser";
-
-// 0 is up, 1 is right, 2 is down, 3 is left
-const SpriteUp = 0;
-const SpriteRight = 1;
-const SpriteDown = 2;
-const SpriteLeft = 3;
-type SpriteDirection =
-	| typeof SpriteUp
-	| typeof SpriteRight
-	| typeof SpriteDown
-	| typeof SpriteLeft;
+import { MonsterA } from "./MonsterA";
+import {
+	SpriteUp,
+	SpriteRight,
+	SpriteDown,
+	SpriteLeft,
+	SpriteDirection,
+	invertSpriteDirection,
+	isDynamicSprite,
+	isDynamicImage,
+	isTilemapTile,
+	getObjectId,
+	getDirectionOfSpriteMovement,
+} from "../shared";
 
 export class Game extends Scene {
 	cursors: Phaser.Types.Input.Keyboard.CursorKeys;
@@ -340,9 +343,7 @@ export class Game extends Scene {
 
 	update() {
 		this.enemies.getChildren().forEach((enemy) => {
-			if (isDynamicSprite(enemy)) {
-				this.updateEnemy(enemy);
-			}
+			enemy.update();
 		});
 		this.updatePlayer();
 	}
@@ -580,13 +581,8 @@ export class Game extends Scene {
 	}
 
 	createEnemy(x: number, y: number) {
-		const enemy = this.physics.add.sprite(x, y, "logman", 0);
-		enemy.setDepth(1);
-		enemy.setSize(enemy.width * 0.55, enemy.height * 0.65);
-		enemy.setOffset(enemy.body.offset.x, enemy.body.offset.y + 5);
+		const enemy = new MonsterA(this, x, y);
 		this.enemies.add(enemy);
-		enemy.setCollideWorldBounds(true);
-		enemy.setPushable(false);
 		return enemy;
 	}
 
@@ -614,7 +610,7 @@ export class Game extends Scene {
 
 		// Bounce the player off the enemy in a random direction perpendicular to
 		// the movement of the enemy so we don't get hit again immediately.
-		const enemyDirection = this.getDirectionOfSpriteMovement(enemy.body);
+		const enemyDirection = getDirectionOfSpriteMovement(enemy.body);
 		const direction = Phaser.Math.Between(0, 1);
 		const bounceSpeed = this.getPlayerSpeed() * 4;
 		const bounceVelocity = direction === 1 ? bounceSpeed : -bounceSpeed;
@@ -634,57 +630,6 @@ export class Game extends Scene {
 		}
 
 		this.framesSincePlayerHit = 10;
-	}
-
-	getDirectionOfSpriteMovement(
-		body: Phaser.Physics.Arcade.Body
-	): null | SpriteDirection {
-		if (body.velocity.x > 0) {
-			return SpriteRight;
-		}
-		if (body.velocity.x < 0) {
-			return SpriteLeft;
-		}
-		if (body.velocity.y > 0) {
-			return SpriteDown;
-		}
-		if (body.velocity.y < 0) {
-			return SpriteUp;
-		}
-		return null;
-	}
-
-	updateEnemy(enemy: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody): void {
-		if (!enemy.active) {
-			return;
-		}
-		const body = enemy.body;
-
-		// If we are not moving, move in a random direction. If we are moving, keep
-		// moving in that direction.
-		const previousDirection = this.getDirectionOfSpriteMovement(body);
-		const direction =
-			previousDirection === null
-				? Phaser.Math.Between(0, 3)
-				: previousDirection;
-		switch (direction) {
-			case SpriteUp:
-				enemy.anims.play("logman-up-walk", true);
-				body.setVelocityY(-this.enemySpeed);
-				break;
-			case SpriteRight:
-				enemy.anims.play("logman-right-walk", true);
-				body.setVelocityX(this.enemySpeed);
-				break;
-			case SpriteDown:
-				enemy.anims.play("logman-down-walk", true);
-				body.setVelocityY(this.enemySpeed);
-				break;
-			case SpriteLeft:
-				enemy.anims.play("logman-left-walk", true);
-				body.setVelocityX(-this.enemySpeed);
-				break;
-		}
 	}
 
 	updatePlayer(): void {
@@ -782,53 +727,5 @@ export class Game extends Scene {
 				this.player.setFrame(16);
 				return;
 		}
-	}
-}
-
-function isDynamicSprite(
-	obj: unknown
-): obj is Phaser.Types.Physics.Arcade.SpriteWithDynamicBody {
-	const dynObj = obj as Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
-	return "setVelocityX" in dynObj;
-}
-
-function isDynamicImage(
-	obj: unknown
-): obj is Phaser.Types.Physics.Arcade.ImageWithDynamicBody {
-	const dynObj = obj as Phaser.Types.Physics.Arcade.ImageWithDynamicBody;
-	return "body" in dynObj;
-}
-
-function isTilemapTile(obj: unknown): obj is Phaser.Tilemaps.Tile {
-	const tile = obj as Phaser.Tilemaps.Tile;
-	return "properties" in tile;
-}
-
-type ObjectWithId = { id: number };
-
-function hasId(obj: unknown): obj is ObjectWithId {
-	const objWithId = obj as ObjectWithId;
-	return "id" in objWithId;
-}
-
-function getObjectId(obj: unknown): number {
-	if (!hasId(obj)) {
-		throw new Error("Object has no id");
-	}
-	return obj.id;
-}
-
-function invertSpriteDirection(direction: SpriteDirection): SpriteDirection {
-	switch (direction) {
-		case SpriteUp:
-			return SpriteDown;
-		case SpriteRight:
-			return SpriteLeft;
-		case SpriteDown:
-			return SpriteUp;
-		case SpriteLeft:
-			return SpriteRight;
-		default:
-			throw new Error(`Invalid sprite direction: ${direction}`);
 	}
 }
