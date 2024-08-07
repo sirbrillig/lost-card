@@ -22,7 +22,6 @@ export class Game extends Scene {
 	sword: Phaser.Types.Physics.Arcade.ImageWithDynamicBody;
 	enemies: Phaser.Physics.Arcade.Group;
 	characterSpeed: number = 80;
-	enemySpeed: number = 40;
 
 	framesSincePlayerHit: number = 0;
 	framesSinceAttack: number = 0;
@@ -596,15 +595,15 @@ export class Game extends Scene {
 	}
 
 	createEnemy(x: number, y: number) {
-		const enemy = new MonsterA(this, x, y);
-		this.enemies.add(enemy);
-		return enemy;
+		new MonsterA(this, x, y, (enemy) => {
+			this.enemies.add(enemy);
+		});
 	}
 
 	createBoss(x: number, y: number) {
-		const enemy = new BossA(this, x, y);
-		this.enemies.add(enemy);
-		return enemy;
+		new BossA(this, x, y, (enemy) => {
+			this.enemies.add(enemy);
+		});
 	}
 
 	playerHitEnemy(

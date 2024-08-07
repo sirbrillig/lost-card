@@ -139,15 +139,7 @@ class SpawnEnemies implements Behavior<AllStates> {
 			true
 		);
 
-		const monster = new MonsterA(
-			sprite.scene,
-			sprite.body.x + 5,
-			sprite.body.y
-		);
-		sprite.scene.enemies.add(monster);
-		sprite.once(Phaser.GameObjects.Events.DESTROY, () => {
-			monster.destroy();
-		});
+		this.#addEnemy(sprite);
 
 		sprite.once(
 			Phaser.Animations.Events.ANIMATION_COMPLETE,
@@ -160,6 +152,22 @@ class SpawnEnemies implements Behavior<AllStates> {
 				sprite.stateMachine.pushState(this.#nextState);
 			}
 		);
+	}
+
+	#addEnemy(sprite: BossA) {
+		if (!sprite.body || !isDynamicSprite(sprite.body)) {
+			throw new Error("Could not update monster");
+		}
+		const monster = new MonsterA(
+			sprite.scene,
+			sprite.body.x + 5,
+			sprite.body.y,
+			sprite.registerEnemy
+		);
+		sprite.registerEnemy(monster);
+		sprite.once(Phaser.GameObjects.Events.DESTROY, () => {
+			monster.destroy();
+		});
 	}
 
 	update(sprite: BossA): void {
@@ -221,12 +229,20 @@ export class BossA
 	#hitPoints: number = 6;
 	stateMachine: BehaviorMachineInterface<AllStates>;
 	#currentPlayingState: Behavior<AllStates> | undefined;
+	registerEnemy: (enemy: Phaser.Physics.Arcade.Sprite) => void;
 
-	constructor(scene: Phaser.Scene, x: number, y: number) {
+	constructor(
+		scene: Phaser.Scene,
+		x: number,
+		y: number,
+		registerEnemy: (enemy: Phaser.Physics.Arcade.Sprite) => void
+	) {
 		super(scene, x, y, "logman");
 
 		scene.add.existing(this);
 		scene.physics.add.existing(this);
+		this.registerEnemy = registerEnemy;
+		registerEnemy(this);
 
 		if (!this.body) {
 			throw new Error("Could not create monster");
