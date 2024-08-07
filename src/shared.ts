@@ -9,21 +9,21 @@ export type SpriteDirection =
 	| typeof SpriteDown
 	| typeof SpriteLeft;
 
-export interface BehaviorState {
-	name: string;
-	getNextState: () => BehaviorState;
+export interface Behavior<Key extends string> {
+	name: Key;
+	init(sprite: HittableSprite): void;
+	update(sprite: HittableSprite): void;
 }
 
-export interface BehaviorMachineInterface {
-	getCurrentState(): BehaviorState;
-	setState(state: BehaviorState): void;
-	moveToNextState(): void;
+export interface BehaviorMachineInterface<Key extends string> {
+	getCurrentState(): Key;
+	pushState(state: Key): void;
+	popState(): void;
 }
 
 export interface HittableSprite {
 	hit(): void;
 	isHittable(): boolean;
-	getPreviousState(): BehaviorState;
 }
 
 export function isHittableSprite(obj: unknown): obj is HittableSprite {
