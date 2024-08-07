@@ -9,9 +9,21 @@ export type SpriteDirection =
 	| typeof SpriteDown
 	| typeof SpriteLeft;
 
+export interface BehaviorState {
+	name: string;
+	getNextState: () => BehaviorState;
+}
+
+export interface BehaviorMachineInterface {
+	getCurrentState(): BehaviorState;
+	setState(state: BehaviorState): void;
+	moveToNextState(): void;
+}
+
 export interface HittableSprite {
 	hit(): void;
 	isHittable(): boolean;
+	getPreviousState(): BehaviorState;
 }
 
 export function isHittableSprite(obj: unknown): obj is HittableSprite {

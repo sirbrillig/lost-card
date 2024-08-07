@@ -6,6 +6,7 @@ import {
 	getDirectionOfSpriteMovement,
 	isDynamicSprite,
 	HittableSprite,
+	BehaviorState,
 } from "../shared";
 
 export class MonsterA
@@ -75,4 +76,21 @@ export class MonsterA
 	isHittable() {
 		return true;
 	}
+
+	getPreviousState(): BehaviorState {
+		return initialState1;
+	}
 }
+
+const initialState1: BehaviorState = {
+	name: "initial1",
+	getNextState() {
+		return initialState2;
+	},
+};
+const initialState2: BehaviorState = {
+	name: "initial2",
+	getNextState() {
+		return initialState2;
+	},
+};

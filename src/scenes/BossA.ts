@@ -6,75 +6,90 @@ import {
 	getDirectionOfSpriteMovement,
 	isDynamicSprite,
 	HittableSprite,
+	BehaviorState,
+	BehaviorMachineInterface,
 } from "../shared";
 
-interface StateMachineState {
-	name: string;
-}
+class StateMachine implements BehaviorMachineInterface {
+	#currentState: BehaviorState;
 
-interface StateMachineAction {
-	getNextState(): StateMachineState;
-}
-
-interface StateMachineInterface {
-	getPreviousState(): StateMachineState;
-	getCurrentState(): StateMachineState;
-	takeAction(action: StateMachineAction): void;
-}
-
-class StateMachine implements StateMachineInterface {
-	#previousState: StateMachineState;
-	#currentState: StateMachineState;
-
-	constructor(initialState: StateMachineState) {
+	constructor(initialState: BehaviorState) {
 		this.#currentState = initialState;
-		this.#previousState = initialState;
 	}
 
-	getPreviousState(): StateMachineState {
-		return this.#previousState;
+	setState(state: BehaviorState): void {
+		console.log("moving to", state);
+		this.#currentState = state;
 	}
 
-	getCurrentState(): StateMachineState {
+	getCurrentState(): BehaviorState {
 		return this.#currentState;
 	}
 
-	takeAction(action: StateMachineAction): void {
-		this.#previousState = this.#currentState;
-		this.#currentState = action.getNextState();
+	moveToNextState(): void {
+		this.setState(this.getCurrentState().getNextState());
 	}
 }
 
-const idleState = { name: "idle" };
-const announceState = { name: "announce" };
-const walkState = { name: "walk" };
-const hitState = { name: "hit" };
-
-class AnnounceAction implements StateMachineAction {
-	getNextState(): StateMachineState {
-		return announceState;
-	}
-}
-
-class BeginAction implements StateMachineAction {
-	getNextState(): StateMachineState {
-		return walkState;
-	}
-}
-
-class GotHitAction implements StateMachineAction {
-	getNextState(): StateMachineState {
-		return hitState;
-	}
-}
+const initialState: BehaviorState = {
+	name: "initial",
+	getNextState() {
+		return roar1State;
+	},
+};
+const roar1State: BehaviorState = {
+	name: "roar1",
+	getNextState: () => roar2State,
+};
+const roar2State: BehaviorState = {
+	name: "roar2",
+	getNextState: () => spawn1State,
+};
+const spawn1State: BehaviorState = {
+	name: "spawn1",
+	getNextState: () => spawn2State,
+};
+const spawn2State: BehaviorState = {
+	name: "spawn2",
+	getNextState: () => idle1State,
+};
+const idle1State: BehaviorState = {
+	name: "idle1",
+	getNextState: () => idle2State,
+};
+const idle2State: BehaviorState = {
+	name: "idle2",
+	getNextState: () => idle3State,
+};
+const idle3State: BehaviorState = {
+	name: "idle3",
+	getNextState: () => rocks1State,
+};
+const rocks1State: BehaviorState = {
+	name: "rocks1",
+	getNextState: () => rocks2State,
+};
+const rocks2State: BehaviorState = {
+	name: "rocks2",
+	getNextState: () => rocks3State,
+};
+const rocks3State: BehaviorState = {
+	name: "rocks3",
+	getNextState: () => idle1State,
+};
+const makeHitState = (enemy: HittableSprite) => ({
+	name: "hit",
+	getNextState: () => enemy.getPreviousState().getNextState(),
+});
 
 export class BossA
 	extends Phaser.Physics.Arcade.Sprite
 	implements HittableSprite
 {
 	enemySpeed: number = 40;
-	stateMachine: StateMachineInterface;
-	#isPlayingState: boolean = false;
+	stateMachine: BehaviorMachineInterface;
+	#currentPlayingState: BehaviorState | undefined;
+	#previousState: BehaviorState;
 
 	constructor(scene: Phaser.Scene, x: number, y: number) {
 		super(scene, x, y, "logman");
@@ -93,7 +108,8 @@ export class BossA
 		this.setPushable(false);
 		this.setScale(2);
 
-		this.stateMachine = new StateMachine(idleState);
+		this.stateMachine = new StateMachine(initialState);
+		this.#previousState = initialState;
 	}
 
 	update() {
@@ -107,22 +123,71 @@ export class BossA
 		}
 
 		const state = this.stateMachine.getCurrentState();
-
-		switch (state) {
-			case idleState:
+		// Only take an action when the state changes
+		if (state.name === this.#currentPlayingState?.name) {
+			// TODO: this hack should not be necessary for this actual behavior
+			if (state.name.startsWith("rocks")) {
+				this.#walk();
+			}
+			return;
+		}
+		this.#currentPlayingState = state;
+		switch (state.name) {
+			case initialState.name:
 				this.body.stop();
-				this.stateMachine.takeAction(new AnnounceAction());
+				// TODO: do nothing until character is nearby
+				this.stateMachine.moveToNextState();
 				return;
-			case hitState:
-				this.#ouch();
-				return;
-			case announceState:
+			case roar1State.name:
+			case roar2State.name:
 				this.#announce();
 				return;
-			case walkState:
+			case spawn1State.name:
+			case spawn2State.name:
+				this.#spawnEnemies();
+				return;
+			case idle1State.name:
+			case idle2State.name:
+			case idle3State.name:
+				this.#wait();
+				return;
+			case rocks1State.name:
+			case rocks2State.name:
+			case rocks3State.name:
+				// TODO: implement rocks
 				this.#walk();
 				return;
+			case "hit":
+				this.#ouch();
+				return;
 		}
+	}
+
+	#wait() {
+		if (!this.body || !isDynamicSprite(this.body)) {
+			throw new Error("Could not update monster");
+		}
+
+		console.log("waiting");
+		this.body.stop();
+		// TODO: make actual animation for this
+		this.anims.play(
+			{
+				key: "logman-left-walk",
+				repeat: 8,
+			},
+			true
+		);
+		this.once(
+			Phaser.Animations.Events.ANIMATION_COMPLETE,
+			(anim: Phaser.Animations.Animation) => {
+				if (anim.key !== "logman-left-walk") {
+					return;
+				}
+				console.log("waiting complete", anim);
+				this.stateMachine.moveToNextState();
+			}
+		);
 	}
 
 	#announce() {
@@ -130,37 +195,63 @@ export class BossA
 			throw new Error("Could not update monster");
 		}
 
-		if (this.#isPlayingState) {
-			return;
-		}
-		this.#isPlayingState = true;
-
 		console.log("announce");
 		this.body.stop();
+		// TODO: make actual animation for this
 		this.anims.play(
 			{
 				key: "logman-down-walk",
-				repeat: 8,
+				repeat: 3,
 			},
 			true
 		);
-		this.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
-			this.#isPlayingState = false;
-			this.stateMachine.takeAction(new BeginAction());
-		});
+		this.once(
+			Phaser.Animations.Events.ANIMATION_COMPLETE,
+			(anim: Phaser.Animations.Animation) => {
+				if (anim.key !== "logman-down-walk") {
+					return;
+				}
+				console.log("announce complete", anim);
+				this.stateMachine.moveToNextState();
+			}
+		);
+	}
+
+	#spawnEnemies() {
+		if (!this.body || !isDynamicSprite(this.body)) {
+			throw new Error("Could not update monster");
+		}
+
+		console.log("spawn");
+		this.body.stop();
+		// TODO: make actual animation for this
+		this.anims.play(
+			{
+				key: "logman-right-walk",
+				repeat: 5,
+			},
+			true
+		);
+		this.once(
+			Phaser.Animations.Events.ANIMATION_COMPLETE,
+			(anim: Phaser.Animations.Animation) => {
+				if (anim.key !== "logman-right-walk") {
+					return;
+				}
+				console.log("spawn complete", anim);
+				this.stateMachine.moveToNextState();
+			}
+		);
 	}
 
 	#ouch() {
 		if (!this.body || !isDynamicSprite(this.body)) {
 			throw new Error("Could not update monster");
 		}
-		if (this.#isPlayingState) {
-			return;
-		}
-		this.#isPlayingState = true;
 
 		console.log("ouch");
-		this.body.stop();
+
+		// TODO: make actual animation for this
 		this.anims.play(
 			{
 				key: "logman-up-walk",
@@ -168,18 +259,16 @@ export class BossA
 			},
 			true
 		);
-		this.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
-			this.#isPlayingState = false;
-			// TODO: this will re-start the state we were in before being hit; instead we should return to the point in the state.
-			switch (this.stateMachine.getPreviousState()) {
-				case announceState:
-					this.stateMachine.takeAction(new AnnounceAction());
+		this.once(
+			Phaser.Animations.Events.ANIMATION_COMPLETE,
+			(anim: Phaser.Animations.Animation) => {
+				if (anim.key !== "logman-up-walk") {
 					return;
-				case walkState:
-					this.stateMachine.takeAction(new BeginAction());
-					return;
+				}
+				console.log("ouch complete", anim);
+				this.stateMachine.moveToNextState();
 			}
-		});
+		);
 	}
 
 	#walk() {
@@ -195,32 +284,56 @@ export class BossA
 		}
 
 		const direction = Phaser.Math.Between(0, 3);
+		let key: string = "logman-up-walk";
 		switch (direction) {
 			case SpriteUp:
-				this.anims.play("logman-up-walk", true);
+				key = "logman-up-walk";
 				this.body.setVelocityY(-this.enemySpeed);
 				break;
 			case SpriteRight:
-				this.anims.play("logman-right-walk", true);
+				key = "logman-right-walk";
 				this.body.setVelocityX(this.enemySpeed);
 				break;
 			case SpriteDown:
-				this.anims.play("logman-down-walk", true);
+				key = "logman-down-walk";
 				this.body.setVelocityY(this.enemySpeed);
 				break;
 			case SpriteLeft:
-				this.anims.play("logman-left-walk", true);
+				key = "logman-left-walk";
 				this.body.setVelocityX(-this.enemySpeed);
 				break;
 		}
+
+		this.anims.play(
+			{
+				key,
+				repeat: 4,
+			},
+			true
+		);
+		this.once(
+			Phaser.Animations.Events.ANIMATION_COMPLETE,
+			(anim: Phaser.Animations.Animation) => {
+				if (anim.key !== key) {
+					return;
+				}
+				console.log("move complete", anim);
+				this.stateMachine.moveToNextState();
+			}
+		);
 	}
 
 	hit() {
 		console.log("hit boss");
-		this.stateMachine.takeAction(new GotHitAction());
+		this.#previousState = this.stateMachine.getCurrentState();
+		this.stateMachine.setState(makeHitState(this));
+	}
+
+	getPreviousState() {
+		return this.#previousState;
 	}
 
 	isHittable(): boolean {
-		return this.stateMachine.getCurrentState() !== hitState;
+		return this.stateMachine.getCurrentState().name !== "hit";
 	}
 }
