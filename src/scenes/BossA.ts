@@ -75,7 +75,7 @@ const rocks2State: BehaviorState = {
 };
 const rocks3State: BehaviorState = {
 	name: "rocks3",
-	getNextState: () => idle1State,
+	getNextState: () => spawn1State,
 };
 const makeHitState = (enemy: HittableSprite) => ({
 	name: "hit",
@@ -314,9 +314,6 @@ export class BossA
 		this.once(
 			Phaser.Animations.Events.ANIMATION_COMPLETE,
 			(anim: Phaser.Animations.Animation) => {
-				if (anim.key !== key) {
-					return;
-				}
 				console.log("move complete", anim);
 				this.stateMachine.moveToNextState();
 			}
