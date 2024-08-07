@@ -4,6 +4,7 @@ import {
 	BehaviorMachineInterface,
 	Behavior,
 } from "../shared";
+import { MonsterA } from "./MonsterA";
 
 type AllStates =
 	| "initial"
@@ -89,9 +90,10 @@ class Roar implements Behavior<AllStates> {
 		}
 		console.log("roar");
 		sprite.body.stop();
+		// TODO: make actual animation for this
 		sprite.anims.play(
 			{
-				key: "logman-right-walk",
+				key: "logman-down-walk",
 				repeat: 5,
 			},
 			true
@@ -99,9 +101,6 @@ class Roar implements Behavior<AllStates> {
 		sprite.once(
 			Phaser.Animations.Events.ANIMATION_COMPLETE,
 			(anim: Phaser.Animations.Animation) => {
-				if (anim.key !== "logman-right-walk") {
-					return;
-				}
 				console.log("roar complete", anim);
 				sprite.stateMachine.popState();
 				sprite.stateMachine.pushState(this.#nextState);
@@ -113,9 +112,6 @@ class Roar implements Behavior<AllStates> {
 		if (!sprite.body || !isDynamicSprite(sprite.body)) {
 			throw new Error("Could not update monster");
 		}
-
-		// TODO: make actual animation for this
-		// TODO: spawn enemies
 	}
 }
 
@@ -135,7 +131,6 @@ class SpawnEnemies implements Behavior<AllStates> {
 		console.log("spawn");
 		sprite.body.stop();
 		// TODO: make actual animation for this
-		// TODO: spawn enemies
 		sprite.anims.play(
 			{
 				key: "logman-right-walk",
@@ -143,6 +138,17 @@ class SpawnEnemies implements Behavior<AllStates> {
 			},
 			true
 		);
+
+		const monster = new MonsterA(
+			sprite.scene,
+			sprite.body.x + 5,
+			sprite.body.y
+		);
+		sprite.scene.enemies.add(monster);
+		sprite.once(Phaser.GameObjects.Events.DESTROY, () => {
+			monster.destroy();
+		});
+
 		sprite.once(
 			Phaser.Animations.Events.ANIMATION_COMPLETE,
 			(anim: Phaser.Animations.Animation) => {
@@ -210,8 +216,9 @@ export class BossA
 	extends Phaser.Physics.Arcade.Sprite
 	implements HittableSprite
 {
+	#isBeingHit: boolean = false;
+	#freeTimeAfterHit: number = 600;
 	#hitPoints: number = 6;
-	enemySpeed: number = 40;
 	stateMachine: BehaviorMachineInterface<AllStates>;
 	#currentPlayingState: Behavior<AllStates> | undefined;
 
@@ -291,11 +298,17 @@ export class BossA
 	}
 
 	hit() {
+		if (!this.isHittable()) {
+			return;
+		}
 		console.log("hit boss");
+
+		this.#isBeingHit = true;
 		this.tint = 0xff0000;
 		setTimeout(() => {
 			this.clearTint();
-		}, 300);
+			this.#isBeingHit = false;
+		}, this.#freeTimeAfterHit);
 		this.#hitPoints -= 1;
 
 		if (this.#hitPoints === 0) {
@@ -304,6 +317,8 @@ export class BossA
 	}
 
 	isHittable(): boolean {
-		return this.stateMachine.getCurrentState() !== "initial";
+		return (
+			this.stateMachine.getCurrentState() !== "initial" && !this.#isBeingHit
+		);
 	}
 }
