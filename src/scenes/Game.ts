@@ -633,6 +633,11 @@ export class Game extends Scene {
 			return;
 		}
 
+		player.tint = 0xff0000;
+		setTimeout(() => {
+			player.clearTint();
+		}, 200);
+
 		// Bounce the player off the enemy in a random direction perpendicular to
 		// the movement of the enemy so we don't get hit again immediately.
 		const enemyDirection = getDirectionOfSpriteMovement(enemy.body);

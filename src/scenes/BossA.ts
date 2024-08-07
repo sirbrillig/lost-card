@@ -291,6 +291,10 @@ export class BossA
 
 	hit() {
 		console.log("hit boss");
+		this.tint = 0xff0000;
+		setTimeout(() => {
+			this.clearTint();
+		}, 300);
 		// TODO: register damage
 	}
 
