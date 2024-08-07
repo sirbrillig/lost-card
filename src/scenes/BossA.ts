@@ -210,6 +210,7 @@ export class BossA
 	extends Phaser.Physics.Arcade.Sprite
 	implements HittableSprite
 {
+	#hitPoints: number = 6;
 	enemySpeed: number = 40;
 	stateMachine: BehaviorMachineInterface<AllStates>;
 	#currentPlayingState: Behavior<AllStates> | undefined;
@@ -295,7 +296,11 @@ export class BossA
 		setTimeout(() => {
 			this.clearTint();
 		}, 300);
-		// TODO: register damage
+		this.#hitPoints -= 1;
+
+		if (this.#hitPoints === 0) {
+			this.destroy();
+		}
 	}
 
 	isHittable(): boolean {
