@@ -1244,6 +1244,72 @@
                  "width":12.615,
                  "x":225.286294076164,
                  "y":190.871625528914
+                }, 
+                {
+                 "gid":866,
+                 "height":13.473,
+                 "id":84,
+                 "name":"",
+                 "properties":[
+                        {
+                         "name":"affectedByWindCard",
+                         "type":"bool",
+                         "value":true
+                        }, 
+                        {
+                         "name":"collides",
+                         "type":"bool",
+                         "value":true
+                        }, 
+                        {
+                         "name":"msAfterApproach",
+                         "type":"int",
+                         "value":1700
+                        }, 
+                        {
+                         "name":"previewBeforeAppear",
+                         "type":"int",
+                         "value":500
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":13.1923,
+                 "x":736.704273131171,
+                 "y":61.5286622002821
+                }, 
+                {
+                 "gid":866,
+                 "height":13.473,
+                 "id":85,
+                 "name":"",
+                 "properties":[
+                        {
+                         "name":"affectedByWindCard",
+                         "type":"bool",
+                         "value":true
+                        }, 
+                        {
+                         "name":"collides",
+                         "type":"bool",
+                         "value":true
+                        }, 
+                        {
+                         "name":"msAfterApproach",
+                         "type":"int",
+                         "value":3500
+                        }, 
+                        {
+                         "name":"previewBeforeAppear",
+                         "type":"int",
+                         "value":500
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":13.1923,
+                 "x":608.918659590973,
+                 "y":31.0632179125529
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -1252,7 +1318,7 @@
          "y":0
         }],
  "nextlayerid":8,
- "nextobjectid":84,
+ "nextobjectid":86,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.0",

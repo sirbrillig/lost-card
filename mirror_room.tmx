@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.0" orientation="orthogonal" renderorder="right-down" width="80" height="60" tilewidth="16" tileheight="16" infinite="0" nextlayerid="8" nextobjectid="84">
+<map version="1.10" tiledversion="1.11.0" orientation="orthogonal" renderorder="right-down" width="80" height="60" tilewidth="16" tileheight="16" infinite="0" nextlayerid="8" nextobjectid="86">
  <editorsettings>
   <export target="public/assets/mirror_room.json" format="json"/>
  </editorsettings>
@@ -7397,6 +7397,18 @@
   <object id="83" gid="866" x="225.286" y="190.872" width="12.615" height="12.615">
    <properties>
     <property name="msAfterApproach" type="int" value="1"/>
+   </properties>
+  </object>
+  <object id="84" gid="866" x="736.704" y="61.5287" width="13.1923" height="13.473">
+   <properties>
+    <property name="msAfterApproach" type="int" value="1700"/>
+    <property name="previewBeforeAppear" type="int" value="500"/>
+   </properties>
+  </object>
+  <object id="85" gid="866" x="608.919" y="31.0632" width="13.1923" height="13.473">
+   <properties>
+    <property name="msAfterApproach" type="int" value="3500"/>
+    <property name="previewBeforeAppear" type="int" value="500"/>
    </properties>
   </object>
  </objectgroup>
