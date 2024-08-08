@@ -540,109 +540,99 @@ export class Game extends Scene {
 		return this.characterSpeed;
 	}
 
+	updateSwordHitboxForAttack() {
+		// Add hitbox for sword in direction of sprite
+		const width = (() => {
+			if (
+				this.playerDirection === SpriteLeft ||
+				this.playerDirection === SpriteRight
+			) {
+				return 6;
+			}
+			return 12;
+		})();
+		const height = (() => {
+			if (
+				this.playerDirection === SpriteUp ||
+				this.playerDirection === SpriteDown
+			) {
+				return 6;
+			}
+			return 12;
+		})();
+
+		this.sword.body.setSize(width, height);
+
+		const [xOffset, yOffset] = this.getSwordOffset();
+		this.sword.x = this.player.x + xOffset;
+		this.sword.y = this.player.y + yOffset;
+		this.physics.world.add(this.sword.body);
+	}
+
+	getSwordOffset() {
+		const xOffset = (() => {
+			if (this.playerDirection === SpriteLeft) {
+				return -8;
+			}
+			if (this.playerDirection === SpriteRight) {
+				return 8;
+			}
+			return 0;
+		})();
+		const yOffset = (() => {
+			if (this.playerDirection === SpriteUp) {
+				return -8;
+			}
+			if (this.playerDirection === SpriteDown) {
+				return 8;
+			}
+			return 0;
+		})();
+		return [xOffset, yOffset];
+	}
+
+	updateSwordHitboxForPower() {
+		// Add hitbox for sword in direction of sprite
+
+		const width = (() => {
+			if (
+				this.playerDirection === SpriteLeft ||
+				this.playerDirection === SpriteRight
+			) {
+				return 10;
+			}
+			return 5;
+		})();
+		const height = (() => {
+			if (
+				this.playerDirection === SpriteUp ||
+				this.playerDirection === SpriteDown
+			) {
+				return 10;
+			}
+			return 5;
+		})();
+
+		this.sword.body.setSize(width, height);
+		const [xOffset, yOffset] = this.getSwordOffset();
+
+		this.sword.x = this.player.x + xOffset;
+		this.sword.y = this.player.y + yOffset;
+	}
+
 	updateSwordHitbox() {
+		this.sword.body.debugShowBody = false;
 		this.sword.body.setVelocity(0);
+		this.updateSwordHitboxForAttack();
 		if (this.framesSinceAttack > 0) {
-			this.physics.world.add(this.sword.body);
-			// Add hitbox for sword in direction of sprite
-
-			const width = (() => {
-				if (
-					this.playerDirection === SpriteLeft ||
-					this.playerDirection === SpriteRight
-				) {
-					return 6;
-				}
-				return 12;
-			})();
-			const height = (() => {
-				if (
-					this.playerDirection === SpriteUp ||
-					this.playerDirection === SpriteDown
-				) {
-					return 6;
-				}
-				return 12;
-			})();
-
-			const xOffset = (() => {
-				if (this.playerDirection === SpriteLeft) {
-					return -8;
-				}
-				if (this.playerDirection === SpriteRight) {
-					return 8;
-				}
-				return 0;
-			})();
-			const yOffset = (() => {
-				if (this.playerDirection === SpriteUp) {
-					return -8;
-				}
-				if (this.playerDirection === SpriteDown) {
-					return 8;
-				}
-				return 0;
-			})();
-
-			this.sword.body.setSize(width, height);
-
-			const playerX = this.player.x;
-			const playerY = this.player.y;
-			this.sword.x = playerX + xOffset;
-			this.sword.y = playerY + yOffset;
+			this.sword.body.debugShowBody = true;
 			return;
 		}
 		if (this.framesSincePower > 0) {
-			this.physics.world.add(this.sword.body);
-			// Add hitbox for sword in direction of sprite
-
-			const width = (() => {
-				if (
-					this.playerDirection === SpriteLeft ||
-					this.playerDirection === SpriteRight
-				) {
-					return 10;
-				}
-				return 5;
-			})();
-			const height = (() => {
-				if (
-					this.playerDirection === SpriteUp ||
-					this.playerDirection === SpriteDown
-				) {
-					return 10;
-				}
-				return 5;
-			})();
-
-			const xOffset = (() => {
-				if (this.playerDirection === SpriteLeft) {
-					return -8;
-				}
-				if (this.playerDirection === SpriteRight) {
-					return 8;
-				}
-				return 0;
-			})();
-			const yOffset = (() => {
-				if (this.playerDirection === SpriteUp) {
-					return -8;
-				}
-				if (this.playerDirection === SpriteDown) {
-					return 8;
-				}
-				return 0;
-			})();
-
-			this.sword.body.setSize(width, height);
-
-			const playerX = this.player.x;
-			const playerY = this.player.y;
-			this.sword.x = playerX + xOffset;
-			this.sword.y = playerY + yOffset;
+			this.updateSwordHitboxForPower();
+			this.sword.body.debugShowBody = true;
 			return;
 		}
-		this.physics.world.remove(this.sword.body);
 	}
 
 	createPlayer(): void {
@@ -666,6 +656,7 @@ export class Game extends Scene {
 			throw new Error("Sword hitbox is not the right kind of object");
 		}
 		this.sword = sword;
+		this.physics.world.add(this.sword.body);
 		this.updateSwordHitbox();
 
 		const anims = this.anims;
