@@ -86,6 +86,18 @@ export class Game extends Scene {
 			throw new Error("No keyboard controls could be found");
 		}
 		this.cursors = this.input.keyboard.createCursorKeys();
+		this.input.keyboard.on("keydown-SPACE", () => {
+			// Attack
+			if (this.canPlayerAttack()) {
+				this.framesSinceAttack = 40;
+			}
+		});
+		this.input.keyboard.on("keydown-SHIFT", () => {
+			// Power
+			if (this.canPlayerAttack()) {
+				this.framesSincePower = 50;
+			}
+		});
 
 		this.setUpCamera();
 
@@ -911,6 +923,10 @@ export class Game extends Scene {
 		);
 	}
 
+	isPlayerFrozen(): boolean {
+		return this.registry.get("freezePlayer") === true;
+	}
+
 	updatePlayer(): void {
 		this.updateSwordHitbox();
 
@@ -925,7 +941,7 @@ export class Game extends Scene {
 		this.player.body.setVelocity(0);
 		this.player.setVisible(true);
 
-		if (this.registry.get("freezePlayer") === true) {
+		if (this.isPlayerFrozen()) {
 			this.player.body.setVelocity(0);
 			console.log("player frozen");
 			return;
@@ -989,16 +1005,6 @@ export class Game extends Scene {
 					this.player.anims.play("character-left-power", true);
 					break;
 			}
-			return;
-		}
-
-		if (this.cursors.space.isDown && this.canPlayerAttack()) {
-			this.framesSinceAttack = 40;
-			return;
-		}
-
-		if (this.cursors.shift.isDown && this.canPlayerAttack()) {
-			this.framesSincePower = 50;
 			return;
 		}
 
