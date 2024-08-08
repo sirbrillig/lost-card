@@ -31,6 +31,8 @@ export class Game extends Scene {
 	landLayer: Phaser.Tilemaps.TilemapLayer;
 	doorsLayer: Phaser.Tilemaps.TilemapLayer;
 	stuffLayer: Phaser.Tilemaps.TilemapLayer;
+	activeRoom: Phaser.Types.Tilemaps.TiledObject;
+	enteredRoomAt: number = 0;
 
 	doors: Phaser.Types.Tilemaps.TiledObject[];
 
@@ -107,7 +109,6 @@ export class Game extends Scene {
 		sprite: Phaser.Types.Physics.Arcade.ArcadeColliderType
 	) {
 		this.physics.add.collider(sprite, layer);
-		this.physics.add.collider(sprite, layer);
 	}
 
 	setUpCamera(): void {
@@ -156,6 +157,8 @@ export class Game extends Scene {
 
 		camera.startFollow(this.player);
 
+		this.activeRoom = room;
+		this.enteredRoomAt = this.time.now;
 		this.hideAllRoomsExcept(room);
 	}
 
@@ -359,10 +362,88 @@ export class Game extends Scene {
 			enemy.update();
 		});
 		this.updatePlayer();
+		this.updateRoom();
+	}
+
+	updateRoom() {
+		const transientTiles = this.getTransientTilesInRoom(this.activeRoom);
+		const appearingTiles = transientTiles.filter((tile) => {
+			if (!isTilemapTile(tile)) {
+				return false;
+			}
+			return tile.properties?.some(
+				(prop: { name: string }) => prop.name === "msAfterApproach"
+			);
+		});
+		appearingTiles.forEach((tile) => {
+			if (!isTilemapTile(tile)) {
+				return false;
+			}
+			const msAfterApproach: number =
+				tile.properties?.find(
+					(prop: { name: string }) => prop.name === "msAfterApproach"
+				)?.value ?? 0;
+
+			const timeSinceApproach = this.time.now - this.enteredRoomAt;
+			if (timeSinceApproach < msAfterApproach) {
+				return;
+			}
+
+			if (tile.visible) {
+				return;
+			}
+			tile.visible = true;
+			if (!tile.gid || !tile.x || !tile.y) {
+				return;
+			}
+
+			const tileAdded = this.stuffLayer.putTileAtWorldXY(
+				tile.gid,
+				tile.x,
+				tile.y
+			);
+			tileAdded.setCollision(true, true, true, true);
+			console.log("adding tile", tileAdded);
+			if (this.physics.overlapTiles(this.player, [tileAdded])) {
+				console.log("hit player with tile");
+				this.enemyHitPlayer(this.player);
+			}
+		});
+	}
+
+	getTransientTilesInRoom(room: Phaser.Types.Tilemaps.TiledObject) {
+		const layerName = "Transients";
+		const layer = this.map.getObjectLayer(layerName);
+		return (
+			layer?.objects.filter((tile) => {
+				const tileX = tile.x ?? 0;
+				const tileY = tile.y ?? 0;
+				const roomX = room.x ?? 0;
+				const roomY = room.y ?? 0;
+				const roomWidth = room.width ?? 0;
+				const roomHeight = room.height ?? 0;
+				if (
+					tileX >= roomX &&
+					tileY >= roomY &&
+					tileX <= roomX + roomWidth &&
+					tileY <= roomY + roomHeight
+				) {
+					return true;
+				}
+				return false;
+			}) ?? []
+		);
 	}
 
 	maybeChangeRoom() {
-		const touchingDoor = this.doors.find((door) => {
+		const touchingDoor = this.getDoorTouchingPlayer();
+		if (touchingDoor) {
+			this.handleCollideDoor(touchingDoor);
+		}
+	}
+
+	getDoorTouchingPlayer(): Phaser.Types.Tilemaps.TiledObject | undefined {
+		return this.doors.find((door) => {
 			if (
 				door.x === undefined ||
 				door.y === undefined ||
@@ -386,9 +467,6 @@ export class Game extends Scene {
 			}
 			return false;
 		});
-		if (touchingDoor) {
-			this.handleCollideDoor(touchingDoor);
-		}
 	}
 
 	movePlayerToPoint(x: number, y: number) {
@@ -626,7 +704,7 @@ export class Game extends Scene {
 
 	enemyHitPlayer(
 		player: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody,
-		enemy: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody
+		enemy?: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody
 	): void {
 		if (this.framesSincePlayerHit > 0) {
 			return;
@@ -639,7 +717,7 @@ export class Game extends Scene {
 
 		// Bounce the player off the enemy in a random direction perpendicular to
 		// the movement of the enemy so we don't get hit again immediately.
-		const enemyDirection = getDirectionOfSpriteMovement(enemy.body);
+		const enemyDirection = enemy ? getDirectionOfSpriteMovement(enemy.body) : 0;
 		const direction = Phaser.Math.Between(0, 1);
 		const bounceSpeed = this.getPlayerSpeed() * 4;
 		const bounceVelocity = direction === 1 ? bounceSpeed : -bounceSpeed;

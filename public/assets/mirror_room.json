@@ -817,9 +817,43 @@
          "visible":true,
          "x":0,
          "y":0
+        }, 
+        {
+         "draworder":"topdown",
+         "id":7,
+         "name":"Transients",
+         "objects":[
+                {
+                 "gid":866,
+                 "height":13.4730458221024,
+                 "id":64,
+                 "name":"",
+                 "properties":[
+                        {
+                         "name":"collides",
+                         "type":"bool",
+                         "value":true
+                        }, 
+                        {
+                         "name":"msAfterApproach",
+                         "type":"int",
+                         "value":1000
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":false,
+                 "width":13.1922731356693,
+                 "x":513.965408805031,
+                 "y":206.596136567835
+                }],
+         "opacity":1,
+         "type":"objectgroup",
+         "visible":true,
+         "x":0,
+         "y":0
         }],
- "nextlayerid":7,
- "nextobjectid":64,
+ "nextlayerid":8,
+ "nextobjectid":65,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.0",
