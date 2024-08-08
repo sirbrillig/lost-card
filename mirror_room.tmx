@@ -7153,7 +7153,7 @@
   </data>
  </layer>
  <objectgroup id="4" name="MetaObjects">
-  <object id="5" name="Start Point" x="288.393" y="65.3876">
+  <object id="5" name="Start Point" x="287.587" y="79.3566">
    <point/>
   </object>
   <object id="12" name="DoorMK1_MK2" gid="1073" x="192" y="80" width="16" height="16">
@@ -7253,7 +7253,7 @@
    </properties>
    <point/>
   </object>
-  <object id="47" name="BossA" x="528.02" y="58.0487">
+  <object id="47" name="BossA" x="528.487" y="75.8082">
    <properties>
     <property name="isBoss" type="bool" value="true"/>
     <property name="isMonster" type="bool" value="true"/>

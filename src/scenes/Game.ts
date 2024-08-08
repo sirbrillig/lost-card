@@ -21,13 +21,16 @@ export class Game extends Scene {
 	player: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
 	sword: Phaser.Types.Physics.Arcade.ImageWithDynamicBody;
 	enemies: Phaser.Physics.Arcade.Group;
-	characterSpeed: number = 80;
+	characterSpeed: number = 90;
 
 	framesSincePlayerHit: number = 0;
 	framesSinceAttack: number = 0;
-	postAttackCooldown: number = 150;
+	postAttackCooldown: number = 180;
 	lastAttackedAt: number = 0;
 	framesSincePower: number = 0;
+	postHitInvincibilityTime: number = 300;
+	attackFrameRate: number = 30;
+	attackDelay: number = 50;
 	playerDirection: SpriteDirection = SpriteDown;
 
 	map: Phaser.Tilemaps.Tilemap;
@@ -72,14 +75,7 @@ export class Game extends Scene {
 			}
 		});
 
-		this.physics.add.overlap(this.sword, this.enemies, (_, enemy) => {
-			if (!isDynamicSprite(enemy)) {
-				throw new Error("Enemy sprite is not valid for hitboxing with sword");
-			}
-			this.playerHitEnemy(enemy);
-		});
-
-		this.physics.add.overlap(this.player, this.enemies, (_, enemy) => {
+		this.physics.add.collider(this.sword, this.enemies, (_, enemy) => {
 			if (!isDynamicSprite(enemy)) {
 				throw new Error("Enemy sprite is not valid for hitboxing with sword");
 			}
@@ -695,17 +691,15 @@ export class Game extends Scene {
 			repeat: -1,
 		});
 
-		const attackFrameRate = 20;
-		const attackDelay = 100;
 		anims.create({
 			key: "character-down-attack",
 			frames: anims.generateFrameNumbers("character", {
 				start: 0,
 				end: 3,
 			}),
-			frameRate: attackFrameRate,
+			frameRate: this.attackFrameRate,
 			repeat: 0,
-			delay: attackDelay,
+			delay: this.attackDelay,
 			showBeforeDelay: true,
 		});
 		anims.create({
@@ -714,9 +708,9 @@ export class Game extends Scene {
 				start: 8,
 				end: 11,
 			}),
-			frameRate: attackFrameRate,
+			frameRate: this.attackFrameRate,
 			repeat: 0,
-			delay: attackDelay,
+			delay: this.attackDelay,
 			showBeforeDelay: true,
 		});
 		anims.create({
@@ -725,9 +719,9 @@ export class Game extends Scene {
 				start: 12,
 				end: 15,
 			}),
-			frameRate: attackFrameRate,
+			frameRate: this.attackFrameRate,
 			repeat: 0,
-			delay: attackDelay,
+			delay: this.attackDelay,
 			showBeforeDelay: true,
 		});
 		anims.create({
@@ -736,9 +730,9 @@ export class Game extends Scene {
 				start: 4,
 				end: 7,
 			}),
-			frameRate: attackFrameRate,
+			frameRate: this.attackFrameRate,
 			repeat: 0,
-			delay: attackDelay,
+			delay: this.attackDelay,
 			showBeforeDelay: true,
 		});
 
@@ -858,6 +852,7 @@ export class Game extends Scene {
 		}
 
 		if (isHittableSprite(enemy) && enemy.isHittable()) {
+			this.cameras.main.shake(200, 0.0001);
 			enemy.hit();
 		}
 	}
@@ -870,17 +865,21 @@ export class Game extends Scene {
 			return;
 		}
 
+		this.cameras.main.shake(300, 0.0001);
 		player.tint = 0xff0000;
 		setTimeout(() => {
 			player.clearTint();
-		}, 200);
+			this.framesSincePlayerHit = 0;
+		}, this.postHitInvincibilityTime);
 
 		// Bounce the player off the enemy in a random direction perpendicular to
 		// the movement of the enemy so we don't get hit again immediately.
 		const enemyDirection = enemy ? getDirectionOfSpriteMovement(enemy.body) : 0;
 		const direction = Phaser.Math.Between(0, 1);
-		const bounceSpeed = this.getPlayerSpeed() * 4;
+		const bounceSpeed = this.getPlayerSpeed() * 2;
 		const bounceVelocity = direction === 1 ? bounceSpeed : -bounceSpeed;
+		player.body.setVelocityX(0);
+		player.body.setVelocityY(0);
 		switch (enemyDirection) {
 			case SpriteUp:
 				player.body.setVelocityX(bounceVelocity);
@@ -896,7 +895,8 @@ export class Game extends Scene {
 				break;
 		}
 
-		this.framesSincePlayerHit = 20;
+		console.log("player got hit!");
+		this.framesSincePlayerHit = 200;
 	}
 
 	getTimeSinceLastAttack(): number {
@@ -927,6 +927,9 @@ export class Game extends Scene {
 
 		if (this.framesSinceAttack > 0) {
 			this.framesSinceAttack -= 1;
+			if (this.framesSinceAttack === 0) {
+				this.lastAttackedAt = this.time.now;
+			}
 		}
 
 		if (
