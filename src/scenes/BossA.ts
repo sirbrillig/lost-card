@@ -6,19 +6,7 @@ import {
 } from "../shared";
 import { MonsterA } from "./MonsterA";
 
-type AllStates =
-	| "initial"
-	| "roar1"
-	| "roar2"
-	| "spawn1"
-	| "spawn2"
-	| "idle1"
-	| "idle2"
-	| "idle3"
-	| "rocks1"
-	| "rocks2"
-	| "rocks3"
-	| "postRocks";
+type AllStates = "initial" | "roar1" | "spawn1" | "spawn2" | "idle1" | "idle2";
 
 class StateMachine implements BehaviorMachineInterface<AllStates> {
 	#stateStack: Array<AllStates> = [];
@@ -62,7 +50,6 @@ class WaitForActive implements Behavior<AllStates> {
 		sprite.body.stop();
 		setTimeout(() => {
 			this.#isReady = true;
-			sprite.scene.cameras.main.shake(1000, 0.0005);
 		}, 2000);
 	}
 
@@ -99,10 +86,13 @@ class Roar implements Behavior<AllStates> {
 			},
 			true
 		);
+		sprite.scene.registry.set("freezePlayer", true);
+		sprite.scene.cameras.main.shake(2000, 0.0005);
 		sprite.once(
 			Phaser.Animations.Events.ANIMATION_COMPLETE,
 			(anim: Phaser.Animations.Animation) => {
 				console.log("roar complete", anim);
+				sprite.scene.registry.set("freezePlayer", false);
 				sprite.stateMachine.popState();
 				sprite.stateMachine.pushState(this.#nextState);
 			}
@@ -141,6 +131,9 @@ class SpawnEnemies implements Behavior<AllStates> {
 		);
 
 		this.#addEnemy(sprite);
+		this.#addEnemy(sprite);
+		this.#addEnemy(sprite);
+		this.#addEnemy(sprite);
 
 		sprite.once(
 			Phaser.Animations.Events.ANIMATION_COMPLETE,
@@ -162,7 +155,7 @@ class SpawnEnemies implements Behavior<AllStates> {
 		const monster = new MonsterA(
 			sprite.scene,
 			sprite.body.x + 5,
-			sprite.body.y,
+			sprite.body.y + sprite.body.height,
 			sprite.registerEnemy
 		);
 		sprite.registerEnemy(monster);
@@ -250,7 +243,7 @@ export class BossA
 		}
 
 		this.setDepth(1);
-		this.setSize(this.width * 0.55, this.height * 0.65);
+		this.setSize(this.width * 0.45, this.height * 0.55);
 		this.setOffset(this.body.offset.x, this.body.offset.y + 5);
 		this.setCollideWorldBounds(true);
 		this.setPushable(false);
@@ -284,10 +277,7 @@ export class BossA
 					this.#currentPlayingState = new WaitForActive("initial", "roar1");
 					break;
 				case "roar1":
-					this.#currentPlayingState = new Roar("roar1", "roar2");
-					break;
-				case "roar2":
-					this.#currentPlayingState = new Roar("roar2", "spawn1");
+					this.#currentPlayingState = new Roar("roar1", "spawn1");
 					break;
 				case "spawn1":
 					this.#currentPlayingState = new SpawnEnemies("spawn1", "spawn2");
@@ -335,7 +325,9 @@ export class BossA
 
 	isHittable(): boolean {
 		return (
-			this.stateMachine.getCurrentState() !== "initial" && !this.#isBeingHit
+			this.stateMachine.getCurrentState() !== "initial" &&
+			!this.stateMachine.getCurrentState().includes("roar") &&
+			!this.#isBeingHit
 		);
 	}
 }

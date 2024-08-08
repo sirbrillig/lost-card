@@ -925,6 +925,12 @@ export class Game extends Scene {
 		this.player.body.setVelocity(0);
 		this.player.setVisible(true);
 
+		if (this.registry.get("freezePlayer") === true) {
+			this.player.body.setVelocity(0);
+			console.log("player frozen");
+			return;
+		}
+
 		if (this.framesSinceAttack > 0) {
 			this.framesSinceAttack -= 1;
 			if (this.framesSinceAttack === 0) {
