@@ -497,35 +497,35 @@ export class Game extends Scene {
 					this.playerDirection === SpriteLeft ||
 					this.playerDirection === SpriteRight
 				) {
-					return 15;
+					return 6;
 				}
-				return 30;
+				return 15;
 			})();
 			const height = (() => {
 				if (
 					this.playerDirection === SpriteUp ||
 					this.playerDirection === SpriteDown
 				) {
-					return 15;
+					return 6;
 				}
-				return 30;
+				return 15;
 			})();
 
 			const xOffset = (() => {
 				if (this.playerDirection === SpriteLeft) {
-					return -10;
+					return -8;
 				}
 				if (this.playerDirection === SpriteRight) {
-					return 10;
+					return 8;
 				}
 				return 0;
 			})();
 			const yOffset = (() => {
 				if (this.playerDirection === SpriteUp) {
-					return -10;
+					return -8;
 				}
 				if (this.playerDirection === SpriteDown) {
-					return 10;
+					return 8;
 				}
 				return 0;
 			})();
