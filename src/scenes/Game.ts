@@ -25,7 +25,7 @@ export class Game extends Scene {
 
 	framesSincePlayerHit: number = 0;
 	framesSinceAttack: number = 0;
-	postAttackCooldown: number = 180;
+	postAttackCooldown: number = 200;
 	lastAttackedAt: number = 0;
 	framesSincePower: number = 0;
 	postHitInvincibilityTime: number = 300;
