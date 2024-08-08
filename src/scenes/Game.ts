@@ -11,7 +11,6 @@ import {
 	isDynamicSprite,
 	isDynamicImage,
 	isTilemapTile,
-	isTileWithPropertiesObject,
 	getObjectId,
 	getDirectionOfSpriteMovement,
 	isHittableSprite,
@@ -554,7 +553,7 @@ export class Game extends Scene {
 				) {
 					return 6;
 				}
-				return 15;
+				return 12;
 			})();
 			const height = (() => {
 				if (
@@ -563,7 +562,7 @@ export class Game extends Scene {
 				) {
 					return 6;
 				}
-				return 15;
+				return 12;
 			})();
 
 			const xOffset = (() => {
@@ -602,7 +601,7 @@ export class Game extends Scene {
 					this.playerDirection === SpriteLeft ||
 					this.playerDirection === SpriteRight
 				) {
-					return 20;
+					return 10;
 				}
 				return 5;
 			})();
@@ -611,9 +610,9 @@ export class Game extends Scene {
 					this.playerDirection === SpriteUp ||
 					this.playerDirection === SpriteDown
 				) {
-					return 20;
+					return 10;
 				}
-				return 10;
+				return 5;
 			})();
 
 			const xOffset = (() => {
@@ -695,7 +694,7 @@ export class Game extends Scene {
 			repeat: -1,
 		});
 
-		const attackFrameRate = 10;
+		const attackFrameRate = 20;
 		anims.create({
 			key: "character-down-attack",
 			frames: anims.generateFrameNumbers("character", {
