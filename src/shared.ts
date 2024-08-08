@@ -50,7 +50,14 @@ export function isDynamicImage(
 
 export function isTilemapTile(obj: unknown): obj is Phaser.Tilemaps.Tile {
 	const tile = obj as Phaser.Tilemaps.Tile;
-	return "properties" in tile;
+	return "properties" in tile && Array.isArray(tile.properties);
+}
+
+export function isTileWithPropertiesObject(
+	obj: unknown
+): obj is { properties: Record<string, any> } {
+	const tile = obj as Phaser.Tilemaps.Tile;
+	return "properties" in tile && !Array.isArray(tile.properties);
 }
 
 export type ObjectWithId = { id: number };

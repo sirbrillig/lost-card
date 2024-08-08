@@ -11,6 +11,7 @@ import {
 	isDynamicSprite,
 	isDynamicImage,
 	isTilemapTile,
+	isTileWithPropertiesObject,
 	getObjectId,
 	getDirectionOfSpriteMovement,
 	isHittableSprite,
@@ -25,6 +26,7 @@ export class Game extends Scene {
 
 	framesSincePlayerHit: number = 0;
 	framesSinceAttack: number = 0;
+	framesSincePower: number = 0;
 	playerDirection: SpriteDirection = SpriteDown;
 
 	map: Phaser.Tilemaps.Tilemap;
@@ -32,6 +34,7 @@ export class Game extends Scene {
 	doorsLayer: Phaser.Tilemaps.TilemapLayer;
 	stuffLayer: Phaser.Tilemaps.TilemapLayer;
 	activeRoom: Phaser.Types.Tilemaps.TiledObject;
+	createdTiles: Phaser.Tilemaps.Tile[] = [];
 	enteredRoomAt: number = 0;
 
 	doors: Phaser.Types.Tilemaps.TiledObject[];
@@ -88,6 +91,8 @@ export class Game extends Scene {
 		this.cursors = this.input.keyboard.createCursorKeys();
 
 		this.setUpCamera();
+
+		this.hideAllTransientTiles();
 	}
 
 	createTileLayer(
@@ -375,6 +380,35 @@ export class Game extends Scene {
 				(prop: { name: string }) => prop.name === "msAfterApproach"
 			);
 		});
+
+		this.createdTiles.forEach((tile) => {
+			if (this.physics.overlapTiles(this.sword, [tile])) {
+				if (!tile.visible) {
+					return;
+				}
+				if (this.framesSincePower === 0) {
+					return;
+				}
+				if (!isTilemapTile(tile)) {
+					return;
+				}
+				const isAffectedByPower =
+					tile.properties?.find(
+						(prop: { name: string }) => prop.name === "affectedByWindCard"
+					)?.value ?? 0;
+				if (!isAffectedByPower) {
+					return;
+				}
+				if (!tile.x || !tile.y) {
+					return;
+				}
+				console.log("hit item", tile);
+				this.createdTiles = this.createdTiles.filter((tileA) => tileA !== tile);
+				this.stuffLayer.removeTileAtWorldXY(tile.pixelX, tile.pixelY);
+				tile.destroy();
+			}
+		});
+
 		appearingTiles.forEach((tile) => {
 			if (!isTilemapTile(tile)) {
 				return false;
@@ -403,10 +437,12 @@ export class Game extends Scene {
 
 			const tileAdded = this.stuffLayer.putTileAtWorldXY(
 				tile.gid,
-				tile.x,
+				tile.x + tile.width / 2,
 				tile.y
 			);
-			console.log("adding tile", tileAdded);
+			tileAdded.properties = tile.properties;
+
+			console.log("adding tile", tileAdded, "from", tile);
 			tileAdded.alpha = 0.4;
 			setTimeout(() => {
 				tileAdded.alpha = 1;
@@ -416,7 +452,26 @@ export class Game extends Scene {
 					console.log("hit player with tile");
 					this.enemyHitPlayer(this.player);
 				}
+
+				this.createdTiles.push(tileAdded);
 			}, previewBeforeAppear);
+		});
+	}
+
+	hideAllTransientTiles() {
+		const layerName = "Transients";
+		const layer = this.map.getObjectLayer(layerName);
+		const appearingTiles =
+			layer?.objects.filter((tile) => {
+				if (!isTilemapTile(tile)) {
+					return false;
+				}
+				return tile.properties?.some(
+					(prop: { name: string }) => prop.name === "msAfterApproach"
+				);
+			}) ?? [];
+		appearingTiles.forEach((tile) => {
+			tile.visible = false;
 		});
 	}
 
@@ -538,6 +593,56 @@ export class Game extends Scene {
 			this.sword.y = playerY + yOffset;
 			return;
 		}
+		if (this.framesSincePower > 0) {
+			this.physics.world.add(this.sword.body);
+			// Add hitbox for sword in direction of sprite
+
+			const width = (() => {
+				if (
+					this.playerDirection === SpriteLeft ||
+					this.playerDirection === SpriteRight
+				) {
+					return 20;
+				}
+				return 5;
+			})();
+			const height = (() => {
+				if (
+					this.playerDirection === SpriteUp ||
+					this.playerDirection === SpriteDown
+				) {
+					return 20;
+				}
+				return 10;
+			})();
+
+			const xOffset = (() => {
+				if (this.playerDirection === SpriteLeft) {
+					return -8;
+				}
+				if (this.playerDirection === SpriteRight) {
+					return 8;
+				}
+				return 0;
+			})();
+			const yOffset = (() => {
+				if (this.playerDirection === SpriteUp) {
+					return -8;
+				}
+				if (this.playerDirection === SpriteDown) {
+					return 8;
+				}
+				return 0;
+			})();
+
+			this.sword.body.setSize(width, height);
+
+			const playerX = this.player.x;
+			const playerY = this.player.y;
+			this.sword.x = playerX + xOffset;
+			this.sword.y = playerY + yOffset;
+			return;
+		}
 		this.physics.world.remove(this.sword.body);
 	}
 
@@ -625,6 +730,43 @@ export class Game extends Scene {
 				end: 7,
 			}),
 			frameRate: attackFrameRate,
+			repeat: 0,
+		});
+
+		anims.create({
+			key: "character-down-power",
+			frames: anims.generateFrameNumbers("character", {
+				start: 2,
+				end: 0,
+			}),
+			frameRate: 1,
+			repeat: 0,
+		});
+		anims.create({
+			key: "character-right-power",
+			frames: anims.generateFrameNumbers("character", {
+				start: 9,
+				end: 9,
+			}),
+			frameRate: 1,
+			repeat: 0,
+		});
+		anims.create({
+			key: "character-up-power",
+			frames: anims.generateFrameNumbers("character", {
+				start: 14,
+				end: 14,
+			}),
+			frameRate: 1,
+			repeat: 0,
+		});
+		anims.create({
+			key: "character-left-power",
+			frames: anims.generateFrameNumbers("character", {
+				start: 5,
+				end: 5,
+			}),
+			frameRate: 1,
 			repeat: 0,
 		});
 		this.player.setCollideWorldBounds(true);
@@ -750,6 +892,7 @@ export class Game extends Scene {
 
 	updatePlayer(): void {
 		this.updateSwordHitbox();
+
 		if (this.framesSincePlayerHit > 0) {
 			this.framesSincePlayerHit -= 1;
 			this.player.setVisible(
@@ -787,8 +930,37 @@ export class Game extends Scene {
 
 			return;
 		}
+
+		if (this.framesSincePower > 0) {
+			this.framesSincePower -= 1;
+			const playerDirection = this.playerDirection;
+			switch (playerDirection) {
+				case SpriteUp:
+					this.player.anims.play("character-up-power", true);
+					break;
+				case SpriteRight:
+					this.player.anims.play("character-right-power", true);
+					break;
+				case SpriteDown:
+					this.player.anims.play("character-down-power", true);
+					break;
+				case SpriteLeft:
+					this.player.anims.play("character-left-power", true);
+					break;
+			}
+			return;
+		}
+
 		if (this.cursors.space.isDown && this.framesSinceAttack === 0) {
 			this.framesSinceAttack = 40;
+			return;
+		}
+		if (
+			this.cursors.shift.isDown &&
+			this.framesSinceAttack === 0 &&
+			this.framesSincePower === 0
+		) {
+			this.framesSincePower = 50;
 			return;
 		}
 
