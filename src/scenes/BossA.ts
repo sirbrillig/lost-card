@@ -62,6 +62,7 @@ class WaitForActive implements Behavior<AllStates> {
 		sprite.body.stop();
 		setTimeout(() => {
 			this.#isReady = true;
+			sprite.scene.cameras.main.shake(1000, 0.0005);
 		}, 2000);
 	}
 
