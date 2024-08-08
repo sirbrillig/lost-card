@@ -383,6 +383,10 @@ export class Game extends Scene {
 				tile.properties?.find(
 					(prop: { name: string }) => prop.name === "msAfterApproach"
 				)?.value ?? 0;
+			const previewBeforeAppear: number =
+				tile.properties?.find(
+					(prop: { name: string }) => prop.name === "previewBeforeAppear"
+				)?.value ?? 0;
 
 			const timeSinceApproach = this.time.now - this.enteredRoomAt;
 			if (timeSinceApproach < msAfterApproach) {
@@ -402,12 +406,17 @@ export class Game extends Scene {
 				tile.x,
 				tile.y
 			);
-			tileAdded.setCollision(true, true, true, true);
 			console.log("adding tile", tileAdded);
-			if (this.physics.overlapTiles(this.player, [tileAdded])) {
-				console.log("hit player with tile");
-				this.enemyHitPlayer(this.player);
-			}
+			tileAdded.alpha = 0.4;
+			setTimeout(() => {
+				tileAdded.alpha = 1;
+
+				tileAdded.setCollision(true, true, true, true);
+				if (this.physics.overlapTiles(this.player, [tileAdded])) {
+					console.log("hit player with tile");
+					this.enemyHitPlayer(this.player);
+				}
+			}, previewBeforeAppear);
 		});
 	}
 
