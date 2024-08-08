@@ -31,7 +31,7 @@ export class MonsterA
 		}
 
 		this.setDepth(1);
-		this.setSize(this.width * 0.55, this.height * 0.65);
+		this.setSize(this.width * 0.45, this.height * 0.55);
 		this.setOffset(this.body.offset.x, this.body.offset.y + 5);
 		this.setCollideWorldBounds(true);
 		this.setPushable(false);

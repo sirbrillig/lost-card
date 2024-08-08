@@ -25,6 +25,8 @@ export class Game extends Scene {
 
 	framesSincePlayerHit: number = 0;
 	framesSinceAttack: number = 0;
+	postAttackCooldown: number = 150;
+	lastAttackedAt: number = 0;
 	framesSincePower: number = 0;
 	playerDirection: SpriteDirection = SpriteDown;
 
@@ -694,7 +696,7 @@ export class Game extends Scene {
 		});
 
 		const attackFrameRate = 20;
-		const attackDelay = 120;
+		const attackDelay = 100;
 		anims.create({
 			key: "character-down-attack",
 			frames: anims.generateFrameNumbers("character", {
@@ -897,6 +899,18 @@ export class Game extends Scene {
 		this.framesSincePlayerHit = 20;
 	}
 
+	getTimeSinceLastAttack(): number {
+		return this.time.now - this.lastAttackedAt;
+	}
+
+	canPlayerAttack(): boolean {
+		return (
+			this.framesSinceAttack === 0 &&
+			this.getTimeSinceLastAttack() > this.postAttackCooldown &&
+			this.framesSincePower === 0
+		);
+	}
+
 	updatePlayer(): void {
 		this.updateSwordHitbox();
 
@@ -939,8 +953,10 @@ export class Game extends Scene {
 		}
 
 		// If the animation completes, stop the attack.
-		if (this.player.anims.getProgress() === 1) {
+		if (this.framesSinceAttack > 0 && this.player.anims.getProgress() === 1) {
 			this.framesSinceAttack = 0;
+			this.lastAttackedAt = this.time.now;
+			return;
 		}
 
 		if (this.framesSinceAttack > 0) {
@@ -967,16 +983,12 @@ export class Game extends Scene {
 			return;
 		}
 
-		if (this.cursors.space.isDown && this.framesSinceAttack === 0) {
+		if (this.cursors.space.isDown && this.canPlayerAttack()) {
 			this.framesSinceAttack = 40;
 			return;
 		}
 
-		if (
-			this.cursors.shift.isDown &&
-			this.framesSinceAttack === 0 &&
-			this.framesSincePower === 0
-		) {
+		if (this.cursors.shift.isDown && this.canPlayerAttack()) {
 			this.framesSincePower = 50;
 			return;
 		}
