@@ -620,11 +620,19 @@ export class Game extends Scene {
 		this.sword.y = this.player.y + yOffset;
 	}
 
+	isPlayerAttacking() {
+		return (
+			this.framesSinceAttack > 0 &&
+			this.player.anims.hasStarted &&
+			this.player.anims.getName().includes("attack")
+		);
+	}
+
 	updateSwordHitbox() {
 		this.sword.body.debugShowBody = false;
 		this.sword.body.setVelocity(0);
 		this.updateSwordHitboxForAttack();
-		if (this.framesSinceAttack > 0) {
+		if (this.isPlayerAttacking()) {
 			this.sword.body.debugShowBody = true;
 			return;
 		}
@@ -686,6 +694,7 @@ export class Game extends Scene {
 		});
 
 		const attackFrameRate = 20;
+		const attackDelay = 120;
 		anims.create({
 			key: "character-down-attack",
 			frames: anims.generateFrameNumbers("character", {
@@ -694,6 +703,8 @@ export class Game extends Scene {
 			}),
 			frameRate: attackFrameRate,
 			repeat: 0,
+			delay: attackDelay,
+			showBeforeDelay: true,
 		});
 		anims.create({
 			key: "character-right-attack",
@@ -703,6 +714,8 @@ export class Game extends Scene {
 			}),
 			frameRate: attackFrameRate,
 			repeat: 0,
+			delay: attackDelay,
+			showBeforeDelay: true,
 		});
 		anims.create({
 			key: "character-up-attack",
@@ -712,6 +725,8 @@ export class Game extends Scene {
 			}),
 			frameRate: attackFrameRate,
 			repeat: 0,
+			delay: attackDelay,
+			showBeforeDelay: true,
 		});
 		anims.create({
 			key: "character-left-attack",
@@ -721,6 +736,8 @@ export class Game extends Scene {
 			}),
 			frameRate: attackFrameRate,
 			repeat: 0,
+			delay: attackDelay,
+			showBeforeDelay: true,
 		});
 
 		anims.create({
@@ -833,8 +850,8 @@ export class Game extends Scene {
 			return;
 		}
 
-		// If the player is not in the attack animation, do nothing.
-		if (this.framesSinceAttack === 0) {
+		// If the player is not in the attack animation, do nothing. Also do nothing if the player is in the warmup for the attack or the cooldown.
+		if (!this.isPlayerAttacking()) {
 			return;
 		}
 
@@ -877,7 +894,7 @@ export class Game extends Scene {
 				break;
 		}
 
-		this.framesSincePlayerHit = 10;
+		this.framesSincePlayerHit = 20;
 	}
 
 	updatePlayer(): void {
@@ -896,7 +913,12 @@ export class Game extends Scene {
 
 		if (this.framesSinceAttack > 0) {
 			this.framesSinceAttack -= 1;
+		}
 
+		if (
+			this.framesSinceAttack > 0 &&
+			!this.player.anims.getName().includes("attack")
+		) {
 			const playerDirection = this.playerDirection;
 			switch (playerDirection) {
 				case SpriteUp:
@@ -913,11 +935,15 @@ export class Game extends Scene {
 					break;
 			}
 
-			// If the animation completes, stop the attack.
-			if (this.player.anims.getProgress() === 1) {
-				this.framesSinceAttack = 0;
-			}
+			return;
+		}
 
+		// If the animation completes, stop the attack.
+		if (this.player.anims.getProgress() === 1) {
+			this.framesSinceAttack = 0;
+		}
+
+		if (this.framesSinceAttack > 0) {
 			return;
 		}
 
@@ -945,6 +971,7 @@ export class Game extends Scene {
 			this.framesSinceAttack = 40;
 			return;
 		}
+
 		if (
 			this.cursors.shift.isDown &&
 			this.framesSinceAttack === 0 &&
@@ -993,15 +1020,19 @@ export class Game extends Scene {
 		this.player.anims.stop();
 		switch (this.playerDirection) {
 			case SpriteLeft:
+				this.player.anims.play("character-left-walk", true);
 				this.player.setFrame(20);
 				return;
 			case SpriteRight:
+				this.player.anims.play("character-right-walk", true);
 				this.player.setFrame(24);
 				return;
 			case SpriteUp:
+				this.player.anims.play("character-up-walk", true);
 				this.player.setFrame(28);
 				return;
 			case SpriteDown:
+				this.player.anims.play("character-down-walk", true);
 				this.player.setFrame(16);
 				return;
 		}
