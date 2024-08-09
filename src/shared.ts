@@ -302,3 +302,34 @@ export function getTransientTilesInRoom(
 		}) ?? []
 	);
 }
+
+export function getDoorDestinationCoordinates(
+	destinationTile: Phaser.Types.Tilemaps.TiledObject,
+	destinationDirection: SpriteDirection
+): [number, number] {
+	if (destinationTile.x == undefined || destinationTile.y === undefined) {
+		throw new Error("Destination tile has no position");
+	}
+	// If the player enters a door, teleport them just past the corresponding
+	// door. That way they won't trigger the door on the other side and end up
+	// in a loop.
+	const destinationX = (() => {
+		if (destinationDirection === SpriteLeft) {
+			return destinationTile.x - 6;
+		}
+		if (destinationDirection === SpriteRight) {
+			return destinationTile.x + 18;
+		}
+		return destinationTile.x + 8;
+	})();
+	const destinationY = (() => {
+		if (destinationDirection === SpriteUp) {
+			return destinationTile.y - 18;
+		}
+		if (destinationDirection === SpriteDown) {
+			return destinationTile.y + 6;
+		}
+		return destinationTile.y - 6;
+	})();
+	return [destinationX, destinationY];
+}
