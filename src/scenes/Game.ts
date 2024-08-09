@@ -835,26 +835,7 @@ export class Game extends Scene {
 		}
 	}
 
-	updatePlayer(): void {
-		this.updateSwordHitbox();
-
-		if (this.isPlayerBeingHit()) {
-			this.updatePlayerBeingHit();
-			return;
-		}
-
-		this.player.setVisible(true);
-
-		if (this.isPlayerFrozen()) {
-			this.player.body.setVelocity(0);
-			console.log("player frozen");
-			return;
-		}
-
-		this.updatePlayerAttackAnimation();
-
-		this.updatePlayerPowerAnimation();
-
+	updatePlayerMovement(): void {
 		if (this.isPlayerAttacking() || this.isPlayerUsingPower()) {
 			return;
 		}
@@ -892,6 +873,29 @@ export class Game extends Scene {
 		} else {
 			this.setPlayerIdleFrame();
 		}
+	}
+
+	updatePlayer(): void {
+		this.updateSwordHitbox();
+
+		if (this.isPlayerBeingHit()) {
+			this.updatePlayerBeingHit();
+			return;
+		}
+
+		this.player.setVisible(true);
+
+		if (this.isPlayerFrozen()) {
+			this.player.body.setVelocity(0);
+			console.log("player frozen");
+			return;
+		}
+
+		this.updatePlayerAttackAnimation();
+
+		this.updatePlayerPowerAnimation();
+
+		this.updatePlayerMovement();
 	}
 
 	setPlayerIdleFrame() {
