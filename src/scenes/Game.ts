@@ -14,9 +14,9 @@ import {
 	getObjectId,
 	isHittableSprite,
 	getDoorTouchingPlayer,
-	getRooms,
 	getRoomForPoint,
-	getEnemiesInRoom,
+	hideAllRoomsExcept,
+	getTransientTilesInRoom,
 } from "../shared";
 
 export class Game extends Scene {
@@ -189,54 +189,7 @@ export class Game extends Scene {
 
 		this.activeRoom = room;
 		this.enteredRoomAt = this.time.now;
-		this.hideAllRoomsExcept(room);
-	}
-
-	hideAllRoomsExcept(activeRoom: Phaser.Types.Tilemaps.TiledObject) {
-		const rooms = getRooms(this.map);
-		rooms.forEach((room) => {
-			const tiles = this.getTilesInRoom(room);
-			if (activeRoom.id === room.id) {
-				// show room
-				tiles.forEach((tile) => {
-					tile.visible = true;
-				});
-				getEnemiesInRoom(this.enemies, room).forEach((enemy) => {
-					enemy.setActive(true);
-					enemy.setVisible(true);
-				});
-			} else {
-				// hide room
-				tiles.forEach((tile) => {
-					tile.visible = false;
-				});
-				getEnemiesInRoom(this.enemies, room).forEach((enemy) => {
-					enemy.setActive(false);
-					enemy.setVisible(false);
-				});
-			}
-		});
-	}
-
-	getTilesInRoom(room: Phaser.Types.Tilemaps.TiledObject) {
-		const tiles: Phaser.Tilemaps.Tile[] = [];
-		this.map.getTileLayerNames().forEach(
-			(layer) =>
-				this.map
-					.getTilesWithinWorldXY(
-						room.x ?? 0,
-						room.y ?? 0,
-						room.width ?? 0,
-						room.height ?? 0,
-						undefined,
-						undefined,
-						layer
-					)
-					?.forEach((tile) => {
-						tiles.push(tile);
-					})
-		);
-		return tiles;
+		hideAllRoomsExcept(this.map, this.enemies, room);
 	}
 
 	handleCollideDoor(door: Phaser.Types.Tilemaps.TiledObject) {
@@ -351,7 +304,7 @@ export class Game extends Scene {
 	}
 
 	updateAppearingTiles() {
-		const transientTiles = this.getTransientTilesInRoom(this.activeRoom);
+		const transientTiles = getTransientTilesInRoom(this.map, this.activeRoom);
 		const appearingTiles = transientTiles.filter((tile) => {
 			if (!isTilemapTile(tile)) {
 				return false;
@@ -425,30 +378,6 @@ export class Game extends Scene {
 		appearingTiles.forEach((tile) => {
 			tile.visible = false;
 		});
-	}
-
-	getTransientTilesInRoom(room: Phaser.Types.Tilemaps.TiledObject) {
-		const layerName = "Transients";
-		const layer = this.map.getObjectLayer(layerName);
-		return (
-			layer?.objects.filter((tile) => {
-				const tileX = tile.x ?? 0;
-				const tileY = tile.y ?? 0;
-				const roomX = room.x ?? 0;
-				const roomY = room.y ?? 0;
-				const roomWidth = room.width ?? 0;
-				const roomHeight = room.height ?? 0;
-				if (
-					tileX >= roomX &&
-					tileY >= roomY &&
-					tileX <= roomX + roomWidth &&
-					tileY <= roomY + roomHeight
-				) {
-					return true;
-				}
-				return false;
-			}) ?? []
-		);
 	}
 
 	maybeChangeRoom() {
