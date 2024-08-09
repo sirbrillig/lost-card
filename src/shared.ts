@@ -157,3 +157,67 @@ export function getRooms(
 ): Phaser.Types.Tilemaps.TiledObject[] {
 	return map.filterObjects("MetaObjects", (obj) => isMetaObjectRoom(obj)) ?? [];
 }
+
+export function isPointInRoom(
+	x: number,
+	y: number,
+	room: Phaser.Types.Tilemaps.TiledObject
+): boolean {
+	if (
+		room.x !== undefined &&
+		room.y !== undefined &&
+		room.width &&
+		room.height &&
+		x >= room.x &&
+		x <= room.x + room.width &&
+		y >= room.y &&
+		y <= room.y + room.height
+	) {
+		return true;
+	}
+	return false;
+}
+
+export function getRoomForPoint(
+	map: Phaser.Tilemaps.Tilemap,
+	x: number,
+	y: number
+): Phaser.Types.Tilemaps.TiledObject {
+	const room = getRooms(map).find((room) => {
+		if (isPointInRoom(x, y, room)) {
+			return room;
+		}
+	});
+	if (!room) {
+		throw new Error(`No room found for position ${x},${y}`);
+	}
+	return room;
+}
+
+export function isEnemyInRoom(
+	enemy: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody,
+	room: Phaser.Types.Tilemaps.TiledObject
+): boolean {
+	return isPointInRoom(enemy.body.x, enemy.body.y, room);
+}
+
+export function getEnemiesInRoom(
+	enemies: Phaser.Physics.Arcade.Group,
+	room: Phaser.Types.Tilemaps.TiledObject
+): Phaser.Types.Physics.Arcade.SpriteWithDynamicBody[] {
+	return enemies
+		.getChildren()
+		.filter((enemy) => {
+			if (!isDynamicSprite(enemy)) {
+				return false;
+			}
+			return isEnemyInRoom(enemy, room);
+		})
+		.reduce((typedEnemies, enemy) => {
+			if (!isDynamicSprite(enemy)) {
+				return typedEnemies;
+			}
+			typedEnemies.push(enemy);
+			return typedEnemies;
+		}, [] as Phaser.Types.Physics.Arcade.SpriteWithDynamicBody[]);
+}

@@ -15,6 +15,8 @@ import {
 	isHittableSprite,
 	getDoorTouchingPlayer,
 	getRooms,
+	getRoomForPoint,
+	getEnemiesInRoom,
 } from "../shared";
 
 export class Game extends Scene {
@@ -142,7 +144,8 @@ export class Game extends Scene {
 		// Focus the camera on the room that the player currently is in.
 		const tileWidth = 16;
 		const tileHeight = 16;
-		const room = this.getRoomForPoint(
+		const room = getRoomForPoint(
+			this.map,
 			this.player.x + tileWidth,
 			this.player.y + tileHeight
 		);
@@ -198,7 +201,7 @@ export class Game extends Scene {
 				tiles.forEach((tile) => {
 					tile.visible = true;
 				});
-				this.getEnemiesInRoom(room).forEach((enemy) => {
+				getEnemiesInRoom(this.enemies, room).forEach((enemy) => {
 					enemy.setActive(true);
 					enemy.setVisible(true);
 				});
@@ -207,39 +210,12 @@ export class Game extends Scene {
 				tiles.forEach((tile) => {
 					tile.visible = false;
 				});
-				this.getEnemiesInRoom(room).forEach((enemy) => {
+				getEnemiesInRoom(this.enemies, room).forEach((enemy) => {
 					enemy.setActive(false);
 					enemy.setVisible(false);
 				});
 			}
 		});
-	}
-
-	getEnemiesInRoom(
-		room: Phaser.Types.Tilemaps.TiledObject
-	): Phaser.Types.Physics.Arcade.SpriteWithDynamicBody[] {
-		return this.enemies
-			.getChildren()
-			.filter((enemy) => {
-				if (!isDynamicSprite(enemy)) {
-					return false;
-				}
-				return this.isEnemyInRoom(enemy, room);
-			})
-			.reduce((typedEnemies, enemy) => {
-				if (!isDynamicSprite(enemy)) {
-					return typedEnemies;
-				}
-				typedEnemies.push(enemy);
-				return typedEnemies;
-			}, [] as Phaser.Types.Physics.Arcade.SpriteWithDynamicBody[]);
-	}
-
-	isEnemyInRoom(
-		enemy: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody,
-		room: Phaser.Types.Tilemaps.TiledObject
-	): boolean {
-		return this.isPointInRoom(enemy.body.x, enemy.body.y, room);
 	}
 
 	getTilesInRoom(room: Phaser.Types.Tilemaps.TiledObject) {
@@ -261,38 +237,6 @@ export class Game extends Scene {
 					})
 		);
 		return tiles;
-	}
-
-	isPointInRoom(
-		x: number,
-		y: number,
-		room: Phaser.Types.Tilemaps.TiledObject
-	): boolean {
-		if (
-			room.x !== undefined &&
-			room.y !== undefined &&
-			room.width &&
-			room.height &&
-			x >= room.x &&
-			x <= room.x + room.width &&
-			y >= room.y &&
-			y <= room.y + room.height
-		) {
-			return true;
-		}
-		return false;
-	}
-
-	getRoomForPoint(x: number, y: number): Phaser.Types.Tilemaps.TiledObject {
-		const room = getRooms(this.map).find((room) => {
-			if (this.isPointInRoom(x, y, room)) {
-				return room;
-			}
-		});
-		if (!room) {
-			throw new Error(`No room found for position ${x},${y}`);
-		}
-		return room;
 	}
 
 	handleCollideDoor(door: Phaser.Types.Tilemaps.TiledObject) {
@@ -327,7 +271,7 @@ export class Game extends Scene {
 		this.movePlayerToPoint(destinationX, destinationY);
 
 		// if the player enters a door, move the camera to that room
-		const room = this.getRoomForPoint(this.player.x, this.player.y);
+		const room = getRoomForPoint(this.map, this.player.x, this.player.y);
 		console.log("moving camera to room", room);
 		this.moveCameraToRoom(room);
 	}
