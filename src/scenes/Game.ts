@@ -12,7 +12,6 @@ import {
 	isDynamicImage,
 	isTilemapTile,
 	getObjectId,
-	getDirectionOfSpriteMovement,
 	isHittableSprite,
 } from "../shared";
 
@@ -28,7 +27,8 @@ export class Game extends Scene {
 	postAttackCooldown: number = 200;
 	lastAttackedAt: number = 0;
 	framesSincePower: number = 0;
-	postHitKnockbackTime: number = 100;
+	postHitPlayerKnockback: number = 110;
+	postHitEnemyKnockback: number = 50;
 	postHitInvincibilityTime: number = 500;
 	attackFrameRate: number = 30;
 	attackDelay: number = 50;
@@ -72,7 +72,7 @@ export class Game extends Scene {
 
 		this.physics.add.collider(this.player, this.enemies, (player, enemy) => {
 			if (isDynamicSprite(player) && isDynamicSprite(enemy)) {
-				this.enemyHitPlayer(player, enemy);
+				this.enemyHitPlayer();
 			}
 		});
 
@@ -90,12 +90,14 @@ export class Game extends Scene {
 		this.input.keyboard.on("keydown-SPACE", () => {
 			// Attack
 			if (this.canPlayerAttack()) {
+				this.player.body.setVelocity(0);
 				this.framesSinceAttack = 40;
 			}
 		});
 		this.input.keyboard.on("keydown-SHIFT", () => {
 			// Power
 			if (this.canPlayerAttack()) {
+				this.player.body.setVelocity(0);
 				this.framesSincePower = 50;
 			}
 		});
@@ -460,7 +462,7 @@ export class Game extends Scene {
 				tileAdded.setCollision(true, true, true, true);
 				if (this.physics.overlapTiles(this.player, [tileAdded])) {
 					console.log("hit player with tile");
-					this.enemyHitPlayer(this.player);
+					this.enemyHitPlayer();
 				}
 
 				this.createdTiles.push(tileAdded);
@@ -860,6 +862,7 @@ export class Game extends Scene {
 		}
 
 		if (isHittableSprite(enemy) && enemy.isHittable()) {
+			this.knockBackPlayer(this.postHitEnemyKnockback);
 			this.cameras.main.shake(200, 0.0001);
 			enemy.hit();
 		}
@@ -877,7 +880,7 @@ export class Game extends Scene {
 			this.framesSincePlayerHit = 0;
 		}, this.postHitInvincibilityTime);
 
-		this.knockBackPlayer(this.postHitKnockbackTime);
+		this.knockBackPlayer(this.postHitPlayerKnockback);
 
 		console.log("player got hit!");
 		this.framesSincePlayerHit = 200;
@@ -938,7 +941,6 @@ export class Game extends Scene {
 			return;
 		}
 
-		this.player.body.setVelocity(0);
 		this.player.setVisible(true);
 
 		if (this.isPlayerFrozen()) {
@@ -1008,6 +1010,7 @@ export class Game extends Scene {
 			return;
 		}
 
+		this.player.body.setVelocity(0);
 		if (this.cursors.left.isDown) {
 			this.player.body.setVelocityX(-this.getPlayerSpeed());
 		} else if (this.cursors.right.isDown) {
