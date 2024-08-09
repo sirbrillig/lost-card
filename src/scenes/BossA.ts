@@ -166,9 +166,11 @@ class SpawnEnemies implements Behavior<AllStates> {
 			sprite.body.y + sprite.body.height,
 			sprite.registerEnemy
 		);
+		monster.once(Phaser.GameObjects.Events.DESTROY, () => {
+			sprite.spawnedEnemyCount -= 1;
+		});
 		sprite.registerEnemy(monster);
 		sprite.once(Phaser.GameObjects.Events.DESTROY, () => {
-			sprite.spawnedEnemyCount -= 1;
 			monster.destroy();
 		});
 	}
