@@ -249,7 +249,7 @@ export class Game extends Scene {
 				if (!tile.visible) {
 					return;
 				}
-				if (this.framesSincePower === 0) {
+				if (!this.isPlayerUsingPower()) {
 					return;
 				}
 				if (!isTilemapTile(tile)) {
@@ -467,7 +467,7 @@ export class Game extends Scene {
 			this.sword.body.debugShowBody = true;
 			return;
 		}
-		if (this.framesSincePower > 0) {
+		if (this.isPlayerUsingPower()) {
 			this.updateSwordHitboxForPower();
 			this.sword.body.debugShowBody = true;
 			return;
@@ -810,6 +810,31 @@ export class Game extends Scene {
 		}
 	}
 
+	isPlayerUsingPower(): boolean {
+		return this.framesSincePower > 0;
+	}
+
+	updatePlayerPowerAnimation(): void {
+		if (this.isPlayerUsingPower()) {
+			this.framesSincePower -= 1;
+			const playerDirection = this.playerDirection;
+			switch (playerDirection) {
+				case SpriteUp:
+					this.player.anims.play("character-up-power", true);
+					break;
+				case SpriteRight:
+					this.player.anims.play("character-right-power", true);
+					break;
+				case SpriteDown:
+					this.player.anims.play("character-down-power", true);
+					break;
+				case SpriteLeft:
+					this.player.anims.play("character-left-power", true);
+					break;
+			}
+		}
+	}
+
 	updatePlayer(): void {
 		this.updateSwordHitbox();
 
@@ -828,27 +853,9 @@ export class Game extends Scene {
 
 		this.updatePlayerAttackAnimation();
 
-		if (this.isPlayerAttacking()) {
-			return;
-		}
+		this.updatePlayerPowerAnimation();
 
-		if (this.framesSincePower > 0) {
-			this.framesSincePower -= 1;
-			const playerDirection = this.playerDirection;
-			switch (playerDirection) {
-				case SpriteUp:
-					this.player.anims.play("character-up-power", true);
-					break;
-				case SpriteRight:
-					this.player.anims.play("character-right-power", true);
-					break;
-				case SpriteDown:
-					this.player.anims.play("character-down-power", true);
-					break;
-				case SpriteLeft:
-					this.player.anims.play("character-left-power", true);
-					break;
-			}
+		if (this.isPlayerAttacking() || this.isPlayerUsingPower()) {
 			return;
 		}
 
