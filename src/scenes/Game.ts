@@ -28,7 +28,7 @@ export class Game extends Scene {
 	postAttackCooldown: number = 200;
 	lastAttackedAt: number = 0;
 	framesSincePower: number = 0;
-	postHitInvincibilityTime: number = 300;
+	postHitInvincibilityTime: number = 100;
 	attackFrameRate: number = 30;
 	attackDelay: number = 50;
 	playerDirection: SpriteDirection = SpriteDown;
@@ -869,46 +869,45 @@ export class Game extends Scene {
 		}
 	}
 
-	enemyHitPlayer(
-		player: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody,
-		enemy?: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody
-	): void {
+	enemyHitPlayer(): void {
 		if (this.framesSincePlayerHit > 0) {
 			return;
 		}
 
 		this.cameras.main.shake(300, 0.0001);
-		player.tint = 0xff0000;
+		this.player.tint = 0xff0000;
 		setTimeout(() => {
-			player.clearTint();
+			this.player.clearTint();
 			this.framesSincePlayerHit = 0;
 		}, this.postHitInvincibilityTime);
 
-		// Bounce the player off the enemy in a random direction perpendicular to
-		// the movement of the enemy so we don't get hit again immediately.
-		const enemyDirection = enemy ? getDirectionOfSpriteMovement(enemy.body) : 0;
-		const direction = Phaser.Math.Between(0, 1);
-		const bounceSpeed = this.getPlayerSpeed() * 2;
-		const bounceVelocity = direction === 1 ? bounceSpeed : -bounceSpeed;
-		player.body.setVelocityX(0);
-		player.body.setVelocityY(0);
-		switch (enemyDirection) {
-			case SpriteUp:
-				player.body.setVelocityX(bounceVelocity);
-				break;
-			case SpriteRight:
-				player.body.setVelocityY(bounceVelocity);
-				break;
-			case SpriteDown:
-				player.body.setVelocityX(bounceVelocity);
-				break;
-			case SpriteLeft:
-				player.body.setVelocityY(bounceVelocity);
-				break;
-		}
+		this.knockBackPlayer();
 
 		console.log("player got hit!");
 		this.framesSincePlayerHit = 200;
+	}
+
+	knockBackPlayer() {
+		// Knock the player back when they are hit
+		const direction = this.playerDirection;
+		const bounceSpeed = this.getPlayerSpeed() * 2;
+
+		this.player.body.setVelocityX(0);
+		this.player.body.setVelocityY(0);
+		switch (direction) {
+			case SpriteUp:
+				this.player.body.setVelocityY(bounceSpeed);
+				break;
+			case SpriteRight:
+				this.player.body.setVelocityX(-bounceSpeed);
+				break;
+			case SpriteDown:
+				this.player.body.setVelocityY(-bounceSpeed);
+				break;
+			case SpriteLeft:
+				this.player.body.setVelocityX(bounceSpeed);
+				break;
+		}
 	}
 
 	getTimeSinceLastAttack(): number {
