@@ -107,7 +107,7 @@ export class Game extends Scene {
 		});
 		this.input.keyboard.on("keydown-SHIFT", () => {
 			// Power
-			if (this.canPlayerAttack()) {
+			if (this.canPlayerUsePower()) {
 				this.player.body.setVelocity(0);
 				this.framesSincePower = 50;
 			}
@@ -733,10 +733,24 @@ export class Game extends Scene {
 
 	canPlayerAttack(): boolean {
 		return (
+			this.doesPlayerHaveSword() &&
+			!this.isPlayerFrozen() &&
 			this.framesSinceAttack === 0 &&
 			this.getTimeSinceLastAttack() > this.postAttackCooldown &&
 			this.framesSincePower === 0
 		);
+	}
+
+	canPlayerUsePower(): boolean {
+		return this.canPlayerAttack() && this.doesPlayerHavePower();
+	}
+
+	doesPlayerHavePower(): boolean {
+		return this.registry.get("hasWindCard") === true;
+	}
+
+	doesPlayerHaveSword(): boolean {
+		return this.registry.get("hasSword") === true;
 	}
 
 	isPlayerFrozen(): boolean {
