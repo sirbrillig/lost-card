@@ -34,6 +34,8 @@ export class Game extends Scene {
 	attackDelay: number = 50;
 	playerDirection: SpriteDirection = SpriteDown;
 
+	enemyCollider: Phaser.Physics.Arcade.Collider;
+
 	map: Phaser.Tilemaps.Tilemap;
 	landLayer: Phaser.Tilemaps.TilemapLayer;
 	doorsLayer: Phaser.Tilemaps.TilemapLayer;
@@ -70,11 +72,15 @@ export class Game extends Scene {
 		this.setTileLayerCollisions(this.stuffLayer, this.player);
 		this.setTileLayerCollisions(this.stuffLayer, this.enemies);
 
-		this.physics.add.collider(this.player, this.enemies, (player, enemy) => {
-			if (isDynamicSprite(player) && isDynamicSprite(enemy)) {
-				this.enemyHitPlayer();
+		this.enemyCollider = this.physics.add.collider(
+			this.player,
+			this.enemies,
+			(player, enemy) => {
+				if (isDynamicSprite(player) && isDynamicSprite(enemy)) {
+					this.enemyHitPlayer();
+				}
 			}
-		});
+		);
 
 		this.physics.add.collider(this.sword, this.enemies, (_, enemy) => {
 			if (!isDynamicSprite(enemy)) {
@@ -880,11 +886,13 @@ export class Game extends Scene {
 			return;
 		}
 
+		this.enemyCollider.active = false;
 		this.cameras.main.shake(300, 0.0001);
 		this.player.tint = 0xff0000;
 		setTimeout(() => {
 			this.player.clearTint();
 			this.framesSincePlayerHit = 0;
+			this.enemyCollider.active = true;
 		}, this.postHitInvincibilityTime);
 
 		this.knockBack(this.player.body, this.postHitPlayerKnockback);
