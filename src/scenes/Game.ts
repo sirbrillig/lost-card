@@ -445,19 +445,25 @@ export class Game extends Scene {
 		this.sword.y = this.player.y + yOffset;
 	}
 
+	// This will be true once the player starts their attack flow. However, there
+	// are frames of the attack where the sword does not threaten anyone. To know
+	// if the sword is active, use `isPlayerSwordActive()` instead.
 	isPlayerAttacking() {
 		return (
 			this.framesSinceAttack > 0 &&
-			this.player.anims.hasStarted &&
 			this.player.anims.getName().includes("attack")
 		);
+	}
+
+	isPlayerSwordActive() {
+		return this.isPlayerAttacking() && this.player.anims.hasStarted;
 	}
 
 	updateSwordHitbox() {
 		this.sword.body.debugShowBody = false;
 		this.sword.body.setVelocity(0);
 		this.updateSwordHitboxForAttack();
-		if (this.isPlayerAttacking()) {
+		if (this.isPlayerSwordActive()) {
 			this.sword.body.debugShowBody = true;
 			return;
 		}
@@ -668,8 +674,9 @@ export class Game extends Scene {
 	playerHitEnemy(
 		enemy: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody
 	): void {
-		// If the player is not in the attack animation, do nothing. Also do nothing if the player is in the warmup for the attack or the cooldown.
-		if (!this.isPlayerAttacking()) {
+		// If the player is not in the attack animation, do nothing. Also do
+		// nothing if the player is in the warmup for the attack or the cooldown.
+		if (!this.isPlayerSwordActive()) {
 			return;
 		}
 
@@ -766,28 +773,15 @@ export class Game extends Scene {
 		this.player.setVisible(this.framesSincePlayerHit % 2 === 0 ? true : false);
 	}
 
-	updatePlayer(): void {
-		this.updateSwordHitbox();
-
-		if (this.isPlayerBeingHit()) {
-			this.updatePlayerBeingHit();
-		}
-
-		this.player.setVisible(true);
-
-		if (this.isPlayerFrozen()) {
-			this.player.body.setVelocity(0);
-			console.log("player frozen");
-			return;
-		}
-
-		if (this.framesSinceAttack > 0) {
+	updatePlayerAttackAnimation() {
+		if (this.isPlayerAttacking()) {
 			this.framesSinceAttack -= 1;
 			if (this.framesSinceAttack === 0) {
 				this.lastAttackedAt = this.time.now;
 			}
 		}
 
+		// If the animation hasn't started, start it.
 		if (
 			this.framesSinceAttack > 0 &&
 			!this.player.anims.getName().includes("attack")
@@ -807,18 +801,34 @@ export class Game extends Scene {
 					this.player.anims.play("character-left-attack", true);
 					break;
 			}
-
-			return;
 		}
 
 		// If the animation completes, stop the attack.
-		if (this.framesSinceAttack > 0 && this.player.anims.getProgress() === 1) {
+		if (this.isPlayerAttacking() && this.player.anims.getProgress() === 1) {
 			this.framesSinceAttack = 0;
 			this.lastAttackedAt = this.time.now;
+		}
+	}
+
+	updatePlayer(): void {
+		this.updateSwordHitbox();
+
+		if (this.isPlayerBeingHit()) {
+			this.updatePlayerBeingHit();
 			return;
 		}
 
-		if (this.framesSinceAttack > 0) {
+		this.player.setVisible(true);
+
+		if (this.isPlayerFrozen()) {
+			this.player.body.setVelocity(0);
+			console.log("player frozen");
+			return;
+		}
+
+		this.updatePlayerAttackAnimation();
+
+		if (this.isPlayerAttacking()) {
 			return;
 		}
 
