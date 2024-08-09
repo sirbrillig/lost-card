@@ -862,7 +862,7 @@ export class Game extends Scene {
 		}
 
 		if (isHittableSprite(enemy) && enemy.isHittable()) {
-			this.knockBackPlayer(this.postHitEnemyKnockback);
+			this.knockBack(this.player.body, this.postHitEnemyKnockback);
 			this.cameras.main.shake(200, 0.0001);
 			enemy.hit();
 		}
@@ -880,36 +880,35 @@ export class Game extends Scene {
 			this.framesSincePlayerHit = 0;
 		}, this.postHitInvincibilityTime);
 
-		this.knockBackPlayer(this.postHitPlayerKnockback);
+		this.knockBack(this.player.body, this.postHitPlayerKnockback);
 
 		console.log("player got hit!");
 		this.framesSincePlayerHit = 200;
 	}
 
-	knockBackPlayer(amount: number) {
-		// Knock the player back when they are hit
+	knockBack(body: Phaser.Physics.Arcade.Body, time: number) {
 		const direction = this.playerDirection;
 		const bounceSpeed = this.getPlayerSpeed() * 2;
 
 		setTimeout(() => {
-			this.player.body.setVelocityX(0);
-			this.player.body.setVelocityY(0);
-		}, amount);
+			body.setVelocityX(0);
+			body.setVelocityY(0);
+		}, time);
 
-		this.player.body.setVelocityX(0);
-		this.player.body.setVelocityY(0);
+		body.setVelocityX(0);
+		body.setVelocityY(0);
 		switch (direction) {
 			case SpriteUp:
-				this.player.body.setVelocityY(bounceSpeed);
+				body.setVelocityY(bounceSpeed);
 				break;
 			case SpriteRight:
-				this.player.body.setVelocityX(-bounceSpeed);
+				body.setVelocityX(-bounceSpeed);
 				break;
 			case SpriteDown:
-				this.player.body.setVelocityY(-bounceSpeed);
+				body.setVelocityY(-bounceSpeed);
 				break;
 			case SpriteLeft:
-				this.player.body.setVelocityX(bounceSpeed);
+				body.setVelocityX(bounceSpeed);
 				break;
 		}
 	}
