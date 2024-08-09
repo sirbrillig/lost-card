@@ -152,6 +152,14 @@ class SpawnEnemies implements Behavior<AllStates> {
 		if (!sprite.body || !isDynamicSprite(sprite.body)) {
 			throw new Error("Could not update monster");
 		}
+
+		if (sprite.spawnedEnemyCount >= sprite.maxSpawnedEnemies) {
+			console.log("too many spawned enemies");
+			return;
+		}
+
+		sprite.spawnedEnemyCount += 1;
+
 		const monster = new MonsterA(
 			sprite.scene,
 			sprite.body.x + 5,
@@ -160,6 +168,7 @@ class SpawnEnemies implements Behavior<AllStates> {
 		);
 		sprite.registerEnemy(monster);
 		sprite.once(Phaser.GameObjects.Events.DESTROY, () => {
+			sprite.spawnedEnemyCount -= 1;
 			monster.destroy();
 		});
 	}
@@ -221,6 +230,8 @@ export class BossA
 	#isBeingHit: boolean = false;
 	#freeTimeAfterHit: number = 600;
 	#hitPoints: number = 6;
+	spawnedEnemyCount: number = 0;
+	maxSpawnedEnemies: number = 16;
 	stateMachine: BehaviorMachineInterface<AllStates>;
 	#currentPlayingState: Behavior<AllStates> | undefined;
 	registerEnemy: (enemy: Phaser.Physics.Arcade.Sprite) => void;
