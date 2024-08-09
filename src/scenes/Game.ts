@@ -383,16 +383,11 @@ export class Game extends Scene {
 	}
 
 	updateRoom() {
-		const transientTiles = this.getTransientTilesInRoom(this.activeRoom);
-		const appearingTiles = transientTiles.filter((tile) => {
-			if (!isTilemapTile(tile)) {
-				return false;
-			}
-			return tile.properties?.some(
-				(prop: { name: string }) => prop.name === "msAfterApproach"
-			);
-		});
+		this.checkForPowerHitTiles();
+		this.updateAppearingTiles();
+	}
 
+	checkForPowerHitTiles() {
 		this.createdTiles.forEach((tile) => {
 			if (this.physics.overlapTiles(this.sword, [tile])) {
 				if (!tile.visible) {
@@ -419,6 +414,18 @@ export class Game extends Scene {
 				this.stuffLayer.removeTileAtWorldXY(tile.pixelX, tile.pixelY);
 				tile.destroy();
 			}
+		});
+	}
+
+	updateAppearingTiles() {
+		const transientTiles = this.getTransientTilesInRoom(this.activeRoom);
+		const appearingTiles = transientTiles.filter((tile) => {
+			if (!isTilemapTile(tile)) {
+				return false;
+			}
+			return tile.properties?.some(
+				(prop: { name: string }) => prop.name === "msAfterApproach"
+			);
 		});
 
 		appearingTiles.forEach((tile) => {
