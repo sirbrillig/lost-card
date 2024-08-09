@@ -28,7 +28,8 @@ export class Game extends Scene {
 	postAttackCooldown: number = 200;
 	lastAttackedAt: number = 0;
 	framesSincePower: number = 0;
-	postHitInvincibilityTime: number = 100;
+	postHitKnockbackTime: number = 100;
+	postHitInvincibilityTime: number = 500;
 	attackFrameRate: number = 30;
 	attackDelay: number = 50;
 	playerDirection: SpriteDirection = SpriteDown;
@@ -881,16 +882,21 @@ export class Game extends Scene {
 			this.framesSincePlayerHit = 0;
 		}, this.postHitInvincibilityTime);
 
-		this.knockBackPlayer();
+		this.knockBackPlayer(this.postHitKnockbackTime);
 
 		console.log("player got hit!");
 		this.framesSincePlayerHit = 200;
 	}
 
-	knockBackPlayer() {
+	knockBackPlayer(amount: number) {
 		// Knock the player back when they are hit
 		const direction = this.playerDirection;
 		const bounceSpeed = this.getPlayerSpeed() * 2;
+
+		setTimeout(() => {
+			this.player.body.setVelocityX(0);
+			this.player.body.setVelocityY(0);
+		}, amount);
 
 		this.player.body.setVelocityX(0);
 		this.player.body.setVelocityY(0);
