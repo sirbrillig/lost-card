@@ -135,6 +135,8 @@ export class Game extends Scene {
 	}
 
 	setUpCamera(): void {
+		this.cameras.main.setBackgroundColor("black");
+
 		// Focus the camera on the room that the player currently is in.
 		const tileWidth = 16;
 		const tileHeight = 16;
