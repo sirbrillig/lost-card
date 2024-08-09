@@ -857,21 +857,23 @@ export class Game extends Scene {
 		if (this.cursors.left.isDown) {
 			this.player.anims.play("character-left-walk", true);
 			this.playerDirection = SpriteLeft;
-			this.maybeChangeRoom();
 		} else if (this.cursors.right.isDown) {
 			this.player.anims.play("character-right-walk", true);
 			this.playerDirection = SpriteRight;
-			this.maybeChangeRoom();
 		} else if (this.cursors.down.isDown) {
 			this.player.anims.play("character-down-walk", true);
 			this.playerDirection = SpriteDown;
-			this.maybeChangeRoom();
 		} else if (this.cursors.up.isDown) {
 			this.player.anims.play("character-up-walk", true);
 			this.playerDirection = SpriteUp;
-			this.maybeChangeRoom();
 		} else {
 			this.setPlayerIdleFrame();
+		}
+
+		const isMoving =
+			this.player.body.velocity.x !== 0 || this.player.body.velocity.y !== 0;
+		if (isMoving) {
+			this.maybeChangeRoom();
 		}
 	}
 
@@ -886,6 +888,7 @@ export class Game extends Scene {
 		this.player.setVisible(true);
 
 		if (this.isPlayerFrozen()) {
+			this.player.stop();
 			this.player.body.setVelocity(0);
 			console.log("player frozen");
 			return;
