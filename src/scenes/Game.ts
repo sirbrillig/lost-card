@@ -13,6 +13,7 @@ import {
 	isTilemapTile,
 	getObjectId,
 	isHittableSprite,
+	getDoorTouchingPlayer,
 } from "../shared";
 
 export class Game extends Scene {
@@ -527,37 +528,10 @@ export class Game extends Scene {
 	}
 
 	maybeChangeRoom() {
-		const touchingDoor = this.getDoorTouchingPlayer();
+		const touchingDoor = getDoorTouchingPlayer(this.doors, this.player);
 		if (touchingDoor) {
 			this.handleCollideDoor(touchingDoor);
 		}
-	}
-
-	getDoorTouchingPlayer(): Phaser.Types.Tilemaps.TiledObject | undefined {
-		return this.doors.find((door) => {
-			if (
-				door.x === undefined ||
-				door.y === undefined ||
-				!door.height ||
-				!door.width
-			) {
-				throw new Error("Door has no position");
-			}
-			// Note: for reasons I don't understand, door.x and door.y are the
-			// lower-left corner of the tile so we have to adjust them to get the
-			// upper-left coordinates.
-			const doorX = door.x;
-			const doorY = door.y - door.height;
-			if (
-				this.player.x >= doorX &&
-				this.player.x < doorX + door.width &&
-				this.player.y >= doorY &&
-				this.player.y < doorY + door.height
-			) {
-				return true;
-			}
-			return false;
-		});
 	}
 
 	movePlayerToPoint(x: number, y: number) {
