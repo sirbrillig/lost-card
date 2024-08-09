@@ -14,6 +14,7 @@ import {
 	getObjectId,
 	isHittableSprite,
 	getDoorTouchingPlayer,
+	getRooms,
 } from "../shared";
 
 export class Game extends Scene {
@@ -189,7 +190,7 @@ export class Game extends Scene {
 	}
 
 	hideAllRoomsExcept(activeRoom: Phaser.Types.Tilemaps.TiledObject) {
-		const rooms = this.getRooms();
+		const rooms = getRooms(this.map);
 		rooms.forEach((room) => {
 			const tiles = this.getTilesInRoom(room);
 			if (activeRoom.id === room.id) {
@@ -262,27 +263,6 @@ export class Game extends Scene {
 		return tiles;
 	}
 
-	isMetaObjectRoom(obj: Phaser.GameObjects.GameObject): boolean {
-		if (!isTilemapTile(obj)) {
-			return false;
-		}
-		const roomName = obj.properties.find(
-			(prop: { name: string }) => prop.name === "room"
-		)?.value;
-		if (!roomName) {
-			return false;
-		}
-		return true;
-	}
-
-	getRooms(): Phaser.Types.Tilemaps.TiledObject[] {
-		return (
-			this.map.filterObjects("MetaObjects", (obj) =>
-				this.isMetaObjectRoom(obj)
-			) ?? []
-		);
-	}
-
 	isPointInRoom(
 		x: number,
 		y: number,
@@ -304,7 +284,7 @@ export class Game extends Scene {
 	}
 
 	getRoomForPoint(x: number, y: number): Phaser.Types.Tilemaps.TiledObject {
-		const room = this.getRooms().find((room) => {
+		const room = getRooms(this.map).find((room) => {
 			if (this.isPointInRoom(x, y, room)) {
 				return room;
 			}
