@@ -757,15 +757,20 @@ export class Game extends Scene {
 		return this.registry.get("freezePlayer") === true;
 	}
 
+	isPlayerBeingHit(): boolean {
+		return this.framesSincePlayerHit > 0;
+	}
+
+	updatePlayerBeingHit(): void {
+		this.framesSincePlayerHit -= 1;
+		this.player.setVisible(this.framesSincePlayerHit % 2 === 0 ? true : false);
+	}
+
 	updatePlayer(): void {
 		this.updateSwordHitbox();
 
-		if (this.framesSincePlayerHit > 0) {
-			this.framesSincePlayerHit -= 1;
-			this.player.setVisible(
-				this.framesSincePlayerHit % 2 === 0 ? true : false
-			);
-			return;
+		if (this.isPlayerBeingHit()) {
+			this.updatePlayerBeingHit();
 		}
 
 		this.player.setVisible(true);
