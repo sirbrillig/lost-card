@@ -415,7 +415,7 @@ export class Game extends Scene {
 
 	updateSwordHitboxForAttack() {
 		// Add hitbox for sword in direction of sprite
-		const swordWidth = 14; // for down/up
+		const swordWidth = 18; // for down/up
 		const swordHeight = 12; // for down/up
 		const width = (() => {
 			if (
