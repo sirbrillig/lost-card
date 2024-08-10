@@ -188,7 +188,7 @@ export class Game extends Scene {
 	}
 
 	moveCameraToRoom(room: Phaser.Types.Tilemaps.TiledObject) {
-		this.floorText?.destroy();
+		this.clearFloorText();
 		const camera = this.cameras.main;
 		const zoomLevel = 6;
 		camera.setZoom(zoomLevel);
@@ -202,9 +202,7 @@ export class Game extends Scene {
 		) {
 			throw new Error("Cannot move camera: Room has no position or size");
 		}
-		const roomWidth = room.width;
-		const roomHeight = room.height;
-		camera.setBounds(room.x, room.y, roomWidth, roomHeight);
+		camera.setBounds(room.x, room.y, room.width, room.height);
 		camera.useBounds = false;
 
 		camera.startFollow(this.player);
@@ -389,20 +387,37 @@ export class Game extends Scene {
 					(item) => item !== touchingItem
 				);
 				touchingItem.destroy();
-				this.floorText = this.add
-					.text(
-						this.cameras.main.worldView.x + this.cameras.main.displayWidth / 2,
-						this.cameras.main.worldView.y + this.cameras.main.displayHeight / 2,
-						"Press SPACE",
-						{ fontFamily: "Arial" }
-					)
-					.setOrigin(0.5, 0.5)
-					.setFontSize(10)
-					.setFontStyle("bold")
-					.setFontFamily("Arial")
-					.setBackgroundColor("#000");
+				this.setFloorText("Press SPACE");
 			}
 		}
+	}
+
+	clearFloorText() {
+		this.floorText?.destroy();
+	}
+
+	setFloorText(text: string) {
+		if (
+			this.activeRoom.x === undefined ||
+			this.activeRoom.y === undefined ||
+			!this.activeRoom.height ||
+			!this.activeRoom.width
+		) {
+			console.log(this.activeRoom);
+			throw new Error("Room has no dimensions when setting text");
+		}
+		this.floorText = this.add
+			.text(
+				this.activeRoom.x + this.activeRoom.width / 2,
+				this.activeRoom.y + this.activeRoom.height / 2,
+				text,
+				{}
+			)
+			.setOrigin(0.5, 0.5)
+			.setFontSize(10)
+			.setFontStyle("bold")
+			.setFontFamily("Arial")
+			.setBackgroundColor("#000");
 	}
 
 	movePlayerToPoint(x: number, y: number) {
@@ -716,8 +731,12 @@ export class Game extends Scene {
 	}
 
 	createBoss(x: number, y: number) {
-		new BossA(this, x, y, (enemy) => {
+		const boss = new BossA(this, x, y, (enemy) => {
 			this.enemies.add(enemy);
+		});
+		boss.once(Phaser.GameObjects.Events.DESTROY, () => {
+			this.equipWindCard();
+			this.setFloorText("Press SHIFT");
 		});
 	}
 
@@ -800,6 +819,10 @@ export class Game extends Scene {
 
 	equipSword(): void {
 		this.registry.set("hasSword", true);
+	}
+
+	equipWindCard(): void {
+		this.registry.set("hasWindCard", true);
 	}
 
 	canPlayerUsePower(): boolean {
