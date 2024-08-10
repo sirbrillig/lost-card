@@ -118,6 +118,10 @@ export class Game extends Scene {
 				this.debugGraphic = this.physics.world.createDebugGraphic();
 			}
 		});
+		this.input.keyboard.on("keydown-P", () => {
+			this.equipSword();
+			this.equipWindCard();
+		});
 		this.input.keyboard.on("keydown-SPACE", () => {
 			// Attack
 			if (this.canPlayerAttack()) {
