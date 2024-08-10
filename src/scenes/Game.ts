@@ -49,8 +49,8 @@ export class Game extends Scene {
 	gotItemFreeze: number = 2000;
 	showSwordFrame: number = 0;
 	showPowerFrame: number = 3;
-	windCardPushSpeed: number = 50;
-	windCardPushTime: number = 250;
+	windCardPushSpeed: number = 100;
+	windCardPushTime: number = 150;
 
 	map: Phaser.Tilemaps.Tilemap;
 	landLayer: Phaser.Tilemaps.TilemapLayer;
