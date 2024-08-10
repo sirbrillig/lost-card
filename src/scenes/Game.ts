@@ -1,4 +1,5 @@
 import { Scene } from "phaser";
+import { MainEvents } from "../MainEvents";
 import { MonsterA } from "./MonsterA";
 import { BossA } from "./BossA";
 import {
@@ -141,6 +142,8 @@ export class Game extends Scene {
 
 		this.hideAllTransientTiles();
 		this.hideHiddenItems();
+
+		this.createOverlay();
 	}
 
 	createAppearingTiles() {
@@ -632,6 +635,11 @@ export class Game extends Scene {
 		}
 	}
 
+	createOverlay() {
+		this.scene.launch("Overlay");
+		MainEvents.emit("setTotalHearts", this.playerHitPoints);
+	}
+
 	createPlayer(): void {
 		const spawnPoint = this.map.findObject(
 			"MetaObjects",
@@ -874,6 +882,7 @@ export class Game extends Scene {
 		this.cameras.main.shake(300, 0.0001);
 		this.player.tint = 0xff0000;
 		this.playerHitPoints -= 1;
+		MainEvents.emit("setActiveHearts", this.playerHitPoints);
 
 		if (this.playerHitPoints <= 0) {
 			this.gameOver();
