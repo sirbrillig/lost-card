@@ -303,8 +303,16 @@ export class Game extends Scene {
 		this.updateAppearingTiles();
 	}
 
+	destroyCreatedTile(tile: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody) {
+		console.log("destroying tile", tile);
+		this.createdTiles = this.createdTiles.filter((tileA) => tileA !== tile);
+		this.stuffLayer.removeTileAtWorldXY(tile.x, tile.y);
+		tile.destroy();
+	}
+
 	checkForPowerHitTiles() {
 		this.createdTiles.forEach((tile) => {
+			// FIXME: use separate hitbox for powers than swords
 			if (this.physics.overlap(this.sword, tile)) {
 				if (!tile.visible) {
 					return;
@@ -364,7 +372,9 @@ export class Game extends Scene {
 				this.physics.add.collider(this.enemies, tile);
 				this.physics.add.collider(this.stuffLayer, tile);
 				this.physics.add.collider(this.landLayer, tile);
-				this.physics.add.collider(this.doorsLayer, tile);
+				// FIXME: Allow pushing rocks through doors so you can't block yourself
+				// in a room, but destroy the rocks when they leave so they don't end
+				// up in another room.
 				if (this.physics.overlap(this.player, tile)) {
 					console.log("hit player with tile");
 					this.enemyHitPlayer();
