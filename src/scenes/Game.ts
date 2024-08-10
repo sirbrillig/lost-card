@@ -19,6 +19,7 @@ import {
 	getDoorDestinationCoordinates,
 	getItemTouchingPlayer,
 	getItemsInRoom,
+	createVelocityForDirection,
 } from "../shared";
 
 export class Game extends Scene {
@@ -38,6 +39,7 @@ export class Game extends Scene {
 	enteredRoomAt: number = 0;
 	isPlayerBeingKnockedBack: boolean = false;
 
+	// Config
 	characterSpeed: number = 90;
 	postAttackCooldown: number = 200;
 	postHitPlayerKnockback: number = 120;
@@ -48,6 +50,8 @@ export class Game extends Scene {
 	gotItemFreeze: number = 2000;
 	showSwordFrame: number = 0;
 	showPowerFrame: number = 3;
+	windCardPushSpeed: number = 50;
+	windCardPushTime: number = 250;
 
 	map: Phaser.Tilemaps.Tilemap;
 	landLayer: Phaser.Tilemaps.TilemapLayer;
@@ -312,9 +316,16 @@ export class Game extends Scene {
 					return;
 				}
 				console.log("hit item", tile);
-				this.createdTiles = this.createdTiles.filter((tileA) => tileA !== tile);
-				this.stuffLayer.removeTileAtWorldXY(tile.x, tile.y);
-				tile.destroy();
+
+				// The wind card pushes tiles.
+				const velocity = createVelocityForDirection(
+					this.windCardPushSpeed,
+					this.playerDirection
+				);
+				tile.body.setVelocity(velocity.x, velocity.y);
+				setTimeout(() => {
+					tile.body.setVelocity(0, 0);
+				}, this.windCardPushTime);
 			}
 		});
 	}
@@ -347,6 +358,9 @@ export class Game extends Scene {
 				tile.body.pushable = false;
 				this.physics.add.collider(this.player, tile);
 				this.physics.add.collider(this.enemies, tile);
+				this.physics.add.collider(this.stuffLayer, tile);
+				this.physics.add.collider(this.landLayer, tile);
+				this.physics.add.collider(this.doorsLayer, tile);
 				if (this.physics.overlap(this.player, tile)) {
 					console.log("hit player with tile");
 					this.enemyHitPlayer();

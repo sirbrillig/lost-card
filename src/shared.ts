@@ -96,6 +96,26 @@ export function invertSpriteDirection(
 	}
 }
 
+export function createVelocityForDirection(
+	speed: number,
+	direction: SpriteDirection
+): { x: number; y: number } {
+	const values = { x: 0, y: 0 };
+	if (direction === SpriteUp) {
+		values.y = -speed;
+	}
+	if (direction === SpriteDown) {
+		values.y = speed;
+	}
+	if (direction === SpriteLeft) {
+		values.x = -speed;
+	}
+	if (direction === SpriteRight) {
+		values.x = speed;
+	}
+	return values;
+}
+
 export function getDirectionOfSpriteMovement(body: {
 	velocity: { x: number; y: number };
 }): null | SpriteDirection {
