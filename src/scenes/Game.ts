@@ -37,6 +37,7 @@ export class Game extends Scene {
 	playerDirection: SpriteDirection = SpriteDown;
 	enteredRoomAt: number = 0;
 	isPlayerBeingKnockedBack: boolean = false;
+	playerHitPoints: number = 4;
 
 	// Config
 	characterSpeed: number = 90;
@@ -853,14 +854,32 @@ export class Game extends Scene {
 		}
 	}
 
+	gameOver() {
+		console.log("game over!");
+		this.cameras.main.fadeOut(1000, 0, 0, 0, (_: unknown, progress: number) => {
+			if (progress === 1) {
+				this.scene.pause();
+				this.scene.launch("GameOver");
+			}
+		});
+	}
+
 	enemyHitPlayer(): void {
 		if (this.framesSincePlayerHit > 0) {
 			return;
 		}
+		console.log("player got hit!");
 
 		this.enemyCollider.active = false;
 		this.cameras.main.shake(300, 0.0001);
 		this.player.tint = 0xff0000;
+		this.playerHitPoints -= 1;
+
+		if (this.playerHitPoints <= 0) {
+			this.gameOver();
+			return;
+		}
+
 		setTimeout(() => {
 			this.player.clearTint();
 			this.framesSincePlayerHit = 0;
@@ -869,7 +888,6 @@ export class Game extends Scene {
 
 		this.knockBack(this.player.body, this.postHitPlayerKnockback);
 
-		console.log("player got hit!");
 		this.framesSincePlayerHit = 200;
 	}
 
@@ -1071,6 +1089,13 @@ export class Game extends Scene {
 			this.player.stop();
 			this.player.body.setVelocity(0);
 			console.log("player frozen");
+			return;
+		}
+
+		if (this.playerHitPoints <= 0) {
+			this.player.stop();
+			this.player.body.setVelocity(0);
+			this.enemyCollider.active = false;
 			return;
 		}
 
