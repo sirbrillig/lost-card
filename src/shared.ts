@@ -314,7 +314,9 @@ export function hideAllRoomsExcept(
 				enemy.setVisible(true);
 			});
 			getItemsInRoom(items, room).forEach((item) => {
-				item.visible = true;
+				if (!item.data.get("hidden")) {
+					item.visible = true;
+				}
 			});
 		} else {
 			// hide room

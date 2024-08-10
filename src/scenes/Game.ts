@@ -28,21 +28,23 @@ export class Game extends Scene {
 	player: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
 	sword: Phaser.Types.Physics.Arcade.ImageWithDynamicBody;
 	enemies: Phaser.Physics.Arcade.Group;
-	characterSpeed: number = 90;
+	enemyCollider: Phaser.Physics.Arcade.Collider;
+	floorText: Phaser.GameObjects.Text | undefined;
 
 	framesSincePlayerHit: number = 0;
 	framesSinceAttack: number = 0;
-	postAttackCooldown: number = 200;
 	lastAttackedAt: number = 0;
 	framesSincePower: number = 0;
-	postHitPlayerKnockback: number = 110;
-	postHitEnemyKnockback: number = 50;
-	postHitInvincibilityTime: number = 500;
-	attackFrameRate: number = 30;
-	attackDelay: number = 50;
 	playerDirection: SpriteDirection = SpriteDown;
+	enteredRoomAt: number = 0;
 
-	enemyCollider: Phaser.Physics.Arcade.Collider;
+	characterSpeed: number = 90;
+	postAttackCooldown: number = 200;
+	postHitPlayerKnockback: number = 120;
+	postHitEnemyKnockback: number = 50;
+	postHitInvincibilityTime: number = 600;
+	attackFrameRate: number = 30;
+	attackDelay: number = 60;
 
 	map: Phaser.Tilemaps.Tilemap;
 	landLayer: Phaser.Tilemaps.TilemapLayer;
@@ -50,12 +52,8 @@ export class Game extends Scene {
 	stuffLayer: Phaser.Tilemaps.TilemapLayer;
 	activeRoom: Phaser.Types.Tilemaps.TiledObject;
 	createdTiles: Phaser.Tilemaps.Tile[] = [];
-	createdSwords: Phaser.GameObjects.Sprite[] = [];
-	enteredRoomAt: number = 0;
-
-	floorText: Phaser.GameObjects.Text | undefined;
-
-	doors: Phaser.Types.Tilemaps.TiledObject[];
+	createdItems: Phaser.GameObjects.Sprite[] = [];
+	doors: Phaser.Types.Tilemaps.TiledObject[] = [];
 
 	constructor() {
 		super("Game");
@@ -81,12 +79,19 @@ export class Game extends Scene {
 		this.setTileLayerCollisions(this.stuffLayer, this.player);
 		this.setTileLayerCollisions(this.stuffLayer, this.enemies);
 
-		this.createdSwords = this.map
-			.createFromObjects("Items", {
-				name: "Sword",
-				key: "dungeon_tiles_sprites",
-				frame: 1315, // FIXME: we should be able to get this automatically from the object layer
-			})
+		this.createdItems = this.map
+			.createFromObjects("Items", [
+				{
+					name: "Sword",
+					key: "dungeon_tiles_sprites",
+					frame: 1315, // FIXME: we should be able to get this automatically from the object layer
+				},
+				{
+					name: "WindCard",
+					key: "dungeon_tiles_sprites",
+					frame: 1271, // FIXME: we should be able to get this automatically from the object layer
+				},
+			])
 			.filter(isSprite);
 
 		this.enemyCollider = this.physics.add.collider(
@@ -136,6 +141,7 @@ export class Game extends Scene {
 		this.setUpCamera();
 
 		this.hideAllTransientTiles();
+		this.hideHiddenItems();
 	}
 
 	createTileLayer(
@@ -209,7 +215,7 @@ export class Game extends Scene {
 
 		this.activeRoom = room;
 		this.enteredRoomAt = this.time.now;
-		hideAllRoomsExcept(this.map, this.enemies, this.createdSwords, room);
+		hideAllRoomsExcept(this.map, this.enemies, this.createdItems, room);
 	}
 
 	handleCollideDoor(door: Phaser.Types.Tilemaps.TiledObject) {
@@ -352,6 +358,27 @@ export class Game extends Scene {
 		});
 	}
 
+	hideHiddenItems() {
+		this.createdItems.forEach((item) => {
+			if (item.data.get("hidden")) {
+				item.setVisible(false);
+				item.setActive(false);
+			}
+		});
+	}
+
+	showHiddenItem(name: string) {
+		this.createdItems.forEach((item) => {
+			if (item.name === name) {
+				if (item.data.get("hidden")) {
+					item.data.set("hidden", false);
+					item.setVisible(true);
+					item.setActive(true);
+				}
+			}
+		});
+	}
+
 	hideAllTransientTiles() {
 		const layerName = "Transients";
 		const layer = this.map.getObjectLayer(layerName);
@@ -378,18 +405,33 @@ export class Game extends Scene {
 
 	maybePickUpItem() {
 		// FIXME: the player width/height is 24 px which is too big; can we use the player's hitbox somehow instead?
-		const touchingItem = getItemTouchingPlayer(this.createdSwords, this.player);
-		if (touchingItem) {
+		const touchingItem = getItemTouchingPlayer(this.createdItems, this.player);
+		if (touchingItem && touchingItem.active) {
 			console.log("touched item", touchingItem);
-			if (touchingItem.name === "Sword") {
-				this.equipSword();
-				this.createdSwords = this.createdSwords.filter(
-					(item) => item !== touchingItem
-				);
-				touchingItem.destroy();
-				this.setFloorText("Press SPACE");
+			switch (touchingItem.name) {
+				case "Sword":
+					this.pickUpSword();
+					break;
+				case "WindCard":
+					this.pickUpWindCard();
+					break;
 			}
+
+			this.createdItems = this.createdItems.filter(
+				(item) => item !== touchingItem
+			);
+			touchingItem.destroy();
 		}
+	}
+
+	pickUpWindCard() {
+		this.equipWindCard();
+		this.setFloorText("Press SHIFT");
+	}
+
+	pickUpSword() {
+		this.equipSword();
+		this.setFloorText("Press SPACE");
 	}
 
 	clearFloorText() {
@@ -735,8 +777,7 @@ export class Game extends Scene {
 			this.enemies.add(enemy);
 		});
 		boss.once(Phaser.GameObjects.Events.DESTROY, () => {
-			this.equipWindCard();
-			this.setFloorText("Press SHIFT");
+			this.showHiddenItem("WindCard");
 		});
 	}
 

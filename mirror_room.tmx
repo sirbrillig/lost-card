@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.0" orientation="orthogonal" renderorder="right-down" width="80" height="60" tilewidth="16" tileheight="16" infinite="0" nextlayerid="9" nextobjectid="87">
+<map version="1.10" tiledversion="1.11.0" orientation="orthogonal" renderorder="right-down" width="80" height="60" tilewidth="16" tileheight="16" infinite="0" nextlayerid="9" nextobjectid="88">
  <editorsettings>
   <export target="public/assets/mirror_room.json" format="json"/>
  </editorsettings>
@@ -7324,6 +7324,11 @@
  </objectgroup>
  <objectgroup id="8" name="Items">
   <object id="86" name="Sword" gid="1316" x="50.8361" y="244.626" width="7.83691" height="7.83691"/>
+  <object id="87" name="WindCard" gid="1272" x="519.156" y="129.539" width="16" height="16">
+   <properties>
+    <property name="hidden" type="bool" value="true"/>
+   </properties>
+  </object>
  </objectgroup>
  <objectgroup id="7" name="Transients">
   <object id="64" gid="866" x="625.713" y="94.2871" width="13.1923" height="13.473">
