@@ -18,6 +18,7 @@ import {
 	hideAllRoomsExcept,
 	getTransientTilesInRoom,
 	getDoorDestinationCoordinates,
+	getItemTouchingPlayer,
 } from "../shared";
 
 export class Game extends Scene {
@@ -47,6 +48,7 @@ export class Game extends Scene {
 	stuffLayer: Phaser.Tilemaps.TilemapLayer;
 	activeRoom: Phaser.Types.Tilemaps.TiledObject;
 	createdTiles: Phaser.Tilemaps.Tile[] = [];
+	createdSwords: Phaser.GameObjects.GameObject[] = [];
 	enteredRoomAt: number = 0;
 
 	doors: Phaser.Types.Tilemaps.TiledObject[];
@@ -76,6 +78,12 @@ export class Game extends Scene {
 		this.stuffLayer = this.createTileLayer("Stuff", tileset, 0);
 		this.setTileLayerCollisions(this.stuffLayer, this.player);
 		this.setTileLayerCollisions(this.stuffLayer, this.enemies);
+
+		this.createdSwords = this.map.createFromObjects("Items", {
+			name: "Sword",
+			key: "dungeon_tiles_sprites",
+			frame: 1315, // FIXME: we should be able to get this automatically from the object layer
+		});
 
 		this.enemyCollider = this.physics.add.collider(
 			this.player,
@@ -125,7 +133,7 @@ export class Game extends Scene {
 	): Phaser.Tilemaps.TilemapLayer {
 		const layer = this.map.createLayer(layerName, tileset, 0, 0);
 		if (!layer) {
-			throw new Error("Could not open tileset layers");
+			throw new Error(`Could not open tileset layers for '${layerName}'`);
 		}
 		layer.setDepth(depth);
 		layer.setCollisionByProperty({ collides: true });
@@ -354,6 +362,21 @@ export class Game extends Scene {
 		const touchingDoor = getDoorTouchingPlayer(this.doors, this.player);
 		if (touchingDoor) {
 			this.handleCollideDoor(touchingDoor);
+		}
+	}
+
+	maybePickUpItem() {
+		// FIXME: the player width/height is 24 px which is too big; can we use the player's hitbox somehow instead?
+		const touchingItem = getItemTouchingPlayer(this.createdSwords, this.player);
+		if (touchingItem) {
+			console.log("touched item", touchingItem);
+			if (touchingItem.name === "Sword") {
+				this.equipSword();
+				this.createdSwords = this.createdSwords.filter(
+					(item) => item !== touchingItem
+				);
+				touchingItem.destroy();
+			}
 		}
 	}
 
@@ -748,6 +771,10 @@ export class Game extends Scene {
 		);
 	}
 
+	equipSword(): void {
+		this.registry.set("hasSword", true);
+	}
+
 	canPlayerUsePower(): boolean {
 		return this.canPlayerAttack() && this.doesPlayerHavePower();
 	}
@@ -874,6 +901,7 @@ export class Game extends Scene {
 			this.player.body.velocity.x !== 0 || this.player.body.velocity.y !== 0;
 		if (isMoving) {
 			this.maybeChangeRoom();
+			this.maybePickUpItem();
 		}
 	}
 

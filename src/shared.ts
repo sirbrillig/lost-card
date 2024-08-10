@@ -109,6 +109,41 @@ export function getDirectionOfSpriteMovement(body: {
 	return null;
 }
 
+export function getItemTouchingPlayer(
+	items: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody[],
+	player: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody
+) {
+	return items.find((item) => {
+		return doRectanglesOverlap(player, item);
+	});
+}
+
+interface OverlapRectangle {
+	x: number;
+	y: number;
+	width: number;
+	height: number;
+}
+
+export function doRectanglesOverlap(
+	a: OverlapRectangle,
+	b: OverlapRectangle
+): boolean {
+	const xOverlap =
+		isValueInRange(a.x, b.x, b.x + b.width) ||
+		isValueInRange(b.x, a.x, a.x + a.width);
+
+	const yOverlap =
+		isValueInRange(a.y, b.y, b.y + b.height) ||
+		isValueInRange(b.y, a.y, a.y + a.height);
+
+	return xOverlap && yOverlap;
+}
+
+function isValueInRange(value: number, min: number, max: number): boolean {
+	return value >= min && value <= max;
+}
+
 export function getDoorTouchingPlayer(
 	doors: Phaser.Types.Tilemaps.TiledObject[],
 	player: { x: number; y: number }

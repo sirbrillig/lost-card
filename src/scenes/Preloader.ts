@@ -31,6 +31,16 @@ export class Preloader extends Scene {
 		this.load.image("dungeon_tiles", "Final_Tileset_extruded.png");
 		this.load.tilemapTiledJSON("map", "mirror_room.json");
 
+		this.load.spritesheet(
+			"dungeon_tiles_sprites",
+			"Final_Tileset_extruded.png",
+			{
+				frameWidth: 16,
+				frameHeight: 16,
+				margin: 1,
+				spacing: 2,
+			}
+		);
 		this.load.spritesheet("character", "character_sprite_sheet.png", {
 			frameWidth: 32,
 			frameHeight: 32,
