@@ -19,7 +19,6 @@ import {
 	getTransientTilesInRoom,
 	getDoorDestinationCoordinates,
 	getItemTouchingPlayer,
-	isSprite,
 } from "../shared";
 
 export class Game extends Scene {
@@ -52,7 +51,7 @@ export class Game extends Scene {
 	stuffLayer: Phaser.Tilemaps.TilemapLayer;
 	activeRoom: Phaser.Types.Tilemaps.TiledObject;
 	createdTiles: Phaser.Tilemaps.Tile[] = [];
-	createdItems: Phaser.GameObjects.Sprite[] = [];
+	createdItems: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody[] = [];
 	doors: Phaser.Types.Tilemaps.TiledObject[] = [];
 
 	constructor() {
@@ -92,7 +91,8 @@ export class Game extends Scene {
 					frame: 1271, // FIXME: we should be able to get this automatically from the object layer
 				},
 			])
-			.filter(isSprite);
+			.map((item) => this.physics.world.enableBody(item))
+			.filter(isDynamicSprite);
 
 		this.enemyCollider = this.physics.add.collider(
 			this.player,
@@ -416,12 +416,15 @@ export class Game extends Scene {
 					this.pickUpWindCard();
 					break;
 			}
-
-			this.createdItems = this.createdItems.filter(
-				(item) => item !== touchingItem
-			);
-			touchingItem.destroy();
+			this.removeItem(touchingItem);
 		}
+	}
+
+	removeItem(itemToRemove: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody) {
+		this.createdItems = this.createdItems.filter(
+			(item) => item !== itemToRemove
+		);
+		itemToRemove.destroy();
 	}
 
 	pickUpWindCard() {

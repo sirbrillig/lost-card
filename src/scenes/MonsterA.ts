@@ -38,7 +38,7 @@ export class MonsterA
 	}
 
 	update() {
-		if (!this.body || !isDynamicSprite(this.body)) {
+		if (!this.body || !isDynamicSprite(this)) {
 			throw new Error("Could not update monster");
 		}
 		const body = this.body;

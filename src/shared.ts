@@ -38,7 +38,7 @@ export function isDynamicSprite(
 	obj: unknown
 ): obj is Phaser.Types.Physics.Arcade.SpriteWithDynamicBody {
 	const dynObj = obj as Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
-	return "setVelocityX" in dynObj;
+	return "body" in dynObj && "enable" in dynObj.body;
 }
 
 export function isDynamicImage(
@@ -115,7 +115,7 @@ export function getDirectionOfSpriteMovement(body: {
 }
 
 export function getItemTouchingPlayer(
-	items: Phaser.GameObjects.Sprite[],
+	items: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody[],
 	player: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody
 ) {
 	return items.find((item) => {
@@ -235,7 +235,7 @@ export function getRoomForPoint(
 }
 
 export function getItemsInRoom(
-	items: Phaser.GameObjects.Sprite[],
+	items: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody[],
 	room: Phaser.Types.Tilemaps.TiledObject
 ) {
 	return items.filter((item) => {
@@ -298,7 +298,7 @@ export function getTilesInRoom(
 export function hideAllRoomsExcept(
 	map: Phaser.Tilemaps.Tilemap,
 	enemies: Phaser.Physics.Arcade.Group,
-	items: Phaser.GameObjects.Sprite[],
+	items: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody[],
 	activeRoom: Phaser.Types.Tilemaps.TiledObject
 ) {
 	const rooms = getRooms(map);

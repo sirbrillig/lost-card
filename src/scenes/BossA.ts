@@ -43,7 +43,7 @@ class WaitForActive implements Behavior<AllStates> {
 	}
 
 	init(sprite: BossA): void {
-		if (!sprite.body || !isDynamicSprite(sprite.body)) {
+		if (!sprite.body || !isDynamicSprite(sprite)) {
 			throw new Error("Could not update monster");
 		}
 		console.log("waiting for player");
@@ -73,7 +73,7 @@ class Roar implements Behavior<AllStates> {
 	}
 
 	init(sprite: BossA): void {
-		if (!sprite.body || !isDynamicSprite(sprite.body)) {
+		if (!sprite.body || !isDynamicSprite(sprite)) {
 			throw new Error("Could not update monster");
 		}
 		console.log("roar");
@@ -100,7 +100,7 @@ class Roar implements Behavior<AllStates> {
 	}
 
 	update(sprite: BossA): void {
-		if (!sprite.body || !isDynamicSprite(sprite.body)) {
+		if (!sprite.body || !isDynamicSprite(sprite)) {
 			throw new Error("Could not update monster");
 		}
 	}
@@ -116,7 +116,7 @@ class SpawnEnemies implements Behavior<AllStates> {
 	}
 
 	init(sprite: BossA): void {
-		if (!sprite.body || !isDynamicSprite(sprite.body)) {
+		if (!sprite.body || !isDynamicSprite(sprite)) {
 			throw new Error("Could not update monster");
 		}
 		console.log("spawn");
@@ -149,7 +149,7 @@ class SpawnEnemies implements Behavior<AllStates> {
 	}
 
 	#addEnemy(sprite: BossA) {
-		if (!sprite.body || !isDynamicSprite(sprite.body)) {
+		if (!sprite.body || !isDynamicSprite(sprite)) {
 			throw new Error("Could not update monster");
 		}
 
@@ -176,7 +176,7 @@ class SpawnEnemies implements Behavior<AllStates> {
 	}
 
 	update(sprite: BossA): void {
-		if (!sprite.body || !isDynamicSprite(sprite.body)) {
+		if (!sprite.body || !isDynamicSprite(sprite)) {
 			throw new Error("Could not update monster");
 		}
 	}
@@ -192,7 +192,7 @@ class PostSpawn implements Behavior<AllStates> {
 	}
 
 	init(sprite: BossA): void {
-		if (!sprite.body || !isDynamicSprite(sprite.body)) {
+		if (!sprite.body || !isDynamicSprite(sprite)) {
 			throw new Error("Could not update monster");
 		}
 		console.log("post-spawn");
@@ -219,7 +219,7 @@ class PostSpawn implements Behavior<AllStates> {
 	}
 
 	update(sprite: BossA): void {
-		if (!sprite.body || !isDynamicSprite(sprite.body)) {
+		if (!sprite.body || !isDynamicSprite(sprite)) {
 			throw new Error("Could not update monster");
 		}
 	}
@@ -266,7 +266,7 @@ export class BossA
 	}
 
 	update() {
-		if (!this.body || !isDynamicSprite(this.body)) {
+		if (!this.body || !isDynamicSprite(this)) {
 			throw new Error("Could not update monster");
 		}
 		const body = this.body;
