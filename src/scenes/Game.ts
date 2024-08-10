@@ -44,6 +44,9 @@ export class Game extends Scene {
 	postHitInvincibilityTime: number = 600;
 	attackFrameRate: number = 30;
 	attackDelay: number = 60;
+	gotItemFreeze: number = 2000;
+	showSwordFrame: number = 0;
+	showPowerFrame: number = 3;
 
 	map: Phaser.Tilemaps.Tilemap;
 	landLayer: Phaser.Tilemaps.TilemapLayer;
@@ -428,12 +431,24 @@ export class Game extends Scene {
 
 	pickUpWindCard() {
 		this.equipWindCard();
-		this.setFloorText("Press SHIFT");
+		this.player.anims.play("character-down-walk", true);
+		this.player.setFrame(this.showPowerFrame);
+		this.registry.set("freezePlayer", true);
+		setTimeout(() => {
+			this.registry.set("freezePlayer", false);
+			this.setFloorText("Press SHIFT");
+		}, this.gotItemFreeze);
 	}
 
 	pickUpSword() {
 		this.equipSword();
-		this.setFloorText("Press SPACE");
+		this.player.anims.play("character-down-walk", true);
+		this.player.setFrame(this.showSwordFrame);
+		this.registry.set("freezePlayer", true);
+		setTimeout(() => {
+			this.registry.set("freezePlayer", false);
+			this.setFloorText("Press SPACE");
+		}, this.gotItemFreeze);
 	}
 
 	clearFloorText() {
