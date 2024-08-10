@@ -12,7 +12,6 @@ import {
 	isDynamicImage,
 	isTilemapTile,
 	getObjectId,
-	isHittableSprite,
 	getDoorTouchingPlayer,
 	getRoomForPoint,
 	hideAllRoomsExcept,
@@ -305,6 +304,7 @@ export class Game extends Scene {
 
 	destroyCreatedTile(tile: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody) {
 		console.log("destroying tile", tile);
+		this.cameras.main.shake(200, 0.0001);
 		this.createdTiles = this.createdTiles.filter((tileA) => tileA !== tile);
 		this.stuffLayer.removeTileAtWorldXY(tile.x, tile.y);
 		tile.destroy();
@@ -336,7 +336,10 @@ export class Game extends Scene {
 				);
 				tile.body.setVelocity(velocity.x, velocity.y);
 				setTimeout(() => {
-					tile.body.setVelocity(0, 0);
+					// Tile might have been destroyed before this happens
+					if (tile.body?.setVelocity) {
+						tile.body.setVelocity(0, 0);
+					}
 				}, this.windCardPushTime);
 			}
 		});
@@ -369,12 +372,28 @@ export class Game extends Scene {
 				tile.data.set("hidden", false);
 				tile.body.pushable = false;
 				this.physics.add.collider(this.player, tile);
-				this.physics.add.collider(this.enemies, tile);
+				this.physics.add.collider(this.enemies, tile, (_, enemy) => {
+					if (!isDynamicSprite(enemy)) {
+						return;
+					}
+					if (tile.body.velocity.x === 0 && tile.body.velocity.y === 0) {
+						return;
+					}
+					console.log("hit enemy with rock");
+					this.sendHitToEnemy(enemy);
+				});
 				this.physics.add.collider(this.stuffLayer, tile);
-				this.physics.add.collider(this.landLayer, tile);
-				// FIXME: Allow pushing rocks through doors so you can't block yourself
-				// in a room, but destroy the rocks when they leave so they don't end
-				// up in another room.
+				// Allow destroying rocks by pushing into walls so you can't block
+				// yourself in a room.
+				this.physics.add.collider(this.landLayer, tile, () => {
+					console.log("hit wall with rock");
+					this.destroyCreatedTile(tile);
+				});
+				this.physics.add.collider(this.doorsLayer, tile, () => {
+					console.log("hit wall with rock");
+					this.destroyCreatedTile(tile);
+				});
+
 				if (this.physics.overlap(this.player, tile)) {
 					console.log("hit player with tile");
 					this.enemyHitPlayer();
@@ -821,10 +840,16 @@ export class Game extends Scene {
 			return;
 		}
 
-		if (isHittableSprite(enemy) && enemy.isHittable()) {
+		this.sendHitToEnemy(enemy);
+	}
+
+	sendHitToEnemy(enemy: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody) {
+		if (enemy.data.get("hittable") === true) {
 			this.knockBack(this.player.body, this.postHitEnemyKnockback);
 			this.cameras.main.shake(200, 0.0001);
-			enemy.hit();
+			enemy.emit("hit");
+		} else {
+			console.log("enemy not hittable", enemy, enemy.data.get("hittable"));
 		}
 	}
 

@@ -1,10 +1,11 @@
-import {
-	isDynamicSprite,
-	HittableSprite,
-	BehaviorMachineInterface,
-	Behavior,
-} from "../shared";
+import { isDynamicSprite, BehaviorMachineInterface } from "../shared";
 import { MonsterA } from "./MonsterA";
+
+interface Behavior<Key extends string> {
+	name: Key;
+	init(sprite: BossA): void;
+	update(sprite: BossA): void;
+}
 
 type AllStates = "initial" | "roar1" | "spawn1" | "spawn2" | "idle1" | "idle2";
 
@@ -225,10 +226,7 @@ class PostSpawn implements Behavior<AllStates> {
 	}
 }
 
-export class BossA
-	extends Phaser.Physics.Arcade.Sprite
-	implements HittableSprite
-{
+export class BossA extends Phaser.Physics.Arcade.Sprite {
 	#isBeingHit: boolean = false;
 	#freeTimeAfterHit: number = 600;
 	#hitPoints: number = 6;
@@ -261,6 +259,9 @@ export class BossA
 		this.setCollideWorldBounds(true);
 		this.setPushable(false);
 		this.setScale(2);
+		this.setDataEnabled();
+		this.data.set("hittable", true);
+		this.on("hit", this.hit);
 
 		this.stateMachine = new StateMachine("initial");
 	}
@@ -269,6 +270,8 @@ export class BossA
 		if (!this.body || !isDynamicSprite(this)) {
 			throw new Error("Could not update monster");
 		}
+		this.data.set("hittable", this.isHittable());
+
 		const body = this.body;
 		if (!this.active) {
 			body.stop();

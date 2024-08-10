@@ -9,29 +9,10 @@ export type SpriteDirection =
 	| typeof SpriteDown
 	| typeof SpriteLeft;
 
-export interface Behavior<Key extends string> {
-	name: Key;
-	init(sprite: HittableSprite): void;
-	update(sprite: HittableSprite): void;
-}
-
 export interface BehaviorMachineInterface<Key extends string> {
 	getCurrentState(): Key;
 	pushState(state: Key): void;
 	popState(): void;
-}
-
-export interface HittableSprite {
-	hit(): void;
-	isHittable(): boolean;
-}
-
-export function isHittableSprite(obj: unknown): obj is HittableSprite {
-	const dynObj = obj as HittableSprite;
-	if ("hit" in dynObj || "isHittable" in dynObj) {
-		return true;
-	}
-	return false;
 }
 
 export function isDynamicSprite(
