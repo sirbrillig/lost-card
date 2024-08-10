@@ -1,3 +1,5 @@
+import { Scene } from "phaser";
+
 // 0 is up, 1 is right, 2 is down, 3 is left
 export const SpriteUp = 0;
 export const SpriteRight = 1;
@@ -119,7 +121,7 @@ export function getItemTouchingPlayer(
 	player: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody
 ) {
 	return items.find((item) => {
-		return doRectanglesOverlap(player, item);
+		return player.scene.physics.overlap(player, item);
 	});
 }
 

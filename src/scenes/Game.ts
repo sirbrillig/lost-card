@@ -404,7 +404,6 @@ export class Game extends Scene {
 	}
 
 	maybePickUpItem() {
-		// FIXME: the player width/height is 24 px which is too big; can we use the player's hitbox somehow instead?
 		const touchingItem = getItemTouchingPlayer(this.createdItems, this.player);
 		if (touchingItem && touchingItem.active) {
 			console.log("touched item", touchingItem);
