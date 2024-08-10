@@ -24,6 +24,7 @@ import {
 
 export class Game extends Scene {
 	cursors: Phaser.Types.Input.Keyboard.CursorKeys;
+	debugGraphic: Phaser.GameObjects.Graphics | undefined;
 	player: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
 	sword: Phaser.Types.Physics.Arcade.ImageWithDynamicBody;
 	enemies: Phaser.Physics.Arcade.Group;
@@ -61,8 +62,6 @@ export class Game extends Scene {
 	}
 
 	create() {
-		// this.physics.world.createDebugGraphic();
-
 		this.map = this.make.tilemap({ key: "map" });
 		const tileset = this.map.addTilesetImage("Final_Tileset", "dungeon_tiles");
 		if (!tileset) {
@@ -111,6 +110,14 @@ export class Game extends Scene {
 			throw new Error("No keyboard controls could be found");
 		}
 		this.cursors = this.input.keyboard.createCursorKeys();
+		this.input.keyboard.on("keydown-D", () => {
+			if (this.debugGraphic) {
+				this.debugGraphic.destroy();
+				this.debugGraphic = undefined;
+			} else {
+				this.debugGraphic = this.physics.world.createDebugGraphic();
+			}
+		});
 		this.input.keyboard.on("keydown-SPACE", () => {
 			// Attack
 			if (this.canPlayerAttack()) {
@@ -408,23 +415,25 @@ export class Game extends Scene {
 
 	updateSwordHitboxForAttack() {
 		// Add hitbox for sword in direction of sprite
+		const swordWidth = 14; // for down/up
+		const swordHeight = 12; // for down/up
 		const width = (() => {
 			if (
 				this.playerDirection === SpriteLeft ||
 				this.playerDirection === SpriteRight
 			) {
-				return 6;
+				return swordHeight;
 			}
-			return 12;
+			return swordWidth;
 		})();
 		const height = (() => {
 			if (
 				this.playerDirection === SpriteUp ||
 				this.playerDirection === SpriteDown
 			) {
-				return 6;
+				return swordHeight;
 			}
-			return 12;
+			return swordWidth;
 		})();
 
 		this.sword.body.setSize(width, height);
