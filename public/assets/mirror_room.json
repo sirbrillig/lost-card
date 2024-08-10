@@ -879,7 +879,7 @@
                  "gid":866,
                  "height":13.473,
                  "id":64,
-                 "name":"",
+                 "name":"Rock",
                  "properties":[
                         {
                          "name":"affectedByWindCard",
@@ -912,7 +912,7 @@
                  "gid":866,
                  "height":13.473,
                  "id":65,
-                 "name":"",
+                 "name":"Rock",
                  "properties":[
                         {
                          "name":"affectedByWindCard",
@@ -945,7 +945,7 @@
                  "gid":866,
                  "height":13.473,
                  "id":66,
-                 "name":"",
+                 "name":"Rock",
                  "properties":[
                         {
                          "name":"affectedByWindCard",
@@ -978,7 +978,7 @@
                  "gid":866,
                  "height":13.473,
                  "id":67,
-                 "name":"",
+                 "name":"Rock",
                  "properties":[
                         {
                          "name":"affectedByWindCard",
@@ -1011,7 +1011,7 @@
                  "gid":866,
                  "height":13.473,
                  "id":68,
-                 "name":"",
+                 "name":"Rock",
                  "properties":[
                         {
                          "name":"affectedByWindCard",
@@ -1044,7 +1044,7 @@
                  "gid":866,
                  "height":13.473,
                  "id":70,
-                 "name":"",
+                 "name":"Rock",
                  "properties":[
                         {
                          "name":"affectedByWindCard",
@@ -1077,7 +1077,7 @@
                  "gid":866,
                  "height":12.615,
                  "id":73,
-                 "name":"",
+                 "name":"Rock",
                  "properties":[
                         {
                          "name":"affectedByWindCard",
@@ -1105,7 +1105,7 @@
                  "gid":866,
                  "height":12.615,
                  "id":74,
-                 "name":"",
+                 "name":"Rock",
                  "properties":[
                         {
                          "name":"affectedByWindCard",
@@ -1133,7 +1133,7 @@
                  "gid":866,
                  "height":12.615,
                  "id":75,
-                 "name":"",
+                 "name":"Rock",
                  "properties":[
                         {
                          "name":"affectedByWindCard",
@@ -1161,7 +1161,7 @@
                  "gid":866,
                  "height":12.615,
                  "id":76,
-                 "name":"",
+                 "name":"Rock",
                  "properties":[
                         {
                          "name":"affectedByWindCard",
@@ -1189,7 +1189,7 @@
                  "gid":866,
                  "height":12.615,
                  "id":78,
-                 "name":"",
+                 "name":"Rock",
                  "properties":[
                         {
                          "name":"affectedByWindCard",
@@ -1217,7 +1217,7 @@
                  "gid":866,
                  "height":12.615,
                  "id":80,
-                 "name":"",
+                 "name":"Rock",
                  "properties":[
                         {
                          "name":"affectedByWindCard",
@@ -1245,7 +1245,7 @@
                  "gid":866,
                  "height":12.615,
                  "id":82,
-                 "name":"",
+                 "name":"Rock",
                  "properties":[
                         {
                          "name":"affectedByWindCard",
@@ -1273,7 +1273,7 @@
                  "gid":866,
                  "height":12.615,
                  "id":83,
-                 "name":"",
+                 "name":"Rock",
                  "properties":[
                         {
                          "name":"affectedByWindCard",
@@ -1301,7 +1301,7 @@
                  "gid":866,
                  "height":13.473,
                  "id":84,
-                 "name":"",
+                 "name":"Rock",
                  "properties":[
                         {
                          "name":"affectedByWindCard",
@@ -1334,7 +1334,7 @@
                  "gid":866,
                  "height":13.473,
                  "id":85,
-                 "name":"",
+                 "name":"Rock",
                  "properties":[
                         {
                          "name":"affectedByWindCard",
@@ -1370,7 +1370,7 @@
          "y":0
         }],
  "nextlayerid":9,
- "nextobjectid":88,
+ "nextobjectid":89,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.0",

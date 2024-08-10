@@ -1,5 +1,3 @@
-import { Scene } from "phaser";
-
 // 0 is up, 1 is right, 2 is down, 3 is left
 export const SpriteUp = 0;
 export const SpriteRight = 1;
@@ -334,33 +332,6 @@ export function hideAllRoomsExcept(
 			});
 		}
 	});
-}
-
-export function getTransientTilesInRoom(
-	map: Phaser.Tilemaps.Tilemap,
-	room: Phaser.Types.Tilemaps.TiledObject
-) {
-	const layerName = "Transients";
-	const layer = map.getObjectLayer(layerName);
-	return (
-		layer?.objects.filter((tile) => {
-			const tileX = tile.x ?? 0;
-			const tileY = tile.y ?? 0;
-			const roomX = room.x ?? 0;
-			const roomY = room.y ?? 0;
-			const roomWidth = room.width ?? 0;
-			const roomHeight = room.height ?? 0;
-			if (
-				tileX >= roomX &&
-				tileY >= roomY &&
-				tileX <= roomX + roomWidth &&
-				tileY <= roomY + roomHeight
-			) {
-				return true;
-			}
-			return false;
-		}) ?? []
-	);
 }
 
 export function getDoorDestinationCoordinates(

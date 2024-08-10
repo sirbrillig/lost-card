@@ -16,9 +16,9 @@ import {
 	getDoorTouchingPlayer,
 	getRoomForPoint,
 	hideAllRoomsExcept,
-	getTransientTilesInRoom,
 	getDoorDestinationCoordinates,
 	getItemTouchingPlayer,
+	getItemsInRoom,
 } from "../shared";
 
 export class Game extends Scene {
@@ -54,7 +54,7 @@ export class Game extends Scene {
 	doorsLayer: Phaser.Tilemaps.TilemapLayer;
 	stuffLayer: Phaser.Tilemaps.TilemapLayer;
 	activeRoom: Phaser.Types.Tilemaps.TiledObject;
-	createdTiles: Phaser.Tilemaps.Tile[] = [];
+	createdTiles: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody[] = [];
 	createdItems: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody[] = [];
 	doors: Phaser.Types.Tilemaps.TiledObject[] = [];
 
@@ -82,21 +82,8 @@ export class Game extends Scene {
 		this.setTileLayerCollisions(this.stuffLayer, this.player);
 		this.setTileLayerCollisions(this.stuffLayer, this.enemies);
 
-		this.createdItems = this.map
-			.createFromObjects("Items", [
-				{
-					name: "Sword",
-					key: "dungeon_tiles_sprites",
-					frame: 1315, // FIXME: we should be able to get this automatically from the object layer
-				},
-				{
-					name: "WindCard",
-					key: "dungeon_tiles_sprites",
-					frame: 1271, // FIXME: we should be able to get this automatically from the object layer
-				},
-			])
-			.map((item) => this.physics.world.enableBody(item))
-			.filter(isDynamicSprite);
+		this.createAppearingTiles();
+		this.createItems();
 
 		this.enemyCollider = this.physics.add.collider(
 			this.player,
@@ -146,6 +133,37 @@ export class Game extends Scene {
 
 		this.hideAllTransientTiles();
 		this.hideHiddenItems();
+	}
+
+	createAppearingTiles() {
+		this.createdTiles = this.map
+			.createFromObjects("Transients", [
+				{
+					name: "Rock",
+					key: "dungeon_tiles_sprites",
+					frame: 865, // FIXME: we should be able to get this automatically from the object layer
+				},
+			])
+			.map((item) => this.physics.world.enableBody(item))
+			.filter(isDynamicSprite);
+	}
+
+	createItems() {
+		this.createdItems = this.map
+			.createFromObjects("Items", [
+				{
+					name: "Sword",
+					key: "dungeon_tiles_sprites",
+					frame: 1315, // FIXME: we should be able to get this automatically from the object layer
+				},
+				{
+					name: "WindCard",
+					key: "dungeon_tiles_sprites",
+					frame: 1271, // FIXME: we should be able to get this automatically from the object layer
+				},
+			])
+			.map((item) => this.physics.world.enableBody(item))
+			.filter(isDynamicSprite);
 	}
 
 	createTileLayer(
@@ -219,7 +237,12 @@ export class Game extends Scene {
 
 		this.activeRoom = room;
 		this.enteredRoomAt = this.time.now;
-		hideAllRoomsExcept(this.map, this.enemies, this.createdItems, room);
+		hideAllRoomsExcept(
+			this.map,
+			this.enemies,
+			[...this.createdItems, ...this.createdTiles],
+			room
+		);
 	}
 
 	handleCollideDoor(door: Phaser.Types.Tilemaps.TiledObject) {
@@ -274,20 +297,14 @@ export class Game extends Scene {
 
 	checkForPowerHitTiles() {
 		this.createdTiles.forEach((tile) => {
-			if (this.physics.overlapTiles(this.sword, [tile])) {
+			if (this.physics.overlap(this.sword, tile)) {
 				if (!tile.visible) {
 					return;
 				}
 				if (!this.isPlayerUsingPower()) {
 					return;
 				}
-				if (!isTilemapTile(tile)) {
-					return;
-				}
-				const isAffectedByPower =
-					tile.properties?.find(
-						(prop: { name: string }) => prop.name === "affectedByWindCard"
-					)?.value ?? 0;
+				const isAffectedByPower = tile.data.get("affectedByWindCard");
 				if (!isAffectedByPower) {
 					return;
 				}
@@ -296,68 +313,46 @@ export class Game extends Scene {
 				}
 				console.log("hit item", tile);
 				this.createdTiles = this.createdTiles.filter((tileA) => tileA !== tile);
-				this.stuffLayer.removeTileAtWorldXY(tile.pixelX, tile.pixelY);
+				this.stuffLayer.removeTileAtWorldXY(tile.x, tile.y);
 				tile.destroy();
 			}
 		});
 	}
 
 	updateAppearingTiles() {
-		const transientTiles = getTransientTilesInRoom(this.map, this.activeRoom);
+		const transientTiles = getItemsInRoom(this.createdTiles, this.activeRoom);
 		const appearingTiles = transientTiles.filter((tile) => {
-			if (!isTilemapTile(tile)) {
-				return false;
-			}
-			return tile.properties?.some(
-				(prop: { name: string }) => prop.name === "msAfterApproach"
-			);
+			return tile.data.get("msAfterApproach") !== undefined;
 		});
 
 		appearingTiles.forEach((tile) => {
-			if (!isTilemapTile(tile)) {
-				return false;
-			}
-			const msAfterApproach: number =
-				tile.properties?.find(
-					(prop: { name: string }) => prop.name === "msAfterApproach"
-				)?.value ?? 0;
+			const msAfterApproach: number = tile.data.get("msAfterApproach");
 			const previewBeforeAppear: number =
-				tile.properties?.find(
-					(prop: { name: string }) => prop.name === "previewBeforeAppear"
-				)?.value ?? 0;
+				tile.data.get("previewBeforeAppear") ?? 0;
 
 			const timeSinceApproach = this.time.now - this.enteredRoomAt;
 			if (timeSinceApproach < msAfterApproach) {
 				return;
 			}
-
 			if (tile.visible) {
 				return;
 			}
-			tile.visible = true;
-			if (!tile.gid || !tile.x || !tile.y) {
-				return;
-			}
+			tile.setVisible(true);
 
-			const tileAdded = this.stuffLayer.putTileAtWorldXY(
-				tile.gid,
-				tile.x + tile.width / 2,
-				tile.y
-			);
-			tileAdded.properties = tile.properties;
-
-			console.log("adding tile", tileAdded, "from", tile);
-			tileAdded.alpha = 0.4;
+			console.log("adding tile", tile);
+			tile.alpha = 0.4;
 			setTimeout(() => {
-				tileAdded.alpha = 1;
-
-				tileAdded.setCollision(true, true, true, true);
-				if (this.physics.overlapTiles(this.player, [tileAdded])) {
+				tile.alpha = 1;
+				tile.data.set("hidden", false);
+				tile.body.pushable = false;
+				this.physics.add.collider(this.player, tile);
+				this.physics.add.collider(this.enemies, tile);
+				if (this.physics.overlap(this.player, tile)) {
 					console.log("hit player with tile");
 					this.enemyHitPlayer();
 				}
 
-				this.createdTiles.push(tileAdded);
+				this.createdTiles.push(tile);
 			}, previewBeforeAppear);
 		});
 	}
@@ -384,19 +379,9 @@ export class Game extends Scene {
 	}
 
 	hideAllTransientTiles() {
-		const layerName = "Transients";
-		const layer = this.map.getObjectLayer(layerName);
-		const appearingTiles =
-			layer?.objects.filter((tile) => {
-				if (!isTilemapTile(tile)) {
-					return false;
-				}
-				return tile.properties?.some(
-					(prop: { name: string }) => prop.name === "msAfterApproach"
-				);
-			}) ?? [];
-		appearingTiles.forEach((tile) => {
-			tile.visible = false;
+		this.createdTiles.forEach((item) => {
+			item.setVisible(false);
+			item.data.set("hidden", true);
 		});
 	}
 
