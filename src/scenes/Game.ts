@@ -19,6 +19,7 @@ import {
 	getTransientTilesInRoom,
 	getDoorDestinationCoordinates,
 	getItemTouchingPlayer,
+	isSprite,
 } from "../shared";
 
 export class Game extends Scene {
@@ -48,8 +49,10 @@ export class Game extends Scene {
 	stuffLayer: Phaser.Tilemaps.TilemapLayer;
 	activeRoom: Phaser.Types.Tilemaps.TiledObject;
 	createdTiles: Phaser.Tilemaps.Tile[] = [];
-	createdSwords: Phaser.GameObjects.GameObject[] = [];
+	createdSwords: Phaser.GameObjects.Sprite[] = [];
 	enteredRoomAt: number = 0;
+
+	floorText: Phaser.GameObjects.Text | undefined;
 
 	doors: Phaser.Types.Tilemaps.TiledObject[];
 
@@ -79,11 +82,13 @@ export class Game extends Scene {
 		this.setTileLayerCollisions(this.stuffLayer, this.player);
 		this.setTileLayerCollisions(this.stuffLayer, this.enemies);
 
-		this.createdSwords = this.map.createFromObjects("Items", {
-			name: "Sword",
-			key: "dungeon_tiles_sprites",
-			frame: 1315, // FIXME: we should be able to get this automatically from the object layer
-		});
+		this.createdSwords = this.map
+			.createFromObjects("Items", {
+				name: "Sword",
+				key: "dungeon_tiles_sprites",
+				frame: 1315, // FIXME: we should be able to get this automatically from the object layer
+			})
+			.filter(isSprite);
 
 		this.enemyCollider = this.physics.add.collider(
 			this.player,
@@ -176,6 +181,7 @@ export class Game extends Scene {
 	}
 
 	moveCameraToRoom(room: Phaser.Types.Tilemaps.TiledObject) {
+		this.floorText?.destroy();
 		const camera = this.cameras.main;
 		const zoomLevel = 6;
 		camera.setZoom(zoomLevel);
@@ -198,7 +204,7 @@ export class Game extends Scene {
 
 		this.activeRoom = room;
 		this.enteredRoomAt = this.time.now;
-		hideAllRoomsExcept(this.map, this.enemies, room);
+		hideAllRoomsExcept(this.map, this.enemies, this.createdSwords, room);
 	}
 
 	handleCollideDoor(door: Phaser.Types.Tilemaps.TiledObject) {
@@ -376,6 +382,18 @@ export class Game extends Scene {
 					(item) => item !== touchingItem
 				);
 				touchingItem.destroy();
+				this.floorText = this.add
+					.text(
+						this.cameras.main.worldView.x + this.cameras.main.displayWidth / 2,
+						this.cameras.main.worldView.y + this.cameras.main.displayHeight / 2,
+						"Press SPACE",
+						{ fontFamily: "Arial" }
+					)
+					.setOrigin(0.5, 0.5)
+					.setFontSize(10)
+					.setFontStyle("bold")
+					.setFontFamily("Arial")
+					.setBackgroundColor("#000");
 			}
 		}
 	}

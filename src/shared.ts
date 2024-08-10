@@ -48,6 +48,11 @@ export function isDynamicImage(
 	return "body" in dynObj;
 }
 
+export function isSprite(obj: unknown): obj is Phaser.GameObjects.Sprite {
+	const dynObj = obj as Phaser.GameObjects.Sprite;
+	return "type" in dynObj && dynObj.type === "Sprite";
+}
+
 export function isTilemapTile(obj: unknown): obj is Phaser.Tilemaps.Tile {
 	const tile = obj as Phaser.Tilemaps.Tile;
 	return "properties" in tile && Array.isArray(tile.properties);
@@ -110,7 +115,7 @@ export function getDirectionOfSpriteMovement(body: {
 }
 
 export function getItemTouchingPlayer(
-	items: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody[],
+	items: Phaser.GameObjects.Sprite[],
 	player: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody
 ) {
 	return items.find((item) => {
@@ -229,6 +234,15 @@ export function getRoomForPoint(
 	return room;
 }
 
+export function getItemsInRoom(
+	items: Phaser.GameObjects.Sprite[],
+	room: Phaser.Types.Tilemaps.TiledObject
+) {
+	return items.filter((item) => {
+		return isPointInRoom(item.x, item.y, room);
+	});
+}
+
 export function isEnemyInRoom(
 	enemy: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody,
 	room: Phaser.Types.Tilemaps.TiledObject
@@ -284,6 +298,7 @@ export function getTilesInRoom(
 export function hideAllRoomsExcept(
 	map: Phaser.Tilemaps.Tilemap,
 	enemies: Phaser.Physics.Arcade.Group,
+	items: Phaser.GameObjects.Sprite[],
 	activeRoom: Phaser.Types.Tilemaps.TiledObject
 ) {
 	const rooms = getRooms(map);
@@ -298,6 +313,9 @@ export function hideAllRoomsExcept(
 				enemy.setActive(true);
 				enemy.setVisible(true);
 			});
+			getItemsInRoom(items, room).forEach((item) => {
+				item.visible = true;
+			});
 		} else {
 			// hide room
 			tiles.forEach((tile) => {
@@ -306,6 +324,9 @@ export function hideAllRoomsExcept(
 			getEnemiesInRoom(enemies, room).forEach((enemy) => {
 				enemy.setActive(false);
 				enemy.setVisible(false);
+			});
+			getItemsInRoom(items, room).forEach((item) => {
+				item.visible = false;
 			});
 		}
 	});
