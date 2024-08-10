@@ -36,6 +36,7 @@ export class Game extends Scene {
 	framesSincePower: number = 0;
 	playerDirection: SpriteDirection = SpriteDown;
 	enteredRoomAt: number = 0;
+	isPlayerBeingKnockedBack: boolean = false;
 
 	characterSpeed: number = 90;
 	postAttackCooldown: number = 200;
@@ -837,10 +838,12 @@ export class Game extends Scene {
 	knockBack(body: Phaser.Physics.Arcade.Body, time: number) {
 		const direction = this.playerDirection;
 		const bounceSpeed = this.getPlayerSpeed() * 2;
+		this.isPlayerBeingKnockedBack = true;
 
 		setTimeout(() => {
 			body.setVelocityX(0);
 			body.setVelocityY(0);
+			this.isPlayerBeingKnockedBack = false;
 		}, time);
 
 		body.setVelocityX(0);
@@ -971,7 +974,11 @@ export class Game extends Scene {
 	}
 
 	updatePlayerMovement(): void {
-		if (this.isPlayerAttacking() || this.isPlayerUsingPower()) {
+		if (
+			this.isPlayerAttacking() ||
+			this.isPlayerUsingPower() ||
+			this.isPlayerBeingKnockedBack
+		) {
 			return;
 		}
 
@@ -1018,10 +1025,9 @@ export class Game extends Scene {
 
 		if (this.isPlayerBeingHit()) {
 			this.updatePlayerBeingHit();
-			return;
+		} else {
+			this.player.setVisible(true);
 		}
-
-		this.player.setVisible(true);
 
 		if (this.isPlayerFrozen()) {
 			this.player.stop();
