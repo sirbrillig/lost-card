@@ -13,7 +13,6 @@ import {
 	isDynamicImage,
 	isTilemapTile,
 	getObjectId,
-	getDoorTouchingPlayer,
 	getRoomForPoint,
 	hideAllRoomsExcept,
 	getDoorDestinationCoordinates,
@@ -57,12 +56,11 @@ export class Game extends Scene {
 
 	map: Phaser.Tilemaps.Tilemap;
 	landLayer: Phaser.Tilemaps.TilemapLayer;
-	doorsLayer: Phaser.Tilemaps.TilemapLayer;
 	stuffLayer: Phaser.Tilemaps.TilemapLayer;
 	activeRoom: Phaser.Types.Tilemaps.TiledObject;
+	createdDoors: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody[] = [];
 	createdTiles: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody[] = [];
 	createdItems: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody[] = [];
-	doors: Phaser.Types.Tilemaps.TiledObject[] = [];
 
 	constructor() {
 		super("Game");
@@ -89,15 +87,16 @@ export class Game extends Scene {
 		this.landLayer = this.createTileLayer("Background", tilesetTile, 0);
 		this.setTileLayerCollisions(this.landLayer, this.player);
 		this.setTileLayerCollisions(this.landLayer, this.enemies);
-		this.doorsLayer = this.createTileLayer("Doors", tilesetTile, 0);
-		// Enemies collide with doors but players can pass through them.
-		this.setTileLayerCollisions(this.doorsLayer, this.enemies);
 		this.stuffLayer = this.createTileLayer("Stuff", tilesetTile, 0);
 		this.setTileLayerCollisions(this.stuffLayer, this.player);
 		this.setTileLayerCollisions(this.stuffLayer, this.enemies);
 
+		this.createDoors();
 		this.createAppearingTiles();
 		this.createItems();
+
+		// Enemies collide with doors but players can pass through them.
+		this.setTileLayerCollisions(this.createdDoors, this.enemies);
 
 		this.enemyCollider = this.physics.add.collider(
 			this.player,
@@ -155,6 +154,19 @@ export class Game extends Scene {
 		this.createOverlay();
 	}
 
+	createDoors() {
+		this.createdDoors = this.map
+			.createFromObjects("Doors", [{ name: "Door" }])
+			.map((item) => this.physics.world.enableBody(item))
+			.map((item) => item.setDataEnabled())
+			.filter(isDynamicSprite)
+			.map((item) => {
+				item.body.pushable = false;
+				console.log("created door", item);
+				return item;
+			});
+	}
+
 	createAppearingTiles() {
 		this.createdTiles = this.map
 			.createFromObjects("Transients", [
@@ -200,7 +212,7 @@ export class Game extends Scene {
 	}
 
 	setTileLayerCollisions(
-		layer: Phaser.Tilemaps.TilemapLayer,
+		layer: Phaser.Types.Physics.Arcade.ArcadeColliderType,
 		sprite: Phaser.Types.Physics.Arcade.ArcadeColliderType
 	) {
 		this.physics.add.collider(sprite, layer);
@@ -218,20 +230,6 @@ export class Game extends Scene {
 			this.player.y + tileHeight
 		);
 		this.moveCameraToRoom(room);
-
-		this.doors =
-			this.map.filterObjects("MetaObjects", (obj) => {
-				if (!isTilemapTile(obj)) {
-					return false;
-				}
-				const destinationId = obj.properties.find(
-					(prop: { name: string }) => prop.name === "doorto"
-				)?.value;
-				if (!destinationId) {
-					return false;
-				}
-				return true;
-			}) ?? [];
 	}
 
 	moveCameraToRoom(room: Phaser.Types.Tilemaps.TiledObject) {
@@ -259,20 +257,19 @@ export class Game extends Scene {
 		hideAllRoomsExcept(
 			this.map,
 			this.enemies,
-			[...this.createdItems, ...this.createdTiles],
+			[...this.createdItems, ...this.createdTiles, ...this.createdDoors],
 			room
 		);
 	}
 
-	handleCollideDoor(door: Phaser.Types.Tilemaps.TiledObject) {
-		const destinationId = door.properties.find(
-			(prop: { name: string }) => prop.name === "doorto"
-		)?.value;
+	handleCollideDoor(door: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody) {
+		const destinationId = door.data.get("doorto");
 		if (!destinationId) {
 			throw new Error("Hit door without destination id");
 		}
+
 		const destinationTile = this.map.findObject(
-			"MetaObjects",
+			"Doors",
 			(obj: unknown) => getObjectId(obj) === destinationId
 		);
 		if (!destinationTile) {
@@ -280,17 +277,19 @@ export class Game extends Scene {
 		}
 		console.log("moving to tile", destinationTile);
 
-		const destinationDirection = destinationTile.properties.find(
+		let destinationDirection = destinationTile.properties.find(
 			(prop: { name: string }) => prop.name === "doordirection"
 		)?.value;
 		if (destinationDirection === undefined) {
 			throw new Error("Door has no destination direction");
 		}
+		destinationDirection = invertSpriteDirection(destinationDirection);
+		console.log("moving through door in direction", destinationDirection);
 
 		// if the player enters a door, teleport them just past the corresponding door
 		const [destinationX, destinationY] = getDoorDestinationCoordinates(
 			destinationTile,
-			invertSpriteDirection(destinationDirection)
+			destinationDirection
 		);
 		console.log("moving player to point", destinationX, destinationY);
 		this.movePlayerToPoint(destinationX, destinationY);
@@ -401,7 +400,7 @@ export class Game extends Scene {
 					console.log("hit wall with rock");
 					this.destroyCreatedTile(tile);
 				});
-				this.physics.add.collider(this.doorsLayer, tile, () => {
+				this.physics.add.collider(this.createdDoors, tile, () => {
 					console.log("hit wall with rock");
 					this.destroyCreatedTile(tile);
 				});
@@ -445,7 +444,7 @@ export class Game extends Scene {
 	}
 
 	maybeChangeRoom() {
-		const touchingDoor = getDoorTouchingPlayer(this.doors, this.player);
+		const touchingDoor = getItemTouchingPlayer(this.createdDoors, this.player);
 		if (touchingDoor) {
 			this.handleCollideDoor(touchingDoor);
 		}

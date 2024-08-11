@@ -150,36 +150,6 @@ function isValueInRange(value: number, min: number, max: number): boolean {
 	return value >= min && value <= max;
 }
 
-export function getDoorTouchingPlayer(
-	doors: Phaser.Types.Tilemaps.TiledObject[],
-	player: { x: number; y: number }
-): Phaser.Types.Tilemaps.TiledObject | undefined {
-	return doors.find((door) => {
-		if (
-			door.x === undefined ||
-			door.y === undefined ||
-			!door.height ||
-			!door.width
-		) {
-			throw new Error("Door has no position");
-		}
-		// Note: for reasons I don't understand, door.x and door.y are the
-		// lower-left corner of the tile so we have to adjust them to get the
-		// upper-left coordinates.
-		const doorX = door.x;
-		const doorY = door.y - door.height;
-		if (
-			player.x >= doorX &&
-			player.x < doorX + door.width &&
-			player.y >= doorY &&
-			player.y < doorY + door.height
-		) {
-			return true;
-		}
-		return false;
-	});
-}
-
 export function isMetaObjectRoom(obj: Phaser.GameObjects.GameObject): boolean {
 	if (!isTilemapTile(obj)) {
 		return false;
@@ -350,13 +320,13 @@ export function getDoorDestinationCoordinates(
 			return destinationTile.x - 6;
 		}
 		if (destinationDirection === SpriteRight) {
-			return destinationTile.x + 18;
+			return destinationTile.x + 24;
 		}
 		return destinationTile.x + 8;
 	})();
 	const destinationY = (() => {
 		if (destinationDirection === SpriteUp) {
-			return destinationTile.y - 18;
+			return destinationTile.y - 24;
 		}
 		if (destinationDirection === SpriteDown) {
 			return destinationTile.y + 6;
