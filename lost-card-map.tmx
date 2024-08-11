@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.0" orientation="orthogonal" renderorder="right-down" width="80" height="60" tilewidth="16" tileheight="16" infinite="0" nextlayerid="9" nextobjectid="173">
+<map version="1.10" tiledversion="1.11.0" orientation="orthogonal" renderorder="right-down" width="80" height="60" tilewidth="16" tileheight="16" infinite="0" nextlayerid="9" nextobjectid="177">
  <editorsettings>
-  <export target="public/assets/mirror_room.json" format="json"/>
+  <export target="public/assets/lost-card-map.json" format="json"/>
  </editorsettings>
  <tileset firstgid="1" name="Dungeon_Tiles" tilewidth="16" tileheight="16" spacing="2" margin="1" tilecount="1394" columns="41">
   <image source="public/assets/Final_Tileset_extruded.png" width="738" height="612"/>
@@ -7422,13 +7422,13 @@
   </object>
  </objectgroup>
  <objectgroup id="8" name="Items">
-  <object id="86" name="Sword" gid="1316" x="50.8361" y="244.626" width="7.83691" height="7.83691"/>
-  <object id="87" name="WindCard" gid="1272" x="519.156" y="39.3744" width="16" height="16">
+  <object id="173" name="Sword" gid="2710" x="50.1932" y="244.362" width="11.3856" height="11.3856"/>
+  <object id="174" name="Heart" gid="2628" x="551.885" y="295.377" width="16" height="16"/>
+  <object id="176" name="WindCard" gid="2666" x="520.247" y="36.4046" width="16" height="16">
    <properties>
     <property name="hidden" type="bool" value="true"/>
    </properties>
   </object>
-  <object id="115" name="Heart" gid="1234" x="551.625" y="297.133" width="16" height="16"/>
  </objectgroup>
  <objectgroup id="7" name="Transients">
   <object id="118" name="Rock" gid="2260" x="337.86" y="110.14" width="12.4482" height="12.4482"/>

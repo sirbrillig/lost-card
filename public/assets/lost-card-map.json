@@ -1077,12 +1077,18 @@
                  "height":16,
                  "id":176,
                  "name":"WindCard",
+                 "properties":[
+                        {
+                         "name":"hidden",
+                         "type":"bool",
+                         "value":true
+                        }],
                  "rotation":0,
                  "type":"",
                  "visible":true,
                  "width":16,
-                 "x":273.284519488717,
-                 "y":106.232602177687
+                 "x":520.246804481616,
+                 "y":36.4046078586082
                 }],
          "opacity":1,
          "type":"objectgroup",

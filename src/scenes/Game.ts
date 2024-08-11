@@ -163,6 +163,7 @@ export class Game extends Scene {
 				},
 			])
 			.map((item) => this.physics.world.enableBody(item))
+			.map((item) => item.setDataEnabled())
 			.filter(isDynamicSprite);
 	}
 
@@ -171,21 +172,16 @@ export class Game extends Scene {
 			.createFromObjects("Items", [
 				{
 					name: "Sword",
-					key: "dungeon_tiles_sprites",
-					frame: 1315, // FIXME: we should be able to get this automatically from the object layer
 				},
 				{
 					name: "WindCard",
-					key: "dungeon_tiles_sprites",
-					frame: 1271, // FIXME: we should be able to get this automatically from the object layer
 				},
 				{
 					name: "Heart",
-					key: "dungeon_tiles_sprites",
-					frame: 1233, // FIXME: we should be able to get this automatically from the object layer
 				},
 			])
 			.map((item) => this.physics.world.enableBody(item))
+			.map((item) => item.setDataEnabled())
 			.filter(isDynamicSprite);
 	}
 

@@ -29,7 +29,7 @@ export class Preloader extends Scene {
 		this.load.image("logo", "logo.png");
 
 		this.load.image("dungeon_tiles", "Final_Tileset_extruded.png");
-		this.load.tilemapTiledJSON("map", "mirror_room.json");
+		this.load.tilemapTiledJSON("map", "lost-card-map.json");
 
 		this.load.spritesheet(
 			"dungeon_tiles_sprites",
