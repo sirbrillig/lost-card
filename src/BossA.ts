@@ -34,8 +34,8 @@ class StateMachine implements BehaviorMachineInterface<AllStates> {
 }
 
 class WaitForActive implements Behavior<AllStates> {
+	#distanceToActivate: number = 100;
 	#nextState: AllStates;
-	#isReady: boolean = false;
 	name: AllStates;
 
 	constructor(name: AllStates, nextState: AllStates) {
@@ -49,18 +49,27 @@ class WaitForActive implements Behavior<AllStates> {
 		}
 		console.log("waiting for player");
 		sprite.body.stop();
-		setTimeout(() => {
-			this.#isReady = true;
-		}, 2000);
 	}
 
 	update(sprite: BossA): void {
-		if (this.#isReady) {
+		if (this.#isPlayerNear(sprite)) {
 			console.log("waiting ended");
 			// TODO: wait for the player to be nearby
 			sprite.stateMachine.popState();
 			sprite.stateMachine.pushState(this.#nextState);
 		}
+	}
+
+	#isPlayerNear(sprite: BossA): boolean {
+		const playerPosition: Phaser.Math.Vector2 =
+			sprite.scene.data.get("playerPosition");
+		const monsterPosition: Phaser.Math.Vector2 =
+			sprite.data.get("monsterPosition");
+		const distance = monsterPosition.distance(playerPosition);
+		if (distance > this.#distanceToActivate) {
+			return false;
+		}
+		return true;
 	}
 }
 
@@ -260,6 +269,7 @@ export class BossA extends Phaser.Physics.Arcade.Sprite {
 		this.setPushable(false);
 		this.setScale(2);
 		this.setDataEnabled();
+		this.data.set("monsterPosition", new Phaser.Math.Vector2(x, y));
 		this.data.set("hittable", true);
 		this.on("hit", this.hit);
 
@@ -315,7 +325,6 @@ export class BossA extends Phaser.Physics.Arcade.Sprite {
 			return;
 		}
 
-		console.log("state has not changed from", state);
 		// Take update actions
 		this.#currentPlayingState?.update(this);
 	}

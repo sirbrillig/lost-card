@@ -1105,6 +1105,10 @@ export class Game extends Scene {
 	}
 
 	updatePlayer(): void {
+		this.data.set(
+			"playerPosition",
+			new Phaser.Math.Vector2(this.player.x, this.player.y)
+		);
 		this.updateSwordHitbox();
 
 		if (this.isPlayerBeingHit()) {
