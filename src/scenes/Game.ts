@@ -70,21 +70,29 @@ export class Game extends Scene {
 
 	create() {
 		this.map = this.make.tilemap({ key: "map" });
-		const tileset = this.map.addTilesetImage("Final_Tileset", "dungeon_tiles");
-		if (!tileset) {
+		const tilesetTile = this.map.addTilesetImage(
+			"Dungeon_Tiles",
+			"dungeon_tiles"
+		);
+		const tilesetSprite = this.map.addTilesetImage(
+			"Dungeon_Tiles_Sprites",
+			"dungeon_tiles_sprites"
+		);
+		console.log(this.map.tilesets);
+		if (!tilesetTile || !tilesetSprite) {
 			throw new Error("Could not make tileset");
 		}
 
 		this.createPlayer();
 		this.createEnemies();
 
-		this.landLayer = this.createTileLayer("Background", tileset, 0);
+		this.landLayer = this.createTileLayer("Background", tilesetTile, 0);
 		this.setTileLayerCollisions(this.landLayer, this.player);
 		this.setTileLayerCollisions(this.landLayer, this.enemies);
-		this.doorsLayer = this.createTileLayer("Doors", tileset, 0);
+		this.doorsLayer = this.createTileLayer("Doors", tilesetTile, 0);
 		// Enemies collide with doors but players can pass through them.
 		this.setTileLayerCollisions(this.doorsLayer, this.enemies);
-		this.stuffLayer = this.createTileLayer("Stuff", tileset, 0);
+		this.stuffLayer = this.createTileLayer("Stuff", tilesetTile, 0);
 		this.setTileLayerCollisions(this.stuffLayer, this.player);
 		this.setTileLayerCollisions(this.stuffLayer, this.enemies);
 
@@ -152,8 +160,6 @@ export class Game extends Scene {
 			.createFromObjects("Transients", [
 				{
 					name: "Rock",
-					key: "dungeon_tiles_sprites",
-					frame: 865, // FIXME: we should be able to get this automatically from the object layer
 				},
 			])
 			.map((item) => this.physics.world.enableBody(item))

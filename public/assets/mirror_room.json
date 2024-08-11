@@ -316,7 +316,7 @@
                  "y":79.716
                 }, 
                 {
-                 "height":175.366075685985,
+                 "height":175.366,
                  "id":37,
                  "name":"MK6",
                  "properties":[
@@ -328,7 +328,7 @@
                  "rotation":0,
                  "type":"",
                  "visible":true,
-                 "width":158.699553513373,
+                 "width":158.7,
                  "x":304,
                  "y":144
                 }, 
@@ -495,7 +495,7 @@
                  "visible":true,
                  "width":0,
                  "x":137.029,
-                 "y":201.601429190689
+                 "y":201.601
                 }, 
                 {
                  "height":0,
@@ -901,8 +901,8 @@
                  "type":"",
                  "visible":true,
                  "width":0,
-                 "x":375.829034635225,
-                 "y":171.225454072565
+                 "x":375.829,
+                 "y":171.225
                 }, 
                 {
                  "height":0,
@@ -919,8 +919,8 @@
                  "type":"",
                  "visible":true,
                  "width":0,
-                 "x":408.773678963111,
-                 "y":250.552689756816
+                 "x":408.774,
+                 "y":250.553
                 }, 
                 {
                  "height":0,
@@ -937,8 +937,8 @@
                  "type":"",
                  "visible":true,
                  "width":0,
-                 "x":326.412068143396,
-                 "y":201.135723264988
+                 "x":326.412,
+                 "y":201.136
                 }, 
                 {
                  "height":0,
@@ -955,8 +955,8 @@
                  "type":"",
                  "visible":true,
                  "width":0,
-                 "x":359.790194633491,
-                 "y":300.836620573063
+                 "x":359.79,
+                 "y":300.837
                 }, 
                 {
                  "height":96,
@@ -1050,7 +1050,7 @@
          "objects":[
                 {
                  "gid":1316,
-                 "height":7.83691005563787,
+                 "height":7.83691,
                  "id":86,
                  "name":"Sword",
                  "properties":[
@@ -1062,9 +1062,9 @@
                  "rotation":0,
                  "type":"",
                  "visible":true,
-                 "width":7.83691005563787,
-                 "x":50.8360656155197,
-                 "y":244.625905600359
+                 "width":7.83691,
+                 "x":50.8361,
+                 "y":244.626
                 }, 
                 {
                  "gid":1272,
@@ -1086,8 +1086,8 @@
                  "type":"",
                  "visible":true,
                  "width":16,
-                 "x":519.156064181951,
-                 "y":39.3744389798588
+                 "x":519.156,
+                 "y":39.3744
                 }, 
                 {
                  "gid":1234,
@@ -1104,8 +1104,8 @@
                  "type":"",
                  "visible":true,
                  "width":16,
-                 "x":551.625471411851,
-                 "y":297.13260219342
+                 "x":551.625,
+                 "y":297.133
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -1119,42 +1119,37 @@
          "name":"Transients",
          "objects":[
                 {
-                 "gid":866,
-                 "height":13.473,
-                 "id":64,
+                 "gid":2260,
+                 "height":12.4482,
+                 "id":118,
                  "name":"Rock",
                  "properties":[
                         {
                          "name":"affectedByWindCard",
-                         "type":"bool",
-                         "value":true
-                        }, 
-                        {
-                         "name":"collides",
                          "type":"bool",
                          "value":true
                         }, 
                         {
                          "name":"msAfterApproach",
                          "type":"int",
-                         "value":1500
+                         "value":1
                         }, 
                         {
                          "name":"previewBeforeAppear",
                          "type":"int",
-                         "value":500
+                         "value":0
                         }],
                  "rotation":0,
                  "type":"",
                  "visible":true,
-                 "width":13.1923,
-                 "x":625.713,
-                 "y":94.2871
+                 "width":12.4482,
+                 "x":337.86,
+                 "y":110.14
                 }, 
                 {
-                 "gid":866,
-                 "height":13.473,
-                 "id":65,
+                 "gid":2260,
+                 "height":12.163,
+                 "id":144,
                  "name":"Rock",
                  "properties":[
                         {
@@ -1163,7 +1158,450 @@
                          "value":true
                         }, 
                         {
-                         "name":"collides",
+                         "name":"msAfterApproach",
+                         "type":"int",
+                         "value":1
+                        }, 
+                        {
+                         "name":"previewBeforeAppear",
+                         "type":"int",
+                         "value":0
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":12.163,
+                 "x":434.144768662838,
+                 "y":126.722499671862
+                }, 
+                {
+                 "gid":2260,
+                 "height":12.163,
+                 "id":161,
+                 "name":"Rock",
+                 "properties":[
+                        {
+                         "name":"affectedByWindCard",
+                         "type":"bool",
+                         "value":true
+                        }, 
+                        {
+                         "name":"msAfterApproach",
+                         "type":"int",
+                         "value":1
+                        }, 
+                        {
+                         "name":"previewBeforeAppear",
+                         "type":"int",
+                         "value":0
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":12.163,
+                 "x":401.587344544709,
+                 "y":173.379595652174
+                }, 
+                {
+                 "gid":2260,
+                 "height":12.163,
+                 "id":162,
+                 "name":"Rock",
+                 "properties":[
+                        {
+                         "name":"affectedByWindCard",
+                         "type":"bool",
+                         "value":true
+                        }, 
+                        {
+                         "name":"msAfterApproach",
+                         "type":"int",
+                         "value":1
+                        }, 
+                        {
+                         "name":"previewBeforeAppear",
+                         "type":"int",
+                         "value":0
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":12.163,
+                 "x":401.587344544709,
+                 "y":191.068274897457
+                }, 
+                {
+                 "gid":2260,
+                 "height":12.163,
+                 "id":163,
+                 "name":"Rock",
+                 "properties":[
+                        {
+                         "name":"affectedByWindCard",
+                         "type":"bool",
+                         "value":true
+                        }, 
+                        {
+                         "name":"msAfterApproach",
+                         "type":"int",
+                         "value":1
+                        }, 
+                        {
+                         "name":"previewBeforeAppear",
+                         "type":"int",
+                         "value":0
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":12.163,
+                 "x":418.250593109106,
+                 "y":236.956297867104
+                }, 
+                {
+                 "gid":2260,
+                 "height":12.163,
+                 "id":164,
+                 "name":"Rock",
+                 "properties":[
+                        {
+                         "name":"affectedByWindCard",
+                         "type":"bool",
+                         "value":true
+                        }, 
+                        {
+                         "name":"msAfterApproach",
+                         "type":"int",
+                         "value":1
+                        }, 
+                        {
+                         "name":"previewBeforeAppear",
+                         "type":"int",
+                         "value":0
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":12.163,
+                 "x":401.84370221493,
+                 "y":237.212655537326
+                }, 
+                {
+                 "gid":2260,
+                 "height":12.163,
+                 "id":165,
+                 "name":"Rock",
+                 "properties":[
+                        {
+                         "name":"affectedByWindCard",
+                         "type":"bool",
+                         "value":true
+                        }, 
+                        {
+                         "name":"msAfterApproach",
+                         "type":"int",
+                         "value":1
+                        }, 
+                        {
+                         "name":"previewBeforeAppear",
+                         "type":"int",
+                         "value":0
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":12.163,
+                 "x":385.436811320755,
+                 "y":236.956297867104
+                }, 
+                {
+                 "gid":2260,
+                 "height":12.163,
+                 "id":166,
+                 "name":"Rock",
+                 "properties":[
+                        {
+                         "name":"affectedByWindCard",
+                         "type":"bool",
+                         "value":true
+                        }, 
+                        {
+                         "name":"msAfterApproach",
+                         "type":"int",
+                         "value":1
+                        }, 
+                        {
+                         "name":"previewBeforeAppear",
+                         "type":"int",
+                         "value":0
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":12.163,
+                 "x":353.904817883511,
+                 "y":269.770079655455
+                }, 
+                {
+                 "gid":2260,
+                 "height":12.163,
+                 "id":167,
+                 "name":"Rock",
+                 "properties":[
+                        {
+                         "name":"affectedByWindCard",
+                         "type":"bool",
+                         "value":true
+                        }, 
+                        {
+                         "name":"msAfterApproach",
+                         "type":"int",
+                         "value":1
+                        }, 
+                        {
+                         "name":"previewBeforeAppear",
+                         "type":"int",
+                         "value":0
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":12.163,
+                 "x":369.798993437244,
+                 "y":270.026437325677
+                }, 
+                {
+                 "gid":2260,
+                 "height":12.163,
+                 "id":168,
+                 "name":"Rock",
+                 "properties":[
+                        {
+                         "name":"affectedByWindCard",
+                         "type":"bool",
+                         "value":true
+                        }, 
+                        {
+                         "name":"msAfterApproach",
+                         "type":"int",
+                         "value":1
+                        }, 
+                        {
+                         "name":"previewBeforeAppear",
+                         "type":"int",
+                         "value":0
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":12.163,
+                 "x":386.462242001641,
+                 "y":270.026437325677
+                }, 
+                {
+                 "gid":2260,
+                 "height":12.163,
+                 "id":169,
+                 "name":"Rock",
+                 "properties":[
+                        {
+                         "name":"affectedByWindCard",
+                         "type":"bool",
+                         "value":true
+                        }, 
+                        {
+                         "name":"msAfterApproach",
+                         "type":"int",
+                         "value":1
+                        }, 
+                        {
+                         "name":"previewBeforeAppear",
+                         "type":"int",
+                         "value":0
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":12.163,
+                 "x":273.664867104184,
+                 "y":270.795510336341
+                }, 
+                {
+                 "gid":2260,
+                 "height":12.163,
+                 "id":170,
+                 "name":"Rock",
+                 "properties":[
+                        {
+                         "name":"affectedByWindCard",
+                         "type":"bool",
+                         "value":true
+                        }, 
+                        {
+                         "name":"msAfterApproach",
+                         "type":"int",
+                         "value":1
+                        }, 
+                        {
+                         "name":"previewBeforeAppear",
+                         "type":"int",
+                         "value":0
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":12.163,
+                 "x":225.982340442986,
+                 "y":254.388619442166
+                }, 
+                {
+                 "gid":2260,
+                 "height":12.163,
+                 "id":171,
+                 "name":"Rock",
+                 "properties":[
+                        {
+                         "name":"affectedByWindCard",
+                         "type":"bool",
+                         "value":true
+                        }, 
+                        {
+                         "name":"msAfterApproach",
+                         "type":"int",
+                         "value":1
+                        }, 
+                        {
+                         "name":"previewBeforeAppear",
+                         "type":"int",
+                         "value":0
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":12.163,
+                 "x":178.043456111567,
+                 "y":286.176970549631
+                }, 
+                {
+                 "gid":2260,
+                 "height":12.163,
+                 "id":172,
+                 "name":"Rock",
+                 "properties":[
+                        {
+                         "name":"affectedByWindCard",
+                         "type":"bool",
+                         "value":true
+                        }, 
+                        {
+                         "name":"msAfterApproach",
+                         "type":"int",
+                         "value":1
+                        }, 
+                        {
+                         "name":"previewBeforeAppear",
+                         "type":"int",
+                         "value":0
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":12.163,
+                 "x":147.024178014766,
+                 "y":269.257364315012
+                }, 
+                {
+                 "gid":2260,
+                 "height":12.163,
+                 "id":158,
+                 "name":"Rock",
+                 "properties":[
+                        {
+                         "name":"affectedByWindCard",
+                         "type":"bool",
+                         "value":true
+                        }, 
+                        {
+                         "name":"msAfterApproach",
+                         "type":"int",
+                         "value":1
+                        }, 
+                        {
+                         "name":"previewBeforeAppear",
+                         "type":"int",
+                         "value":0
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":12.163,
+                 "x":232.134924528302,
+                 "y":174.661384003281
+                }, 
+                {
+                 "gid":2260,
+                 "height":12.163,
+                 "id":160,
+                 "name":"Rock",
+                 "properties":[
+                        {
+                         "name":"affectedByWindCard",
+                         "type":"bool",
+                         "value":true
+                        }, 
+                        {
+                         "name":"msAfterApproach",
+                         "type":"int",
+                         "value":1
+                        }, 
+                        {
+                         "name":"previewBeforeAppear",
+                         "type":"int",
+                         "value":0
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":12.163,
+                 "x":232.134924528302,
+                 "y":190.299201886792
+                }, 
+                {
+                 "gid":2260,
+                 "height":12.163,
+                 "id":145,
+                 "name":"Rock",
+                 "properties":[
+                        {
+                         "name":"affectedByWindCard",
+                         "type":"bool",
+                         "value":true
+                        }, 
+                        {
+                         "name":"msAfterApproach",
+                         "type":"int",
+                         "value":1
+                        }, 
+                        {
+                         "name":"previewBeforeAppear",
+                         "type":"int",
+                         "value":0
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":12.163,
+                 "x":401.330986874487,
+                 "y":94.1650755537326
+                }, 
+                {
+                 "gid":2260,
+                 "height":12.163,
+                 "id":146,
+                 "name":"Rock",
+                 "properties":[
+                        {
+                         "name":"affectedByWindCard",
                          "type":"bool",
                          "value":true
                         }, 
@@ -1180,47 +1618,42 @@
                  "rotation":0,
                  "type":"",
                  "visible":true,
-                 "width":13.1923,
-                 "x":513.965,
-                 "y":206.596
+                 "width":12.163,
+                 "x":513.872004101723,
+                 "y":205.937019770304
                 }, 
                 {
-                 "gid":866,
-                 "height":13.473,
-                 "id":66,
+                 "gid":2260,
+                 "height":12.163,
+                 "id":147,
                  "name":"Rock",
                  "properties":[
                         {
                          "name":"affectedByWindCard",
-                         "type":"bool",
-                         "value":true
-                        }, 
-                        {
-                         "name":"collides",
                          "type":"bool",
                          "value":true
                         }, 
                         {
                          "name":"msAfterApproach",
                          "type":"int",
-                         "value":3000
+                         "value":1000
                         }, 
                         {
                          "name":"previewBeforeAppear",
                          "type":"int",
-                         "value":500
+                         "value":100
                         }],
                  "rotation":0,
                  "type":"",
                  "visible":true,
-                 "width":13.1923,
-                 "x":640.866,
-                 "y":62.3336
+                 "width":12.163,
+                 "x":513.872004101723,
+                 "y":205.937019770304
                 }, 
                 {
-                 "gid":866,
-                 "height":13.473,
-                 "id":67,
+                 "gid":2260,
+                 "height":12.163,
+                 "id":148,
                  "name":"Rock",
                  "properties":[
                         {
@@ -1229,7 +1662,58 @@
                          "value":true
                         }, 
                         {
-                         "name":"collides",
+                         "name":"msAfterApproach",
+                         "type":"int",
+                         "value":1
+                        }, 
+                        {
+                         "name":"previewBeforeAppear",
+                         "type":"int",
+                         "value":0
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":12.163,
+                 "x":610.006130434783,
+                 "y":189.786486546349
+                }, 
+                {
+                 "gid":2260,
+                 "height":12.163,
+                 "id":149,
+                 "name":"Rock",
+                 "properties":[
+                        {
+                         "name":"affectedByWindCard",
+                         "type":"bool",
+                         "value":true
+                        }, 
+                        {
+                         "name":"msAfterApproach",
+                         "type":"int",
+                         "value":1
+                        }, 
+                        {
+                         "name":"previewBeforeAppear",
+                         "type":"int",
+                         "value":0
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":12.163,
+                 "x":641.281766201805,
+                 "y":188.761055865464
+                }, 
+                {
+                 "gid":2260,
+                 "height":12.163,
+                 "id":150,
+                 "name":"Rock",
+                 "properties":[
+                        {
+                         "name":"affectedByWindCard",
                          "type":"bool",
                          "value":true
                         }, 
@@ -1246,14 +1730,14 @@
                  "rotation":0,
                  "type":"",
                  "visible":true,
-                 "width":13.1923,
-                 "x":712.463,
-                 "y":111.188
+                 "width":12.163,
+                 "x":704.602110746514,
+                 "y":92.8832872026251
                 }, 
                 {
-                 "gid":866,
-                 "height":13.473,
-                 "id":68,
+                 "gid":2260,
+                 "height":12.163,
+                 "id":154,
                  "name":"Rock",
                  "properties":[
                         {
@@ -1262,14 +1746,9 @@
                          "value":true
                         }, 
                         {
-                         "name":"collides",
-                         "type":"bool",
-                         "value":true
-                        }, 
-                        {
                          "name":"msAfterApproach",
                          "type":"int",
-                         "value":800
+                         "value":1000
                         }, 
                         {
                          "name":"previewBeforeAppear",
@@ -1279,23 +1758,18 @@
                  "rotation":0,
                  "type":"",
                  "visible":true,
-                 "width":13.1923,
-                 "x":609.138,
-                 "y":111.75
+                 "width":12.163,
+                 "x":608.467984413454,
+                 "y":109.802893437244
                 }, 
                 {
-                 "gid":866,
-                 "height":13.473,
-                 "id":70,
+                 "gid":2260,
+                 "height":12.163,
+                 "id":155,
                  "name":"Rock",
                  "properties":[
                         {
                          "name":"affectedByWindCard",
-                         "type":"bool",
-                         "value":true
-                        }, 
-                        {
-                         "name":"collides",
                          "type":"bool",
                          "value":true
                         }, 
@@ -1312,14 +1786,14 @@
                  "rotation":0,
                  "type":"",
                  "visible":true,
-                 "width":13.1923,
-                 "x":705.443,
-                 "y":95.184
+                 "width":12.163,
+                 "x":625.900305988515,
+                 "y":109.802893437244
                 }, 
                 {
-                 "gid":866,
-                 "height":12.615,
-                 "id":73,
+                 "gid":2260,
+                 "height":12.163,
+                 "id":156,
                  "name":"Rock",
                  "properties":[
                         {
@@ -1328,238 +1802,9 @@
                          "value":true
                         }, 
                         {
-                         "name":"collides",
-                         "type":"bool",
-                         "value":true
-                        }, 
-                        {
                          "name":"msAfterApproach",
                          "type":"int",
-                         "value":1
-                        }],
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":12.615,
-                 "x":401.873,
-                 "y":94.0367
-                }, 
-                {
-                 "gid":866,
-                 "height":12.615,
-                 "id":74,
-                 "name":"Rock",
-                 "properties":[
-                        {
-                         "name":"affectedByWindCard",
-                         "type":"bool",
-                         "value":true
-                        }, 
-                        {
-                         "name":"collides",
-                         "type":"bool",
-                         "value":true
-                        }, 
-                        {
-                         "name":"msAfterApproach",
-                         "type":"int",
-                         "value":1
-                        }],
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":12.615,
-                 "x":434.031,
-                 "y":127.12
-                }, 
-                {
-                 "gid":866,
-                 "height":12.615,
-                 "id":75,
-                 "name":"Rock",
-                 "properties":[
-                        {
-                         "name":"affectedByWindCard",
-                         "type":"bool",
-                         "value":true
-                        }, 
-                        {
-                         "name":"collides",
-                         "type":"bool",
-                         "value":true
-                        }, 
-                        {
-                         "name":"msAfterApproach",
-                         "type":"int",
-                         "value":1
-                        }],
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":12.615,
-                 "x":240.97079782392,
-                 "y":254.311877844727
-                }, 
-                {
-                 "gid":866,
-                 "height":12.615,
-                 "id":76,
-                 "name":"Rock",
-                 "properties":[
-                        {
-                         "name":"affectedByWindCard",
-                         "type":"bool",
-                         "value":true
-                        }, 
-                        {
-                         "name":"collides",
-                         "type":"bool",
-                         "value":true
-                        }, 
-                        {
-                         "name":"msAfterApproach",
-                         "type":"int",
-                         "value":1
-                        }],
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":12.615,
-                 "x":273.825084312281,
-                 "y":271.611004334822
-                }, 
-                {
-                 "gid":866,
-                 "height":12.615,
-                 "id":78,
-                 "name":"Rock",
-                 "properties":[
-                        {
-                         "name":"affectedByWindCard",
-                         "type":"bool",
-                         "value":true
-                        }, 
-                        {
-                         "name":"collides",
-                         "type":"bool",
-                         "value":true
-                        }, 
-                        {
-                         "name":"msAfterApproach",
-                         "type":"int",
-                         "value":1
-                        }],
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":12.615,
-                 "x":609.207,
-                 "y":190.307
-                }, 
-                {
-                 "gid":866,
-                 "height":12.615,
-                 "id":80,
-                 "name":"Rock",
-                 "properties":[
-                        {
-                         "name":"affectedByWindCard",
-                         "type":"bool",
-                         "value":true
-                        }, 
-                        {
-                         "name":"collides",
-                         "type":"bool",
-                         "value":true
-                        }, 
-                        {
-                         "name":"msAfterApproach",
-                         "type":"int",
-                         "value":1
-                        }],
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":12.615,
-                 "x":642.212,
-                 "y":190.307
-                }, 
-                {
-                 "gid":866,
-                 "height":12.615,
-                 "id":82,
-                 "name":"Rock",
-                 "properties":[
-                        {
-                         "name":"affectedByWindCard",
-                         "type":"bool",
-                         "value":true
-                        }, 
-                        {
-                         "name":"collides",
-                         "type":"bool",
-                         "value":true
-                        }, 
-                        {
-                         "name":"msAfterApproach",
-                         "type":"int",
-                         "value":1
-                        }],
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":12.615,
-                 "x":210.054,
-                 "y":173.946
-                }, 
-                {
-                 "gid":866,
-                 "height":12.615,
-                 "id":83,
-                 "name":"Rock",
-                 "properties":[
-                        {
-                         "name":"affectedByWindCard",
-                         "type":"bool",
-                         "value":true
-                        }, 
-                        {
-                         "name":"collides",
-                         "type":"bool",
-                         "value":true
-                        }, 
-                        {
-                         "name":"msAfterApproach",
-                         "type":"int",
-                         "value":1
-                        }],
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":12.615,
-                 "x":225.286,
-                 "y":190.872
-                }, 
-                {
-                 "gid":866,
-                 "height":13.473,
-                 "id":84,
-                 "name":"Rock",
-                 "properties":[
-                        {
-                         "name":"affectedByWindCard",
-                         "type":"bool",
-                         "value":true
-                        }, 
-                        {
-                         "name":"collides",
-                         "type":"bool",
-                         "value":true
-                        }, 
-                        {
-                         "name":"msAfterApproach",
-                         "type":"int",
-                         "value":1700
+                         "value":3000
                         }, 
                         {
                          "name":"previewBeforeAppear",
@@ -1569,23 +1814,18 @@
                  "rotation":0,
                  "type":"",
                  "visible":true,
-                 "width":13.1923,
-                 "x":736.704,
-                 "y":61.5287
+                 "width":12.163,
+                 "x":642.307196882691,
+                 "y":77.2454693191141
                 }, 
                 {
-                 "gid":866,
-                 "height":13.473,
-                 "id":85,
+                 "gid":2260,
+                 "height":12.163,
+                 "id":157,
                  "name":"Rock",
                  "properties":[
                         {
                          "name":"affectedByWindCard",
-                         "type":"bool",
-                         "value":true
-                        }, 
-                        {
-                         "name":"collides",
                          "type":"bool",
                          "value":true
                         }, 
@@ -1602,14 +1842,14 @@
                  "rotation":0,
                  "type":"",
                  "visible":true,
-                 "width":13.1923,
-                 "x":608.919,
-                 "y":31.0632
+                 "width":12.163,
+                 "x":658.457730106645,
+                 "y":62.120366776046
                 }, 
                 {
-                 "gid":866,
-                 "height":12.615,
-                 "id":89,
+                 "gid":2260,
+                 "height":12.163,
+                 "id":151,
                  "name":"Rock",
                  "properties":[
                         {
@@ -1618,26 +1858,26 @@
                          "value":true
                         }, 
                         {
-                         "name":"collides",
-                         "type":"bool",
-                         "value":true
-                        }, 
-                        {
                          "name":"msAfterApproach",
                          "type":"int",
-                         "value":1
+                         "value":1500
+                        }, 
+                        {
+                         "name":"previewBeforeAppear",
+                         "type":"int",
+                         "value":500
                         }],
                  "rotation":0,
                  "type":"",
                  "visible":true,
-                 "width":12.615,
-                 "x":177.922418938836,
-                 "y":288.893852464346
+                 "width":12.163,
+                 "x":713.830986874487,
+                 "y":110.571966447908
                 }, 
                 {
-                 "gid":866,
-                 "height":12.615,
-                 "id":95,
+                 "gid":2260,
+                 "height":12.163,
+                 "id":152,
                  "name":"Rock",
                  "properties":[
                         {
@@ -1646,26 +1886,26 @@
                          "value":true
                         }, 
                         {
-                         "name":"collides",
-                         "type":"bool",
-                         "value":true
-                        }, 
-                        {
                          "name":"msAfterApproach",
                          "type":"int",
-                         "value":1
+                         "value":2200
+                        }, 
+                        {
+                         "name":"previewBeforeAppear",
+                         "type":"int",
+                         "value":500
                         }],
                  "rotation":0,
                  "type":"",
                  "visible":true,
-                 "width":12.615,
-                 "x":130.239381095843,
-                 "y":302.331799492826
+                 "width":12.163,
+                 "x":737.672250205086,
+                 "y":61.3512937653815
                 }, 
                 {
-                 "gid":866,
-                 "height":12.615,
-                 "id":96,
+                 "gid":2260,
+                 "height":12.163,
+                 "id":153,
                  "name":"Rock",
                  "properties":[
                         {
@@ -1674,329 +1914,21 @@
                          "value":true
                         }, 
                         {
-                         "name":"collides",
-                         "type":"bool",
-                         "value":true
-                        }, 
-                        {
                          "name":"msAfterApproach",
                          "type":"int",
-                         "value":1
+                         "value":4000
+                        }, 
+                        {
+                         "name":"previewBeforeAppear",
+                         "type":"int",
+                         "value":500
                         }],
                  "rotation":0,
                  "type":"",
                  "visible":true,
-                 "width":12.615,
-                 "x":130.672863258052,
-                 "y":254.215279487624
-                }, 
-                {
-                 "gid":866,
-                 "height":12.615,
-                 "id":97,
-                 "name":"Rock",
-                 "properties":[
-                        {
-                         "name":"affectedByWindCard",
-                         "type":"bool",
-                         "value":true
-                        }, 
-                        {
-                         "name":"collides",
-                         "type":"bool",
-                         "value":true
-                        }, 
-                        {
-                         "name":"msAfterApproach",
-                         "type":"int",
-                         "value":1
-                        }],
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":12.615,
-                 "x":241.210814621353,
-                 "y":302.765281655035
-                }, 
-                {
-                 "gid":866,
-                 "height":12.615,
-                 "id":98,
-                 "name":"Rock",
-                 "properties":[
-                        {
-                         "name":"affectedByWindCard",
-                         "type":"bool",
-                         "value":true
-                        }, 
-                        {
-                         "name":"collides",
-                         "type":"bool",
-                         "value":true
-                        }, 
-                        {
-                         "name":"msAfterApproach",
-                         "type":"int",
-                         "value":1
-                        }],
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":12.615,
-                 "x":337.877336793966,
-                 "y":238.17643948589
-                }, 
-                {
-                 "gid":866,
-                 "height":12.615,
-                 "id":99,
-                 "name":"Rock",
-                 "properties":[
-                        {
-                         "name":"affectedByWindCard",
-                         "type":"bool",
-                         "value":true
-                        }, 
-                        {
-                         "name":"collides",
-                         "type":"bool",
-                         "value":true
-                        }, 
-                        {
-                         "name":"msAfterApproach",
-                         "type":"int",
-                         "value":1
-                        }],
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":12.615,
-                 "x":415.90412599159,
-                 "y":239.043403810308
-                }, 
-                {
-                 "gid":866,
-                 "height":12.615,
-                 "id":100,
-                 "name":"Rock",
-                 "properties":[
-                        {
-                         "name":"affectedByWindCard",
-                         "type":"bool",
-                         "value":true
-                        }, 
-                        {
-                         "name":"collides",
-                         "type":"bool",
-                         "value":true
-                        }, 
-                        {
-                         "name":"msAfterApproach",
-                         "type":"int",
-                         "value":1
-                        }],
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":12.615,
-                 "x":401.165732476484,
-                 "y":176.18849029
-                }, 
-                {
-                 "gid":866,
-                 "height":12.615,
-                 "id":101,
-                 "name":"Rock",
-                 "properties":[
-                        {
-                         "name":"affectedByWindCard",
-                         "type":"bool",
-                         "value":true
-                        }, 
-                        {
-                         "name":"collides",
-                         "type":"bool",
-                         "value":true
-                        }, 
-                        {
-                         "name":"msAfterApproach",
-                         "type":"int",
-                         "value":1
-                        }],
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":12.615,
-                 "x":400.732250314275,
-                 "y":190.059919480688
-                }, 
-                {
-                 "gid":866,
-                 "height":12.615,
-                 "id":102,
-                 "name":"Rock",
-                 "properties":[
-                        {
-                         "name":"affectedByWindCard",
-                         "type":"bool",
-                         "value":true
-                        }, 
-                        {
-                         "name":"collides",
-                         "type":"bool",
-                         "value":true
-                        }, 
-                        {
-                         "name":"msAfterApproach",
-                         "type":"int",
-                         "value":1
-                        }],
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":12.615,
-                 "x":400.298768152066,
-                 "y":238.609921648099
-                }, 
-                {
-                 "gid":866,
-                 "height":12.615,
-                 "id":107,
-                 "name":"Rock",
-                 "properties":[
-                        {
-                         "name":"affectedByWindCard",
-                         "type":"bool",
-                         "value":true
-                        }, 
-                        {
-                         "name":"collides",
-                         "type":"bool",
-                         "value":true
-                        }, 
-                        {
-                         "name":"msAfterApproach",
-                         "type":"int",
-                         "value":1
-                        }],
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":12.615,
-                 "x":354.349658957909,
-                 "y":270.687601651567
-                }, 
-                {
-                 "gid":866,
-                 "height":12.615,
-                 "id":108,
-                 "name":"Rock",
-                 "properties":[
-                        {
-                         "name":"affectedByWindCard",
-                         "type":"bool",
-                         "value":true
-                        }, 
-                        {
-                         "name":"collides",
-                         "type":"bool",
-                         "value":true
-                        }, 
-                        {
-                         "name":"msAfterApproach",
-                         "type":"int",
-                         "value":1
-                        }],
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":12.615,
-                 "x":369.521534635225,
-                 "y":270.687601651567
-                }, 
-                {
-                 "gid":866,
-                 "height":12.615,
-                 "id":109,
-                 "name":"Rock",
-                 "properties":[
-                        {
-                         "name":"affectedByWindCard",
-                         "type":"bool",
-                         "value":true
-                        }, 
-                        {
-                         "name":"collides",
-                         "type":"bool",
-                         "value":true
-                        }, 
-                        {
-                         "name":"msAfterApproach",
-                         "type":"int",
-                         "value":1
-                        }],
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":12.615,
-                 "x":386.427338961377,
-                 "y":270.687601651567
-                }, 
-                {
-                 "gid":866,
-                 "height":12.615,
-                 "id":110,
-                 "name":"Rock",
-                 "properties":[
-                        {
-                         "name":"affectedByWindCard",
-                         "type":"bool",
-                         "value":true
-                        }, 
-                        {
-                         "name":"collides",
-                         "type":"bool",
-                         "value":true
-                        }, 
-                        {
-                         "name":"msAfterApproach",
-                         "type":"int",
-                         "value":1
-                        }],
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":12.615,
-                 "x":385.560374636959,
-                 "y":238.609921648099
-                }, 
-                {
-                 "gid":866,
-                 "height":12.615,
-                 "id":114,
-                 "name":"Rock",
-                 "properties":[
-                        {
-                         "name":"affectedByWindCard",
-                         "type":"bool",
-                         "value":true
-                        }, 
-                        {
-                         "name":"collides",
-                         "type":"bool",
-                         "value":true
-                        }, 
-                        {
-                         "name":"msAfterApproach",
-                         "type":"int",
-                         "value":1
-                        }],
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":12.615,
-                 "x":513.87109465083,
-                 "y":253.781797325415
+                 "width":12.163,
+                 "x":610.262488105004,
+                 "y":29.3065849876949
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -2005,7 +1937,7 @@
          "y":0
         }],
  "nextlayerid":9,
- "nextobjectid":117,
+ "nextobjectid":173,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.0",
@@ -2018,7 +1950,7 @@
          "imageheight":612,
          "imagewidth":738,
          "margin":1,
-         "name":"Final_Tileset",
+         "name":"Dungeon_Tiles",
          "spacing":2,
          "tilecount":1394,
          "tileheight":16,
@@ -9830,15 +9762,40 @@
                          "name":"collides",
                          "type":"bool",
                          "value":true
+                        }, 
+                        {
+                         "name":"msAfterApproach",
+                         "type":"int",
+                         "value":1
+                        }, 
+                        {
+                         "name":"previewBeforeAppear",
+                         "type":"int",
+                         "value":0
                         }]
                 }, 
                 {
                  "id":866,
                  "properties":[
                         {
+                         "name":"affectedByWindCard",
+                         "type":"bool",
+                         "value":true
+                        }, 
+                        {
                          "name":"collides",
                          "type":"bool",
                          "value":true
+                        }, 
+                        {
+                         "name":"msAfterApproach",
+                         "type":"int",
+                         "value":1
+                        }, 
+                        {
+                         "name":"previewBeforeAppear",
+                         "type":"int",
+                         "value":0
                         }]
                 }, 
                 {
@@ -10197,18 +10154,48 @@
                  "id":906,
                  "properties":[
                         {
+                         "name":"affectedByWindCard",
+                         "type":"bool",
+                         "value":true
+                        }, 
+                        {
                          "name":"collides",
                          "type":"bool",
                          "value":true
+                        }, 
+                        {
+                         "name":"msAfterApproach",
+                         "type":"int",
+                         "value":1
+                        }, 
+                        {
+                         "name":"previewBeforeAppear",
+                         "type":"int",
+                         "value":0
                         }]
                 }, 
                 {
                  "id":907,
                  "properties":[
                         {
+                         "name":"affectedByWindCard",
+                         "type":"bool",
+                         "value":true
+                        }, 
+                        {
                          "name":"collides",
                          "type":"bool",
                          "value":true
+                        }, 
+                        {
+                         "name":"msAfterApproach",
+                         "type":"int",
+                         "value":1
+                        }, 
+                        {
+                         "name":"previewBeforeAppear",
+                         "type":"int",
+                         "value":0
                         }]
                 }, 
                 {
@@ -15389,6 +15376,96 @@
                          "name":"collides",
                          "type":"bool",
                          "value":false
+                        }]
+                }],
+         "tilewidth":16
+        }, 
+        {
+         "columns":41,
+         "firstgid":1395,
+         "image":"Final_Tileset_extruded.png",
+         "imageheight":612,
+         "imagewidth":738,
+         "margin":1,
+         "name":"Dungeon_Tiles_Sprites",
+         "spacing":2,
+         "tilecount":1394,
+         "tileheight":16,
+         "tiles":[
+                {
+                 "id":865,
+                 "properties":[
+                        {
+                         "name":"affectedByWindCard",
+                         "type":"bool",
+                         "value":true
+                        }, 
+                        {
+                         "name":"msAfterApproach",
+                         "type":"int",
+                         "value":1
+                        }, 
+                        {
+                         "name":"previewBeforeAppear",
+                         "type":"int",
+                         "value":0
+                        }]
+                }, 
+                {
+                 "id":866,
+                 "properties":[
+                        {
+                         "name":"affectedByWindCard",
+                         "type":"bool",
+                         "value":true
+                        }, 
+                        {
+                         "name":"msAfterApproach",
+                         "type":"int",
+                         "value":1
+                        }, 
+                        {
+                         "name":"previewBeforeAppear",
+                         "type":"int",
+                         "value":0
+                        }]
+                }, 
+                {
+                 "id":906,
+                 "properties":[
+                        {
+                         "name":"affectedByWindCard",
+                         "type":"bool",
+                         "value":true
+                        }, 
+                        {
+                         "name":"msAfterApproach",
+                         "type":"int",
+                         "value":1
+                        }, 
+                        {
+                         "name":"previewBeforeAppear",
+                         "type":"int",
+                         "value":0
+                        }]
+                }, 
+                {
+                 "id":907,
+                 "properties":[
+                        {
+                         "name":"affectedByWindCard",
+                         "type":"bool",
+                         "value":true
+                        }, 
+                        {
+                         "name":"msAfterApproach",
+                         "type":"int",
+                         "value":1
+                        }, 
+                        {
+                         "name":"previewBeforeAppear",
+                         "type":"int",
+                         "value":0
                         }]
                 }],
          "tilewidth":16
