@@ -38,6 +38,7 @@ export class Game extends Scene {
 	playerDirection: SpriteDirection = SpriteDown;
 	enteredRoomAt: number = 0;
 	isPlayerBeingKnockedBack: boolean = false;
+	playerTotalHitPoints: number = 4;
 	playerHitPoints: number = 4;
 
 	// Config
@@ -171,6 +172,11 @@ export class Game extends Scene {
 					name: "WindCard",
 					key: "dungeon_tiles_sprites",
 					frame: 1271, // FIXME: we should be able to get this automatically from the object layer
+				},
+				{
+					name: "Heart",
+					key: "dungeon_tiles_sprites",
+					frame: 1233, // FIXME: we should be able to get this automatically from the object layer
 				},
 			])
 			.map((item) => this.physics.world.enableBody(item))
@@ -454,6 +460,11 @@ export class Game extends Scene {
 				case "WindCard":
 					this.pickUpWindCard();
 					break;
+				case "Heart":
+					this.pickUpHeart();
+					break;
+				default:
+					return;
 			}
 			this.removeItem(touchingItem);
 		}
@@ -464,6 +475,13 @@ export class Game extends Scene {
 			(item) => item !== itemToRemove
 		);
 		itemToRemove.destroy();
+	}
+
+	pickUpHeart() {
+		this.playerTotalHitPoints += 1;
+		MainEvents.emit("setTotalHearts", this.playerTotalHitPoints);
+		this.playerHitPoints += 1;
+		MainEvents.emit("setActiveHearts", this.playerHitPoints);
 	}
 
 	pickUpWindCard() {
