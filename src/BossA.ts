@@ -1,4 +1,4 @@
-import { isDynamicSprite, BehaviorMachineInterface } from "../shared";
+import { isDynamicSprite, BehaviorMachineInterface } from "./shared";
 import { MonsterA } from "./MonsterA";
 
 interface Behavior<Key extends string> {

@@ -5,7 +5,7 @@ import {
 	SpriteLeft,
 	getDirectionOfSpriteMovement,
 	isDynamicSprite,
-} from "../shared";
+} from "./shared";
 
 export class MonsterA extends Phaser.Physics.Arcade.Sprite {
 	enemySpeed: number = 40;

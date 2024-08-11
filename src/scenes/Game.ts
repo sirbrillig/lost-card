@@ -1,7 +1,7 @@
 import { Scene } from "phaser";
 import { MainEvents } from "../MainEvents";
-import { MonsterA } from "./MonsterA";
-import { BossA } from "./BossA";
+import { MonsterA } from "../MonsterA";
+import { BossA } from "../BossA";
 import {
 	SpriteUp,
 	SpriteRight,
