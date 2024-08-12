@@ -55,6 +55,7 @@ export class Game extends Scene {
 	windCardPushSpeed: number = 100;
 	windCardPushTime: number = 150;
 	knockBackSpeed: number = 180;
+	distanceToActivateTransient: number = 30;
 
 	map: Phaser.Tilemaps.Tilemap;
 	landLayer: Phaser.Tilemaps.TilemapLayer;
@@ -233,11 +234,7 @@ export class Game extends Scene {
 
 	createAppearingTiles() {
 		this.createdTiles = this.map
-			.createFromObjects("Transients", [
-				{
-					name: "Rock",
-				},
-			])
+			.createFromObjects("Transients", [{}])
 			.map((item) => this.physics.world.enableBody(item))
 			.map((item) => item.setDataEnabled())
 			.filter(isDynamicSprite);
@@ -444,7 +441,8 @@ export class Game extends Scene {
 			const tilePosition = new Phaser.Math.Vector2(tile.body.x, tile.body.y);
 			const playerPosition: Phaser.Math.Vector2 =
 				this.data.get("playerPosition");
-			const distanceToActivate = 50;
+			const distanceToActivate: number =
+				this.data.get("distanceToActivate") ?? this.distanceToActivateTransient;
 
 			// If you haven't gotten close to the tile, do nothing.
 			if (tilePosition.distance(playerPosition) > distanceToActivate) {

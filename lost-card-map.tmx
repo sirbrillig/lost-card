@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.0" orientation="orthogonal" renderorder="right-down" width="200" height="200" tilewidth="16" tileheight="16" infinite="0" nextlayerid="12" nextobjectid="255">
+<map version="1.10" tiledversion="1.11.0" orientation="orthogonal" renderorder="right-down" width="200" height="200" tilewidth="16" tileheight="16" infinite="0" nextlayerid="12" nextobjectid="292">
  <editorsettings>
   <export target="public/assets/lost-card-map.json" format="json"/>
  </editorsettings>
@@ -7689,6 +7689,7 @@
   </object>
   <object id="150" name="Rock" gid="2260" x="1409.84" y="654.262" width="12.163" height="12.163">
    <properties>
+    <property name="distanceToActivate" type="int" value="50"/>
     <property name="msAfterApproach" type="int" value="1000"/>
     <property name="previewBeforeAppear" type="int" value="500"/>
    </properties>
@@ -7702,23 +7703,24 @@
   <object id="155" name="Rock" gid="2260" x="1426.44" y="510.101" width="12.163" height="12.163">
    <properties>
     <property name="msAfterApproach" type="int" value="500"/>
-    <property name="previewBeforeAppear" type="int" value="500"/>
+    <property name="previewBeforeAppear" type="int" value="400"/>
    </properties>
   </object>
   <object id="156" name="Rock" gid="2260" x="1442.85" y="477.543" width="12.163" height="12.163">
    <properties>
     <property name="msAfterApproach" type="int" value="500"/>
-    <property name="previewBeforeAppear" type="int" value="500"/>
+    <property name="previewBeforeAppear" type="int" value="400"/>
    </properties>
   </object>
   <object id="157" name="Rock" gid="2260" x="1459" y="462.418" width="12.163" height="12.163">
    <properties>
     <property name="msAfterApproach" type="int" value="500"/>
-    <property name="previewBeforeAppear" type="int" value="500"/>
+    <property name="previewBeforeAppear" type="int" value="400"/>
    </properties>
   </object>
   <object id="151" name="Rock" gid="2260" x="1417.19" y="670.081" width="12.163" height="12.163">
    <properties>
+    <property name="distanceToActivate" type="int" value="50"/>
     <property name="msAfterApproach" type="int" value="800"/>
     <property name="previewBeforeAppear" type="int" value="500"/>
    </properties>
@@ -7726,7 +7728,7 @@
   <object id="152" name="Rock" gid="2260" x="1441.04" y="620.861" width="12.163" height="12.163">
    <properties>
     <property name="msAfterApproach" type="int" value="500"/>
-    <property name="previewBeforeAppear" type="int" value="500"/>
+    <property name="previewBeforeAppear" type="int" value="400"/>
    </properties>
   </object>
   <object id="153" name="Rock" gid="2260" x="1410.81" y="429.604" width="12.163" height="12.163">
@@ -7748,14 +7750,140 @@
   <object id="218" name="Rock" gid="2260" x="1248" y="1456" width="16" height="16"/>
   <object id="252" name="Rock" gid="2260" x="1712.41" y="1804.51" width="14.358" height="14.358">
    <properties>
-    <property name="msAfterApproach" type="int" value="1000"/>
-    <property name="previewBeforeAppear" type="int" value="500"/>
+    <property name="msAfterApproach" type="int" value="500"/>
+    <property name="previewBeforeAppear" type="int" value="400"/>
    </properties>
   </object>
-  <object id="253" name="Rock" gid="2260" x="1727.46" y="1822.3" width="14.358" height="14.358">
+  <object id="253" name="Rock" gid="2260" x="1739.35" y="1816.1" width="14.358" height="14.358">
    <properties>
-    <property name="msAfterApproach" type="int" value="1000"/>
-    <property name="previewBeforeAppear" type="int" value="500"/>
+    <property name="msAfterApproach" type="int" value="500"/>
+    <property name="previewBeforeAppear" type="int" value="400"/>
+   </properties>
+  </object>
+  <object id="272" name="Rock" gid="2260" x="1767.77" y="1791.81" width="14.358" height="14.358">
+   <properties>
+    <property name="msAfterApproach" type="int" value="500"/>
+    <property name="previewBeforeAppear" type="int" value="400"/>
+   </properties>
+  </object>
+  <object id="255" name="Rock" gid="2260" x="1769.32" y="1842.97" width="14.358" height="14.358">
+   <properties>
+    <property name="msAfterApproach" type="int" value="500"/>
+    <property name="previewBeforeAppear" type="int" value="400"/>
+   </properties>
+  </object>
+  <object id="256" name="Rock" gid="2260" x="1667.52" y="1818.17" width="14.358" height="14.358">
+   <properties>
+    <property name="msAfterApproach" type="int" value="500"/>
+    <property name="previewBeforeAppear" type="int" value="400"/>
+   </properties>
+  </object>
+  <object id="257" name="Rock" gid="2260" x="1787.92" y="1807.83" width="14.358" height="14.358">
+   <properties>
+    <property name="msAfterApproach" type="int" value="500"/>
+    <property name="previewBeforeAppear" type="int" value="400"/>
+   </properties>
+  </object>
+  <object id="258" name="Rock" gid="2260" x="1826.68" y="1848.14" width="14.358" height="14.358">
+   <properties>
+    <property name="msAfterApproach" type="int" value="500"/>
+    <property name="previewBeforeAppear" type="int" value="400"/>
+   </properties>
+  </object>
+  <object id="259" name="Rock" gid="2260" x="1838.05" y="1874.5" width="14.358" height="14.358">
+   <properties>
+    <property name="msAfterApproach" type="int" value="500"/>
+    <property name="previewBeforeAppear" type="int" value="400"/>
+   </properties>
+  </object>
+  <object id="260" name="Rock" gid="2260" x="1823.06" y="1915.32" width="14.358" height="14.358">
+   <properties>
+    <property name="msAfterApproach" type="int" value="500"/>
+    <property name="previewBeforeAppear" type="int" value="400"/>
+   </properties>
+  </object>
+  <object id="261" name="Rock" gid="2260" x="1632.37" y="1858.99" width="14.358" height="14.358">
+   <properties>
+    <property name="msAfterApproach" type="int" value="500"/>
+    <property name="previewBeforeAppear" type="int" value="400"/>
+   </properties>
+  </object>
+  <object id="262" name="Rock" gid="2260" x="1647.36" y="1839.87" width="14.358" height="14.358">
+   <properties>
+    <property name="msAfterApproach" type="int" value="500"/>
+    <property name="previewBeforeAppear" type="int" value="400"/>
+   </properties>
+  </object>
+  <object id="263" name="Rock" gid="2260" x="1669.07" y="1945.29" width="14.358" height="14.358">
+   <properties>
+    <property name="msAfterApproach" type="int" value="500"/>
+    <property name="previewBeforeAppear" type="int" value="400"/>
+   </properties>
+  </object>
+  <object id="289" name="Rock" gid="2260" x="1678.81" y="1975.13" width="14.358" height="14.358">
+   <properties>
+    <property name="msAfterApproach" type="int" value="500"/>
+    <property name="previewBeforeAppear" type="int" value="400"/>
+   </properties>
+  </object>
+  <object id="290" name="Rock" gid="2260" x="1715.34" y="1964.17" width="14.358" height="14.358">
+   <properties>
+    <property name="msAfterApproach" type="int" value="500"/>
+    <property name="previewBeforeAppear" type="int" value="400"/>
+   </properties>
+  </object>
+  <object id="291" name="Rock" gid="2260" x="1818.86" y="1940.42" width="14.358" height="14.358">
+   <properties>
+    <property name="msAfterApproach" type="int" value="500"/>
+    <property name="previewBeforeAppear" type="int" value="400"/>
+   </properties>
+  </object>
+  <object id="264" name="Rock" gid="2260" x="1701.62" y="1935.47" width="14.358" height="14.358">
+   <properties>
+    <property name="msAfterApproach" type="int" value="500"/>
+    <property name="previewBeforeAppear" type="int" value="400"/>
+   </properties>
+  </object>
+  <object id="265" name="Rock" gid="2260" x="1737.28" y="1953.56" width="14.358" height="14.358">
+   <properties>
+    <property name="msAfterApproach" type="int" value="500"/>
+    <property name="previewBeforeAppear" type="int" value="400"/>
+   </properties>
+  </object>
+  <object id="266" name="Rock" gid="2260" x="1778.1" y="1951.49" width="14.358" height="14.358">
+   <properties>
+    <property name="msAfterApproach" type="int" value="500"/>
+    <property name="previewBeforeAppear" type="int" value="400"/>
+   </properties>
+  </object>
+  <object id="267" name="Rock" gid="2260" x="1797.74" y="1932.89" width="14.358" height="14.358">
+   <properties>
+    <property name="msAfterApproach" type="int" value="500"/>
+    <property name="previewBeforeAppear" type="int" value="400"/>
+   </properties>
+  </object>
+  <object id="268" name="Rock" gid="2260" x="1632.89" y="1932.89" width="14.358" height="14.358">
+   <properties>
+    <property name="msAfterApproach" type="int" value="500"/>
+    <property name="previewBeforeAppear" type="int" value="400"/>
+   </properties>
+  </object>
+  <object id="269" name="Rock" gid="2260" x="1639.61" y="1971.65" width="14.358" height="14.358">
+   <properties>
+    <property name="msAfterApproach" type="int" value="500"/>
+    <property name="previewBeforeAppear" type="int" value="400"/>
+   </properties>
+  </object>
+  <object id="270" name="Rock" gid="2260" x="1833.91" y="1959.76" width="14.358" height="14.358">
+   <properties>
+    <property name="msAfterApproach" type="int" value="500"/>
+    <property name="previewBeforeAppear" type="int" value="400"/>
+   </properties>
+  </object>
+  <object id="271" name="Rock" gid="2260" x="1765.7" y="1980.95" width="14.358" height="14.358">
+   <properties>
+    <property name="msAfterApproach" type="int" value="500"/>
+    <property name="previewBeforeAppear" type="int" value="400"/>
    </properties>
   </object>
   <object id="254" name="Rock" gid="2260" x="1712.41" y="1838.45" width="14.358" height="14.358">
@@ -7764,5 +7892,21 @@
     <property name="previewBeforeAppear" type="int" value="500"/>
    </properties>
   </object>
+  <object id="273" gid="2260" x="1679.98" y="1854.3" width="16" height="16"/>
+  <object id="274" gid="2260" x="1698.86" y="1854.91" width="16" height="16"/>
+  <object id="275" gid="2260" x="1718.34" y="1854.91" width="16" height="16"/>
+  <object id="276" gid="2260" x="1736" y="1854.91" width="16" height="16"/>
+  <object id="277" gid="2260" x="1754.27" y="1861.61" width="16" height="16"/>
+  <object id="278" gid="2260" x="1771.93" y="1864.05" width="16" height="16"/>
+  <object id="279" gid="2260" x="1793.24" y="1870.14" width="16" height="16"/>
+  <object id="280" gid="2260" x="1805.42" y="1889.62" width="16" height="16"/>
+  <object id="281" gid="2260" x="1804.2" y="1909.11" width="16" height="16"/>
+  <object id="282" gid="2260" x="1785.93" y="1917.02" width="16" height="16"/>
+  <object id="283" gid="2260" x="1768.88" y="1917.63" width="16" height="16"/>
+  <object id="284" gid="2260" x="1750.01" y="1918.24" width="16" height="16"/>
+  <object id="285" gid="2260" x="1730.52" y="1912.76" width="16" height="16"/>
+  <object id="286" gid="2260" x="1705.55" y="1912.15" width="16" height="16"/>
+  <object id="287" gid="2260" x="1687.9" y="1910.33" width="16" height="16"/>
+  <object id="288" gid="2260" x="1671.45" y="1921.9" width="16" height="16"/>
  </objectgroup>
 </map>
