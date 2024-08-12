@@ -7528,13 +7528,13 @@
   <object id="5" name="Start Point" x="1744.46" y="947.607">
    <point/>
   </object>
-  <object id="45" name="MonsterA" x="1392.2" y="848">
+  <object id="45" name="MonsterA" x="1391.67" y="848.528">
    <properties>
     <property name="isMonster" type="bool" value="true"/>
    </properties>
    <point/>
   </object>
-  <object id="46" name="MonsterA" x="1392" y="878.577">
+  <object id="46" name="MonsterA" x="1391.47" y="872.768">
    <properties>
     <property name="isMonster" type="bool" value="true"/>
    </properties>

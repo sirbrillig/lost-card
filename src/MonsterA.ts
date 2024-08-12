@@ -16,7 +16,7 @@ export class MonsterA extends Phaser.Physics.Arcade.Sprite {
 		y: number,
 		registerEnemy: (enemy: Phaser.Physics.Arcade.Sprite) => void
 	) {
-		super(scene, x, y, "logman");
+		super(scene, x, y, "monsters1", 54);
 
 		scene.add.existing(this);
 		scene.physics.add.existing(this);
@@ -28,11 +28,52 @@ export class MonsterA extends Phaser.Physics.Arcade.Sprite {
 
 		this.setDepth(1);
 		this.setSize(this.width * 0.45, this.height * 0.55);
-		this.setOffset(this.body.offset.x, this.body.offset.y + 5);
+		this.setOffset(this.body.offset.x, this.body.offset.y + 9);
 		this.setPushable(false);
 		this.setDataEnabled();
 		this.data.set("hittable", true);
 		this.on("hit", this.hit);
+
+		this.initSprites();
+	}
+
+	initSprites() {
+		this.anims.create({
+			key: "down",
+			frames: this.anims.generateFrameNumbers("monsters1", {
+				start: 54,
+				end: 56,
+			}),
+			frameRate: 10,
+			repeat: -1,
+		});
+		this.anims.create({
+			key: "left",
+			frames: this.anims.generateFrameNumbers("monsters1", {
+				start: 66,
+				end: 68,
+			}),
+			frameRate: 10,
+			repeat: -1,
+		});
+		this.anims.create({
+			key: "right",
+			frames: this.anims.generateFrameNumbers("monsters1", {
+				start: 78,
+				end: 80,
+			}),
+			frameRate: 10,
+			repeat: -1,
+		});
+		this.anims.create({
+			key: "up",
+			frames: this.anims.generateFrameNumbers("monsters1", {
+				start: 90,
+				end: 92,
+			}),
+			frameRate: 10,
+			repeat: -1,
+		});
 	}
 
 	update() {
@@ -57,19 +98,19 @@ export class MonsterA extends Phaser.Physics.Arcade.Sprite {
 		const direction = Phaser.Math.Between(0, 3);
 		switch (direction) {
 			case SpriteUp:
-				this.anims.play("logman-up-walk", true);
+				this.anims.play("up", true);
 				body.setVelocityY(-this.enemySpeed);
 				break;
 			case SpriteRight:
-				this.anims.play("logman-right-walk", true);
+				this.anims.play("right", true);
 				body.setVelocityX(this.enemySpeed);
 				break;
 			case SpriteDown:
-				this.anims.play("logman-down-walk", true);
+				this.anims.play("down", true);
 				body.setVelocityY(this.enemySpeed);
 				break;
 			case SpriteLeft:
-				this.anims.play("logman-left-walk", true);
+				this.anims.play("left", true);
 				body.setVelocityX(-this.enemySpeed);
 				break;
 		}

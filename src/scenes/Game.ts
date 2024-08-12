@@ -895,31 +895,6 @@ export class Game extends Scene {
 	createEnemies(): void {
 		this.enemies = this.physics.add.group();
 
-		this.anims.create({
-			key: "logman-down-walk",
-			frames: this.anims.generateFrameNumbers("logman", { start: 0, end: 3 }),
-			frameRate: 10,
-			repeat: -1,
-		});
-		this.anims.create({
-			key: "logman-right-walk",
-			frames: this.anims.generateFrameNumbers("logman", { start: 12, end: 15 }),
-			frameRate: 10,
-			repeat: -1,
-		});
-		this.anims.create({
-			key: "logman-up-walk",
-			frames: this.anims.generateFrameNumbers("logman", { start: 6, end: 9 }),
-			frameRate: 10,
-			repeat: -1,
-		});
-		this.anims.create({
-			key: "logman-left-walk",
-			frames: this.anims.generateFrameNumbers("logman", { start: 18, end: 21 }),
-			frameRate: 10,
-			repeat: -1,
-		});
-
 		this.spawnPoints =
 			// FIXME: just make a whole layer for monsters
 			this.map.filterObjects("MetaObjects", (obj) => {
