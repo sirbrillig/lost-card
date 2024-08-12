@@ -19,6 +19,7 @@ import {
 	getItemsInRoom,
 	createVelocityForDirection,
 	isPointInRoom,
+	invertSpriteDirection,
 } from "../shared";
 
 export class Game extends Scene {
@@ -53,6 +54,7 @@ export class Game extends Scene {
 	showPowerFrame: number = 3;
 	windCardPushSpeed: number = 100;
 	windCardPushTime: number = 150;
+	knockBackSpeed: number = 180;
 
 	map: Phaser.Tilemaps.Tilemap;
 	landLayer: Phaser.Tilemaps.TilemapLayer;
@@ -977,16 +979,41 @@ export class Game extends Scene {
 	): void {
 		// If the player is not in the attack animation, do nothing. Also do
 		// nothing if the player is in the warmup for the attack or the cooldown.
-		if (!this.isPlayerSwordActive()) {
-			return;
+		if (this.isPlayerSwordActive()) {
+			this.sendHitToEnemy(enemy);
 		}
+		if (this.isPlayerUsingPower()) {
+			this.pushEnemy(enemy);
+		}
+	}
 
-		this.sendHitToEnemy(enemy);
+	pushEnemy(enemy: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody) {
+		if (enemy.data.get("hittable") === true) {
+			enemy.data.set("stunned", true);
+			this.knockBack(
+				enemy.body,
+				this.windCardPushTime,
+				this.playerDirection,
+				() => {
+					// Enemy might be gone before stun ends
+					enemy?.data?.set("stunned", false);
+				}
+			);
+		}
 	}
 
 	sendHitToEnemy(enemy: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody) {
 		if (enemy.data.get("hittable") === true) {
-			this.knockBack(this.player.body, this.postHitEnemyKnockback);
+			enemy.data.set("stunned", true);
+			this.knockBack(
+				this.player.body,
+				this.postHitEnemyKnockback,
+				invertSpriteDirection(this.playerDirection),
+				() => {
+					// Enemy might be gone before stun ends
+					enemy?.data?.set("stunned", false);
+				}
+			);
 			this.cameras.main.shake(200, 0.004);
 			enemy.emit("hit");
 		} else {
@@ -1027,36 +1054,47 @@ export class Game extends Scene {
 			this.enemyCollider.active = true;
 		}, this.postHitInvincibilityTime);
 
-		this.knockBack(this.player.body, this.postHitPlayerKnockback);
+		this.isPlayerBeingKnockedBack = true;
+		this.knockBack(
+			this.player.body,
+			this.postHitPlayerKnockback,
+			invertSpriteDirection(this.playerDirection),
+			() => {
+				this.isPlayerBeingKnockedBack = false;
+			}
+		);
 
 		this.framesSincePlayerHit = 200;
 	}
 
-	knockBack(body: Phaser.Physics.Arcade.Body, time: number) {
-		const direction = this.playerDirection;
-		const bounceSpeed = this.getPlayerSpeed() * 2;
-		this.isPlayerBeingKnockedBack = true;
+	knockBack(
+		body: Phaser.Physics.Arcade.Body,
+		time: number,
+		direction: SpriteDirection,
+		completeCallback: () => void
+	) {
+		const bounceSpeed = this.knockBackSpeed;
 
 		setTimeout(() => {
 			body.setVelocityX(0);
 			body.setVelocityY(0);
-			this.isPlayerBeingKnockedBack = false;
+			completeCallback();
 		}, time);
 
 		body.setVelocityX(0);
 		body.setVelocityY(0);
 		switch (direction) {
 			case SpriteUp:
-				body.setVelocityY(bounceSpeed);
-				break;
-			case SpriteRight:
-				body.setVelocityX(-bounceSpeed);
-				break;
-			case SpriteDown:
 				body.setVelocityY(-bounceSpeed);
 				break;
-			case SpriteLeft:
+			case SpriteRight:
 				body.setVelocityX(bounceSpeed);
+				break;
+			case SpriteDown:
+				body.setVelocityY(bounceSpeed);
+				break;
+			case SpriteLeft:
+				body.setVelocityX(-bounceSpeed);
 				break;
 		}
 	}

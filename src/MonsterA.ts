@@ -44,6 +44,9 @@ export class MonsterA extends Phaser.Physics.Arcade.Sprite {
 			body.stop();
 			return;
 		}
+		if (this.data.get("stunned")) {
+			return;
+		}
 
 		// If we are not moving, move in a random direction. If we are moving, keep
 		// moving in that direction.
