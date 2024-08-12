@@ -810,26 +810,26 @@ export class Game extends Scene {
 
 		anims.create({
 			key: "character-down-walk",
-			frames: anims.generateFrameNumbers("character", { start: 16, end: 19 }),
-			frameRate: 10,
+			frames: anims.generateFrameNumbers("character-run-down"),
+			frameRate: 14,
 			repeat: -1,
 		});
 		anims.create({
 			key: "character-right-walk",
-			frames: anims.generateFrameNumbers("character", { start: 24, end: 27 }),
-			frameRate: 10,
+			frames: anims.generateFrameNumbers("character-run-right"),
+			frameRate: 14,
 			repeat: -1,
 		});
 		anims.create({
 			key: "character-up-walk",
-			frames: anims.generateFrameNumbers("character", { start: 28, end: 31 }),
-			frameRate: 10,
+			frames: anims.generateFrameNumbers("character-run-up"),
+			frameRate: 14,
 			repeat: -1,
 		});
 		anims.create({
 			key: "character-left-walk",
-			frames: anims.generateFrameNumbers("character", { start: 20, end: 23 }),
-			frameRate: 10,
+			frames: anims.generateFrameNumbers("character-run-left"),
+			frameRate: 14,
 			repeat: -1,
 		});
 
