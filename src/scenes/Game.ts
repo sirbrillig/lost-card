@@ -59,6 +59,7 @@ export class Game extends Scene {
 	stuffLayer: Phaser.Tilemaps.TilemapLayer;
 	activeRoom: Phaser.Types.Tilemaps.TiledObject | undefined;
 	createdDoors: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody[] = [];
+	createdSavePoints: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody[] = [];
 	createdTiles: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody[] = [];
 	createdItems: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody[] = [];
 	spawnPoints: Phaser.Types.Tilemaps.TiledObject[] = [];
@@ -95,9 +96,14 @@ export class Game extends Scene {
 		this.createDoors();
 		this.createAppearingTiles();
 		this.createItems();
+		this.createSavePoints();
 
 		// Enemies collide with doors but players can pass through them.
 		this.setTileLayerCollisions(this.createdDoors, this.enemies);
+
+		this.physics.add.collider(this.player, this.createdSavePoints, () => {
+			this.saveGame();
+		});
 
 		this.enemyCollider = this.physics.add.collider(
 			this.player,
@@ -138,6 +144,9 @@ export class Game extends Scene {
 			this.equipSword();
 			this.equipWindCard();
 		});
+		this.input.keyboard.on("keydown-L", () => {
+			this.loadLastSave();
+		});
 		this.input.keyboard.on("keydown-SPACE", () => {
 			// Attack
 			if (this.canPlayerAttack()) {
@@ -161,6 +170,51 @@ export class Game extends Scene {
 		this.hideHiddenItems();
 
 		this.createOverlay();
+	}
+
+	loadLastSave() {
+		const rawSaveData = localStorage.getItem("lost-card-save");
+		if (!rawSaveData) {
+			console.log("no save data");
+			return;
+		}
+		const saveData = JSON.parse(rawSaveData);
+		if (saveData?.playerX === undefined || saveData.playerY === undefined) {
+			console.log("no save point found for save data");
+			return;
+		}
+		if (saveData.hasSword) {
+			this.equipSword();
+		}
+		if (saveData.hasWindCard) {
+			this.equipWindCard();
+		}
+		this.movePlayerToPoint(saveData.playerX, saveData.playerY);
+	}
+
+	saveGame() {
+		localStorage.setItem("lost-card-save", JSON.stringify(this.getSaveData()));
+		console.log("game saved");
+	}
+
+	getSaveData() {
+		return {
+			playerX: this.player.x,
+			playerY: this.player.y,
+			...this.registry.getAll(),
+		};
+	}
+
+	createSavePoints() {
+		this.createdSavePoints = this.map
+			.createFromObjects("SavePoints", {})
+			.map((item) => this.physics.world.enableBody(item))
+			.map((item) => item.setDataEnabled())
+			.filter(isDynamicSprite)
+			.map((item) => {
+				item.body.pushable = false;
+				return item;
+			});
 	}
 
 	createDoors() {
@@ -263,7 +317,12 @@ export class Game extends Scene {
 		hideAllRoomsExcept(
 			this.map,
 			this.enemies,
-			[...this.createdItems, ...this.createdTiles, ...this.createdDoors],
+			[
+				...this.createdItems,
+				...this.createdTiles,
+				...this.createdDoors,
+				...this.createdSavePoints,
+			],
 			room
 		);
 
@@ -298,11 +357,6 @@ export class Game extends Scene {
 		);
 		console.log("moving player to point", destinationX, destinationY);
 		this.movePlayerToPoint(destinationX, destinationY);
-
-		// if the player enters a door, move the camera to that room
-		const room = getRoomForPoint(this.map, this.player.x, this.player.y);
-		console.log("moving camera to room", room);
-		this.moveCameraToRoom(room);
 	}
 
 	update() {
@@ -368,61 +422,88 @@ export class Game extends Scene {
 		const transientTiles = this.activeRoom
 			? getItemsInRoom(this.createdTiles, this.activeRoom)
 			: [];
-		const appearingTiles = transientTiles.filter((tile) => {
-			return tile.data.get("msAfterApproach") !== undefined;
-		});
+
+		// Don't consider tiles which are already visible.
+		const appearingTiles = transientTiles.filter(
+			(tile) => tile.visible === false
+		);
 
 		appearingTiles.forEach((tile) => {
-			const msAfterApproach: number = tile.data.get("msAfterApproach");
-			const previewBeforeAppear: number =
-				tile.data.get("previewBeforeAppear") ?? 0;
+			const msAfterApproach: number = tile.data.get("msAfterApproach") ?? 0;
+			let firstApproachedTime: number =
+				tile.data.get("firstApproachedTime") ?? 0;
 
-			const timeSinceApproach = this.time.now - this.enteredRoomAt;
+			// If the tile has no msAfterApproach, then it should appear immediately.
+			if (msAfterApproach < 100) {
+				this.showTransientTile(tile);
+				return;
+			}
+
+			const tilePosition = new Phaser.Math.Vector2(tile.body.x, tile.body.y);
+			const playerPosition: Phaser.Math.Vector2 =
+				this.data.get("playerPosition");
+			const distanceToActivate = 50;
+
+			// If you haven't gotten close to the tile, do nothing.
+			if (tilePosition.distance(playerPosition) > distanceToActivate) {
+				return;
+			}
+
+			// Record the time when you get close to it.
+			if (!firstApproachedTime) {
+				firstApproachedTime = this.time.now;
+				tile.data.set("firstApproachedTime", firstApproachedTime);
+			}
+
+			// If the time since you've gotten close is greater than the time it
+			// should appear, make it appear.
+			const timeSinceApproach = this.time.now - firstApproachedTime;
 			if (timeSinceApproach < msAfterApproach) {
 				return;
 			}
-			if (tile.visible) {
-				return;
-			}
-			tile.setVisible(true);
-
-			console.log("adding tile", tile);
-			tile.alpha = 0.4;
-			setTimeout(() => {
-				tile.alpha = 1;
-				tile.data.set("hidden", false);
-				tile.body.pushable = false;
-				this.physics.add.collider(this.player, tile);
-				this.physics.add.collider(this.enemies, tile, (_, enemy) => {
-					if (!isDynamicSprite(enemy)) {
-						return;
-					}
-					if (tile.body.velocity.x === 0 && tile.body.velocity.y === 0) {
-						return;
-					}
-					console.log("hit enemy with rock");
-					this.sendHitToEnemy(enemy);
-				});
-				this.physics.add.collider(this.stuffLayer, tile);
-				// Allow destroying rocks by pushing into walls so you can't block
-				// yourself in a room.
-				this.physics.add.collider(this.landLayer, tile, () => {
-					console.log("hit wall with rock");
-					this.destroyCreatedTile(tile);
-				});
-				this.physics.add.collider(this.createdDoors, tile, () => {
-					console.log("hit wall with rock");
-					this.destroyCreatedTile(tile);
-				});
-
-				if (this.physics.overlap(this.player, tile)) {
-					console.log("hit player with tile");
-					this.enemyHitPlayer();
-				}
-
-				this.createdTiles.push(tile);
-			}, previewBeforeAppear);
+			this.showTransientTile(tile);
 		});
+	}
+
+	showTransientTile(tile: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody) {
+		const previewBeforeAppear: number =
+			tile.data.get("previewBeforeAppear") ?? 0;
+		tile.setVisible(true);
+		tile.alpha = 0.4;
+		setTimeout(() => {
+			tile.alpha = 1;
+			tile.data.set("hidden", false);
+			tile.body.pushable = false;
+			this.physics.add.collider(this.player, tile);
+			this.physics.add.collider(this.enemies, tile, (_, enemy) => {
+				if (!isDynamicSprite(enemy)) {
+					return;
+				}
+				if (tile.body.velocity.x === 0 && tile.body.velocity.y === 0) {
+					return;
+				}
+				console.log("hit enemy with rock");
+				this.sendHitToEnemy(enemy);
+			});
+			this.physics.add.collider(this.stuffLayer, tile);
+			// Allow destroying rocks by pushing into walls so you can't block
+			// yourself in a room.
+			this.physics.add.collider(this.landLayer, tile, () => {
+				console.log("hit wall with rock");
+				this.destroyCreatedTile(tile);
+			});
+			this.physics.add.collider(this.createdDoors, tile, () => {
+				console.log("hit wall with rock");
+				this.destroyCreatedTile(tile);
+			});
+
+			if (this.physics.overlap(this.player, tile)) {
+				console.log("hit player with tile");
+				this.enemyHitPlayer();
+			}
+
+			this.createdTiles.push(tile);
+		}, previewBeforeAppear);
 	}
 
 	hideHiddenItems() {
@@ -547,6 +628,13 @@ export class Game extends Scene {
 
 	movePlayerToPoint(x: number, y: number) {
 		this.player.setPosition(x, y);
+
+		// if the player enters a door, move the camera to that room
+		const room = getRoomForPoint(this.map, this.player.x, this.player.y);
+		if (room !== this.activeRoom) {
+			console.log("moving camera to room", room);
+			this.moveCameraToRoom(room);
+		}
 	}
 
 	getPlayerSpeed(): number {
