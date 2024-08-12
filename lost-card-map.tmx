@@ -7467,8 +7467,8 @@
   <object id="170" name="Rock" gid="2260" x="115.507" y="1134.39" width="12.163" height="12.163"/>
   <object id="171" name="Rock" gid="2260" x="67.5683" y="1166.18" width="12.163" height="12.163"/>
   <object id="172" name="Rock" gid="2260" x="36.5493" y="1149.26" width="12.163" height="12.163"/>
-  <object id="158" name="Rock" gid="2260" x="336" y="848" width="12.163" height="12.163"/>
-  <object id="160" name="Rock" gid="2260" x="336" y="863.638" width="12.163" height="12.163"/>
+  <object id="158" name="Rock" gid="2260" x="338.807" y="847.599" width="12.163" height="12.163"/>
+  <object id="160" name="Rock" gid="2260" x="338.607" y="864.24" width="12.163" height="12.163"/>
   <object id="145" name="Rock" gid="2260" x="160" y="880" width="12.163" height="12.163"/>
   <object id="147" name="Rock" gid="2260" x="289.98" y="382.353" width="12.163" height="12.163">
    <properties>
