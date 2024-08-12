@@ -144,6 +144,7 @@ export class Game extends Scene {
 			if (this.canPlayerAttack()) {
 				this.player.body.setVelocity(0);
 				this.framesSinceAttack = 40;
+				this.updateSwordHitbox();
 			}
 		});
 		this.input.keyboard.on("keydown-SHIFT", () => {
@@ -151,6 +152,7 @@ export class Game extends Scene {
 			if (this.canPlayerUsePower()) {
 				this.player.body.setVelocity(0);
 				this.framesSincePower = 50;
+				this.updateSwordHitbox();
 			}
 		});
 
@@ -334,7 +336,6 @@ export class Game extends Scene {
 
 	checkForPowerHitTiles() {
 		this.createdTiles.forEach((tile) => {
-			// FIXME: use separate hitbox for powers than swords
 			if (this.physics.overlap(this.sword, tile)) {
 				if (!tile.visible) {
 					return;
@@ -610,8 +611,6 @@ export class Game extends Scene {
 	}
 
 	updateSwordHitboxForPower() {
-		// Add hitbox for sword in direction of sprite
-
 		const width = (() => {
 			if (
 				this.playerDirection === SpriteLeft ||
