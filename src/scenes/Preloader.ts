@@ -41,6 +41,24 @@ export class Preloader extends Scene {
 				spacing: 2,
 			}
 		);
+
+		this.load.spritesheet("character-idle-down", "character_idle_down.png", {
+			frameWidth: 15,
+			frameHeight: 26,
+		});
+		this.load.spritesheet("character-idle-up", "character_idle_up.png", {
+			frameWidth: 15,
+			frameHeight: 26,
+		});
+		this.load.spritesheet("character-idle-right", "character_idle_right.png", {
+			frameWidth: 15,
+			frameHeight: 26,
+		});
+		this.load.spritesheet("character-idle-left", "character_idle_left.png", {
+			frameWidth: 15,
+			frameHeight: 26,
+		});
+
 		this.load.spritesheet("character", "character_sprite_sheet.png", {
 			frameWidth: 32,
 			frameHeight: 32,

@@ -766,7 +766,7 @@ export class Game extends Scene {
 		this.player = this.physics.add.sprite(
 			spawnPoint?.x ?? 400,
 			spawnPoint?.y ?? 350,
-			"character",
+			"character-idle-down",
 			0
 		);
 		this.player.setDisplaySize(24, 24);
@@ -783,6 +783,31 @@ export class Game extends Scene {
 		this.updateSwordHitbox();
 
 		const anims = this.anims;
+		anims.create({
+			key: "character-idle-down",
+			frames: anims.generateFrameNumbers("character-idle-down"),
+			frameRate: 7,
+			repeat: -1,
+		});
+		anims.create({
+			key: "character-idle-up",
+			frames: anims.generateFrameNumbers("character-idle-up"),
+			frameRate: 7,
+			repeat: -1,
+		});
+		anims.create({
+			key: "character-idle-right",
+			frames: anims.generateFrameNumbers("character-idle-right"),
+			frameRate: 7,
+			repeat: -1,
+		});
+		anims.create({
+			key: "character-idle-left",
+			frames: anims.generateFrameNumbers("character-idle-left"),
+			frameRate: 7,
+			repeat: -1,
+		});
+
 		anims.create({
 			key: "character-down-walk",
 			frames: anims.generateFrameNumbers("character", { start: 16, end: 19 }),
@@ -1267,23 +1292,18 @@ export class Game extends Scene {
 
 	setPlayerIdleFrame() {
 		// If the player stops moving, stop animations and reset the image to an idle frame in the correct direction.
-		this.player.anims.stop();
 		switch (this.playerDirection) {
 			case SpriteLeft:
-				this.player.anims.play("character-left-walk", true);
-				this.player.setFrame(20);
+				this.player.anims.play("character-idle-left", true);
 				return;
 			case SpriteRight:
-				this.player.anims.play("character-right-walk", true);
-				this.player.setFrame(24);
+				this.player.anims.play("character-idle-right", true);
 				return;
 			case SpriteUp:
-				this.player.anims.play("character-up-walk", true);
-				this.player.setFrame(28);
+				this.player.anims.play("character-idle-up", true);
 				return;
 			case SpriteDown:
-				this.player.anims.play("character-down-walk", true);
-				this.player.setFrame(16);
+				this.player.anims.play("character-idle-down", true);
 				return;
 		}
 	}
