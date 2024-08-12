@@ -284,15 +284,12 @@ export class Game extends Scene {
 		if (!destinationTile) {
 			throw new Error("Hit door without destination tile");
 		}
-		console.log("moving to tile", destinationTile);
+		console.log("moving to tile", destinationTile, "through door", door);
 
-		let destinationDirection = destinationTile.properties.find(
-			(prop: { name: string }) => prop.name === "doordirection"
-		)?.value;
+		const destinationDirection = door.data.get("doordirection");
 		if (destinationDirection === undefined) {
 			throw new Error("Door has no destination direction");
 		}
-		destinationDirection = invertSpriteDirection(destinationDirection);
 		console.log("moving through door in direction", destinationDirection);
 
 		// if the player enters a door, teleport them just past the corresponding door
