@@ -150,17 +150,10 @@ function isValueInRange(value: number, min: number, max: number): boolean {
 	return value >= min && value <= max;
 }
 
-export function isMetaObjectRoom(obj: Phaser.GameObjects.GameObject): boolean {
-	if (!isTilemapTile(obj)) {
-		return false;
-	}
-	return true;
-}
-
 export function getRooms(
 	map: Phaser.Tilemaps.Tilemap
 ): Phaser.Types.Tilemaps.TiledObject[] {
-	return map.filterObjects("Rooms", (obj) => isMetaObjectRoom(obj)) ?? [];
+	return map.getObjectLayer("Rooms")?.objects ?? [];
 }
 
 export function isPointInRoom(
