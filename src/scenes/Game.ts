@@ -8,7 +8,6 @@ import {
 	SpriteDown,
 	SpriteLeft,
 	SpriteDirection,
-	invertSpriteDirection,
 	isDynamicSprite,
 	isDynamicImage,
 	isTilemapTile,
