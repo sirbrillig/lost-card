@@ -48,7 +48,7 @@ export class Game extends Scene {
 	postHitEnemyKnockback: number = 50;
 	postHitInvincibilityTime: number = 600;
 	attackFrameRate: number = 30;
-	attackDelay: number = 60;
+	attackDelay: number = 100;
 	gotItemFreeze: number = 2000;
 	showSwordFrame: number = 0;
 	showPowerFrame: number = 3;
