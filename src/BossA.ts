@@ -54,7 +54,6 @@ class WaitForActive implements Behavior<AllStates> {
 	update(sprite: BossA): void {
 		if (this.#isPlayerNear(sprite)) {
 			console.log("waiting ended");
-			// TODO: wait for the player to be nearby
 			sprite.stateMachine.popState();
 			sprite.stateMachine.pushState(this.#nextState);
 		}
@@ -88,11 +87,9 @@ class Roar implements Behavior<AllStates> {
 		}
 		console.log("roar");
 		sprite.body.stop();
-		// TODO: make actual animation for this
 		sprite.anims.play(
 			{
-				key: "logman-down-walk",
-				repeat: 5,
+				key: "roar",
 			},
 			true
 		);
@@ -131,11 +128,9 @@ class SpawnEnemies implements Behavior<AllStates> {
 		}
 		console.log("spawn");
 		sprite.body.stop();
-		// TODO: make actual animation for this
 		sprite.anims.play(
 			{
-				key: "logman-right-walk",
-				repeat: 5,
+				key: "spawn",
 			},
 			true
 		);
@@ -148,9 +143,6 @@ class SpawnEnemies implements Behavior<AllStates> {
 		sprite.once(
 			Phaser.Animations.Events.ANIMATION_COMPLETE,
 			(anim: Phaser.Animations.Animation) => {
-				if (anim.key !== "logman-right-walk") {
-					return;
-				}
 				console.log("spawn complete", anim);
 				sprite.stateMachine.popState();
 				sprite.stateMachine.pushState(this.#nextState);
@@ -207,20 +199,15 @@ class PostSpawn implements Behavior<AllStates> {
 		}
 		console.log("post-spawn");
 		sprite.body.stop();
-		// TODO: make actual animation for this
 		sprite.anims.play(
 			{
-				key: "logman-left-walk",
-				repeat: 5,
+				key: "idle",
 			},
 			true
 		);
 		sprite.once(
 			Phaser.Animations.Events.ANIMATION_COMPLETE,
 			(anim: Phaser.Animations.Animation) => {
-				if (anim.key !== "logman-left-walk") {
-					return;
-				}
 				console.log("post-spawn complete", anim);
 				sprite.stateMachine.popState();
 				sprite.stateMachine.pushState(this.#nextState);
@@ -251,7 +238,7 @@ export class BossA extends Phaser.Physics.Arcade.Sprite {
 		y: number,
 		registerEnemy: (enemy: Phaser.Physics.Arcade.Sprite) => void
 	) {
-		super(scene, x, y, "logman");
+		super(scene, x, y, "bosses1", 84);
 
 		scene.add.existing(this);
 		scene.physics.add.existing(this);
@@ -263,17 +250,50 @@ export class BossA extends Phaser.Physics.Arcade.Sprite {
 		}
 
 		this.setDepth(1);
-		this.setSize(this.width * 0.45, this.height * 0.55);
-		this.setOffset(this.body.offset.x, this.body.offset.y + 5);
+		this.setSize(this.width * 0.6, this.height * 0.65);
+		this.setOffset(this.body.offset.x, this.body.offset.y + 10);
+		this.setOrigin(0.5, 0.75);
 		this.setCollideWorldBounds(true);
 		this.setPushable(false);
-		this.setScale(2);
+		this.setScale(1);
 		this.setDataEnabled();
 		this.data.set("monsterPosition", new Phaser.Math.Vector2(x, y));
 		this.data.set("hittable", true);
 		this.on("hit", this.hit);
 
 		this.stateMachine = new StateMachine("initial");
+
+		this.initSprites();
+	}
+
+	initSprites() {
+		this.anims.create({
+			key: "roar",
+			frames: this.anims.generateFrameNumbers("bosses1", {
+				start: 48,
+				end: 50,
+			}),
+			frameRate: 10,
+			repeat: 8,
+		});
+		this.anims.create({
+			key: "spawn",
+			frames: this.anims.generateFrameNumbers("bosses1", {
+				start: 72,
+				end: 74,
+			}),
+			frameRate: 10,
+			repeat: 8,
+		});
+		this.anims.create({
+			key: "idle",
+			frames: this.anims.generateFrameNumbers("bosses1", {
+				start: 60,
+				end: 62,
+			}),
+			frameRate: 10,
+			repeat: 8,
+		});
 	}
 
 	update() {

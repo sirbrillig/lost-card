@@ -147,6 +147,9 @@ export class Game extends Scene {
 			this.equipSword();
 			this.equipWindCard();
 		});
+		this.input.keyboard.on("keydown-S", () => {
+			this.saveGame();
+		});
 		this.input.keyboard.on("keydown-L", () => {
 			this.loadLastSave();
 		});
