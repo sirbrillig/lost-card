@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.0" orientation="orthogonal" renderorder="right-down" width="100" height="100" tilewidth="16" tileheight="16" infinite="0" nextlayerid="10" nextobjectid="202">
+<map version="1.10" tiledversion="1.11.0" orientation="orthogonal" renderorder="right-down" width="100" height="100" tilewidth="16" tileheight="16" infinite="0" nextlayerid="11" nextobjectid="202">
  <editorsettings>
   <export target="public/assets/lost-card-map.json" format="json"/>
  </editorsettings>
@@ -7333,6 +7333,57 @@
   <object id="5" name="Start Point" x="607.587" y="959.357">
    <point/>
   </object>
+  <object id="45" name="MonsterA" x="256.199" y="848">
+   <properties>
+    <property name="isMonster" type="bool" value="true"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="46" name="MonsterA" x="256" y="878.577">
+   <properties>
+    <property name="isMonster" type="bool" value="true"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="47" name="BossA" x="304.352" y="254.961">
+   <properties>
+    <property name="isBoss" type="bool" value="true"/>
+    <property name="isMonster" type="bool" value="true"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="62" name="MonsterA" x="280.599" y="747.902">
+   <properties>
+    <property name="isMonster" type="bool" value="true"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="103" name="MonsterA" x="145.417" y="960">
+   <properties>
+    <property name="isMonster" type="bool" value="true"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="104" name="MonsterA" x="178.362" y="1039.33">
+   <properties>
+    <property name="isMonster" type="bool" value="true"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="105" name="MonsterA" x="96" y="989.911">
+   <properties>
+    <property name="isMonster" type="bool" value="true"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="106" name="MonsterA" x="129.378" y="1089.61">
+   <properties>
+    <property name="isMonster" type="bool" value="true"/>
+   </properties>
+   <point/>
+  </object>
+ </objectgroup>
+ <objectgroup id="10" name="Rooms">
   <object id="15" name="MK1" x="512" y="896" width="192" height="128">
    <properties>
     <property name="room" value="MK1"/>
@@ -7368,25 +7419,6 @@
     <property name="room" value="MK10"/>
    </properties>
   </object>
-  <object id="45" name="MonsterA" x="256.199" y="848">
-   <properties>
-    <property name="isMonster" type="bool" value="true"/>
-   </properties>
-   <point/>
-  </object>
-  <object id="46" name="MonsterA" x="256" y="878.577">
-   <properties>
-    <property name="isMonster" type="bool" value="true"/>
-   </properties>
-   <point/>
-  </object>
-  <object id="47" name="BossA" x="304.352" y="254.961">
-   <properties>
-    <property name="isBoss" type="bool" value="true"/>
-    <property name="isMonster" type="bool" value="true"/>
-   </properties>
-   <point/>
-  </object>
   <object id="49" name="MK7" x="256" y="400" width="96" height="160">
    <properties>
     <property name="room" value="MK7"/>
@@ -7402,40 +7434,10 @@
     <property name="room" value="MK9"/>
    </properties>
   </object>
-  <object id="62" name="MonsterA" x="280.599" y="747.902">
-   <properties>
-    <property name="isMonster" type="bool" value="true"/>
-   </properties>
-   <point/>
-  </object>
   <object id="92" name="MK11" x="0" y="1104" width="192" height="96">
    <properties>
     <property name="room" value="MK11"/>
    </properties>
-  </object>
-  <object id="103" name="MonsterA" x="145.417" y="960">
-   <properties>
-    <property name="isMonster" type="bool" value="true"/>
-   </properties>
-   <point/>
-  </object>
-  <object id="104" name="MonsterA" x="178.362" y="1039.33">
-   <properties>
-    <property name="isMonster" type="bool" value="true"/>
-   </properties>
-   <point/>
-  </object>
-  <object id="105" name="MonsterA" x="96" y="989.911">
-   <properties>
-    <property name="isMonster" type="bool" value="true"/>
-   </properties>
-   <point/>
-  </object>
-  <object id="106" name="MonsterA" x="129.378" y="1089.61">
-   <properties>
-    <property name="isMonster" type="bool" value="true"/>
-   </properties>
-   <point/>
   </object>
   <object id="111" name="MK12" x="144" y="1200" width="128" height="96">
    <properties>

@@ -154,19 +154,13 @@ export function isMetaObjectRoom(obj: Phaser.GameObjects.GameObject): boolean {
 	if (!isTilemapTile(obj)) {
 		return false;
 	}
-	const roomName = obj.properties.find(
-		(prop: { name: string }) => prop.name === "room"
-	)?.value;
-	if (!roomName) {
-		return false;
-	}
 	return true;
 }
 
 export function getRooms(
 	map: Phaser.Tilemaps.Tilemap
 ): Phaser.Types.Tilemaps.TiledObject[] {
-	return map.filterObjects("MetaObjects", (obj) => isMetaObjectRoom(obj)) ?? [];
+	return map.filterObjects("Rooms", (obj) => isMetaObjectRoom(obj)) ?? [];
 }
 
 export function isPointInRoom(

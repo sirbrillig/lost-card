@@ -589,6 +589,172 @@
                  "y":959.3566
                 }, 
                 {
+                 "height":0,
+                 "id":45,
+                 "name":"MonsterA",
+                 "point":true,
+                 "properties":[
+                        {
+                         "name":"isMonster",
+                         "type":"bool",
+                         "value":true
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":256.199,
+                 "y":848
+                }, 
+                {
+                 "height":0,
+                 "id":46,
+                 "name":"MonsterA",
+                 "point":true,
+                 "properties":[
+                        {
+                         "name":"isMonster",
+                         "type":"bool",
+                         "value":true
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":256,
+                 "y":878.577
+                }, 
+                {
+                 "height":0,
+                 "id":47,
+                 "name":"BossA",
+                 "point":true,
+                 "properties":[
+                        {
+                         "name":"isBoss",
+                         "type":"bool",
+                         "value":true
+                        }, 
+                        {
+                         "name":"isMonster",
+                         "type":"bool",
+                         "value":true
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":304.351656156925,
+                 "y":254.960654463317
+                }, 
+                {
+                 "height":0,
+                 "id":62,
+                 "name":"MonsterA",
+                 "point":true,
+                 "properties":[
+                        {
+                         "name":"isMonster",
+                         "type":"bool",
+                         "value":true
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":280.598705286374,
+                 "y":747.901722585981
+                }, 
+                {
+                 "height":0,
+                 "id":103,
+                 "name":"MonsterA",
+                 "point":true,
+                 "properties":[
+                        {
+                         "name":"isMonster",
+                         "type":"bool",
+                         "value":true
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":145.417,
+                 "y":960
+                }, 
+                {
+                 "height":0,
+                 "id":104,
+                 "name":"MonsterA",
+                 "point":true,
+                 "properties":[
+                        {
+                         "name":"isMonster",
+                         "type":"bool",
+                         "value":true
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":178.362,
+                 "y":1039.328
+                }, 
+                {
+                 "height":0,
+                 "id":105,
+                 "name":"MonsterA",
+                 "point":true,
+                 "properties":[
+                        {
+                         "name":"isMonster",
+                         "type":"bool",
+                         "value":true
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":96,
+                 "y":989.911
+                }, 
+                {
+                 "height":0,
+                 "id":106,
+                 "name":"MonsterA",
+                 "point":true,
+                 "properties":[
+                        {
+                         "name":"isMonster",
+                         "type":"bool",
+                         "value":true
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":129.378,
+                 "y":1089.612
+                }],
+         "opacity":1,
+         "properties":[
+                {
+                 "name":"room",
+                 "type":"string",
+                 "value":"MK12"
+                }],
+         "type":"objectgroup",
+         "visible":true,
+         "x":0,
+         "y":0
+        }, 
+        {
+         "draworder":"topdown",
+         "id":10,
+         "name":"Rooms",
+         "objects":[
+                {
                  "height":128,
                  "id":15,
                  "name":"MK1",
@@ -708,65 +874,6 @@
                  "y":176
                 }, 
                 {
-                 "height":0,
-                 "id":45,
-                 "name":"MonsterA",
-                 "point":true,
-                 "properties":[
-                        {
-                         "name":"isMonster",
-                         "type":"bool",
-                         "value":true
-                        }],
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":0,
-                 "x":256.199,
-                 "y":848
-                }, 
-                {
-                 "height":0,
-                 "id":46,
-                 "name":"MonsterA",
-                 "point":true,
-                 "properties":[
-                        {
-                         "name":"isMonster",
-                         "type":"bool",
-                         "value":true
-                        }],
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":0,
-                 "x":256,
-                 "y":878.577
-                }, 
-                {
-                 "height":0,
-                 "id":47,
-                 "name":"BossA",
-                 "point":true,
-                 "properties":[
-                        {
-                         "name":"isBoss",
-                         "type":"bool",
-                         "value":true
-                        }, 
-                        {
-                         "name":"isMonster",
-                         "type":"bool",
-                         "value":true
-                        }],
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":0,
-                 "x":304.351656156925,
-                 "y":254.960654463317
-                }, 
-                {
                  "height":160,
                  "id":49,
                  "name":"MK7",
@@ -818,24 +925,6 @@
                  "y":560
                 }, 
                 {
-                 "height":0,
-                 "id":62,
-                 "name":"MonsterA",
-                 "point":true,
-                 "properties":[
-                        {
-                         "name":"isMonster",
-                         "type":"bool",
-                         "value":true
-                        }],
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":0,
-                 "x":280.598705286374,
-                 "y":747.901722585981
-                }, 
-                {
                  "height":96,
                  "id":92,
                  "name":"MK11",
@@ -851,78 +940,6 @@
                  "width":192,
                  "x":0,
                  "y":1104
-                }, 
-                {
-                 "height":0,
-                 "id":103,
-                 "name":"MonsterA",
-                 "point":true,
-                 "properties":[
-                        {
-                         "name":"isMonster",
-                         "type":"bool",
-                         "value":true
-                        }],
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":0,
-                 "x":145.417,
-                 "y":960
-                }, 
-                {
-                 "height":0,
-                 "id":104,
-                 "name":"MonsterA",
-                 "point":true,
-                 "properties":[
-                        {
-                         "name":"isMonster",
-                         "type":"bool",
-                         "value":true
-                        }],
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":0,
-                 "x":178.362,
-                 "y":1039.328
-                }, 
-                {
-                 "height":0,
-                 "id":105,
-                 "name":"MonsterA",
-                 "point":true,
-                 "properties":[
-                        {
-                         "name":"isMonster",
-                         "type":"bool",
-                         "value":true
-                        }],
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":0,
-                 "x":96,
-                 "y":989.911
-                }, 
-                {
-                 "height":0,
-                 "id":106,
-                 "name":"MonsterA",
-                 "point":true,
-                 "properties":[
-                        {
-                         "name":"isMonster",
-                         "type":"bool",
-                         "value":true
-                        }],
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":0,
-                 "x":129.378,
-                 "y":1089.612
                 }, 
                 {
                  "height":96,
@@ -942,12 +959,6 @@
                  "y":1200
                 }],
          "opacity":1,
-         "properties":[
-                {
-                 "name":"room",
-                 "type":"string",
-                 "value":"MK12"
-                }],
          "type":"objectgroup",
          "visible":true,
          "x":0,
@@ -1801,7 +1812,7 @@
          "x":0,
          "y":0
         }],
- "nextlayerid":10,
+ "nextlayerid":11,
  "nextobjectid":202,
  "orientation":"orthogonal",
  "renderorder":"right-down",
