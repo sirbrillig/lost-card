@@ -19,6 +19,7 @@ import {
 	getItemTouchingPlayer,
 	getItemsInRoom,
 	createVelocityForDirection,
+	isPointInRoom,
 } from "../shared";
 
 export class Game extends Scene {
@@ -57,10 +58,11 @@ export class Game extends Scene {
 	map: Phaser.Tilemaps.Tilemap;
 	landLayer: Phaser.Tilemaps.TilemapLayer;
 	stuffLayer: Phaser.Tilemaps.TilemapLayer;
-	activeRoom: Phaser.Types.Tilemaps.TiledObject;
+	activeRoom: Phaser.Types.Tilemaps.TiledObject | undefined;
 	createdDoors: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody[] = [];
 	createdTiles: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody[] = [];
 	createdItems: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody[] = [];
+	spawnPoints: Phaser.Types.Tilemaps.TiledObject[] = [];
 
 	constructor() {
 		super("Game");
@@ -105,6 +107,12 @@ export class Game extends Scene {
 				if (isDynamicSprite(player) && isDynamicSprite(enemy)) {
 					this.enemyHitPlayer();
 				}
+			},
+			(_, enemy) => {
+				if (isDynamicSprite(enemy)) {
+					return enemy.visible;
+				}
+				return false;
 			}
 		);
 
@@ -162,7 +170,6 @@ export class Game extends Scene {
 			.filter(isDynamicSprite)
 			.map((item) => {
 				item.body.pushable = false;
-				console.log("created door", item);
 				return item;
 			});
 	}
@@ -235,10 +242,7 @@ export class Game extends Scene {
 	moveCameraToRoom(room: Phaser.Types.Tilemaps.TiledObject) {
 		this.clearFloorText();
 		const camera = this.cameras.main;
-		const zoomLevel = 6;
-		camera.setZoom(zoomLevel);
 
-		// This size is in-game pixels (corresponding to the tiles in the scene) that will be zoomed.
 		if (
 			room.x === undefined ||
 			room.y === undefined ||
@@ -247,6 +251,7 @@ export class Game extends Scene {
 		) {
 			throw new Error("Cannot move camera: Room has no position or size");
 		}
+		this.physics.world.setBounds(room.x, room.y, room.width, room.height);
 		camera.setBounds(room.x, room.y, room.width, room.height);
 		camera.useBounds = false;
 
@@ -260,6 +265,8 @@ export class Game extends Scene {
 			[...this.createdItems, ...this.createdTiles, ...this.createdDoors],
 			room
 		);
+
+		this.createEnemiesInRoom();
 	}
 
 	handleCollideDoor(door: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody) {
@@ -302,6 +309,10 @@ export class Game extends Scene {
 
 	update() {
 		this.enemies.getChildren().forEach((enemy) => {
+			if (!isDynamicSprite(enemy)) {
+				return;
+			}
+			// Note that enemies should avoid rendering if they are not active!
 			enemy.update();
 		});
 		this.updatePlayer();
@@ -315,7 +326,7 @@ export class Game extends Scene {
 
 	destroyCreatedTile(tile: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody) {
 		console.log("destroying tile", tile);
-		this.cameras.main.shake(200, 0.0001);
+		this.cameras.main.shake(200, 0.004);
 		this.createdTiles = this.createdTiles.filter((tileA) => tileA !== tile);
 		this.stuffLayer.removeTileAtWorldXY(tile.x, tile.y);
 		tile.destroy();
@@ -357,7 +368,9 @@ export class Game extends Scene {
 	}
 
 	updateAppearingTiles() {
-		const transientTiles = getItemsInRoom(this.createdTiles, this.activeRoom);
+		const transientTiles = this.activeRoom
+			? getItemsInRoom(this.createdTiles, this.activeRoom)
+			: [];
 		const appearingTiles = transientTiles.filter((tile) => {
 			return tile.data.get("msAfterApproach") !== undefined;
 		});
@@ -513,8 +526,8 @@ export class Game extends Scene {
 
 	setFloorText(text: string) {
 		if (
-			this.activeRoom.x === undefined ||
-			this.activeRoom.y === undefined ||
+			this.activeRoom?.x === undefined ||
+			this.activeRoom?.y === undefined ||
 			!this.activeRoom.height ||
 			!this.activeRoom.width
 		) {
@@ -794,6 +807,8 @@ export class Game extends Scene {
 	}
 
 	createEnemies(): void {
+		this.enemies = this.physics.add.group();
+
 		this.anims.create({
 			key: "logman-down-walk",
 			frames: this.anims.generateFrameNumbers("logman", { start: 0, end: 3 }),
@@ -819,29 +834,44 @@ export class Game extends Scene {
 			repeat: -1,
 		});
 
-		this.enemies = this.physics.add.group();
-		const spawnPoints = this.map.filterObjects("MetaObjects", (obj) => {
-			if (!isTilemapTile(obj)) {
-				return false;
-			}
-			const isMonster = obj.properties?.find(
-				(prop: { name: string }) => prop.name === "isMonster"
-			)?.value;
-			return isMonster === true;
-		});
-		spawnPoints?.forEach((point) => {
-			if (point.x !== undefined && point.y !== undefined) {
-				console.log("creating monster at", point.x, point.y);
-				const isBoss = point.properties.find(
-					(prop: { name: string }) => prop.name === "isBoss"
-				);
-				if (isBoss) {
-					this.createBoss(point.x, point.y);
-				} else {
-					this.createEnemy(point.x, point.y);
+		this.spawnPoints =
+			// FIXME: just make a whole layer for monsters
+			this.map.filterObjects("MetaObjects", (obj) => {
+				if (!isTilemapTile(obj)) {
+					return false;
 				}
+				const isMonster = obj.properties?.find(
+					(prop: { name: string }) => prop.name === "isMonster"
+				)?.value;
+				return isMonster === true;
+			}) ?? [];
+	}
+
+	createEnemiesInRoom() {
+		this.spawnPoints.forEach((point) => {
+			if (point.x === undefined || point.y === undefined || !this.activeRoom) {
+				return;
 			}
+			const isEnemyInRoom = isPointInRoom(point.x, point.y, this.activeRoom);
+			if (!isEnemyInRoom) {
+				return;
+			}
+
+			console.log("creating monster at", point.x, point.y);
+			const isBoss = point.properties.find(
+				(prop: { name: string }) => prop.name === "isBoss"
+			);
+			if (isBoss) {
+				this.createBoss(point.x, point.y);
+			} else {
+				this.createEnemy(point.x, point.y);
+			}
+
+			this.spawnPoints = this.spawnPoints.filter((pointB) => pointB !== point);
 		});
+
+		// It seems that we may need to do this again when enemies changes?
+		this.setTileLayerCollisions(this.createdDoors, this.enemies);
 	}
 
 	createEnemy(x: number, y: number) {
@@ -874,7 +904,7 @@ export class Game extends Scene {
 	sendHitToEnemy(enemy: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody) {
 		if (enemy.data.get("hittable") === true) {
 			this.knockBack(this.player.body, this.postHitEnemyKnockback);
-			this.cameras.main.shake(200, 0.0001);
+			this.cameras.main.shake(200, 0.004);
 			enemy.emit("hit");
 		} else {
 			console.log("enemy not hittable", enemy, enemy.data.get("hittable"));
@@ -898,7 +928,7 @@ export class Game extends Scene {
 		console.log("player got hit!");
 
 		this.enemyCollider.active = false;
-		this.cameras.main.shake(300, 0.0001);
+		this.cameras.main.shake(300, 0.008);
 		this.player.tint = 0xff0000;
 		this.playerHitPoints -= 1;
 		MainEvents.emit("setActiveHearts", this.playerHitPoints);

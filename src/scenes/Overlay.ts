@@ -3,9 +3,9 @@ import { MainEvents } from "../MainEvents";
 
 export class Overlay extends Scene {
 	hearts: Phaser.GameObjects.Image[] = [];
-	heartSize: number = 80;
-	heartLeft: number = 50;
-	heartTop: number = 50;
+	heartSize: number = 20;
+	heartLeft: number = 10;
+	heartTop: number = 10;
 	totalHearts: number = 4;
 	activeHearts: number = 4;
 

@@ -97,7 +97,7 @@ class Roar implements Behavior<AllStates> {
 			true
 		);
 		sprite.scene.registry.set("freezePlayer", true);
-		sprite.scene.cameras.main.shake(2000, 0.0005);
+		sprite.scene.cameras.main.shake(2000, 0.009);
 		sprite.once(
 			Phaser.Animations.Events.ANIMATION_COMPLETE,
 			(anim: Phaser.Animations.Animation) => {
