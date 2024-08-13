@@ -387,9 +387,14 @@ export class Game extends Scene {
 	destroyCreatedTile(tile: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody) {
 		console.log("destroying tile", tile);
 		this.cameras.main.shake(200, 0.004);
-		this.createdTiles = this.createdTiles.filter((tileA) => tileA !== tile);
-		this.stuffLayer.removeTileAtWorldXY(tile.x, tile.y);
-		tile.destroy();
+
+		tile.setOrigin(0.6, 0.5);
+		tile.anims.play("explode", true);
+		tile.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
+			this.createdTiles = this.createdTiles.filter((tileA) => tileA !== tile);
+			this.stuffLayer.removeTileAtWorldXY(tile.x, tile.y);
+			tile.destroy();
+		});
 	}
 
 	checkForPowerHitTiles() {
@@ -789,6 +794,12 @@ export class Game extends Scene {
 		this.updateSwordHitbox();
 
 		const anims = this.anims;
+		anims.create({
+			key: "explode",
+			frames: anims.generateFrameNumbers("monster_explode1"),
+			frameRate: 20,
+		});
+
 		anims.create({
 			key: "character-idle-down",
 			frames: anims.generateFrameNumbers("character-idle-down"),
