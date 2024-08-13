@@ -26,7 +26,7 @@ export class Game extends Scene {
 	cursors: Phaser.Types.Input.Keyboard.CursorKeys;
 	debugGraphic: Phaser.GameObjects.Graphics | undefined;
 	player: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
-	sword: Phaser.Types.Physics.Arcade.ImageWithDynamicBody;
+	sword: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
 	enemies: Phaser.Physics.Arcade.Group;
 	enemyCollider: Phaser.Physics.Arcade.Collider;
 	floorText: Phaser.GameObjects.Text | undefined;
@@ -52,7 +52,7 @@ export class Game extends Scene {
 	gotItemFreeze: number = 1500;
 	showPowerFrame: number = 3;
 	windCardPushSpeed: number = 100;
-	windCardPushTime: number = 150;
+	windCardPushTime: number = 100;
 	knockBackSpeed: number = 180;
 	distanceToActivateTransient: number = 30;
 
@@ -166,7 +166,9 @@ export class Game extends Scene {
 			// Power
 			if (this.canPlayerUsePower()) {
 				this.player.body.setVelocity(0);
-				this.framesSincePower = 50;
+				// This number is not important; the attack time is dictated by the
+				// animation. This is just used to count how long it goes for.
+				this.framesSincePower = 400;
 				this.updateSwordHitbox();
 			}
 		});
@@ -413,6 +415,10 @@ export class Game extends Scene {
 				if (!tile.x || !tile.y) {
 					return;
 				}
+				if (tile.data.get("beingPushed")) {
+					return;
+				}
+				tile.data.set("beingPushed", true);
 				console.log("hit item", tile);
 
 				// The wind card pushes tiles.
@@ -424,7 +430,9 @@ export class Game extends Scene {
 				setTimeout(() => {
 					// Tile might have been destroyed before this happens
 					if (tile.body?.setVelocity) {
+						console.log("hit item complete");
 						tile.body.setVelocity(0, 0);
+						tile.data.set("beingPushed", false);
 					}
 				}, this.windCardPushTime);
 			}
@@ -682,7 +690,28 @@ export class Game extends Scene {
 		const [xOffset, yOffset] = this.getSwordOffset();
 		this.sword.x = this.player.x + xOffset;
 		this.sword.y = this.player.y + yOffset;
-		this.physics.world.add(this.sword.body);
+	}
+
+	getPowerOffset() {
+		const xOffset = (() => {
+			if (this.playerDirection === SpriteLeft) {
+				return -18;
+			}
+			if (this.playerDirection === SpriteRight) {
+				return 18;
+			}
+			return 0;
+		})();
+		const yOffset = (() => {
+			if (this.playerDirection === SpriteUp) {
+				return -18;
+			}
+			if (this.playerDirection === SpriteDown) {
+				return 18;
+			}
+			return 0;
+		})();
+		return [xOffset, yOffset];
 	}
 
 	getSwordOffset() {
@@ -713,22 +742,22 @@ export class Game extends Scene {
 				this.playerDirection === SpriteLeft ||
 				this.playerDirection === SpriteRight
 			) {
-				return 10;
+				return 20;
 			}
-			return 5;
+			return 10;
 		})();
 		const height = (() => {
 			if (
 				this.playerDirection === SpriteUp ||
 				this.playerDirection === SpriteDown
 			) {
-				return 10;
+				return 20;
 			}
-			return 5;
+			return 10;
 		})();
 
 		this.sword.body.setSize(width, height);
-		const [xOffset, yOffset] = this.getSwordOffset();
+		const [xOffset, yOffset] = this.getPowerOffset();
 
 		this.sword.x = this.player.x + xOffset;
 		this.sword.y = this.player.y + yOffset;
@@ -749,15 +778,26 @@ export class Game extends Scene {
 	}
 
 	updateSwordHitbox() {
+		this.sword.setVisible(false);
 		this.sword.body.debugShowBody = false;
 		this.sword.body.setVelocity(0);
-		this.updateSwordHitboxForAttack();
+
+		// We update the sword hitbox on every frame even when not in use to make
+		// sure it stays in position relative to the player; otherwise the hitbox
+		// appears briefly at its old location.
+		if (!this.isPlayerSwordActive() && !this.isPlayerUsingPower()) {
+			this.updateSwordHitboxForAttack();
+			return;
+		}
+
 		if (this.isPlayerSwordActive()) {
+			this.updateSwordHitboxForAttack();
 			this.sword.body.debugShowBody = true;
 			return;
 		}
 		if (this.isPlayerUsingPower()) {
 			this.updateSwordHitboxForPower();
+			this.sword.setVisible(true);
 			this.sword.body.debugShowBody = true;
 			return;
 		}
@@ -783,14 +823,13 @@ export class Game extends Scene {
 		this.player.setSize(10, 14);
 		this.resetPlayerOffset();
 		this.player.setDepth(1);
-		const sword = this.physics.add.existing(
-			this.add.rectangle(400, 350, 20, 20)
+		this.sword = this.physics.add.sprite(
+			this.player.x,
+			this.player.y,
+			"character-power-right",
+			4
 		);
-		if (!isDynamicImage(sword)) {
-			throw new Error("Sword hitbox is not the right kind of object");
-		}
-		this.sword = sword;
-		this.physics.world.add(this.sword.body);
+		this.sword.setDepth(4);
 		this.updateSwordHitbox();
 
 		const anims = this.anims;
@@ -833,7 +872,10 @@ export class Game extends Scene {
 		});
 		anims.create({
 			key: "character-right-walk",
-			frames: anims.generateFrameNumbers("character-run-right"),
+			frames: anims.generateFrameNumbers("character-run-right", {
+				start: 7,
+				end: 0,
+			}),
 			frameRate: 14,
 			repeat: -1,
 		});
@@ -884,40 +926,16 @@ export class Game extends Scene {
 		});
 
 		anims.create({
-			key: "character-down-power",
-			frames: anims.generateFrameNumbers("character", {
-				start: 2,
-				end: 0,
-			}),
-			frameRate: 1,
-			repeat: 0,
-		});
-		anims.create({
 			key: "character-right-power",
-			frames: anims.generateFrameNumbers("character", {
-				start: 9,
-				end: 9,
-			}),
-			frameRate: 1,
-			repeat: 0,
-		});
-		anims.create({
-			key: "character-up-power",
-			frames: anims.generateFrameNumbers("character", {
-				start: 14,
-				end: 14,
-			}),
-			frameRate: 1,
-			repeat: 0,
+			frames: anims.generateFrameNumbers("character-power-right"),
+			frameRate: 24,
 		});
 		anims.create({
 			key: "character-left-power",
-			frames: anims.generateFrameNumbers("character", {
-				start: 5,
-				end: 5,
+			frames: anims.generateFrameNumbers("character-power-left", {
+				frames: [5, 4, 3, 2, 1, 0, 11, 10, 9, 8, 7, 6],
 			}),
-			frameRate: 1,
-			repeat: 0,
+			frameRate: 24,
 		});
 		this.player.setCollideWorldBounds(true);
 	}
@@ -1157,6 +1175,7 @@ export class Game extends Scene {
 
 	updatePlayerAttackAnimation() {
 		if (this.isPlayerAttacking()) {
+			this.sword.setRotation(Phaser.Math.DegToRad(0));
 			this.framesSinceAttack -= 1;
 			if (this.framesSinceAttack === 0) {
 				this.finishPlayerAttackAnimation();
@@ -1214,17 +1233,28 @@ export class Game extends Scene {
 			const playerDirection = this.playerDirection;
 			switch (playerDirection) {
 				case SpriteUp:
-					this.player.anims.play("character-up-power", true);
+					// We just rotate the sideways powers for up/down
+					this.sword.setRotation(Phaser.Math.DegToRad(90));
+					this.sword.anims.play("character-left-power", true);
 					break;
 				case SpriteRight:
-					this.player.anims.play("character-right-power", true);
+					this.sword.setRotation(Phaser.Math.DegToRad(0));
+					this.sword.anims.play("character-right-power", true);
 					break;
 				case SpriteDown:
-					this.player.anims.play("character-down-power", true);
+					// We just rotate the sideways powers for up/down
+					this.sword.setRotation(Phaser.Math.DegToRad(90));
+					this.sword.anims.play("character-right-power", true);
 					break;
 				case SpriteLeft:
-					this.player.anims.play("character-left-power", true);
+					this.sword.setRotation(Phaser.Math.DegToRad(0));
+					this.sword.anims.play("character-left-power", true);
 					break;
+			}
+
+			// If the animation completes, stop the attack.
+			if (this.sword.anims.getProgress() === 1) {
+				this.framesSincePower = 0;
 			}
 		}
 	}

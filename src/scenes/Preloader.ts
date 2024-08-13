@@ -95,6 +95,19 @@ export class Preloader extends Scene {
 			frameHeight: 38,
 		});
 
+		this.load.spritesheet(
+			"character-power-right",
+			"wind_card_effect_right.png",
+			{
+				frameWidth: 32,
+				frameHeight: 32,
+			}
+		);
+		this.load.spritesheet("character-power-left", "wind_card_effect_left.png", {
+			frameWidth: 32,
+			frameHeight: 32,
+		});
+
 		this.load.spritesheet("character", "character_sprite_sheet.png", {
 			frameWidth: 32,
 			frameHeight: 32,
