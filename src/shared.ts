@@ -316,9 +316,9 @@ export function getDoorDestinationCoordinates(
 			return destinationTile.y - 24;
 		}
 		if (destinationDirection === SpriteDown) {
-			return destinationTile.y + 6;
+			return destinationTile.y + 10;
 		}
-		return destinationTile.y - 6;
+		return destinationTile.y - 10;
 	})();
 	return [destinationX, destinationY];
 }

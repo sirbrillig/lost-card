@@ -43,14 +43,13 @@ export class Game extends Scene {
 
 	// Config
 	characterSpeed: number = 90;
-	postAttackCooldown: number = 200;
+	postAttackCooldown: number = 150;
 	postHitPlayerKnockback: number = 120;
 	postHitEnemyKnockback: number = 50;
 	postHitInvincibilityTime: number = 600;
-	attackFrameRate: number = 20;
-	attackDelay: number = 80;
-	gotItemFreeze: number = 2000;
-	showSwordFrame: number = 0;
+	attackFrameRate: number = 35;
+	attackDelay: number = 110;
+	gotItemFreeze: number = 1500;
 	showPowerFrame: number = 3;
 	windCardPushSpeed: number = 100;
 	windCardPushTime: number = 150;
@@ -339,6 +338,17 @@ export class Game extends Scene {
 			throw new Error("Hit door without destination id");
 		}
 
+		const destinationDirection = door.data.get("doordirection");
+		if (destinationDirection === undefined) {
+			throw new Error("Door has no destination direction");
+		}
+		console.log("moving through door in direction", destinationDirection);
+
+		if (this.playerDirection !== destinationDirection) {
+			console.log("hit door in wrong direction");
+			return;
+		}
+
 		const destinationTile = this.map.findObject(
 			"Doors",
 			(obj: unknown) => getObjectId(obj) === destinationId
@@ -347,12 +357,6 @@ export class Game extends Scene {
 			throw new Error("Hit door without destination tile");
 		}
 		console.log("moving to tile", destinationTile, "through door", door);
-
-		const destinationDirection = door.data.get("doordirection");
-		if (destinationDirection === undefined) {
-			throw new Error("Door has no destination direction");
-		}
-		console.log("moving through door in direction", destinationDirection);
 
 		// if the player enters a door, teleport them just past the corresponding door
 		const [destinationX, destinationY] = getDoorDestinationCoordinates(
@@ -594,8 +598,7 @@ export class Game extends Scene {
 
 	pickUpSword() {
 		this.equipSword();
-		this.player.anims.play("character-down-walk", true);
-		this.player.setFrame(this.showSwordFrame);
+		this.player.anims.play("character-down-attack", true);
 		this.registry.set("freezePlayer", true);
 		setTimeout(() => {
 			this.registry.set("freezePlayer", false);
@@ -648,8 +651,8 @@ export class Game extends Scene {
 
 	updateSwordHitboxForAttack() {
 		// Add hitbox for sword in direction of sprite
-		const swordWidth = 35; // for down/up
-		const swordHeight = 20; // for down/up
+		const swordWidth = 34; // for down/up
+		const swordHeight = 18; // for down/up
 		const width = (() => {
 			if (
 				this.playerDirection === SpriteLeft ||
@@ -680,19 +683,19 @@ export class Game extends Scene {
 	getSwordOffset() {
 		const xOffset = (() => {
 			if (this.playerDirection === SpriteLeft) {
-				return -15;
+				return -10;
 			}
 			if (this.playerDirection === SpriteRight) {
-				return 15;
+				return 8;
 			}
 			return 0;
 		})();
 		const yOffset = (() => {
 			if (this.playerDirection === SpriteUp) {
-				return -15;
+				return -8;
 			}
 			if (this.playerDirection === SpriteDown) {
-				return 15;
+				return 8;
 			}
 			return 0;
 		})();
@@ -771,7 +774,9 @@ export class Game extends Scene {
 			"character-idle-down",
 			0
 		);
-		this.player.setSize(10, 18);
+		this.player.setDisplaySize(13, 24);
+		this.player.setSize(10, 14);
+		this.resetPlayerOffset();
 		this.player.setDepth(1);
 		const sword = this.physics.add.existing(
 			this.add.rectangle(400, 350, 20, 20)
@@ -1166,7 +1171,7 @@ export class Game extends Scene {
 			}
 			// The attack sprite is significantly bigger than the idle sprite so we
 			// need to move the hitbox to the center.
-			this.player.setOffset(15, 13);
+			this.player.setOffset(15, 12);
 		}
 
 		// If the animation completes, stop the attack.
@@ -1178,7 +1183,11 @@ export class Game extends Scene {
 	finishPlayerAttackAnimation() {
 		this.framesSinceAttack = 0;
 		this.lastAttackedAt = this.time.now;
-		this.player.setOffset(2.5, 4);
+		this.resetPlayerOffset();
+	}
+
+	resetPlayerOffset() {
+		this.player.setOffset(2.5, 7);
 	}
 
 	isPlayerUsingPower(): boolean {
@@ -1267,7 +1276,6 @@ export class Game extends Scene {
 		}
 
 		if (this.isPlayerFrozen()) {
-			this.player.stop();
 			this.player.body.setVelocity(0);
 			console.log("player frozen");
 			return;
