@@ -769,8 +769,7 @@ export class Game extends Scene {
 			"character-idle-down",
 			0
 		);
-		this.player.setDisplaySize(24, 24);
-		this.player.setSize(this.player.width * 0.35, this.player.height * 0.35);
+		this.player.setSize(10, 18);
 		this.player.setDepth(1);
 		const sword = this.physics.add.existing(
 			this.add.rectangle(400, 350, 20, 20)
@@ -835,10 +834,7 @@ export class Game extends Scene {
 
 		anims.create({
 			key: "character-down-attack",
-			frames: anims.generateFrameNumbers("character", {
-				start: 0,
-				end: 3,
-			}),
+			frames: anims.generateFrameNumbers("character-attack-down"),
 			frameRate: this.attackFrameRate,
 			repeat: 0,
 			delay: this.attackDelay,
@@ -846,10 +842,7 @@ export class Game extends Scene {
 		});
 		anims.create({
 			key: "character-right-attack",
-			frames: anims.generateFrameNumbers("character", {
-				start: 8,
-				end: 11,
-			}),
+			frames: anims.generateFrameNumbers("character-attack-right"),
 			frameRate: this.attackFrameRate,
 			repeat: 0,
 			delay: this.attackDelay,
@@ -857,10 +850,7 @@ export class Game extends Scene {
 		});
 		anims.create({
 			key: "character-up-attack",
-			frames: anims.generateFrameNumbers("character", {
-				start: 12,
-				end: 15,
-			}),
+			frames: anims.generateFrameNumbers("character-attack-up"),
 			frameRate: this.attackFrameRate,
 			repeat: 0,
 			delay: this.attackDelay,
@@ -868,10 +858,7 @@ export class Game extends Scene {
 		});
 		anims.create({
 			key: "character-left-attack",
-			frames: anims.generateFrameNumbers("character", {
-				start: 4,
-				end: 7,
-			}),
+			frames: anims.generateFrameNumbers("character-attack-left"),
 			frameRate: this.attackFrameRate,
 			repeat: 0,
 			delay: this.attackDelay,

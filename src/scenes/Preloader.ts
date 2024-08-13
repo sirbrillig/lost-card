@@ -74,6 +74,26 @@ export class Preloader extends Scene {
 			frameWidth: 17,
 			frameHeight: 24,
 		});
+		this.load.spritesheet("character-attack-down", "character_sword_down.png", {
+			frameWidth: 38,
+			frameHeight: 45,
+		});
+		this.load.spritesheet("character-attack-up", "character_sword_up.png", {
+			frameWidth: 39,
+			frameHeight: 45,
+		});
+		this.load.spritesheet(
+			"character-attack-right",
+			"character_sword_right.png",
+			{
+				frameWidth: 48,
+				frameHeight: 38,
+			}
+		);
+		this.load.spritesheet("character-attack-left", "character_sword_left.png", {
+			frameWidth: 48,
+			frameHeight: 38,
+		});
 
 		this.load.spritesheet("character", "character_sprite_sheet.png", {
 			frameWidth: 32,
