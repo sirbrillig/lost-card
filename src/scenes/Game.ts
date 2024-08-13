@@ -1028,20 +1028,15 @@ export class Game extends Scene {
 
 	sendHitToEnemy(enemy: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody) {
 		if (enemy.data.get("hittable") === true) {
-			enemy.data.set("stunned", true);
+			this.cameras.main.shake(200, 0.004);
+			enemy.emit("hit");
+
+			// Knock the player back a bit when they hit an enemy.
 			this.knockBack(
 				this.player.body,
 				this.postHitEnemyKnockback,
 				invertSpriteDirection(this.playerDirection),
-				() => {
-					// Enemy might be gone before stun ends
-					if (!enemy?.data) {
-						return;
-					}
-					enemy.data.set("stunned", false);
-					this.cameras.main.shake(200, 0.004);
-					enemy.emit("hit");
-				}
+				() => {}
 			);
 		} else {
 			console.log("enemy not hittable", enemy, enemy.data.get("hittable"));
