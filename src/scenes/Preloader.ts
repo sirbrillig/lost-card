@@ -107,6 +107,10 @@ export class Preloader extends Scene {
 			frameWidth: 32,
 			frameHeight: 32,
 		});
+		this.load.spritesheet("light-lantern", "light_lantern.png", {
+			frameWidth: 32,
+			frameHeight: 32,
+		});
 
 		this.load.spritesheet("character", "character_sprite_sheet.png", {
 			frameWidth: 32,

@@ -1502,7 +1502,7 @@
          "name":"SavePoints",
          "objects":[
                 {
-                 "gid":2718,
+                 "gid":2717,
                  "height":16,
                  "id":244,
                  "name":"",
@@ -1514,7 +1514,7 @@
                  "y":1504
                 }, 
                 {
-                 "gid":2718,
+                 "gid":2717,
                  "height":16,
                  "id":245,
                  "name":"",
@@ -1526,7 +1526,7 @@
                  "y":929.55
                 }, 
                 {
-                 "gid":2718,
+                 "gid":2717,
                  "height":16,
                  "id":295,
                  "name":"",
@@ -3744,7 +3744,7 @@
          "y":0
         }],
  "nextlayerid":12,
- "nextobjectid":300,
+ "nextobjectid":301,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.0",

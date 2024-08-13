@@ -101,10 +101,35 @@ export class Game extends Scene {
 		// Enemies collide with doors but players can pass through them.
 		this.setTileLayerCollisions(this.createdDoors, this.enemies);
 
-		this.physics.add.collider(this.player, this.createdSavePoints, () => {
-			// FIXME: do something to show player that saving happened
-			this.saveGame();
-		});
+		let isSaving = false;
+		this.physics.add.collider(
+			this.player,
+			this.createdSavePoints,
+			(_, savePoint) => {
+				if (!isDynamicSprite(savePoint)) {
+					return;
+				}
+				if (isSaving) {
+					return;
+				}
+
+				isSaving = true;
+				this.turnOffAllLanterns();
+				const effect = this.add.sprite(
+					savePoint.x,
+					savePoint.y,
+					"light-lantern",
+					0
+				);
+				effect.anims.play("light-lantern", true);
+				savePoint.setTexture("dungeon_tiles_sprites", 1323);
+				effect.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
+					isSaving = false;
+					effect.destroy();
+				});
+				this.saveGame();
+			}
+		);
 
 		this.enemyCollider = this.physics.add.collider(
 			this.player,
@@ -170,6 +195,12 @@ export class Game extends Scene {
 		this.hideHiddenItems();
 
 		this.createOverlay();
+	}
+
+	turnOffAllLanterns() {
+		this.createdSavePoints.forEach((savePoint) => {
+			savePoint.setTexture("dungeon_tiles_sprites", 1322);
+		});
 	}
 
 	activateAttack() {
@@ -855,6 +886,11 @@ export class Game extends Scene {
 			key: "explode",
 			frames: anims.generateFrameNumbers("monster_explode1"),
 			frameRate: 20,
+		});
+		anims.create({
+			key: "light-lantern",
+			frames: anims.generateFrameNumbers("light-lantern"),
+			frameRate: 24,
 		});
 
 		anims.create({
