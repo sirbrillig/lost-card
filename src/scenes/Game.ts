@@ -26,12 +26,12 @@ export class Game extends Scene {
 	debugGraphic: Phaser.GameObjects.Graphics | undefined;
 	player: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
 	sword: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
+	attackSprite: Phaser.GameObjects.Sprite;
 	enemies: Phaser.Physics.Arcade.Group;
 	enemyCollider: Phaser.Physics.Arcade.Collider;
 	floorText: Phaser.GameObjects.Text | undefined;
 
 	framesSincePlayerHit: number = 0;
-	framesSinceAttack: number = 0;
 	lastAttackedAt: number = 0;
 	framesSincePower: number = 0;
 	playerDirection: SpriteDirection = SpriteDown;
@@ -47,7 +47,7 @@ export class Game extends Scene {
 	postHitEnemyKnockback: number = 50;
 	postHitInvincibilityTime: number = 600;
 	attackFrameRate: number = 35;
-	attackDelay: number = 110;
+	attackDelay: number = 8;
 	gotItemFreeze: number = 1500;
 	windCardPushSpeed: number = 100;
 	windCardPushTime: number = 100;
@@ -84,6 +84,15 @@ export class Game extends Scene {
 		}
 
 		this.createPlayer();
+		this.attackSprite = this.add.sprite(
+			this.player.x,
+			this.player.y,
+			"character-attack-up",
+			0
+		);
+		this.attackSprite.setDepth(4);
+		this.attackSprite.setVisible(false);
+
 		this.createEnemies();
 
 		this.landLayer = this.createTileLayer("Background", tilesetTile, 0);
@@ -204,11 +213,41 @@ export class Game extends Scene {
 	}
 
 	activateAttack() {
+		console.log("attack beginning");
 		this.player.body.setVelocity(0);
-		// This number is not important; the attack time is dictated by the
-		// animation. This is just used to count how long it goes for.
-		this.framesSinceAttack = 400;
 		this.updateSwordHitbox();
+
+		this.sword.setRotation(Phaser.Math.DegToRad(0));
+
+		// If the animation hasn't started, start it.
+		// Do not move the player hitbox when attacking; since it changes size it
+		// causes accidental hits as it wiggles around. Instead we use a separate
+		// sprite for the attack animation and leave the player and its hitbox
+		// alone.
+		this.attackSprite.setVisible(true);
+		this.attackSprite.setPosition(this.player.x, this.player.y);
+		this.player.setVisible(false);
+		switch (this.playerDirection) {
+			case SpriteUp:
+				this.attackSprite.play("character-up-attack", true);
+				break;
+			case SpriteRight:
+				this.attackSprite.play("character-right-attack", true);
+				break;
+			case SpriteDown:
+				this.attackSprite.play("character-down-attack", true);
+				break;
+			case SpriteLeft:
+				this.attackSprite.play("character-left-attack", true);
+				break;
+		}
+
+		this.attackSprite.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
+			console.log("attack complete");
+			this.attackSprite.setVisible(false);
+			this.player.setVisible(true);
+			this.lastAttackedAt = this.time.now;
+		});
 	}
 
 	activatePower() {
@@ -220,6 +259,8 @@ export class Game extends Scene {
 	}
 
 	loadLastSave() {
+		// FIXME: Clean up old stuff first
+		this.scene.restart();
 		// FIXME: reset level otherwise like enemy positions etc, but not picked-up items
 		const rawSaveData = localStorage.getItem("lost-card-save");
 		if (!rawSaveData) {
@@ -715,7 +756,7 @@ export class Game extends Scene {
 	updateSwordHitboxForAttack() {
 		// Add hitbox for sword in direction of sprite
 		const swordWidth = 34; // for down/up
-		const swordHeight = 18; // for down/up
+		const swordHeight = 20; // for down/up
 		const width = (() => {
 			if (
 				this.playerDirection === SpriteLeft ||
@@ -818,13 +859,17 @@ export class Game extends Scene {
 	// if the sword is active, use `isPlayerSwordActive()` instead.
 	isPlayerAttacking() {
 		return (
-			this.framesSinceAttack > 0 &&
-			this.player.anims.getName().includes("attack")
+			this.attackSprite?.anims.getName().includes("attack") &&
+			this.attackSprite.visible === true
 		);
 	}
 
+	// Similar to `isPlayerAttacking()` but that is true any time the attack flow
+	// animation has started and does not consider the warmup part of the
+	// animation. This function will return true only when the sword is
+	// threatening damage.
 	isPlayerSwordActive() {
-		return this.isPlayerAttacking() && this.player.anims.hasStarted;
+		return this.isPlayerAttacking() && this.attackSprite.anims.hasStarted;
 	}
 
 	updateSwordHitbox() {
@@ -868,9 +913,9 @@ export class Game extends Scene {
 			"character-idle-down",
 			0
 		);
+		this.player.setDebugBodyColor(0x00ff00);
 		this.player.setDisplaySize(13, 24);
-		this.player.setSize(10, 14);
-		this.resetPlayerOffset();
+		this.player.setSize(8, 14);
 		this.player.setDepth(1);
 		this.sword = this.physics.add.sprite(
 			this.player.x,
@@ -878,6 +923,7 @@ export class Game extends Scene {
 			"character-power-right",
 			4
 		);
+		this.sword.setDebugBodyColor(0x00fff0);
 		this.sword.setDepth(4);
 		this.updateSwordHitbox();
 
@@ -1187,7 +1233,7 @@ export class Game extends Scene {
 		return (
 			this.doesPlayerHaveSword() &&
 			!this.isPlayerFrozen() &&
-			this.framesSinceAttack === 0 &&
+			!this.isPlayerAttacking() &&
 			this.getTimeSinceLastAttack() > this.postAttackCooldown &&
 			this.framesSincePower === 0
 		);
@@ -1205,7 +1251,7 @@ export class Game extends Scene {
 		return (
 			this.doesPlayerHavePower() &&
 			!this.isPlayerFrozen() &&
-			this.framesSinceAttack === 0 &&
+			!this.isPlayerAttacking() &&
 			this.getTimeSinceLastAttack() > this.postAttackCooldown &&
 			this.framesSincePower === 0
 		);
@@ -1229,57 +1275,8 @@ export class Game extends Scene {
 
 	updatePlayerBeingHit(): void {
 		this.framesSincePlayerHit -= 1;
-		this.player.setVisible(this.framesSincePlayerHit % 2 === 0 ? true : false);
-	}
-
-	updatePlayerAttackAnimation() {
-		if (this.isPlayerAttacking()) {
-			this.sword.setRotation(Phaser.Math.DegToRad(0));
-			this.framesSinceAttack -= 1;
-			if (this.framesSinceAttack === 0) {
-				this.finishPlayerAttackAnimation();
-			}
-		}
-
-		// If the animation hasn't started, start it.
-		if (
-			this.framesSinceAttack > 0 &&
-			!this.player.anims.getName().includes("attack")
-		) {
-			const playerDirection = this.playerDirection;
-			switch (playerDirection) {
-				case SpriteUp:
-					this.player.anims.play("character-up-attack", true);
-					break;
-				case SpriteRight:
-					this.player.anims.play("character-right-attack", true);
-					break;
-				case SpriteDown:
-					this.player.anims.play("character-down-attack", true);
-					break;
-				case SpriteLeft:
-					this.player.anims.play("character-left-attack", true);
-					break;
-			}
-			// The attack sprite is significantly bigger than the idle sprite so we
-			// need to move the hitbox to the center.
-			this.player.setOffset(15, 12);
-		}
-
-		// If the animation completes, stop the attack.
-		if (this.isPlayerAttacking() && this.player.anims.getProgress() === 1) {
-			this.finishPlayerAttackAnimation();
-		}
-	}
-
-	finishPlayerAttackAnimation() {
-		this.framesSinceAttack = 0;
-		this.lastAttackedAt = this.time.now;
-		this.resetPlayerOffset();
-	}
-
-	resetPlayerOffset() {
-		this.player.setOffset(2.5, 7);
+		// FIXME this needs to end on visible
+		// this.player.setVisible(this.framesSincePlayerHit % 2 === 0 ? true : false);
 	}
 
 	isPlayerUsingPower(): boolean {
@@ -1372,8 +1369,6 @@ export class Game extends Scene {
 
 		if (this.isPlayerBeingHit()) {
 			this.updatePlayerBeingHit();
-		} else {
-			this.player.setVisible(true);
 		}
 
 		if (this.isPlayerFrozen()) {
@@ -1390,7 +1385,6 @@ export class Game extends Scene {
 		}
 
 		this.updateSwordHitbox();
-		this.updatePlayerAttackAnimation();
 		this.updatePlayerPowerAnimation();
 		this.updatePlayerMovement();
 	}
