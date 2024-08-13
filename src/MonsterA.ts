@@ -33,6 +33,7 @@ export class MonsterA extends Phaser.Physics.Arcade.Sprite {
 		this.setDataEnabled();
 		this.data.set("hittable", true);
 		this.on("hit", this.hit);
+		this.on("kill", this.hit);
 
 		this.initSprites();
 	}

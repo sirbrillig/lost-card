@@ -172,9 +172,8 @@ class SpawnEnemies implements Behavior<AllStates> {
 			sprite.spawnedEnemyCount -= 1;
 		});
 		sprite.registerEnemy(monster);
-		sprite.once(Phaser.GameObjects.Events.DESTROY, () => {
-			// FIXME: animate these destructions
-			monster.destroy();
+		sprite.once("dying", () => {
+			monster.emit("kill");
 		});
 	}
 
@@ -295,6 +294,11 @@ export class BossA extends Phaser.Physics.Arcade.Sprite {
 			frameRate: 10,
 			repeat: 8,
 		});
+		this.anims.create({
+			key: "explode-boss",
+			frames: this.anims.generateFrameNumbers("monster_explode1"),
+			frameRate: 20,
+		});
 	}
 
 	update() {
@@ -306,6 +310,10 @@ export class BossA extends Phaser.Physics.Arcade.Sprite {
 		const body = this.body;
 		if (!this.active) {
 			body.stop();
+			return;
+		}
+
+		if (this.data.get("stunned")) {
 			return;
 		}
 
@@ -365,8 +373,15 @@ export class BossA extends Phaser.Physics.Arcade.Sprite {
 		this.#hitPoints -= 1;
 
 		if (this.#hitPoints === 0) {
-			// FIXME: animate this destruction
-			this.destroy();
+			this.emit("dying");
+			this.setVelocity(0);
+			this.data.set("stunned", true);
+			this.setOrigin(0.5, 0.3);
+			this.setDisplaySize(this.width * 2, this.height * 2);
+			this.anims.play("explode-boss", true);
+			this.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
+				this.destroy();
+			});
 		}
 	}
 

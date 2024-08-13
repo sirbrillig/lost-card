@@ -260,7 +260,7 @@ export class Game extends Scene {
 
 	loadLastSave() {
 		// FIXME: Clean up old stuff first
-		this.scene.restart();
+		// this.scene.restart();
 		// FIXME: reset level otherwise like enemy positions etc, but not picked-up items
 		const rawSaveData = localStorage.getItem("lost-card-save");
 		if (!rawSaveData) {
