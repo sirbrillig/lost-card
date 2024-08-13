@@ -74,6 +74,11 @@ export class MonsterA extends Phaser.Physics.Arcade.Sprite {
 			frameRate: 10,
 			repeat: -1,
 		});
+		this.anims.create({
+			key: "explode",
+			frames: this.anims.generateFrameNumbers("monster_explode1"),
+			frameRate: 20,
+		});
 	}
 
 	update() {
@@ -117,6 +122,12 @@ export class MonsterA extends Phaser.Physics.Arcade.Sprite {
 	}
 
 	hit() {
-		this.destroy();
+		this.setVelocity(0);
+		this.data.set("stunned", true);
+		this.setOrigin(0.5, 0.3);
+		this.anims.play("explode", true);
+		this.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
+			this.destroy();
+		});
 	}
 }

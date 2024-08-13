@@ -117,7 +117,7 @@ export class Game extends Scene {
 			},
 			(_, enemy) => {
 				if (isDynamicSprite(enemy)) {
-					return enemy.visible;
+					return enemy.visible && !enemy.data?.get("stunned");
 				}
 				return false;
 			}
@@ -1006,11 +1006,14 @@ export class Game extends Scene {
 				invertSpriteDirection(this.playerDirection),
 				() => {
 					// Enemy might be gone before stun ends
-					enemy?.data?.set("stunned", false);
+					if (!enemy?.data) {
+						return;
+					}
+					enemy.data.set("stunned", false);
+					this.cameras.main.shake(200, 0.004);
+					enemy.emit("hit");
 				}
 			);
-			this.cameras.main.shake(200, 0.004);
-			enemy.emit("hit");
 		} else {
 			console.log("enemy not hittable", enemy, enemy.data.get("hittable"));
 		}
