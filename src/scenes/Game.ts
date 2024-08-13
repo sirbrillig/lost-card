@@ -47,8 +47,8 @@ export class Game extends Scene {
 	postHitPlayerKnockback: number = 120;
 	postHitEnemyKnockback: number = 50;
 	postHitInvincibilityTime: number = 600;
-	attackFrameRate: number = 30;
-	attackDelay: number = 100;
+	attackFrameRate: number = 20;
+	attackDelay: number = 80;
 	gotItemFreeze: number = 2000;
 	showSwordFrame: number = 0;
 	showPowerFrame: number = 3;
@@ -157,7 +157,9 @@ export class Game extends Scene {
 			// Attack
 			if (this.canPlayerAttack()) {
 				this.player.body.setVelocity(0);
-				this.framesSinceAttack = 40;
+				// This number is not important; the attack time is dictated by the
+				// animation. This is just used to count how long it goes for.
+				this.framesSinceAttack = 400;
 				this.updateSwordHitbox();
 			}
 		});
@@ -646,8 +648,8 @@ export class Game extends Scene {
 
 	updateSwordHitboxForAttack() {
 		// Add hitbox for sword in direction of sprite
-		const swordWidth = 18; // for down/up
-		const swordHeight = 12; // for down/up
+		const swordWidth = 35; // for down/up
+		const swordHeight = 20; // for down/up
 		const width = (() => {
 			if (
 				this.playerDirection === SpriteLeft ||
@@ -678,19 +680,19 @@ export class Game extends Scene {
 	getSwordOffset() {
 		const xOffset = (() => {
 			if (this.playerDirection === SpriteLeft) {
-				return -8;
+				return -15;
 			}
 			if (this.playerDirection === SpriteRight) {
-				return 8;
+				return 15;
 			}
 			return 0;
 		})();
 		const yOffset = (() => {
 			if (this.playerDirection === SpriteUp) {
-				return -8;
+				return -15;
 			}
 			if (this.playerDirection === SpriteDown) {
-				return 8;
+				return 15;
 			}
 			return 0;
 		})();
@@ -1138,7 +1140,7 @@ export class Game extends Scene {
 		if (this.isPlayerAttacking()) {
 			this.framesSinceAttack -= 1;
 			if (this.framesSinceAttack === 0) {
-				this.lastAttackedAt = this.time.now;
+				this.finishPlayerAttackAnimation();
 			}
 		}
 
@@ -1162,13 +1164,21 @@ export class Game extends Scene {
 					this.player.anims.play("character-left-attack", true);
 					break;
 			}
+			// The attack sprite is significantly bigger than the idle sprite so we
+			// need to move the hitbox to the center.
+			this.player.setOffset(15, 13);
 		}
 
 		// If the animation completes, stop the attack.
 		if (this.isPlayerAttacking() && this.player.anims.getProgress() === 1) {
-			this.framesSinceAttack = 0;
-			this.lastAttackedAt = this.time.now;
+			this.finishPlayerAttackAnimation();
 		}
+	}
+
+	finishPlayerAttackAnimation() {
+		this.framesSinceAttack = 0;
+		this.lastAttackedAt = this.time.now;
+		this.player.setOffset(2.5, 4);
 	}
 
 	isPlayerUsingPower(): boolean {
