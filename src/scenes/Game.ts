@@ -9,7 +9,6 @@ import {
 	SpriteLeft,
 	SpriteDirection,
 	isDynamicSprite,
-	isDynamicImage,
 	isTilemapTile,
 	getObjectId,
 	getRoomForPoint,
@@ -50,7 +49,6 @@ export class Game extends Scene {
 	attackFrameRate: number = 35;
 	attackDelay: number = 110;
 	gotItemFreeze: number = 1500;
-	showPowerFrame: number = 3;
 	windCardPushSpeed: number = 100;
 	windCardPushTime: number = 100;
 	knockBackSpeed: number = 180;
@@ -155,21 +153,13 @@ export class Game extends Scene {
 		this.input.keyboard.on("keydown-SPACE", () => {
 			// Attack
 			if (this.canPlayerAttack()) {
-				this.player.body.setVelocity(0);
-				// This number is not important; the attack time is dictated by the
-				// animation. This is just used to count how long it goes for.
-				this.framesSinceAttack = 400;
-				this.updateSwordHitbox();
+				this.activateAttack();
 			}
 		});
 		this.input.keyboard.on("keydown-SHIFT", () => {
 			// Power
 			if (this.canPlayerUsePower()) {
-				this.player.body.setVelocity(0);
-				// This number is not important; the attack time is dictated by the
-				// animation. This is just used to count how long it goes for.
-				this.framesSincePower = 400;
-				this.updateSwordHitbox();
+				this.activatePower();
 			}
 		});
 
@@ -179,6 +169,22 @@ export class Game extends Scene {
 		this.hideHiddenItems();
 
 		this.createOverlay();
+	}
+
+	activateAttack() {
+		this.player.body.setVelocity(0);
+		// This number is not important; the attack time is dictated by the
+		// animation. This is just used to count how long it goes for.
+		this.framesSinceAttack = 400;
+		this.updateSwordHitbox();
+	}
+
+	activatePower() {
+		this.player.body.setVelocity(0);
+		// This number is not important; the attack time is dictated by the
+		// animation. This is just used to count how long it goes for.
+		this.framesSincePower = 400;
+		this.updateSwordHitbox();
 	}
 
 	loadLastSave() {
@@ -600,11 +606,20 @@ export class Game extends Scene {
 
 	pickUpWindCard() {
 		this.equipWindCard();
-		this.player.anims.play("character-down-walk", true);
-		this.player.setFrame(this.showPowerFrame);
+
+		// Face right
+		this.playerDirection = SpriteRight;
+		this.setPlayerIdleFrame();
+
+		// Play power animation
+		this.updateSwordHitboxForPower();
+		this.sword.setRotation(Phaser.Math.DegToRad(0));
+		this.sword.anims.play("character-right-power", true);
+
 		this.registry.set("freezePlayer", true);
 		setTimeout(() => {
 			this.registry.set("freezePlayer", false);
+			// FIXME: replace this with sprite font
 			this.setFloorText("Press SHIFT");
 		}, this.gotItemFreeze);
 	}
@@ -615,6 +630,7 @@ export class Game extends Scene {
 		this.registry.set("freezePlayer", true);
 		setTimeout(() => {
 			this.registry.set("freezePlayer", false);
+			// FIXME: replace this with sprite font
 			this.setFloorText("Press SPACE");
 		}, this.gotItemFreeze);
 	}
@@ -778,7 +794,6 @@ export class Game extends Scene {
 	}
 
 	updateSwordHitbox() {
-		this.sword.setVisible(false);
 		this.sword.body.debugShowBody = false;
 		this.sword.body.setVelocity(0);
 
@@ -786,6 +801,7 @@ export class Game extends Scene {
 		// sure it stays in position relative to the player; otherwise the hitbox
 		// appears briefly at its old location.
 		if (!this.isPlayerSwordActive() && !this.isPlayerUsingPower()) {
+			this.sword.setVisible(false);
 			this.updateSwordHitboxForAttack();
 			return;
 		}
@@ -797,7 +813,6 @@ export class Game extends Scene {
 		}
 		if (this.isPlayerUsingPower()) {
 			this.updateSwordHitboxForPower();
-			this.sword.setVisible(true);
 			this.sword.body.debugShowBody = true;
 			return;
 		}
@@ -929,6 +944,8 @@ export class Game extends Scene {
 			key: "character-right-power",
 			frames: anims.generateFrameNumbers("character-power-right"),
 			frameRate: 24,
+			showOnStart: true,
+			hideOnComplete: true,
 		});
 		anims.create({
 			key: "character-left-power",
@@ -936,6 +953,8 @@ export class Game extends Scene {
 				frames: [5, 4, 3, 2, 1, 0, 11, 10, 9, 8, 7, 6],
 			}),
 			frameRate: 24,
+			showOnStart: true,
+			hideOnComplete: true,
 		});
 		this.player.setCollideWorldBounds(true);
 	}
@@ -1144,7 +1163,13 @@ export class Game extends Scene {
 	}
 
 	canPlayerUsePower(): boolean {
-		return this.canPlayerAttack() && this.doesPlayerHavePower();
+		return (
+			this.doesPlayerHavePower() &&
+			!this.isPlayerFrozen() &&
+			this.framesSinceAttack === 0 &&
+			this.getTimeSinceLastAttack() > this.postAttackCooldown &&
+			this.framesSincePower === 0
+		);
 	}
 
 	doesPlayerHavePower(): boolean {
@@ -1225,8 +1250,7 @@ export class Game extends Scene {
 	updatePlayerPowerAnimation(): void {
 		if (this.isPlayerUsingPower()) {
 			this.framesSincePower -= 1;
-			const playerDirection = this.playerDirection;
-			switch (playerDirection) {
+			switch (this.playerDirection) {
 				case SpriteUp:
 					// We just rotate the sideways powers for up/down
 					this.sword.setRotation(Phaser.Math.DegToRad(90));
@@ -1306,7 +1330,6 @@ export class Game extends Scene {
 			"playerPosition",
 			new Phaser.Math.Vector2(this.player.x, this.player.y)
 		);
-		this.updateSwordHitbox();
 
 		if (this.isPlayerBeingHit()) {
 			this.updatePlayerBeingHit();
@@ -1327,10 +1350,9 @@ export class Game extends Scene {
 			return;
 		}
 
+		this.updateSwordHitbox();
 		this.updatePlayerAttackAnimation();
-
 		this.updatePlayerPowerAnimation();
-
 		this.updatePlayerMovement();
 	}
 
