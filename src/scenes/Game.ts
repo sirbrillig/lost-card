@@ -240,6 +240,7 @@ export class Game extends Scene {
 			.filter(isDynamicSprite)
 			.map((item) => {
 				item.body.pushable = false;
+				item.body.setSize(item.body.width + 1, item.body.height + 1);
 				return item;
 			});
 	}

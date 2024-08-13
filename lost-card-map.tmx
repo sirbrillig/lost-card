@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.0" orientation="orthogonal" renderorder="right-down" width="200" height="200" tilewidth="16" tileheight="16" infinite="0" nextlayerid="12" nextobjectid="294">
+<map version="1.10" tiledversion="1.11.0" orientation="orthogonal" renderorder="right-down" width="200" height="200" tilewidth="16" tileheight="16" infinite="0" nextlayerid="12" nextobjectid="295">
  <editorsettings>
   <export target="public/assets/lost-card-map.json" format="json"/>
  </editorsettings>
@@ -7525,7 +7525,7 @@
   <properties>
    <property name="room" value="MK12"/>
   </properties>
-  <object id="5" name="Start Point" x="1744.46" y="947.607">
+  <object id="5" name="Start Point" x="1743.99" y="952.14">
    <point/>
   </object>
   <object id="45" name="MonsterA" x="1391.67" y="848.528">
@@ -7668,8 +7668,8 @@
   <object id="170" name="Rock" gid="2260" x="1251.51" y="1134.39" width="12.163" height="12.163"/>
   <object id="171" name="Rock" gid="2260" x="1203.57" y="1166.18" width="12.163" height="12.163"/>
   <object id="172" name="Rock" gid="2260" x="1172.55" y="1149.26" width="12.163" height="12.163"/>
-  <object id="158" name="Rock" gid="2260" x="1474.81" y="847.599" width="12.163" height="12.163"/>
-  <object id="160" name="Rock" gid="2260" x="1474.61" y="864.24" width="12.163" height="12.163"/>
+  <object id="158" name="Rock" gid="2260" x="1474.21" y="846.402" width="12.163" height="12.163"/>
+  <object id="160" name="Rock" gid="2260" x="1473.71" y="879.207" width="12.163" height="12.163"/>
   <object id="145" name="Rock" gid="2260" x="1296" y="880" width="12.163" height="12.163"/>
   <object id="147" name="Rock" gid="2260" x="1425.98" y="382.353" width="12.163" height="12.163">
    <properties>
