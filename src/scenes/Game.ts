@@ -102,6 +102,7 @@ export class Game extends Scene {
 		this.setTileLayerCollisions(this.createdDoors, this.enemies);
 
 		this.physics.add.collider(this.player, this.createdSavePoints, () => {
+			// FIXME: do something to show player that saving happened
 			this.saveGame();
 		});
 
@@ -188,6 +189,7 @@ export class Game extends Scene {
 	}
 
 	loadLastSave() {
+		// FIXME: reset level otherwise like enemy positions etc, but not picked-up items
 		const rawSaveData = localStorage.getItem("lost-card-save");
 		if (!rawSaveData) {
 			console.log("no save data");

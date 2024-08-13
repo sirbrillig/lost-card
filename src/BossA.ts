@@ -173,6 +173,7 @@ class SpawnEnemies implements Behavior<AllStates> {
 		});
 		sprite.registerEnemy(monster);
 		sprite.once(Phaser.GameObjects.Events.DESTROY, () => {
+			// FIXME: animate these destructions
 			monster.destroy();
 		});
 	}
@@ -364,6 +365,7 @@ export class BossA extends Phaser.Physics.Arcade.Sprite {
 		this.#hitPoints -= 1;
 
 		if (this.#hitPoints === 0) {
+			// FIXME: animate this destruction
 			this.destroy();
 		}
 	}
