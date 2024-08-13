@@ -27,7 +27,7 @@ export class MonsterA extends Phaser.Physics.Arcade.Sprite {
 		}
 
 		this.setDepth(1);
-		this.setSize(this.width * 0.45, this.height * 0.55);
+		this.setSize(this.width * 0.35, this.height * 0.35);
 		this.setOffset(this.body.offset.x, this.body.offset.y + 9);
 		this.setPushable(false);
 		this.setDataEnabled();
