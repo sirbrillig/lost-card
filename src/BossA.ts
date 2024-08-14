@@ -1,4 +1,5 @@
 import { isDynamicSprite, BehaviorMachineInterface } from "./shared";
+import { MainEvents } from "./MainEvents";
 import { MonsterA } from "./MonsterA";
 
 interface Behavior<Key extends string> {
@@ -93,13 +94,13 @@ class Roar implements Behavior<AllStates> {
 			},
 			true
 		);
-		sprite.scene.registry.set("freezePlayer", true);
+		MainEvents.emit("freezePlayer", true);
 		sprite.scene.cameras.main.shake(2000, 0.009);
 		sprite.once(
 			Phaser.Animations.Events.ANIMATION_COMPLETE,
 			(anim: Phaser.Animations.Animation) => {
 				console.log("roar complete", anim);
-				sprite.scene.registry.set("freezePlayer", false);
+				MainEvents.emit("freezePlayer", false);
 				sprite.stateMachine.popState();
 				sprite.stateMachine.pushState(this.#nextState);
 			}

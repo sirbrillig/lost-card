@@ -204,6 +204,14 @@ export class Game extends Scene {
 		this.hideHiddenItems();
 
 		this.createOverlay();
+
+		MainEvents.on("freezePlayer", (setting: boolean) =>
+			this.setPlayerFrozen(setting)
+		);
+	}
+
+	setPlayerFrozen(setting: boolean) {
+		this.registry.set("freezePlayer", setting);
 	}
 
 	turnOffAllLanterns() {
@@ -701,9 +709,9 @@ export class Game extends Scene {
 		this.sword.setRotation(Phaser.Math.DegToRad(0));
 		this.sword.anims.play("character-right-power", true);
 
-		this.registry.set("freezePlayer", true);
+		this.setPlayerFrozen(true);
 		setTimeout(() => {
-			this.registry.set("freezePlayer", false);
+			this.setPlayerFrozen(false);
 			// FIXME: replace this with sprite font
 			this.setFloorText("Press SHIFT");
 		}, this.gotItemFreeze);
@@ -712,9 +720,9 @@ export class Game extends Scene {
 	pickUpSword() {
 		this.equipSword();
 		this.player.anims.play("character-down-attack", true);
-		this.registry.set("freezePlayer", true);
+		this.setPlayerFrozen(true);
 		setTimeout(() => {
-			this.registry.set("freezePlayer", false);
+			this.setPlayerFrozen(false);
 			// FIXME: replace this with sprite font
 			this.setFloorText("Press SPACE");
 		}, this.gotItemFreeze);
