@@ -210,10 +210,6 @@ export class Game extends Scene {
 		);
 	}
 
-	setPlayerFrozen(setting: boolean) {
-		this.registry.set("freezePlayer", setting);
-	}
-
 	turnOffAllLanterns() {
 		this.createdSavePoints.forEach((savePoint) => {
 			savePoint.setTexture("dungeon_tiles_sprites", 1322);
@@ -931,6 +927,7 @@ export class Game extends Scene {
 			"character-idle-down",
 			0
 		);
+		this.player.setDataEnabled();
 		this.player.setDebugBodyColor(0x00ff00);
 		this.player.setDisplaySize(13, 24);
 		this.player.setSize(8, 14);
@@ -1279,8 +1276,12 @@ export class Game extends Scene {
 		return this.registry.get("hasSword") === true;
 	}
 
+	setPlayerFrozen(setting: boolean) {
+		this.player.data.set("freezePlayer", setting);
+	}
+
 	isPlayerFrozen(): boolean {
-		return this.registry.get("freezePlayer") === true;
+		return this.player.data.get("freezePlayer") === true;
 	}
 
 	isPlayerBeingHit(): boolean {
