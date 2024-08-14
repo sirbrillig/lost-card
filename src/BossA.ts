@@ -297,7 +297,9 @@ export class BossA extends Phaser.Physics.Arcade.Sprite {
 		this.anims.create({
 			key: "explode-boss",
 			frames: this.anims.generateFrameNumbers("monster_explode1"),
-			frameRate: 20,
+			frameRate: 24,
+			repeat: 4,
+			repeatDelay: 2,
 		});
 	}
 
