@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.0" orientation="orthogonal" renderorder="right-down" width="200" height="200" tilewidth="16" tileheight="16" infinite="0" nextlayerid="12" nextobjectid="302">
+<map version="1.10" tiledversion="1.11.0" orientation="orthogonal" renderorder="right-down" width="200" height="200" tilewidth="16" tileheight="16" infinite="0" nextlayerid="13" nextobjectid="305">
  <editorsettings>
   <export target="public/assets/lost-card-map.json" format="json"/>
  </editorsettings>
@@ -7538,49 +7538,6 @@
   <object id="5" name="Start Point" x="1743.99" y="952.14">
    <point/>
   </object>
-  <object id="45" name="MonsterA" x="1391.67" y="848.528">
-   <properties>
-    <property name="isMonster" type="bool" value="true"/>
-   </properties>
-   <point/>
-  </object>
-  <object id="46" name="MonsterA" x="1391.88" y="871.13">
-   <properties>
-    <property name="isMonster" type="bool" value="true"/>
-   </properties>
-   <point/>
-  </object>
-  <object id="47" name="BossA" x="1471.91" y="190.122">
-   <properties>
-    <property name="isBoss" type="bool" value="true"/>
-    <property name="isMonster" type="bool" value="true"/>
-   </properties>
-   <point/>
-  </object>
-  <object id="62" name="MonsterA" x="1416.6" y="747.902">
-   <properties>
-    <property name="isMonster" type="bool" value="true"/>
-   </properties>
-   <point/>
-  </object>
-  <object id="103" name="MonsterA" x="1281.42" y="960">
-   <properties>
-    <property name="isMonster" type="bool" value="true"/>
-   </properties>
-   <point/>
-  </object>
-  <object id="104" name="MonsterA" x="1317" y="1037.75">
-   <properties>
-    <property name="isMonster" type="bool" value="true"/>
-   </properties>
-   <point/>
-  </object>
-  <object id="106" name="MonsterA" x="1260.63" y="1070.61">
-   <properties>
-    <property name="isMonster" type="bool" value="true"/>
-   </properties>
-   <point/>
-  </object>
  </objectgroup>
  <objectgroup id="10" name="Rooms">
   <object id="15" name="MK1" x="1648" y="896" width="192" height="128">
@@ -7651,6 +7608,51 @@
   <object id="249" name="IK4" x="1616" y="1760" width="256" height="240"/>
   <object id="298" name="MKBeforeBoss" x="1408" y="336" width="128" height="64"/>
  </objectgroup>
+ <objectgroup id="12" name="Creatures">
+  <object id="45" name="MonsterA" x="1391.67" y="848.528">
+   <properties>
+    <property name="isMonster" type="bool" value="true"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="46" name="MonsterA" x="1391.88" y="871.13">
+   <properties>
+    <property name="isMonster" type="bool" value="true"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="47" name="BossA" x="1471.91" y="190.122">
+   <properties>
+    <property name="isBoss" type="bool" value="true"/>
+    <property name="isMonster" type="bool" value="true"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="62" name="MonsterA" x="1416.6" y="747.902">
+   <properties>
+    <property name="isMonster" type="bool" value="true"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="103" name="MonsterA" x="1281.42" y="960">
+   <properties>
+    <property name="isMonster" type="bool" value="true"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="104" name="MonsterA" x="1317" y="1037.75">
+   <properties>
+    <property name="isMonster" type="bool" value="true"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="106" name="MonsterA" x="1260.63" y="1070.61">
+   <properties>
+    <property name="isMonster" type="bool" value="true"/>
+   </properties>
+   <point/>
+  </object>
+ </objectgroup>
  <objectgroup id="8" name="Items">
   <object id="173" name="Sword" gid="2710" x="1506.19" y="1124.36" width="11.3856" height="11.3856"/>
   <object id="174" name="Heart" gid="2628" x="1369.17" y="1272.78" width="16" height="16"/>
@@ -7677,7 +7679,8 @@
   <object id="166" name="Rock" gid="2260" x="1248" y="1056.39" width="12.163" height="12.163"/>
   <object id="167" name="Rock" gid="2260" x="1263.89" y="1056.65" width="12.163" height="12.163"/>
   <object id="168" name="Rock" gid="2260" x="1280.56" y="1056.65" width="12.163" height="12.163"/>
-  <object id="169" name="Rock" gid="2260" x="1299.19" y="1150.8" width="12.163" height="12.163"/>
+  <object id="169" name="Rock" gid="2260" x="1287.02" y="1150.91" width="12.0054" height="12.0054"/>
+  <object id="303" name="Rock" gid="2260" x="1298.97" y="1146.66" width="12.0054" height="12.0054"/>
   <object id="170" name="Rock" gid="2260" x="1251.51" y="1134.39" width="12.163" height="12.163"/>
   <object id="171" name="Rock" gid="2260" x="1203.57" y="1166.18" width="12.163" height="12.163"/>
   <object id="172" name="Rock" gid="2260" x="1172.55" y="1149.26" width="12.163" height="12.163"/>
@@ -7685,7 +7688,13 @@
   <object id="299" name="Rock" gid="2260" x="1441.05" y="861.142" width="12.163" height="12.163"/>
   <object id="160" name="Rock" gid="2260" x="1473.71" y="879.207" width="12.163" height="12.163"/>
   <object id="145" name="Rock" gid="2260" x="1296" y="880" width="12.163" height="12.163"/>
-  <object id="147" name="Rock" gid="2260" x="1457.51" y="318.888" width="12.163" height="12.163">
+  <object id="147" name="Rock" gid="2260" x="1451.95" y="318.176" width="12.7039" height="12.7039">
+   <properties>
+    <property name="msAfterApproach" type="int" value="1000"/>
+    <property name="previewBeforeAppear" type="int" value="300"/>
+   </properties>
+  </object>
+  <object id="304" name="Rock" gid="2260" x="1464.71" y="318.176" width="12.7039" height="12.7039">
    <properties>
     <property name="msAfterApproach" type="int" value="1000"/>
     <property name="previewBeforeAppear" type="int" value="300"/>

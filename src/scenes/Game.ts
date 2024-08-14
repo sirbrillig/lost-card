@@ -591,13 +591,23 @@ export class Game extends Scene {
 			this.physics.add.collider(this.stuffLayer, tile);
 			// Allow destroying rocks by pushing into walls so you can't block
 			// yourself in a room.
-			this.physics.add.collider(this.landLayer, tile, () => {
-				console.log("hit wall with rock");
-				this.destroyCreatedTile(tile);
+			this.physics.add.collider(this.landLayer, tile, (collideTile) => {
+				if (!isDynamicSprite(collideTile)) {
+					return;
+				}
+				if (collideTile.data.get("beingPushed")) {
+					console.log("hit wall with rock");
+					this.destroyCreatedTile(tile);
+				}
 			});
-			this.physics.add.collider(this.createdDoors, tile, () => {
-				console.log("hit wall with rock");
-				this.destroyCreatedTile(tile);
+			this.physics.add.collider(this.createdDoors, tile, (_, collideTile) => {
+				if (!isDynamicSprite(collideTile)) {
+					return;
+				}
+				if (collideTile.data.get("beingPushed")) {
+					console.log("hit door with rock");
+					this.destroyCreatedTile(tile);
+				}
 			});
 
 			if (this.physics.overlap(this.player, tile)) {
@@ -1048,15 +1058,11 @@ export class Game extends Scene {
 		this.enemies = this.physics.add.group();
 
 		this.spawnPoints =
-			// FIXME: just make a whole layer for monsters
-			this.map.filterObjects("MetaObjects", (obj) => {
+			this.map.filterObjects("Creatures", (obj) => {
 				if (!isTilemapTile(obj)) {
 					return false;
 				}
-				const isMonster = obj.properties?.find(
-					(prop: { name: string }) => prop.name === "isMonster"
-				)?.value;
-				return isMonster === true;
+				return true;
 			}) ?? [];
 	}
 

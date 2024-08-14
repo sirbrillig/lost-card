@@ -1005,139 +1005,8 @@
                  "type":"",
                  "visible":true,
                  "width":0,
-                 "x":1743.98951139759,
-                 "y":952.139547708162
-                }, 
-                {
-                 "height":0,
-                 "id":45,
-                 "name":"MonsterA",
-                 "point":true,
-                 "properties":[
-                        {
-                         "name":"isMonster",
-                         "type":"bool",
-                         "value":true
-                        }],
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":0,
-                 "x":1391.67,
-                 "y":848.528
-                }, 
-                {
-                 "height":0,
-                 "id":46,
-                 "name":"MonsterA",
-                 "point":true,
-                 "properties":[
-                        {
-                         "name":"isMonster",
-                         "type":"bool",
-                         "value":true
-                        }],
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":0,
-                 "x":1391.8794501085,
-                 "y":871.130199565983
-                }, 
-                {
-                 "height":0,
-                 "id":47,
-                 "name":"BossA",
-                 "point":true,
-                 "properties":[
-                        {
-                         "name":"isBoss",
-                         "type":"bool",
-                         "value":true
-                        }, 
-                        {
-                         "name":"isMonster",
-                         "type":"bool",
-                         "value":true
-                        }],
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":0,
-                 "x":1471.90655857184,
-                 "y":190.122233181837
-                }, 
-                {
-                 "height":0,
-                 "id":62,
-                 "name":"MonsterA",
-                 "point":true,
-                 "properties":[
-                        {
-                         "name":"isMonster",
-                         "type":"bool",
-                         "value":true
-                        }],
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":0,
-                 "x":1416.6,
-                 "y":747.902
-                }, 
-                {
-                 "height":0,
-                 "id":103,
-                 "name":"MonsterA",
-                 "point":true,
-                 "properties":[
-                        {
-                         "name":"isMonster",
-                         "type":"bool",
-                         "value":true
-                        }],
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":0,
-                 "x":1281.42,
-                 "y":960
-                }, 
-                {
-                 "height":0,
-                 "id":104,
-                 "name":"MonsterA",
-                 "point":true,
-                 "properties":[
-                        {
-                         "name":"isMonster",
-                         "type":"bool",
-                         "value":true
-                        }],
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":0,
-                 "x":1317,
-                 "y":1037.75
-                }, 
-                {
-                 "height":0,
-                 "id":106,
-                 "name":"MonsterA",
-                 "point":true,
-                 "properties":[
-                        {
-                         "name":"isMonster",
-                         "type":"bool",
-                         "value":true
-                        }],
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":0,
-                 "x":1260.63,
-                 "y":1070.61
+                 "x":1743.99,
+                 "y":952.14
                 }],
          "opacity":1,
          "properties":[
@@ -1445,6 +1314,148 @@
         }, 
         {
          "draworder":"topdown",
+         "id":12,
+         "name":"Creatures",
+         "objects":[
+                {
+                 "height":0,
+                 "id":45,
+                 "name":"MonsterA",
+                 "point":true,
+                 "properties":[
+                        {
+                         "name":"isMonster",
+                         "type":"bool",
+                         "value":true
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":1391.67,
+                 "y":848.528
+                }, 
+                {
+                 "height":0,
+                 "id":46,
+                 "name":"MonsterA",
+                 "point":true,
+                 "properties":[
+                        {
+                         "name":"isMonster",
+                         "type":"bool",
+                         "value":true
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":1391.88,
+                 "y":871.13
+                }, 
+                {
+                 "height":0,
+                 "id":47,
+                 "name":"BossA",
+                 "point":true,
+                 "properties":[
+                        {
+                         "name":"isBoss",
+                         "type":"bool",
+                         "value":true
+                        }, 
+                        {
+                         "name":"isMonster",
+                         "type":"bool",
+                         "value":true
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":1471.91,
+                 "y":190.122
+                }, 
+                {
+                 "height":0,
+                 "id":62,
+                 "name":"MonsterA",
+                 "point":true,
+                 "properties":[
+                        {
+                         "name":"isMonster",
+                         "type":"bool",
+                         "value":true
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":1416.6,
+                 "y":747.902
+                }, 
+                {
+                 "height":0,
+                 "id":103,
+                 "name":"MonsterA",
+                 "point":true,
+                 "properties":[
+                        {
+                         "name":"isMonster",
+                         "type":"bool",
+                         "value":true
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":1281.42,
+                 "y":960
+                }, 
+                {
+                 "height":0,
+                 "id":104,
+                 "name":"MonsterA",
+                 "point":true,
+                 "properties":[
+                        {
+                         "name":"isMonster",
+                         "type":"bool",
+                         "value":true
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":1317,
+                 "y":1037.75
+                }, 
+                {
+                 "height":0,
+                 "id":106,
+                 "name":"MonsterA",
+                 "point":true,
+                 "properties":[
+                        {
+                         "name":"isMonster",
+                         "type":"bool",
+                         "value":true
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":1260.63,
+                 "y":1070.61
+                }],
+         "opacity":1,
+         "type":"objectgroup",
+         "visible":true,
+         "x":0,
+         "y":0
+        }, 
+        {
+         "draworder":"topdown",
          "id":8,
          "name":"Items",
          "objects":[
@@ -1487,8 +1498,8 @@
                  "type":"",
                  "visible":true,
                  "width":16,
-                 "x":1464.04710846333,
-                 "y":147.58828198829
+                 "x":1464.05,
+                 "y":147.588
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -1534,8 +1545,8 @@
                  "type":"",
                  "visible":true,
                  "width":16,
-                 "x":1096.90476673428,
-                 "y":1363.4369168357
+                 "x":1096.9,
+                 "y":1363.44
                 }, 
                 {
                  "gid":2717,
@@ -1546,8 +1557,8 @@
                  "type":"",
                  "visible":true,
                  "width":16,
-                 "x":1494.2724481022,
-                 "y":373.229496785817
+                 "x":1494.27,
+                 "y":373.229
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -1614,7 +1625,7 @@
                  "visible":true,
                  "width":12.163,
                  "x":1328.81,
-                 "y":908.332242923532
+                 "y":908.332
                 }, 
                 {
                  "gid":2260,
@@ -1842,7 +1853,7 @@
                 }, 
                 {
                  "gid":2260,
-                 "height":12.163,
+                 "height":12.0053845496145,
                  "id":169,
                  "name":"Rock",
                  "properties":[
@@ -1864,9 +1875,37 @@
                  "rotation":0,
                  "type":"",
                  "visible":true,
-                 "width":12.163,
-                 "x":1299.19,
-                 "y":1150.8
+                 "width":12.0053845496145,
+                 "x":1287.01751934034,
+                 "y":1150.90808054026
+                }, 
+                {
+                 "gid":2260,
+                 "height":12.0053845496145,
+                 "id":303,
+                 "name":"Rock",
+                 "properties":[
+                        {
+                         "name":"affectedByWindCard",
+                         "type":"bool",
+                         "value":true
+                        }, 
+                        {
+                         "name":"msAfterApproach",
+                         "type":"int",
+                         "value":1
+                        }, 
+                        {
+                         "name":"previewBeforeAppear",
+                         "type":"int",
+                         "value":0
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":12.0053845496145,
+                 "x":1298.97383891948,
+                 "y":1146.6569446899
                 }, 
                 {
                  "gid":2260,
@@ -1977,8 +2016,8 @@
                  "type":"",
                  "visible":true,
                  "width":12.163,
-                 "x":1474.21130515476,
-                 "y":846.401610309525
+                 "x":1474.21,
+                 "y":846.402
                 }, 
                 {
                  "gid":2260,
@@ -2005,8 +2044,8 @@
                  "type":"",
                  "visible":true,
                  "width":12.163,
-                 "x":1441.04584636592,
-                 "y":861.141814215679
+                 "x":1441.05,
+                 "y":861.142
                 }, 
                 {
                  "gid":2260,
@@ -2033,8 +2072,8 @@
                  "type":"",
                  "visible":true,
                  "width":12.163,
-                 "x":1473.71195773214,
-                 "y":879.207371130935
+                 "x":1473.71,
+                 "y":879.207
                 }, 
                 {
                  "gid":2260,
@@ -2066,7 +2105,7 @@
                 }, 
                 {
                  "gid":2260,
-                 "height":12.163,
+                 "height":12.7039433379901,
                  "id":147,
                  "name":"Rock",
                  "properties":[
@@ -2088,9 +2127,37 @@
                  "rotation":0,
                  "type":"",
                  "visible":true,
-                 "width":12.163,
-                 "x":1457.50765835483,
-                 "y":318.888233181837
+                 "width":12.7039433379901,
+                 "x":1451.95247714016,
+                 "y":318.176293572708
+                }, 
+                {
+                 "gid":2260,
+                 "height":12.7039433379901,
+                 "id":304,
+                 "name":"Rock",
+                 "properties":[
+                        {
+                         "name":"affectedByWindCard",
+                         "type":"bool",
+                         "value":true
+                        }, 
+                        {
+                         "name":"msAfterApproach",
+                         "type":"int",
+                         "value":1000
+                        }, 
+                        {
+                         "name":"previewBeforeAppear",
+                         "type":"int",
+                         "value":300
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":12.7039433379901,
+                 "x":1464.70588469124,
+                 "y":318.176293572708
                 }, 
                 {
                  "gid":2260,
@@ -2117,8 +2184,8 @@
                  "type":"",
                  "visible":true,
                  "width":12.163,
-                 "x":1362.32496455937,
-                 "y":750.659545027462
+                 "x":1362.32,
+                 "y":750.66
                 }, 
                 {
                  "gid":2260,
@@ -2150,7 +2217,7 @@
                  "type":"",
                  "visible":true,
                  "width":12.163,
-                 "x":1413.48005096071,
+                 "x":1413.48,
                  "y":654.262
                 }, 
                 {
@@ -3755,8 +3822,8 @@
          "x":0,
          "y":0
         }],
- "nextlayerid":12,
- "nextobjectid":302,
+ "nextlayerid":13,
+ "nextobjectid":305,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.0",
