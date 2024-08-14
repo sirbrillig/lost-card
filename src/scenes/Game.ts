@@ -779,8 +779,8 @@ export class Game extends Scene {
 		this.sword.body.setSize(width, height);
 
 		const [xOffset, yOffset] = this.getSwordOffset();
-		this.sword.x = this.player.x + xOffset;
-		this.sword.y = this.player.y + yOffset;
+		this.sword.x = this.player.body.center.x + xOffset;
+		this.sword.y = this.player.body.center.y + yOffset;
 	}
 
 	getPowerOffset() {
@@ -808,19 +808,19 @@ export class Game extends Scene {
 	getSwordOffset() {
 		const xOffset = (() => {
 			if (this.playerDirection === SpriteLeft) {
-				return -10;
+				return -this.player.body.height;
 			}
 			if (this.playerDirection === SpriteRight) {
-				return 8;
+				return this.player.body.height;
 			}
 			return 0;
 		})();
 		const yOffset = (() => {
 			if (this.playerDirection === SpriteUp) {
-				return -8;
+				return -this.player.body.height;
 			}
 			if (this.playerDirection === SpriteDown) {
-				return 8;
+				return this.player.body.height;
 			}
 			return 0;
 		})();
