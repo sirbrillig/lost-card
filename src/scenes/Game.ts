@@ -1,5 +1,6 @@
 import { Scene } from "phaser";
 import { MainEvents } from "../MainEvents";
+import { EnemyManager } from "../EnemyManager";
 import { MonsterA } from "../MonsterA";
 import { IceMonster } from "../IceMonster";
 import { BossA } from "../BossA";
@@ -33,7 +34,7 @@ export class Game extends Scene {
 	player: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
 	sword: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
 	attackSprite: Phaser.GameObjects.Sprite;
-	enemies: Phaser.Physics.Arcade.Group;
+	enemyManager: EnemyManager;
 	enemyCollider: Phaser.Physics.Arcade.Collider;
 	floorText: Phaser.GameObjects.Text | undefined;
 	overlay: Phaser.Scenes.ScenePlugin;
@@ -76,6 +77,7 @@ export class Game extends Scene {
 	}
 
 	create(saveData: SaveData | undefined) {
+		this.enemyManager = new EnemyManager(this);
 		this.map = this.make.tilemap({ key: "map" });
 		const tilesetTile = this.map.addTilesetImage(
 			"Dungeon_Tiles",
@@ -104,10 +106,10 @@ export class Game extends Scene {
 
 		this.landLayer = this.createTileLayer("Background", tilesetTile, 0);
 		this.setTileLayerCollisions(this.landLayer, this.player);
-		this.setTileLayerCollisions(this.landLayer, this.enemies);
+		this.setTileLayerCollisions(this.landLayer, this.enemyManager.enemies);
 		this.stuffLayer = this.createTileLayer("Stuff", tilesetTile, 0);
 		this.setTileLayerCollisions(this.stuffLayer, this.player);
-		this.setTileLayerCollisions(this.stuffLayer, this.enemies);
+		this.setTileLayerCollisions(this.stuffLayer, this.enemyManager.enemies);
 
 		this.createDoors();
 		this.createAppearingTiles();
@@ -115,7 +117,7 @@ export class Game extends Scene {
 		this.createSavePoints();
 
 		// Enemies collide with doors but players can pass through them.
-		this.setTileLayerCollisions(this.createdDoors, this.enemies);
+		this.setTileLayerCollisions(this.createdDoors, this.enemyManager.enemies);
 
 		let isSaving = false;
 		this.physics.add.collider(
@@ -154,7 +156,7 @@ export class Game extends Scene {
 
 		this.enemyCollider = this.physics.add.collider(
 			this.player,
-			this.enemies,
+			this.enemyManager.enemies,
 			(player, enemy) => {
 				if (isDynamicSprite(player) && isDynamicSprite(enemy)) {
 					this.enemyHitPlayer();
@@ -168,12 +170,16 @@ export class Game extends Scene {
 			}
 		);
 
-		this.physics.add.collider(this.sword, this.enemies, (_, enemy) => {
-			if (!isDynamicSprite(enemy)) {
-				throw new Error("Enemy sprite is not valid for hitboxing with sword");
+		this.physics.add.collider(
+			this.sword,
+			this.enemyManager.enemies,
+			(_, enemy) => {
+				if (!isDynamicSprite(enemy)) {
+					throw new Error("Enemy sprite is not valid for hitboxing with sword");
+				}
+				this.playerHitEnemy(enemy);
 			}
-			this.playerHitEnemy(enemy);
-		});
+		);
 
 		if (!this.input.keyboard) {
 			throw new Error("No keyboard controls could be found");
@@ -421,7 +427,7 @@ export class Game extends Scene {
 		this.enteredRoomAt = this.time.now;
 		hideAllRoomsExcept(
 			this.map,
-			this.enemies,
+			this.enemyManager.enemies,
 			[
 				...this.createdItems,
 				...this.createdTiles,
@@ -470,7 +476,7 @@ export class Game extends Scene {
 	}
 
 	update() {
-		this.enemies.getChildren().forEach((enemy) => {
+		this.enemyManager.enemies.getChildren().forEach((enemy) => {
 			if (!isDynamicSprite(enemy)) {
 				return;
 			}
@@ -597,7 +603,7 @@ export class Game extends Scene {
 			tile.data.set("hidden", false);
 			tile.body.pushable = false;
 			this.physics.add.collider(this.player, tile);
-			this.physics.add.collider(this.enemies, tile, (_, enemy) => {
+			this.physics.add.collider(this.enemyManager.enemies, tile, (_, enemy) => {
 				if (!isDynamicSprite(enemy)) {
 					return;
 				}
@@ -1107,8 +1113,6 @@ export class Game extends Scene {
 	}
 
 	createEnemies(): void {
-		this.enemies = this.physics.add.group();
-
 		this.spawnPoints =
 			this.map.filterObjects("Creatures", (obj) => {
 				if (!isTilemapTile(obj)) {
@@ -1131,23 +1135,22 @@ export class Game extends Scene {
 			console.log("creating monster at", point.x, point.y);
 			const enemyType = point.name;
 			switch (enemyType) {
-				case "MonsterA":
-					new MonsterA(this, point.x, point.y, (enemy) => {
-						this.enemies.add(enemy);
-					});
+				case "MonsterA": {
+					const monster = new MonsterA(this, point.x, point.y);
+					this.enemyManager.enemies.add(monster);
 					break;
-				case "IceMonster":
-					new IceMonster(this, point.x, point.y, (enemy) => {
-						this.enemies.add(enemy);
-					});
+				}
+				case "IceMonster": {
+					const monster = new IceMonster(this, point.x, point.y);
+					this.enemyManager.enemies.add(monster);
 					break;
+				}
 				case "BossA": {
-					const boss = new BossA(this, point.x, point.y, (enemy) => {
-						this.enemies.add(enemy);
-					});
+					const boss = new BossA(this, this.enemyManager, point.x, point.y);
 					boss.once("defeated", () => {
 						this.showHiddenItem("WindCard");
 					});
+					this.enemyManager.enemies.add(boss);
 					break;
 				}
 				default:
@@ -1158,7 +1161,7 @@ export class Game extends Scene {
 		});
 
 		// It seems that we may need to do this again when enemies changes?
-		this.setTileLayerCollisions(this.createdDoors, this.enemies);
+		this.setTileLayerCollisions(this.createdDoors, this.enemyManager.enemies);
 	}
 
 	playerHitEnemy(

@@ -10,17 +10,11 @@ import {
 export class MonsterA extends Phaser.Physics.Arcade.Sprite {
 	enemySpeed: number = 40;
 
-	constructor(
-		scene: Phaser.Scene,
-		x: number,
-		y: number,
-		registerEnemy: (enemy: Phaser.Physics.Arcade.Sprite) => void
-	) {
+	constructor(scene: Phaser.Scene, x: number, y: number) {
 		super(scene, x, y, "monsters1", 54);
 
 		scene.add.existing(this);
 		scene.physics.add.existing(this);
-		registerEnemy(this);
 
 		if (!this.body) {
 			throw new Error("Could not create monster");
