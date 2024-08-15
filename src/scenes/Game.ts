@@ -1209,6 +1209,7 @@ export class Game extends Scene {
 		this.cameras.main.fadeOut(1000, 0, 0, 0, (_: unknown, progress: number) => {
 			if (progress === 1) {
 				this.scene.pause();
+				this.overlay.stop();
 				this.scene.launch("GameOver");
 			}
 		});
