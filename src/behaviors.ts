@@ -227,7 +227,7 @@ export class RandomlyWalk<AllStates extends string>
 	implements Behavior<AllStates, Phaser.GameObjects.Sprite>
 {
 	#enemySpeed = 40;
-	#walkingTime = 1500;
+	#walkingTime = 2000;
 	#nextState: AllStates;
 	name: AllStates;
 
@@ -237,10 +237,14 @@ export class RandomlyWalk<AllStates extends string>
 	}
 
 	init(
-		_: Phaser.GameObjects.Sprite,
+		sprite: Phaser.GameObjects.Sprite,
 		stateMachine: BehaviorMachineInterface<AllStates>
 	): void {
+		if (!isDynamicSprite(sprite)) {
+			throw new Error("invalid sprite");
+		}
 		setTimeout(() => {
+			sprite.setVelocity(0);
 			stateMachine.popState();
 			stateMachine.pushState(this.#nextState);
 		}, this.#walkingTime);
@@ -276,4 +280,96 @@ export class RandomlyWalk<AllStates extends string>
 				break;
 		}
 	}
+}
+
+export class PowerUp<AllStates extends string>
+	implements Behavior<AllStates, Phaser.GameObjects.Sprite>
+{
+	#nextState: AllStates;
+	name: AllStates;
+
+	constructor(name: AllStates, nextState: AllStates) {
+		this.name = name;
+		this.#nextState = nextState;
+	}
+
+	init(
+		sprite: Phaser.GameObjects.Sprite,
+		stateMachine: BehaviorMachineInterface<AllStates>
+	): void {
+		if (!sprite.body || !isDynamicSprite(sprite)) {
+			throw new Error("Could not update monster");
+		}
+		sprite.scene.anims.create({
+			key: "powerup",
+			frames: sprite.anims.generateFrameNumbers("ice_powerup"),
+			frameRate: 24,
+			repeat: 2,
+			showOnStart: true,
+			hideOnComplete: true,
+		});
+		const effect = sprite.scene.add.sprite(
+			sprite.body.center.x,
+			sprite.body.center.y,
+			"powerup",
+			0
+		);
+		effect.setDepth(5);
+		effect.setAlpha(0.7);
+		effect.anims.play("powerup", true);
+		effect.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
+			effect.destroy();
+			stateMachine.popState();
+			stateMachine.pushState(this.#nextState);
+		});
+	}
+
+	update(): void {}
+}
+
+export class IceAttack<AllStates extends string>
+	implements Behavior<AllStates, Phaser.GameObjects.Sprite>
+{
+	#nextState: AllStates;
+	name: AllStates;
+
+	constructor(name: AllStates, nextState: AllStates) {
+		this.name = name;
+		this.#nextState = nextState;
+	}
+
+	init(
+		sprite: Phaser.GameObjects.Sprite,
+		stateMachine: BehaviorMachineInterface<AllStates>
+	): void {
+		if (!sprite.body || !isDynamicSprite(sprite)) {
+			throw new Error("Could not update monster");
+		}
+		sprite.scene.anims.create({
+			key: "ice_attack",
+			frames: sprite.anims.generateFrameNumbers("ice_attack"),
+			frameRate: 24,
+			showOnStart: true,
+			hideOnComplete: true,
+		});
+		const effect = sprite.scene.add.sprite(
+			sprite.body.center.x,
+			sprite.body.center.y,
+			"ice_attack",
+			0
+		);
+		sprite.scene.physics.add.existing(effect);
+		effect.setSize(sprite.body.width * 5, sprite.body.height * 5);
+		effect.setDisplaySize(sprite.body.width * 5, sprite.body.height * 5);
+		effect.setDepth(5);
+		effect.anims.play("ice_attack", true);
+		// TODO: if the effect collides with the player, treat it as the enemy colliding with the player
+		effect.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
+			effect.destroy();
+			stateMachine.popState();
+			stateMachine.pushState(this.#nextState);
+		});
+	}
+
+	update(): void {}
 }

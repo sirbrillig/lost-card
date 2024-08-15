@@ -1,9 +1,9 @@
 import { isDynamicSprite } from "./shared";
 import { BehaviorMachineInterface, Behavior, StateMachine } from "./behavior";
-import { RandomlyWalk } from "./behaviors";
+import { RandomlyWalk, PowerUp, IceAttack } from "./behaviors";
 import { EnemyManager } from "./EnemyManager";
 
-type AllStates = "randomwalk";
+type AllStates = "randomwalk" | "powerup" | "iceattack";
 
 export class IceMonster extends Phaser.Physics.Arcade.Sprite {
 	#stateMachine: BehaviorMachineInterface<AllStates>;
@@ -109,7 +109,13 @@ export class IceMonster extends Phaser.Physics.Arcade.Sprite {
 			);
 			switch (state) {
 				case "randomwalk":
-					this.#currentPlayingState = new RandomlyWalk(state, "randomwalk");
+					this.#currentPlayingState = new RandomlyWalk(state, "powerup");
+					break;
+				case "powerup":
+					this.#currentPlayingState = new PowerUp(state, "iceattack");
+					break;
+				case "iceattack":
+					this.#currentPlayingState = new IceAttack(state, "randomwalk");
 					break;
 			}
 			if (!this.#currentPlayingState) {
