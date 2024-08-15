@@ -9,12 +9,6 @@ export type SpriteDirection =
 	| typeof SpriteDown
 	| typeof SpriteLeft;
 
-export interface BehaviorMachineInterface<Key extends string> {
-	getCurrentState(): Key;
-	pushState(state: Key): void;
-	popState(): void;
-}
-
 export function isDynamicSprite(
 	obj: unknown
 ): obj is Phaser.Types.Physics.Arcade.SpriteWithDynamicBody {

@@ -1,40 +1,11 @@
-import { isDynamicSprite, BehaviorMachineInterface } from "./shared";
+import { isDynamicSprite } from "./shared";
+import { Behavior, BehaviorMachineInterface, StateMachine } from "./behavior";
 import { MainEvents } from "./MainEvents";
 import { MonsterA } from "./MonsterA";
 
-interface Behavior<Key extends string> {
-	name: Key;
-	init(sprite: BossA): void;
-	update(sprite: BossA): void;
-}
-
 type AllStates = "initial" | "roar1" | "spawn1" | "spawn2" | "idle1" | "idle2";
 
-class StateMachine implements BehaviorMachineInterface<AllStates> {
-	#stateStack: Array<AllStates> = [];
-
-	constructor(initialState: AllStates) {
-		this.pushState(initialState);
-	}
-
-	pushState(state: AllStates): void {
-		console.log("pushing state", state);
-		this.#stateStack.push(state);
-	}
-
-	popState(): void {
-		this.#stateStack.pop();
-	}
-
-	getCurrentState(): AllStates {
-		if (!this.#stateStack[this.#stateStack.length - 1]) {
-			throw new Error("No states in state machine");
-		}
-		return this.#stateStack[this.#stateStack.length - 1];
-	}
-}
-
-class WaitForActive implements Behavior<AllStates> {
+class WaitForActive implements Behavior<AllStates, BossA> {
 	#distanceToActivate: number = 100;
 	#nextState: AllStates;
 	name: AllStates;
@@ -73,7 +44,7 @@ class WaitForActive implements Behavior<AllStates> {
 	}
 }
 
-class Roar implements Behavior<AllStates> {
+class Roar implements Behavior<AllStates, BossA> {
 	#nextState: AllStates;
 	name: AllStates;
 
@@ -114,7 +85,7 @@ class Roar implements Behavior<AllStates> {
 	}
 }
 
-class SpawnEnemies implements Behavior<AllStates> {
+class SpawnEnemies implements Behavior<AllStates, BossA> {
 	#nextState: AllStates;
 	name: AllStates;
 
@@ -185,7 +156,7 @@ class SpawnEnemies implements Behavior<AllStates> {
 	}
 }
 
-class PostSpawn implements Behavior<AllStates> {
+class PostSpawn implements Behavior<AllStates, BossA> {
 	#nextState: AllStates;
 	name: AllStates;
 
@@ -230,7 +201,7 @@ export class BossA extends Phaser.Physics.Arcade.Sprite {
 	spawnedEnemyCount: number = 0;
 	maxSpawnedEnemies: number = 16;
 	stateMachine: BehaviorMachineInterface<AllStates>;
-	#currentPlayingState: Behavior<AllStates> | undefined;
+	#currentPlayingState: Behavior<AllStates, BossA> | undefined;
 	registerEnemy: (enemy: Phaser.Physics.Arcade.Sprite) => void;
 
 	constructor(
