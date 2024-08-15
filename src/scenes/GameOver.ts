@@ -65,7 +65,7 @@ export class GameOver extends Scene {
 		this.cursors = cursors;
 
 		if (loadSavedData()) {
-			this.selectedButton = 1;
+			this.selectNextButton(1);
 		}
 	}
 
@@ -82,11 +82,13 @@ export class GameOver extends Scene {
 
 	confirmSelection() {
 		if (this.selectedButton === 0) {
+			console.log("Restarting");
 			this.registry.reset();
-			this.scene.start("Game");
+			this.scene.start("Game", {});
 			return;
 		}
 		if (this.selectedButton === 1) {
+			console.log("Loading");
 			const savedData = loadSavedData();
 			if (savedData) {
 				loadSavedRegistry(this.registry, savedData);
