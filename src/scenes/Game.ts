@@ -1136,12 +1136,22 @@ export class Game extends Scene {
 			const enemyType = point.name;
 			switch (enemyType) {
 				case "MonsterA": {
-					const monster = new MonsterA(this, point.x, point.y);
+					const monster = new MonsterA(
+						this,
+						this.enemyManager,
+						point.x,
+						point.y
+					);
 					this.enemyManager.enemies.add(monster);
 					break;
 				}
 				case "IceMonster": {
-					const monster = new IceMonster(this, point.x, point.y);
+					const monster = new IceMonster(
+						this,
+						this.enemyManager,
+						point.x,
+						point.y
+					);
 					this.enemyManager.enemies.add(monster);
 					break;
 				}

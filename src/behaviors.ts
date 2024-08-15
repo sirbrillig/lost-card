@@ -1,4 +1,11 @@
-import { isDynamicSprite } from "./shared";
+import {
+	isDynamicSprite,
+	getDirectionOfSpriteMovement,
+	SpriteUp,
+	SpriteDown,
+	SpriteLeft,
+	SpriteRight,
+} from "./shared";
 import { EnemyManager } from "./EnemyManager";
 import { Behavior, BehaviorMachineInterface } from "./behavior";
 import { MainEvents } from "./MainEvents";
@@ -153,6 +160,7 @@ export class SpawnEnemies<AllStates extends string>
 
 		const monster = new MonsterA(
 			sprite.scene,
+			enemyManager,
 			sprite.body.x + 5,
 			sprite.body.y + sprite.body.height
 		);
@@ -211,6 +219,61 @@ export class PostSpawn<AllStates extends string>
 	update(sprite: Phaser.GameObjects.Sprite): void {
 		if (!sprite.body || !isDynamicSprite(sprite)) {
 			throw new Error("Could not update monster");
+		}
+	}
+}
+
+export class RandomlyWalk<AllStates extends string>
+	implements Behavior<AllStates, Phaser.GameObjects.Sprite>
+{
+	#enemySpeed = 40;
+	#walkingTime = 1500;
+	#nextState: AllStates;
+	name: AllStates;
+
+	constructor(name: AllStates, nextState: AllStates) {
+		this.name = name;
+		this.#nextState = nextState;
+	}
+
+	init(
+		_: Phaser.GameObjects.Sprite,
+		stateMachine: BehaviorMachineInterface<AllStates>
+	): void {
+		setTimeout(() => {
+			stateMachine.popState();
+			stateMachine.pushState(this.#nextState);
+		}, this.#walkingTime);
+	}
+
+	update(sprite: Phaser.GameObjects.Sprite) {
+		if (!isDynamicSprite(sprite)) {
+			return;
+		}
+		// If we are not moving, move in a random direction. If we are moving, keep
+		// moving in that direction.
+		const previousDirection = getDirectionOfSpriteMovement(sprite.body);
+		if (previousDirection) {
+			return;
+		}
+		const direction = Phaser.Math.Between(0, 3);
+		switch (direction) {
+			case SpriteUp:
+				sprite.anims.play("up", true);
+				sprite.body.setVelocityY(-this.#enemySpeed);
+				break;
+			case SpriteRight:
+				sprite.anims.play("right", true);
+				sprite.body.setVelocityX(this.#enemySpeed);
+				break;
+			case SpriteDown:
+				sprite.anims.play("down", true);
+				sprite.body.setVelocityY(this.#enemySpeed);
+				break;
+			case SpriteLeft:
+				sprite.anims.play("left", true);
+				sprite.body.setVelocityX(-this.#enemySpeed);
+				break;
 		}
 	}
 }

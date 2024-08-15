@@ -1,17 +1,25 @@
-import {
-	SpriteUp,
-	SpriteRight,
-	SpriteDown,
-	SpriteLeft,
-	getDirectionOfSpriteMovement,
-	isDynamicSprite,
-} from "./shared";
+import { isDynamicSprite } from "./shared";
+import { BehaviorMachineInterface, Behavior, StateMachine } from "./behavior";
+import { RandomlyWalk } from "./behaviors";
+import { EnemyManager } from "./EnemyManager";
+
+type AllStates = "randomwalk";
 
 export class MonsterA extends Phaser.Physics.Arcade.Sprite {
-	enemySpeed: number = 40;
+	#stateMachine: BehaviorMachineInterface<AllStates>;
+	#currentPlayingState: Behavior<AllStates, MonsterA> | undefined;
+	#enemyManager: EnemyManager;
 
-	constructor(scene: Phaser.Scene, x: number, y: number) {
+	constructor(
+		scene: Phaser.Scene,
+		enemyManager: EnemyManager,
+		x: number,
+		y: number
+	) {
 		super(scene, x, y, "monsters1", 54);
+
+		this.#enemyManager = enemyManager;
+		this.#stateMachine = new StateMachine("randomwalk");
 
 		scene.add.existing(this);
 		scene.physics.add.existing(this);
@@ -89,31 +97,38 @@ export class MonsterA extends Phaser.Physics.Arcade.Sprite {
 			return;
 		}
 
-		// If we are not moving, move in a random direction. If we are moving, keep
-		// moving in that direction.
-		const previousDirection = getDirectionOfSpriteMovement(body);
-		if (previousDirection) {
+		const state = this.#stateMachine.getCurrentState();
+
+		// Take init actions
+		if (state !== this.#currentPlayingState?.name) {
+			console.log(
+				"state has changed from",
+				this.#currentPlayingState?.name,
+				"to",
+				state
+			);
+			switch (state) {
+				case "randomwalk":
+					this.#currentPlayingState = new RandomlyWalk(state, "randomwalk");
+					break;
+			}
+			if (!this.#currentPlayingState) {
+				throw new Error("No state active");
+			}
+			this.#currentPlayingState.init(
+				this,
+				this.#stateMachine,
+				this.#enemyManager
+			);
 			return;
 		}
-		const direction = Phaser.Math.Between(0, 3);
-		switch (direction) {
-			case SpriteUp:
-				this.anims.play("up", true);
-				body.setVelocityY(-this.enemySpeed);
-				break;
-			case SpriteRight:
-				this.anims.play("right", true);
-				body.setVelocityX(this.enemySpeed);
-				break;
-			case SpriteDown:
-				this.anims.play("down", true);
-				body.setVelocityY(this.enemySpeed);
-				break;
-			case SpriteLeft:
-				this.anims.play("left", true);
-				body.setVelocityX(-this.enemySpeed);
-				break;
-		}
+
+		// Take update actions
+		this.#currentPlayingState?.update(
+			this,
+			this.#stateMachine,
+			this.#enemyManager
+		);
 	}
 
 	hit() {
