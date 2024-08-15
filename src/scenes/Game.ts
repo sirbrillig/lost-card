@@ -19,6 +19,11 @@ import {
 	createVelocityForDirection,
 	isPointInRoom,
 	invertSpriteDirection,
+	hasGid,
+	createSpritesFromObjectLayer,
+	loadSavedData,
+	loadSavedRegistry,
+	SaveData,
 } from "../shared";
 
 export class Game extends Scene {
@@ -30,6 +35,7 @@ export class Game extends Scene {
 	enemies: Phaser.Physics.Arcade.Group;
 	enemyCollider: Phaser.Physics.Arcade.Collider;
 	floorText: Phaser.GameObjects.Text | undefined;
+	overlay: Phaser.Scenes.ScenePlugin;
 
 	framesSincePlayerHit: number = 0;
 	lastAttackedAt: number = 0;
@@ -37,8 +43,6 @@ export class Game extends Scene {
 	playerDirection: SpriteDirection = SpriteDown;
 	enteredRoomAt: number = 0;
 	isPlayerBeingKnockedBack: boolean = false;
-	playerTotalHitPoints: number = 4;
-	playerHitPoints: number = 4;
 
 	// Config
 	characterSpeed: number = 90;
@@ -53,6 +57,8 @@ export class Game extends Scene {
 	windCardPushTime: number = 100;
 	knockBackSpeed: number = 180;
 	distanceToActivateTransient: number = 30;
+	playerInitialHitPoints: number = 4;
+	saveCooldown: number = 30000;
 
 	map: Phaser.Tilemaps.Tilemap;
 	landLayer: Phaser.Tilemaps.TilemapLayer;
@@ -68,7 +74,7 @@ export class Game extends Scene {
 		super("Game");
 	}
 
-	create() {
+	create(saveData: SaveData | undefined) {
 		this.map = this.make.tilemap({ key: "map" });
 		const tilesetTile = this.map.addTilesetImage(
 			"Dungeon_Tiles",
@@ -121,8 +127,13 @@ export class Game extends Scene {
 				if (isSaving) {
 					return;
 				}
+				const lastSaved = savePoint.data.get("savedAt");
+				if (lastSaved && this.time.now - lastSaved < this.saveCooldown) {
+					return;
+				}
 
 				isSaving = true;
+				savePoint.data.set("savedAt", this.time.now);
 				this.turnOffAllLanterns();
 				const effect = this.add.sprite(
 					savePoint.x,
@@ -208,6 +219,11 @@ export class Game extends Scene {
 		MainEvents.on("freezePlayer", (setting: boolean) =>
 			this.setPlayerFrozen(setting)
 		);
+
+		if (saveData?.playerX) {
+			console.log("starting game with saved data", saveData);
+			this.movePlayerToPoint(saveData.playerX, saveData.playerY);
+		}
 	}
 
 	turnOffAllLanterns() {
@@ -263,90 +279,88 @@ export class Game extends Scene {
 	}
 
 	loadLastSave() {
-		// FIXME: Clean up old stuff first
-		// this.scene.restart();
-		// FIXME: reset level otherwise like enemy positions etc, but not picked-up items
-		const rawSaveData = localStorage.getItem("lost-card-save");
-		if (!rawSaveData) {
-			console.log("no save data");
+		const saveData = loadSavedData();
+		if (!saveData) {
+			console.log("No saved data");
 			return;
 		}
-		const saveData = JSON.parse(rawSaveData);
-		if (saveData?.playerX === undefined || saveData.playerY === undefined) {
-			console.log("no save point found for save data");
-			return;
-		}
-		if (saveData.hasSword) {
-			this.equipSword();
-		}
-		if (saveData.hasWindCard) {
-			this.equipWindCard();
-		}
-		this.movePlayerToPoint(saveData.playerX, saveData.playerY);
+		this.overlay.stop();
+		loadSavedRegistry(this.registry, saveData);
+		this.scene.restart(saveData);
 	}
 
 	saveGame() {
 		localStorage.setItem("lost-card-save", JSON.stringify(this.getSaveData()));
+		console.log(this.getSaveData());
 		console.log("game saved");
 	}
 
 	getSaveData() {
 		return {
+			...this.registry.getAll(),
 			playerX: this.player.x,
 			playerY: this.player.y,
-			...this.registry.getAll(),
 		};
 	}
 
 	createSavePoints() {
-		this.createdSavePoints = this.map
-			.createFromObjects("SavePoints", {})
-			.map((item) => this.physics.world.enableBody(item))
-			.map((item) => item.setDataEnabled())
-			.filter(isDynamicSprite)
-			.map((item) => {
-				item.body.pushable = false;
-				return item;
-			});
+		this.createdSavePoints = createSpritesFromObjectLayer(
+			this.map,
+			"SavePoints",
+			this.shouldCreateLayerObject.bind(this),
+			this.recordObjectIdOnSprite
+		).map((item) => {
+			item.body.pushable = false;
+			return item;
+		});
 	}
 
 	createDoors() {
-		this.createdDoors = this.map
-			.createFromObjects("Doors", [{ name: "Door" }])
-			.map((item) => this.physics.world.enableBody(item))
-			.map((item) => item.setDataEnabled())
-			.filter(isDynamicSprite)
-			.map((item) => {
-				item.body.pushable = false;
-				item.body.setSize(item.body.width + 1, item.body.height + 1);
-				return item;
-			});
+		this.createdDoors = createSpritesFromObjectLayer(
+			this.map,
+			"Doors",
+			this.shouldCreateLayerObject.bind(this),
+			this.recordObjectIdOnSprite
+		).map((item) => {
+			item.body.pushable = false;
+			item.body.setSize(item.body.width + 1, item.body.height + 1);
+			return item;
+		});
 	}
 
 	createAppearingTiles() {
-		this.createdTiles = this.map
-			.createFromObjects("Transients", [{}])
-			.map((item) => this.physics.world.enableBody(item))
-			.map((item) => item.setDataEnabled())
-			.filter(isDynamicSprite);
+		this.createdTiles = createSpritesFromObjectLayer(
+			this.map,
+			"Transients",
+			this.shouldCreateLayerObject.bind(this),
+			this.recordObjectIdOnSprite
+		);
 	}
 
 	createItems() {
-		this.createdItems = this.map
-			.createFromObjects("Items", [
-				{
-					name: "Sword",
-				},
-				{
-					name: "WindCard",
-				},
-				{
-					name: "Heart",
-				},
-			])
-			.map((item) => this.physics.world.enableBody(item))
-			.map((item) => item.setDataEnabled())
-			.filter(isDynamicSprite);
+		this.createdItems = createSpritesFromObjectLayer(
+			this.map,
+			"Items",
+			this.shouldCreateLayerObject.bind(this),
+			this.recordObjectIdOnSprite
+		);
+	}
+
+	shouldCreateLayerObject(
+		layerObject: Phaser.Types.Tilemaps.TiledObject
+	): boolean {
+		if (!layerObject.gid) {
+			return true;
+		}
+		const itemsRemoved: Array<number> = this.registry.get("itemsRemoved") ?? [];
+		return !itemsRemoved.includes(layerObject.gid);
+	}
+
+	recordObjectIdOnSprite(
+		layerObject: Phaser.Types.Tilemaps.TiledObject,
+		sprite: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody
+	): void {
+		sprite.data.set("objectGid", layerObject.gid);
 	}
 
 	createTileLayer(
@@ -683,14 +697,38 @@ export class Game extends Scene {
 		this.createdItems = this.createdItems.filter(
 			(item) => item !== itemToRemove
 		);
+		const itemsRemoved = this.registry.get("itemsRemoved") ?? [];
+		const itemObject = this.map.findObject("Items", (obj) => {
+			if (!hasGid(obj)) {
+				return false;
+			}
+			if (obj.gid === itemToRemove.data.get("objectGid")) {
+				return true;
+			}
+			return false;
+		});
+		if (!itemObject) {
+			return;
+		}
+		itemsRemoved.push(itemObject.gid);
+		this.registry.set("itemsRemoved", itemsRemoved);
 		itemToRemove.destroy();
 	}
 
+	getPlayerHitPoints(): number {
+		return this.registry.get("playerHitPoints") ?? this.playerInitialHitPoints;
+	}
+
+	setPlayerHitPoints(hitPoints: number) {
+		this.registry.set("playerHitPoints", hitPoints);
+	}
+
 	pickUpHeart() {
-		this.playerTotalHitPoints += 1;
-		MainEvents.emit("setTotalHearts", this.playerTotalHitPoints);
-		this.playerHitPoints += 1;
-		MainEvents.emit("setActiveHearts", this.playerHitPoints);
+		let playerTotalHitPoints =
+			this.registry.get("playerTotalHitPoints") ?? this.playerInitialHitPoints;
+		playerTotalHitPoints += 1;
+		this.registry.set("playerTotalHitPoints", playerTotalHitPoints);
+		this.setPlayerHitPoints(this.getPlayerHitPoints() + 1);
 	}
 
 	pickUpWindCard() {
@@ -873,7 +911,7 @@ export class Game extends Scene {
 	// if the sword is active, use `isPlayerSwordActive()` instead.
 	isPlayerAttacking() {
 		return (
-			this.attackSprite?.anims.getName().includes("attack") &&
+			this.attackSprite?.anims?.getName().includes("attack") &&
 			this.attackSprite.visible === true
 		);
 	}
@@ -912,8 +950,9 @@ export class Game extends Scene {
 	}
 
 	createOverlay() {
-		this.scene.launch("Overlay");
-		MainEvents.emit("setTotalHearts", this.playerHitPoints);
+		this.registry.set("playerTotalHitPoints", this.playerInitialHitPoints);
+		this.setPlayerHitPoints(this.playerInitialHitPoints);
+		this.overlay = this.scene.launch("Overlay");
 	}
 
 	createPlayer(): void {
@@ -1177,10 +1216,9 @@ export class Game extends Scene {
 		this.enemyCollider.active = false;
 		this.cameras.main.shake(300, 0.008);
 		this.player.tint = 0xff0000;
-		this.playerHitPoints -= 1;
-		MainEvents.emit("setActiveHearts", this.playerHitPoints);
+		this.setPlayerHitPoints(this.getPlayerHitPoints() - 1);
 
-		if (this.playerHitPoints <= 0) {
+		if (this.getPlayerHitPoints() <= 0) {
 			this.gameOver();
 			return;
 		}
@@ -1208,14 +1246,14 @@ export class Game extends Scene {
 		body: Phaser.Physics.Arcade.Body,
 		time: number,
 		direction: SpriteDirection,
-		completeCallback: () => void
+		completeCallback?: () => void
 	) {
 		const bounceSpeed = this.knockBackSpeed;
 
 		setTimeout(() => {
 			body.setVelocityX(0);
 			body.setVelocityY(0);
-			completeCallback();
+			completeCallback?.();
 		}, time);
 
 		body.setVelocityX(0);
@@ -1392,7 +1430,7 @@ export class Game extends Scene {
 			return;
 		}
 
-		if (this.playerHitPoints <= 0) {
+		if (this.getPlayerHitPoints() <= 0) {
 			this.player.stop();
 			this.player.body.setVelocity(0);
 			this.enemyCollider.active = false;

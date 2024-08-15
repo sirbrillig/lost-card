@@ -1,4 +1,5 @@
 import { Scene } from "phaser";
+import { loadSavedRegistry, loadSavedData } from "../shared";
 
 export class MainMenu extends Scene {
 	selectedButton: 0 | 1 = 0;
@@ -77,8 +78,16 @@ export class MainMenu extends Scene {
 	confirmSelection() {
 		if (this.selectedButton === 0) {
 			this.scene.start("Game");
+			return;
 		}
-		// TODO: handle load
+		if (this.selectedButton === 1) {
+			const savedData = loadSavedData();
+			if (savedData) {
+				loadSavedRegistry(this.registry, savedData);
+			}
+			this.scene.start("Game", savedData);
+			return;
+		}
 	}
 
 	update() {

@@ -19,7 +19,7 @@ export function isDynamicSprite(
 	obj: unknown
 ): obj is Phaser.Types.Physics.Arcade.SpriteWithDynamicBody {
 	const dynObj = obj as Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
-	return "body" in dynObj && "enable" in dynObj.body;
+	return "body" in dynObj && dynObj.body && "enable" in dynObj.body;
 }
 
 export function isDynamicImage(
@@ -44,6 +44,15 @@ export function isTileWithPropertiesObject(
 ): obj is { properties: Record<string, any> } {
 	const tile = obj as Phaser.Tilemaps.Tile;
 	return "properties" in tile && !Array.isArray(tile.properties);
+}
+
+export type ObjectWithXandY = { x: number; y: number };
+
+export function hasXandY(obj: unknown): obj is ObjectWithXandY {
+	const test = obj as ObjectWithXandY;
+	return (
+		"x" in test && "y" in test && test.x !== undefined && test.y !== undefined
+	);
 }
 
 export type ObjectWithId = { id: number };
@@ -321,4 +330,191 @@ export function getDoorDestinationCoordinates(
 		return destinationTile.y - 10;
 	})();
 	return [destinationX, destinationY];
+}
+
+/**
+ * Custom version of createFromObjects that provides callbacks
+ *
+ * The callback argument will be called for each sprite after it has been
+ * created. Its arguments are the object that the sprite was created from and
+ * the sprite itself.
+ *
+ * Similar to https://github.com/samme/phaser/blob/master/src/tilemaps/Tilemap.js#L770
+ */
+export function createSpritesFromObjectLayer(
+	map: Phaser.Tilemaps.Tilemap,
+	layerName: string,
+	filterCallback?: (layerObject: Phaser.Types.Tilemaps.TiledObject) => boolean,
+	callback?: (
+		layerObject: Phaser.Types.Tilemaps.TiledObject,
+		sprite: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody
+	) => void
+): Phaser.Types.Physics.Arcade.SpriteWithDynamicBody[] {
+	const created: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody[] = [];
+	const gidToTextureMap: Record<string, Phaser.Tilemaps.Tileset> = {};
+	map.tilesets.forEach((tileset) => {
+		for (let i = 0; i < tileset.total; i++) {
+			gidToTextureMap[tileset.firstgid + i] = tileset;
+		}
+	});
+
+	const layer = map.getObjectLayer(layerName);
+	if (!layer) {
+		throw new Error(
+			`Could not find layer "${layerName}" to convert to sprites`
+		);
+	}
+	layer.objects.forEach((obj) => {
+		const filterResult = filterCallback?.(obj) ?? true;
+		if (
+			!filterResult ||
+			!hasXandY(obj) ||
+			!hasGid(obj) ||
+			!hasWidthAndHeight(obj)
+		) {
+			return;
+		}
+
+		const tileset = gidToTextureMap[obj.gid];
+		const tilesetKey = tileset?.image?.key;
+		if (!tilesetKey) {
+			console.warn(`No tileset found for layer object "${obj.gid}"`);
+			return;
+		}
+
+		const frame = obj.gid - tileset.firstgid;
+		const sprite = new Phaser.GameObjects.Sprite(
+			map.scene,
+			obj.x,
+			obj.y,
+			tilesetKey,
+			frame
+		);
+		sprite.setDisplaySize(obj.height, obj.width);
+		sprite.setDataEnabled();
+		setSpritePropertiesFromJSON(sprite, obj.properties);
+		sprite.setName(obj.name);
+		map.scene.physics.add.existing(sprite);
+		map.scene.add.existing(sprite);
+
+		const offset = {
+			x: sprite.originX * obj.width,
+			y: (sprite.originY - (obj.gid ? 1 : 0)) * obj.height,
+		};
+		if (obj.rotation) {
+			const angle = Phaser.Math.DegToRad(obj.rotation);
+
+			Phaser.Math.Rotate(offset, angle);
+
+			sprite.rotation = angle;
+		}
+
+		sprite.x += offset.x;
+		sprite.y += offset.y;
+
+		if (
+			obj.flippedHorizontal !== undefined ||
+			obj.flippedVertical !== undefined
+		) {
+			sprite.setFlip(
+				obj.flippedHorizontal ?? false,
+				obj.flippedVertical ?? false
+			);
+		}
+
+		if (!obj.visible) {
+			sprite.visible = false;
+		}
+
+		if (!isDynamicSprite(sprite)) {
+			throw new Error("Created sprite is not dynamic");
+		}
+
+		callback?.(obj, sprite);
+
+		created.push(sprite);
+	});
+
+	return created;
+}
+
+export function hasGid(obj: unknown): obj is { gid: number } {
+	const test = obj as { gid: number };
+	return "gid" in test;
+}
+
+export function hasWidthAndHeight(
+	obj: unknown
+): obj is { width: number; height: number } {
+	const test = obj as { width: number; height: number };
+	return (
+		"width" in test &&
+		"height" in test &&
+		test.width !== undefined &&
+		test.height !== undefined
+	);
+}
+
+/**
+ * Copied from https://github.com/samme/phaser/blob/master/src/tilemaps/ObjectHelper.js#L177
+ */
+function setSpritePropertiesFromJSON(
+	sprite: Phaser.GameObjects.Sprite,
+	properties: unknown
+) {
+	if (!properties) {
+		return;
+	}
+
+	if (Array.isArray(properties)) {
+		for (var i = 0; i < properties.length; i++) {
+			var prop = properties[i];
+
+			if (sprite[prop.name as keyof typeof sprite] !== undefined) {
+				(sprite as any)[prop.name as keyof typeof sprite] = prop.value;
+			} else {
+				sprite.setData(prop.name, prop.value);
+			}
+		}
+
+		return;
+	}
+
+	for (var key in properties) {
+		if (sprite[key as keyof typeof sprite] !== undefined) {
+			(sprite as any)[key as keyof typeof sprite] =
+				properties[key as keyof typeof properties];
+		} else {
+			sprite.setData(key, properties[key as keyof typeof properties]);
+		}
+	}
+}
+
+export type SaveData = Record<string, string | number | boolean> & {
+	playerX: number;
+	playerY: number;
+};
+
+export function loadSavedRegistry(
+	registry: Phaser.Data.DataManager,
+	saveData: SaveData
+): void {
+	Object.keys(saveData).forEach((key) => {
+		console.log("key", key, saveData[key]);
+		registry.set(key, saveData[key]);
+	});
+}
+
+export function loadSavedData(): SaveData | undefined {
+	const rawSaveData = localStorage.getItem("lost-card-save");
+	if (!rawSaveData) {
+		console.log("no save data");
+		return undefined;
+	}
+	const saveData = JSON.parse(rawSaveData);
+	if (saveData?.playerX === undefined || saveData.playerY === undefined) {
+		console.log("no save point found for save data");
+		return undefined;
+	}
+	return saveData;
 }
