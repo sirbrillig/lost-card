@@ -1128,13 +1128,24 @@ export class Game extends Scene {
 			}
 
 			console.log("creating monster at", point.x, point.y);
-			const isBoss = point.properties.find(
-				(prop: { name: string }) => prop.name === "isBoss"
-			);
-			if (isBoss) {
-				this.createBoss(point.x, point.y);
-			} else {
-				this.createEnemy(point.x, point.y);
+			const enemyType = point.name;
+			switch (enemyType) {
+				case "MonsterA":
+					new MonsterA(this, point.x, point.y, (enemy) => {
+						this.enemies.add(enemy);
+					});
+					break;
+				case "BossA": {
+					const boss = new BossA(this, point.x, point.y, (enemy) => {
+						this.enemies.add(enemy);
+					});
+					boss.once("defeated", () => {
+						this.showHiddenItem("WindCard");
+					});
+					break;
+				}
+				default:
+					throw new Error(`Unknown enemy type "${enemyType}"`);
 			}
 
 			this.spawnPoints = this.spawnPoints.filter((pointB) => pointB !== point);
@@ -1142,21 +1153,6 @@ export class Game extends Scene {
 
 		// It seems that we may need to do this again when enemies changes?
 		this.setTileLayerCollisions(this.createdDoors, this.enemies);
-	}
-
-	createEnemy(x: number, y: number) {
-		new MonsterA(this, x, y, (enemy) => {
-			this.enemies.add(enemy);
-		});
-	}
-
-	createBoss(x: number, y: number) {
-		const boss = new BossA(this, x, y, (enemy) => {
-			this.enemies.add(enemy);
-		});
-		boss.once("defeated", () => {
-			this.showHiddenItem("WindCard");
-		});
 	}
 
 	playerHitEnemy(
