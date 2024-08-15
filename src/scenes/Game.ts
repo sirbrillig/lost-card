@@ -959,32 +959,7 @@ export class Game extends Scene {
 		this.overlay = this.scene.launch("Overlay");
 	}
 
-	createPlayer(): void {
-		const spawnPoint = this.map.findObject(
-			"MetaObjects",
-			(obj) => obj.name === "Start Point"
-		);
-		this.player = this.physics.add.sprite(
-			spawnPoint?.x ?? 400,
-			spawnPoint?.y ?? 350,
-			"character-idle-down",
-			0
-		);
-		this.player.setDataEnabled();
-		this.player.setDebugBodyColor(0x00ff00);
-		this.player.setDisplaySize(13, 24);
-		this.player.setSize(8, 14);
-		this.player.setDepth(1);
-		this.sword = this.physics.add.sprite(
-			this.player.x,
-			this.player.y,
-			"character-power-right",
-			4
-		);
-		this.sword.setDebugBodyColor(0x00fff0);
-		this.sword.setDepth(4);
-		this.updateSwordHitbox();
-
+	preload() {
 		const anims = this.anims;
 		anims.create({
 			key: "explode",
@@ -1099,6 +1074,34 @@ export class Game extends Scene {
 			showOnStart: true,
 			hideOnComplete: true,
 		});
+	}
+
+	createPlayer(): void {
+		const spawnPoint = this.map.findObject(
+			"MetaObjects",
+			(obj) => obj.name === "Start Point"
+		);
+		this.player = this.physics.add.sprite(
+			spawnPoint?.x ?? 400,
+			spawnPoint?.y ?? 350,
+			"character-idle-down",
+			0
+		);
+		this.player.setDataEnabled();
+		this.player.setDebugBodyColor(0x00ff00);
+		this.player.setDisplaySize(13, 24);
+		this.player.setSize(8, 14);
+		this.player.setDepth(1);
+		this.sword = this.physics.add.sprite(
+			this.player.x,
+			this.player.y,
+			"character-power-right",
+			4
+		);
+		this.sword.setDebugBodyColor(0x00fff0);
+		this.sword.setDepth(4);
+		this.updateSwordHitbox();
+
 		this.player.setCollideWorldBounds(true);
 	}
 
