@@ -1154,7 +1154,7 @@ export class Game extends Scene {
 		const boss = new BossA(this, x, y, (enemy) => {
 			this.enemies.add(enemy);
 		});
-		boss.once(Phaser.GameObjects.Events.DESTROY, () => {
+		boss.once("defeated", () => {
 			this.showHiddenItem("WindCard");
 		});
 	}

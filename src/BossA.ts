@@ -383,6 +383,7 @@ export class BossA extends Phaser.Physics.Arcade.Sprite {
 			this.setDisplaySize(this.width * 2, this.height * 2);
 			this.anims.play("explode-boss", true);
 			this.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
+				this.emit("defeated");
 				this.destroy();
 			});
 		}
