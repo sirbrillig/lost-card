@@ -950,8 +950,12 @@ export class Game extends Scene {
 	}
 
 	createOverlay() {
-		this.registry.set("playerTotalHitPoints", this.playerInitialHitPoints);
-		this.setPlayerHitPoints(this.playerInitialHitPoints);
+		if (!this.registry.has("playerTotalHitPoints")) {
+			this.registry.set("playerTotalHitPoints", this.playerInitialHitPoints);
+		}
+		if (!this.registry.has("playerHitPoints")) {
+			this.setPlayerHitPoints(this.playerInitialHitPoints);
+		}
 		this.overlay = this.scene.launch("Overlay");
 	}
 

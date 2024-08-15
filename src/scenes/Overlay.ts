@@ -47,17 +47,28 @@ export class Overlay extends Scene {
 		super("Overlay");
 	}
 
+	create() {
+		console.log("creating overlay");
+		this.totalHearts = this.registry.get("playerTotalHitPoints") ?? 0;
+		this.activeHearts = this.registry.get("playerHitPoints") ?? 0;
+		this.createHearts();
+	}
+
 	update() {
 		const totalHearts = this.registry.get("playerTotalHitPoints") ?? 0;
 		const activeHearts = this.registry.get("playerHitPoints") ?? 0;
 
 		if (this.totalHearts !== totalHearts) {
+			console.log("resetting hearts");
 			this.totalHearts = totalHearts;
 			this.createHearts();
 		}
 
 		this.activeHearts = activeHearts;
 		for (let x = 1; x <= this.totalHearts; x++) {
+			if (!this.hearts[x - 1]) {
+				throw new Error("Insufficient hearts");
+			}
 			if (x > this.activeHearts) {
 				this.hearts[x - 1].isActive = false;
 			} else {
@@ -74,6 +85,7 @@ export class Overlay extends Scene {
 		this.hearts.forEach((heart) => {
 			heart.destroy();
 		});
+		this.hearts = [];
 		for (let x = 0; x < this.totalHearts; x++) {
 			this.hearts.push(new Heart(this, x));
 		}
