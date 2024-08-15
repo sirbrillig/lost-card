@@ -1,6 +1,7 @@
 import { Scene } from "phaser";
 import { MainEvents } from "../MainEvents";
 import { MonsterA } from "../MonsterA";
+import { IceMonster } from "../IceMonster";
 import { BossA } from "../BossA";
 import {
 	SpriteUp,
@@ -1132,6 +1133,11 @@ export class Game extends Scene {
 			switch (enemyType) {
 				case "MonsterA":
 					new MonsterA(this, point.x, point.y, (enemy) => {
+						this.enemies.add(enemy);
+					});
+					break;
+				case "IceMonster":
+					new IceMonster(this, point.x, point.y, (enemy) => {
 						this.enemies.add(enemy);
 					});
 					break;

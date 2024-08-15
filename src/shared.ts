@@ -30,7 +30,7 @@ export function isSprite(obj: unknown): obj is Phaser.GameObjects.Sprite {
 
 export function isTilemapTile(obj: unknown): obj is Phaser.Tilemaps.Tile {
 	const tile = obj as Phaser.Tilemaps.Tile;
-	return "properties" in tile && Array.isArray(tile.properties);
+	return hasXandY(obj) && "name" in tile;
 }
 
 export function isTileWithPropertiesObject(

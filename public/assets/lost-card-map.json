@@ -1447,6 +1447,18 @@
                  "width":0,
                  "x":1260.63,
                  "y":1070.61
+                }, 
+                {
+                 "height":0,
+                 "id":305,
+                 "name":"IceMonster",
+                 "point":true,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":1414.223669924,
+                 "y":1604.77741585233
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -3823,7 +3835,7 @@
          "y":0
         }],
  "nextlayerid":13,
- "nextobjectid":305,
+ "nextobjectid":306,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.0",
