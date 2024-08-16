@@ -28,8 +28,21 @@ export class Preloader extends Scene {
 
 		this.load.image("logo", "logo.png");
 
+		this.load.image("Mountain-Dusk", "Mountain-Dusk.png");
+		this.load.bitmapFont("retro", "RetroGaming.png", "RetroGaming.xml");
+		this.load.bitmapFont(
+			"RetroGamingWhite",
+			"RetroGamingWhite.png",
+			"RetroGamingWhite.xml"
+		);
+
 		this.load.image("dungeon_tiles", "Final_Tileset_extruded.png");
 		this.load.tilemapTiledJSON("map", "lost-card-map.json");
+
+		this.load.spritesheet("icons1", "simple_icons.png", {
+			frameWidth: 12,
+			frameHeight: 12,
+		});
 
 		this.load.spritesheet(
 			"dungeon_tiles_sprites",

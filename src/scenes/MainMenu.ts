@@ -3,7 +3,7 @@ import { loadSavedRegistry, loadSavedData } from "../shared";
 
 export class MainMenu extends Scene {
 	selectedButton: 0 | 1 = 0;
-	selector: Phaser.GameObjects.Text;
+	selector: Phaser.GameObjects.Image;
 	cursors: Phaser.Types.Input.Keyboard.CursorKeys;
 
 	constructor() {
@@ -11,51 +11,40 @@ export class MainMenu extends Scene {
 	}
 
 	create() {
-		this.cameras.main.setBackgroundColor("black");
+		this.add.image(0, 0, "Mountain-Dusk").setOrigin(0, 0);
 
 		this.add
-			.text(this.cameras.main.width / 2, 50, "Lost Card", {
-				fontFamily: "Arial Black",
-				fontSize: 24,
-				color: "#ffffff",
-				stroke: "#000000",
-				strokeThickness: 8,
-				align: "center",
-			})
+			.bitmapText(
+				this.cameras.main.width / 2,
+				50,
+				"RetroGamingWhite",
+				"Lost Card",
+				24
+			)
 			.setOrigin(0.5);
 
-		this.add
-			.text(this.cameras.main.width / 2, 100, "Start", {
-				fontFamily: "Arial Black",
-				fontSize: 18,
-				color: "#ffffff",
-				stroke: "#000000",
-				strokeThickness: 8,
-				align: "center",
-			})
-			.setOrigin(0.5);
+		this.add.bitmapText(
+			this.cameras.main.width / 2 - 50,
+			100,
+			"RetroGamingWhite",
+			"Start",
+			18
+		);
 
-		this.add
-			.text(this.cameras.main.width / 2, 125, "Load", {
-				fontFamily: "Arial Black",
-				fontSize: 18,
-				color: "#ffffff",
-				stroke: "#000000",
-				strokeThickness: 8,
-				align: "center",
-			})
-			.setOrigin(0.5);
+		this.add.bitmapText(
+			this.cameras.main.width / 2 - 50,
+			125,
+			"RetroGamingWhite",
+			"Load",
+			18
+		);
 
-		this.selector = this.add
-			.text(this.cameras.main.width / 2 - 40, 100, "👉", {
-				fontFamily: "Arial Black",
-				fontSize: 18,
-				color: "#ffffff",
-				stroke: "#000000",
-				strokeThickness: 8,
-				align: "center",
-			})
-			.setOrigin(0.5);
+		this.selector = this.add.image(
+			this.cameras.main.width / 2 - 65,
+			110,
+			"icons1",
+			29
+		);
 
 		const cursors = this.input.keyboard?.createCursorKeys();
 		if (!cursors) {
@@ -72,7 +61,7 @@ export class MainMenu extends Scene {
 		if (this.selectedButton < 0) {
 			this.selectedButton = 1;
 		}
-		this.selector.setPosition(this.selector.x, 100 + this.selectedButton * 25);
+		this.selector.setPosition(this.selector.x, 110 + this.selectedButton * 25);
 	}
 
 	confirmSelection() {
