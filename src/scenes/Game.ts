@@ -1520,6 +1520,7 @@ export class Game extends Scene {
 
 		if (this.isPlayerFrozen()) {
 			this.player.body.setVelocity(0);
+			this.player.stop();
 			console.log("player frozen");
 			return;
 		}
