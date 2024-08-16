@@ -37,7 +37,6 @@ export class Game extends Scene {
 	enemyManager: EnemyManager;
 	enemyCollider: Phaser.Physics.Arcade.Collider;
 	floorText: Phaser.GameObjects.Text | undefined;
-	overlay: Phaser.Scenes.ScenePlugin;
 
 	framesSincePlayerHit: number = 0;
 	lastAttackedAt: number = 0;
@@ -301,7 +300,8 @@ export class Game extends Scene {
 			console.log("No saved data");
 			return;
 		}
-		this.overlay.stop();
+		this.scene.stop();
+		this.scene.get("Overlay")?.scene.stop();
 		loadSavedRegistry(this.registry, saveData);
 		this.scene.restart(saveData);
 	}
@@ -984,7 +984,7 @@ export class Game extends Scene {
 		if (!this.registry.has("playerHitPoints")) {
 			this.setPlayerHitPoints(this.playerInitialHitPoints);
 		}
-		this.overlay = this.scene.launch("Overlay");
+		this.scene.launch("Overlay");
 	}
 
 	preload() {
@@ -1244,9 +1244,9 @@ export class Game extends Scene {
 		console.log("game over!");
 		this.cameras.main.fadeOut(1000, 0, 0, 0, (_: unknown, progress: number) => {
 			if (progress === 1) {
-				this.scene.pause();
-				this.overlay.stop();
-				this.scene.launch("GameOver");
+				this.scene.stop();
+				this.scene.get("Overlay")?.scene.stop();
+				this.scene.start("GameOver");
 			}
 		});
 	}
@@ -1279,7 +1279,6 @@ export class Game extends Scene {
 
 		setTimeout(() => {
 			if (this.getPlayerHitPoints() > 0) {
-				this.physics.world.timeScale = 1;
 				this.framesSincePlayerHit = 0;
 				this.enemyCollider.active = true;
 			}
