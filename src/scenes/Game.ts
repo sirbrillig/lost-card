@@ -427,8 +427,6 @@ export class Game extends Scene {
 			throw new Error("Cannot move camera: Room has no position or size");
 		}
 		this.physics.world.setBounds(room.x, room.y, room.width, room.height);
-		camera.setBounds(room.x, room.y, room.width, room.height);
-		camera.useBounds = false;
 
 		camera.startFollow(this.player);
 
