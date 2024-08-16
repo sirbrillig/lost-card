@@ -227,9 +227,13 @@ export class Game extends Scene {
 
 		this.createOverlay();
 
-		MainEvents.on("freezePlayer", (setting: boolean) =>
-			this.setPlayerFrozen(setting)
+		MainEvents.on("stunPlayer", (setting: boolean) =>
+			this.setPlayerStunned(setting)
 		);
+
+		MainEvents.on("freezePlayer", (setting: boolean) => {
+			this.setPlayerFrozen(setting);
+		});
 
 		if (saveData?.playerX) {
 			console.log("starting game with saved data", saveData);
@@ -754,9 +758,9 @@ export class Game extends Scene {
 		this.sword.setRotation(Phaser.Math.DegToRad(0));
 		this.sword.anims.play("character-right-power", true);
 
-		this.setPlayerFrozen(true);
+		this.setPlayerStunned(true);
 		setTimeout(() => {
-			this.setPlayerFrozen(false);
+			this.setPlayerStunned(false);
 			// FIXME: replace this with sprite font
 			this.setFloorText("Press SHIFT");
 		}, this.gotItemFreeze);
@@ -765,9 +769,9 @@ export class Game extends Scene {
 	pickUpSword() {
 		this.equipSword();
 		this.player.anims.play("character-down-attack", true);
-		this.setPlayerFrozen(true);
+		this.setPlayerStunned(true);
 		setTimeout(() => {
-			this.setPlayerFrozen(false);
+			this.setPlayerStunned(false);
 			// FIXME: replace this with sprite font
 			this.setFloorText("Press SPACE");
 		}, this.gotItemFreeze);
@@ -1242,7 +1246,6 @@ export class Game extends Scene {
 
 		this.enemyCollider.active = false;
 		this.cameras.main.shake(300, 0.008);
-		this.player.tint = 0xff0000;
 		this.setPlayerHitPoints(this.getPlayerHitPoints() - 1);
 
 		if (this.getPlayerHitPoints() <= 0) {
@@ -1251,7 +1254,6 @@ export class Game extends Scene {
 		}
 
 		setTimeout(() => {
-			this.player.clearTint();
 			this.framesSincePlayerHit = 0;
 			this.enemyCollider.active = true;
 		}, this.postHitInvincibilityTime);
@@ -1342,11 +1344,19 @@ export class Game extends Scene {
 	}
 
 	setPlayerFrozen(setting: boolean) {
-		this.player.data.set("freezePlayer", setting);
+		this.player.data?.set("freezePlayer", setting);
+	}
+
+	setPlayerStunned(setting: boolean) {
+		this.player.data?.set("stunPlayer", setting);
 	}
 
 	isPlayerFrozen(): boolean {
 		return this.player.data.get("freezePlayer") === true;
+	}
+
+	isPlayerStunned(): boolean {
+		return this.player.data.get("stunPlayer") === true;
 	}
 
 	isPlayerBeingHit(): boolean {
@@ -1441,7 +1451,27 @@ export class Game extends Scene {
 		}
 	}
 
+	getPlayerTint(): number {
+		if (this.isPlayerBeingHit()) {
+			return 0xff0000;
+		}
+		if (this.isPlayerFrozen()) {
+			return 0x0000ff;
+		}
+		return 0;
+	}
+
+	updatePlayerTint() {
+		const tint = this.getPlayerTint();
+		if (tint) {
+			this.player.setTint(tint);
+		} else {
+			this.player.clearTint();
+		}
+	}
+
 	updatePlayer(): void {
+		this.updatePlayerTint();
 		this.data.set(
 			"playerPosition",
 			new Phaser.Math.Vector2(this.player.x, this.player.y)
@@ -1449,6 +1479,12 @@ export class Game extends Scene {
 
 		if (this.isPlayerBeingHit()) {
 			this.updatePlayerBeingHit();
+		}
+
+		if (this.isPlayerStunned()) {
+			this.player.body.setVelocity(0);
+			console.log("player stunned");
+			return;
 		}
 
 		if (this.isPlayerFrozen()) {

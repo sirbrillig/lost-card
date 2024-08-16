@@ -81,13 +81,13 @@ export class Roar<AllStates extends string>
 			},
 			true
 		);
-		MainEvents.emit("freezePlayer", true);
+		MainEvents.emit("stunPlayer", true);
 		sprite.scene.cameras.main.shake(2000, 0.009);
 		sprite.once(
 			Phaser.Animations.Events.ANIMATION_COMPLETE,
 			(anim: Phaser.Animations.Animation) => {
 				console.log("roar complete", anim);
-				MainEvents.emit("freezePlayer", false);
+				MainEvents.emit("stunPlayer", false);
 				stateMachine.popState();
 				stateMachine.pushState(this.#nextState);
 			}
@@ -244,7 +244,8 @@ export class RandomlyWalk<AllStates extends string>
 			throw new Error("invalid sprite");
 		}
 		setTimeout(() => {
-			sprite.setVelocity(0);
+			// sprite may have been destroyed before this happens
+			sprite?.body?.setVelocity(0);
 			stateMachine.popState();
 			stateMachine.pushState(this.#nextState);
 		}, this.#walkingTime);
@@ -332,6 +333,7 @@ export class IceAttack<AllStates extends string>
 {
 	#nextState: AllStates;
 	name: AllStates;
+	#freezePlayerTime = 4000;
 
 	constructor(name: AllStates, nextState: AllStates) {
 		this.name = name;
@@ -366,7 +368,10 @@ export class IceAttack<AllStates extends string>
 		effect.anims.play("ice_attack", true);
 
 		sprite.scene.physics.add.overlap(enemyManager.player, effect, () => {
-			MainEvents.emit("enemyHitPlayer", true);
+			MainEvents.emit("freezePlayer", true);
+			setTimeout(() => {
+				MainEvents.emit("freezePlayer", false);
+			}, this.#freezePlayerTime);
 		});
 
 		effect.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
