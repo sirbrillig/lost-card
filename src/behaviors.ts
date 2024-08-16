@@ -323,6 +323,9 @@ export class PowerUp<AllStates extends string>
 		effect.setDepth(5);
 		effect.setAlpha(0.7);
 		effect.anims.play("powerup", true);
+		sprite.once(Phaser.GameObjects.Events.DESTROY, () => {
+			effect?.destroy();
+		});
 		effect.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
 			effect.destroy();
 			stateMachine.popState();
@@ -379,6 +382,9 @@ export class IceAttack<AllStates extends string>
 			}, this.#freezePlayerTime);
 		});
 
+		sprite.once(Phaser.GameObjects.Events.DESTROY, () => {
+			effect?.destroy();
+		});
 		effect.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
 			effect.destroy();
 			stateMachine.popState();
