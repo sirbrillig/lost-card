@@ -61,6 +61,7 @@ export class Game extends Scene {
 	distanceToActivateTransient: number = 30;
 	playerInitialHitPoints: number = 4;
 	saveCooldown: number = 30000;
+	preGameOverTime: number = 2500;
 
 	map: Phaser.Tilemaps.Tilemap;
 	landLayer: Phaser.Tilemaps.TilemapLayer;
@@ -1245,17 +1246,31 @@ export class Game extends Scene {
 		console.log("player got hit!");
 
 		this.enemyCollider.active = false;
-		this.cameras.main.shake(300, 0.008);
+		this.cameras.main.shake(300, 0.009);
+		this.cameras.main.zoomTo(1.5, 600, "Linear", false, (_, progress) => {
+			if (progress === 1) {
+				setTimeout(() => {
+					if (this.getPlayerHitPoints() > 0) {
+						this.cameras.main.zoomTo(1, 400, "Linear", true);
+					}
+				}, 0);
+			}
+		});
 		this.setPlayerHitPoints(this.getPlayerHitPoints() - 1);
 
 		if (this.getPlayerHitPoints() <= 0) {
-			this.gameOver();
+			setTimeout(() => {
+				this.gameOver();
+			}, this.preGameOverTime);
 			return;
 		}
 
 		setTimeout(() => {
-			this.framesSincePlayerHit = 0;
-			this.enemyCollider.active = true;
+			if (this.getPlayerHitPoints() > 0) {
+				this.physics.world.timeScale = 1;
+				this.framesSincePlayerHit = 0;
+				this.enemyCollider.active = true;
+			}
 		}, this.postHitInvincibilityTime);
 
 		this.isPlayerBeingKnockedBack = true;
@@ -1452,6 +1467,9 @@ export class Game extends Scene {
 	}
 
 	getPlayerTint(): number {
+		if (this.getPlayerHitPoints() === 0) {
+			return 0xff0000;
+		}
 		if (this.isPlayerBeingHit()) {
 			return 0xff0000;
 		}
