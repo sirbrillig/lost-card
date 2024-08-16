@@ -43,6 +43,7 @@ export class Overlay extends Scene {
 	hearts: Heart[] = [];
 	totalHearts: number = 0;
 	activeHearts: number = 0;
+	bg: Phaser.GameObjects.NineSlice;
 
 	constructor() {
 		super("Overlay");
@@ -50,13 +51,15 @@ export class Overlay extends Scene {
 
 	create() {
 		console.log("creating overlay");
-		this.add
+		this.totalHearts = this.registry.get("playerTotalHitPoints") ?? 0;
+		this.activeHearts = this.registry.get("playerHitPoints") ?? 0;
+		this.bg = this.add
 			.nineslice(
 				this.cameras.main.x,
 				this.cameras.main.y,
 				"panel4",
 				0,
-				150,
+				this.getBackgroundWidth(),
 				20,
 				8,
 				8,
@@ -69,9 +72,11 @@ export class Overlay extends Scene {
 			.image(this.cameras.main.x + 2, this.cameras.main.y, "side_portrait", 0)
 			.setScale(0.5)
 			.setOrigin(0);
-		this.totalHearts = this.registry.get("playerTotalHitPoints") ?? 0;
-		this.activeHearts = this.registry.get("playerHitPoints") ?? 0;
 		this.createHearts();
+	}
+
+	getBackgroundWidth() {
+		return this.totalHearts * 25;
 	}
 
 	update() {
@@ -99,6 +104,8 @@ export class Overlay extends Scene {
 		this.hearts.forEach((heart) => {
 			heart.update();
 		});
+
+		this.bg.setSize(this.getBackgroundWidth(), 20);
 	}
 
 	createHearts() {
