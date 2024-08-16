@@ -756,7 +756,7 @@ export class Game extends Scene {
 			this.registry.get("playerTotalHitPoints") ?? this.playerInitialHitPoints;
 		playerTotalHitPoints += 1;
 		this.registry.set("playerTotalHitPoints", playerTotalHitPoints);
-		this.setPlayerHitPoints(this.getPlayerHitPoints() + 1);
+		this.setPlayerHitPoints(playerTotalHitPoints);
 	}
 
 	pickUpWindCard() {
