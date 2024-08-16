@@ -1335,6 +1335,7 @@ export class Game extends Scene {
 
 	canPlayerAttack(): boolean {
 		return (
+			this.getPlayerHitPoints() > 0 &&
 			this.doesPlayerHaveSword() &&
 			!this.isPlayerFrozen() &&
 			!this.isPlayerAttacking() &&
@@ -1353,6 +1354,7 @@ export class Game extends Scene {
 
 	canPlayerUsePower(): boolean {
 		return (
+			this.getPlayerHitPoints() > 0 &&
 			this.doesPlayerHavePower() &&
 			!this.isPlayerFrozen() &&
 			!this.isPlayerAttacking() &&
