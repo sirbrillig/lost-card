@@ -1,6 +1,7 @@
 import { Scene } from "phaser";
 
 const heartSize: number = 18;
+const portraitPadding = 22;
 const inactiveFrame = 13;
 const activeFrame = 29;
 
@@ -12,7 +13,7 @@ class Heart {
 	constructor(scene: Phaser.Scene, count: number) {
 		const heart = scene.add
 			.image(
-				scene.cameras.main.x + heartSize * count,
+				portraitPadding + scene.cameras.main.x + heartSize * count,
 				scene.cameras.main.y,
 				"icons3",
 				inactiveFrame
@@ -64,6 +65,10 @@ export class Overlay extends Scene {
 			)
 			.setOrigin(0)
 			.setAlpha(0.9);
+		this.add
+			.image(this.cameras.main.x + 2, this.cameras.main.y, "side_portrait", 0)
+			.setScale(0.5)
+			.setOrigin(0);
 		this.totalHearts = this.registry.get("playerTotalHitPoints") ?? 0;
 		this.activeHearts = this.registry.get("playerHitPoints") ?? 0;
 		this.createHearts();
