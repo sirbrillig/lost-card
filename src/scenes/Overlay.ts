@@ -1,10 +1,10 @@
 import { Scene } from "phaser";
 
-const heartSize: number = 20;
-const heartLeft: number = 10;
-const heartTop: number = 10;
-const inactiveFrame = 1235;
-const activeFrame = 1233;
+const heartSize: number = 18;
+const heartLeft: number = 20;
+const heartTop: number = 20;
+const inactiveFrame = 13;
+const activeFrame = 29;
 
 class Heart {
 	isActive: boolean = false;
@@ -15,7 +15,7 @@ class Heart {
 		const heart = scene.add.image(
 			heartLeft + heartSize * count,
 			heartTop,
-			"dungeon_tiles_sprites",
+			"icons3",
 			inactiveFrame
 		);
 		heart.setDisplaySize(heartSize, heartSize);

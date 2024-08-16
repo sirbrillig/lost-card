@@ -43,6 +43,16 @@ export class Preloader extends Scene {
 			frameWidth: 12,
 			frameHeight: 12,
 		});
+		this.load.spritesheet("icons2", "menu-icons-white.png", {
+			frameWidth: 13,
+			frameHeight: 12,
+		});
+		this.load.spritesheet("icons3", "white_sprite_sheet.png", {
+			frameWidth: 18,
+			frameHeight: 18,
+			margin: 1,
+			spacing: 2,
+		});
 
 		this.load.spritesheet(
 			"dungeon_tiles_sprites",
