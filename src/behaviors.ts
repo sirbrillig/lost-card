@@ -340,7 +340,8 @@ export class IceAttack<AllStates extends string>
 
 	init(
 		sprite: Phaser.GameObjects.Sprite,
-		stateMachine: BehaviorMachineInterface<AllStates>
+		stateMachine: BehaviorMachineInterface<AllStates>,
+		enemyManager: EnemyManager
 	): void {
 		if (!sprite.body || !isDynamicSprite(sprite)) {
 			throw new Error("Could not update monster");
@@ -363,7 +364,11 @@ export class IceAttack<AllStates extends string>
 		effect.setDisplaySize(sprite.body.width * 5, sprite.body.height * 5);
 		effect.setDepth(5);
 		effect.anims.play("ice_attack", true);
-		// TODO: if the effect collides with the player, treat it as the enemy colliding with the player
+
+		sprite.scene.physics.add.overlap(enemyManager.player, effect, () => {
+			MainEvents.emit("enemyHitPlayer", true);
+		});
+
 		effect.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
 			effect.destroy();
 			stateMachine.popState();

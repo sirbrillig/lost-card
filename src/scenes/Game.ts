@@ -77,7 +77,6 @@ export class Game extends Scene {
 	}
 
 	create(saveData: SaveData | undefined) {
-		this.enemyManager = new EnemyManager(this);
 		this.map = this.make.tilemap({ key: "map" });
 		const tilesetTile = this.map.addTilesetImage(
 			"Dungeon_Tiles",
@@ -102,6 +101,7 @@ export class Game extends Scene {
 		this.attackSprite.setDepth(4);
 		this.attackSprite.setVisible(false);
 
+		this.enemyManager = new EnemyManager(this, this.player);
 		this.createEnemies();
 
 		this.landLayer = this.createTileLayer("Background", tilesetTile, 0);
@@ -118,6 +118,10 @@ export class Game extends Scene {
 
 		// Enemies collide with doors but players can pass through them.
 		this.setTileLayerCollisions(this.createdDoors, this.enemyManager.enemies);
+
+		MainEvents.on("enemyHitPlayer", () => {
+			this.enemyHitPlayer();
+		});
 
 		let isSaving = false;
 		this.physics.add.collider(
