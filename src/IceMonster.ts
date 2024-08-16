@@ -9,6 +9,9 @@ export class IceMonster extends Phaser.Physics.Arcade.Sprite {
 	#stateMachine: BehaviorMachineInterface<AllStates>;
 	#currentPlayingState: Behavior<AllStates, IceMonster> | undefined;
 	#enemyManager: EnemyManager;
+	#hitPoints: number = 2;
+	#isBeingHit: boolean = false;
+	#freeTimeAfterHit: number = 600;
 
 	constructor(
 		scene: Phaser.Scene,
@@ -138,12 +141,32 @@ export class IceMonster extends Phaser.Physics.Arcade.Sprite {
 	}
 
 	hit() {
-		this.setVelocity(0);
-		this.data.set("stunned", true);
-		this.setOrigin(0.5, 0.3);
-		this.anims.play("explode", true);
-		this.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
-			this.destroy();
-		});
+		if (!this.isHittable()) {
+			return;
+		}
+
+		this.#isBeingHit = true;
+		this.tint = 0xff0000;
+		setTimeout(() => {
+			this.clearTint();
+			this.#isBeingHit = false;
+		}, this.#freeTimeAfterHit);
+		this.#hitPoints -= 1;
+
+		if (this.#hitPoints === 0) {
+			this.emit("dying");
+			this.setVelocity(0);
+			this.data.set("stunned", true);
+			this.setOrigin(0.5, 0.3);
+			this.anims.play("explode", true);
+			this.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
+				this.emit("defeated");
+				this.destroy();
+			});
+		}
+	}
+
+	isHittable(): boolean {
+		return !this.#isBeingHit;
 	}
 }
