@@ -370,9 +370,20 @@ export function createSpritesFromObjectLayer(
 		}
 
 		const tileset = gidToTextureMap[obj.gid];
-		const tilesetKey = tileset?.image?.key;
+		if (!tileset) {
+			console.warn(`No tileset found for layer object "${obj.gid}"`, obj);
+			console.warn("tilesets are", gidToTextureMap);
+			return;
+		}
+		let tilesetKey = tileset.image?.key;
 		if (!tilesetKey) {
-			console.warn(`No tileset found for layer object "${obj.gid}"`);
+			if (tileset.name === "Icons") {
+				tilesetKey = "icons4";
+			}
+		}
+		if (!tilesetKey) {
+			console.warn(`No tileset key found for layer object "${obj.gid}"`, obj);
+			console.warn("tileset is", tileset);
 			return;
 		}
 

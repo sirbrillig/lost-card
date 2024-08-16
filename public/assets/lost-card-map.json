@@ -1717,7 +1717,7 @@
                  "y":1598.72542398341
                 }, 
                 {
-                 "gid":2666,
+                 "gid":2820,
                  "height":16,
                  "id":176,
                  "name":"WindCard",
@@ -4392,7 +4392,7 @@
          "y":0
         }],
  "nextlayerid":13,
- "nextobjectid":338,
+ "nextobjectid":346,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.0",
@@ -18308,6 +18308,19 @@
                          "value":0
                         }]
                 }],
+         "tilewidth":16
+        }, 
+        {
+         "columns":8,
+         "firstgid":2789,
+         "image":"sprites.png",
+         "imageheight":128,
+         "imagewidth":128,
+         "margin":0,
+         "name":"Icons",
+         "spacing":0,
+         "tilecount":64,
+         "tileheight":16,
          "tilewidth":16
         }],
  "tilewidth":16,
