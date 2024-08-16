@@ -39,6 +39,7 @@ export class Preloader extends Scene {
 		this.load.image("dungeon_tiles", "Final_Tileset_extruded.png");
 		this.load.tilemapTiledJSON("map", "lost-card-map.json");
 
+		this.load.image("panel4", "Panel_4.png");
 		this.load.spritesheet("icons1", "simple_icons.png", {
 			frameWidth: 12,
 			frameHeight: 12,
