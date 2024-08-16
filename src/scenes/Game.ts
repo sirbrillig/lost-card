@@ -62,6 +62,7 @@ export class Game extends Scene {
 	playerInitialHitPoints: number = 4;
 	saveCooldown: number = 30000;
 	preGameOverTime: number = 2500;
+	roomTransitionFadeTime: number = 300;
 
 	map: Phaser.Tilemaps.Tilemap;
 	landLayer: Phaser.Tilemaps.TilemapLayer;
@@ -479,7 +480,20 @@ export class Game extends Scene {
 			destinationDirection
 		);
 		console.log("moving player to point", destinationX, destinationY);
-		this.movePlayerToPoint(destinationX, destinationY);
+		this.setPlayerStunned(true);
+		this.cameras.main.fadeOut(
+			this.roomTransitionFadeTime,
+			0,
+			0,
+			0,
+			(_: unknown, progress: number) => {
+				if (progress === 1) {
+					this.movePlayerToPoint(destinationX, destinationY);
+					this.setPlayerStunned(false);
+					this.cameras.main.fadeIn(this.roomTransitionFadeTime);
+				}
+			}
+		);
 	}
 
 	update() {
