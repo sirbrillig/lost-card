@@ -226,8 +226,9 @@ export class PostSpawn<AllStates extends string>
 export class RandomlyWalk<AllStates extends string>
 	implements Behavior<AllStates, Phaser.GameObjects.Sprite>
 {
-	#enemySpeed = 40;
-	#walkingTime = 2000;
+	#enemySpeed = 50;
+	#minWalkTime = 500;
+	#maxWalkTime = 4000;
 	#nextState: AllStates;
 	name: AllStates;
 
@@ -248,7 +249,11 @@ export class RandomlyWalk<AllStates extends string>
 			sprite?.body?.setVelocity(0);
 			stateMachine.popState();
 			stateMachine.pushState(this.#nextState);
-		}, this.#walkingTime);
+		}, this.#getWalkingTime());
+	}
+
+	#getWalkingTime(): number {
+		return Phaser.Math.Between(this.#minWalkTime, this.#maxWalkTime);
 	}
 
 	update(sprite: Phaser.GameObjects.Sprite) {

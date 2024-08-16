@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.0" orientation="orthogonal" renderorder="right-down" width="200" height="200" tilewidth="16" tileheight="16" infinite="0" nextlayerid="13" nextobjectid="306">
+<map version="1.10" tiledversion="1.11.0" orientation="orthogonal" renderorder="right-down" width="200" height="200" tilewidth="16" tileheight="16" infinite="0" nextlayerid="13" nextobjectid="315">
  <editorsettings>
   <export target="public/assets/lost-card-map.json" format="json"/>
  </editorsettings>
@@ -7653,6 +7653,33 @@
    <point/>
   </object>
   <object id="305" name="IceMonster" x="1414.22" y="1604.78">
+   <point/>
+  </object>
+  <object id="306" name="IceMonster" x="1531.8" y="1623.11">
+   <point/>
+  </object>
+  <object id="307" name="IceMonster" x="1624.78" y="1574.88">
+   <point/>
+  </object>
+  <object id="308" name="IceMonster" x="1673.68" y="1689.65">
+   <point/>
+  </object>
+  <object id="313" name="IceMonster" x="1742.27" y="1688.93">
+   <point/>
+  </object>
+  <object id="312" name="IceMonster" x="1720.48" y="1720.37">
+   <point/>
+  </object>
+  <object id="309" name="IceMonster" x="1783.63" y="1881.1">
+   <point/>
+  </object>
+  <object id="310" name="IceMonster" x="1662.78" y="1903.78">
+   <point/>
+  </object>
+  <object id="311" name="IceMonster" x="1722.44" y="1880.56">
+   <point/>
+  </object>
+  <object id="314" name="MonsterA" x="1193.2" y="1288.94">
    <point/>
   </object>
  </objectgroup>
