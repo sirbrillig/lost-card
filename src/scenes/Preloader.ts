@@ -30,11 +30,15 @@ export class Preloader extends Scene {
 
 		this.load.image("Mountain-Dusk", "Mountain-Dusk.png");
 		this.load.image("side_portrait", "Side_Portrait_Small.png");
-		this.load.bitmapFont("retro", "RetroGaming.png", "RetroGaming.xml");
 		this.load.bitmapFont(
 			"RetroGamingWhite",
 			"RetroGamingWhite.png",
 			"RetroGamingWhite.xml"
+		);
+		this.load.bitmapFont(
+			"RetroGamingWhiteSmall",
+			"RetroGamingWhiteSmall.png",
+			"RetroGamingWhiteSmall.xml"
 		);
 
 		this.load.image("dungeon_tiles", "Final_Tileset_extruded.png");

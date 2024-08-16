@@ -36,7 +36,6 @@ export class Game extends Scene {
 	attackSprite: Phaser.GameObjects.Sprite;
 	enemyManager: EnemyManager;
 	enemyCollider: Phaser.Physics.Arcade.Collider;
-	floorText: Phaser.GameObjects.Text | undefined;
 
 	framesSincePlayerHit: number = 0;
 	lastAttackedAt: number = 0;
@@ -53,7 +52,7 @@ export class Game extends Scene {
 	postHitInvincibilityTime: number = 600;
 	attackFrameRate: number = 35;
 	attackDelay: number = 8;
-	gotItemFreeze: number = 1500;
+	gotItemFreeze: number = 1000;
 	windCardPushSpeed: number = 100;
 	windCardPushTime: number = 100;
 	knockBackSpeed: number = 180;
@@ -416,7 +415,6 @@ export class Game extends Scene {
 	}
 
 	moveCameraToRoom(room: Phaser.Types.Tilemaps.TiledObject) {
-		this.clearFloorText();
 		const camera = this.cameras.main;
 
 		if (
@@ -773,9 +771,14 @@ export class Game extends Scene {
 
 		this.setPlayerStunned(true);
 		setTimeout(() => {
+			this.scene.launch("Dialog", {
+				heading: "The Wind Card",
+				text: "Press SHIFT to use it.",
+			});
 			this.setPlayerStunned(false);
-			// FIXME: replace this with sprite font
-			this.setFloorText("Press SHIFT");
+			this.input.keyboard?.once("keydown-SHIFT", () => {
+				this.scene.get("Dialog")?.scene.stop();
+			});
 		}, this.gotItemFreeze);
 	}
 
@@ -784,38 +787,15 @@ export class Game extends Scene {
 		this.player.anims.play("character-down-attack", true);
 		this.setPlayerStunned(true);
 		setTimeout(() => {
+			this.scene.launch("Dialog", {
+				heading: "You found a sword!",
+				text: "Press SPACE to swing.",
+			});
 			this.setPlayerStunned(false);
-			// FIXME: replace this with sprite font
-			this.setFloorText("Press SPACE");
+			this.input.keyboard?.once("keydown-SPACE", () => {
+				this.scene.get("Dialog")?.scene.stop();
+			});
 		}, this.gotItemFreeze);
-	}
-
-	clearFloorText() {
-		this.floorText?.destroy();
-	}
-
-	setFloorText(text: string) {
-		if (
-			this.activeRoom?.x === undefined ||
-			this.activeRoom?.y === undefined ||
-			!this.activeRoom.height ||
-			!this.activeRoom.width
-		) {
-			console.log(this.activeRoom);
-			throw new Error("Room has no dimensions when setting text");
-		}
-		this.floorText = this.add
-			.text(
-				this.activeRoom.x + this.activeRoom.width / 2,
-				this.activeRoom.y + this.activeRoom.height / 2,
-				text,
-				{}
-			)
-			.setOrigin(0.5, 0.5)
-			.setFontSize(10)
-			.setFontStyle("bold")
-			.setFontFamily("Arial")
-			.setBackgroundColor("#000");
 	}
 
 	movePlayerToPoint(x: number, y: number) {

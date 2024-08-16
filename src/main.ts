@@ -2,6 +2,7 @@ import { Boot } from "./scenes/Boot";
 import { Game as MainGame } from "./scenes/Game";
 import { GameOver } from "./scenes/GameOver";
 import { Overlay } from "./scenes/Overlay";
+import { Dialog } from "./scenes/Dialog";
 import { MainMenu } from "./scenes/MainMenu";
 import { Preloader } from "./scenes/Preloader";
 
@@ -26,7 +27,7 @@ const config: Types.Core.GameConfig = {
 			debug: false,
 		},
 	},
-	scene: [Boot, Preloader, MainMenu, MainGame, GameOver, Overlay],
+	scene: [Boot, Preloader, MainMenu, MainGame, GameOver, Overlay, Dialog],
 };
 
 export default new Game(config);
