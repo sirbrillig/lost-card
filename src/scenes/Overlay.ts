@@ -1,9 +1,38 @@
 import { Scene } from "phaser";
 
 const heartSize: number = 18;
+const itemSize: number = 20;
 const portraitPadding = 22;
 const inactiveFrame = 13;
 const activeFrame = 29;
+
+class Item {
+	image: Phaser.GameObjects.Image;
+	name: string;
+
+	constructor(
+		scene: Phaser.Scene,
+		count: number,
+		texture: string,
+		frame: number,
+		name: string
+	) {
+		const image = scene.add
+			.image(
+				scene.cameras.main.x + scene.cameras.main.width - itemSize * count,
+				scene.cameras.main.y + 20,
+				texture,
+				frame
+			)
+			.setOrigin(1);
+		this.image = image;
+		this.name = name;
+	}
+
+	destroy() {
+		this.image.destroy();
+	}
+}
 
 class Heart {
 	isActive: boolean = false;
@@ -40,6 +69,7 @@ class Heart {
 }
 
 export class Overlay extends Scene {
+	items: Item[] = [];
 	hearts: Heart[] = [];
 	totalHearts: number = 0;
 	activeHearts: number = 0;
@@ -73,6 +103,34 @@ export class Overlay extends Scene {
 			.setScale(0.5)
 			.setOrigin(0);
 		this.createHearts();
+		this.updateItems();
+	}
+
+	updateItems() {
+		if (
+			this.registry.get("hasSword") &&
+			!this.items.some((item) => item.name === "Sword")
+		) {
+			this.items.push(
+				new Item(this, 0, "dungeon_tiles_sprites", 1315, "Sword")
+			);
+		}
+		if (
+			this.registry.get("hasWindCard") &&
+			!this.items.some((item) => item.name === "WindCard")
+		) {
+			this.items.push(
+				new Item(this, this.items.length, "icons3", 31, "WindCard")
+			);
+		}
+		if (
+			this.registry.get("hasIceCard") &&
+			!this.items.some((item) => item.name === "IceCard")
+		) {
+			this.items.push(
+				new Item(this, this.items.length, "icons3", 47, "IceCard")
+			);
+		}
 	}
 
 	getBackgroundWidth() {
@@ -106,6 +164,8 @@ export class Overlay extends Scene {
 		});
 
 		this.bg.setSize(this.getBackgroundWidth(), 20);
+
+		this.updateItems();
 	}
 
 	createHearts() {
