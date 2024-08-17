@@ -14,7 +14,7 @@ export class Dialog extends Scene {
 
 	create(data: DialogData) {
 		const panelTopLeft = new Phaser.Math.Vector2(
-			this.cameras.main.x + 20,
+			this.cameras.main.x + 10,
 			this.cameras.main.y + 40
 		);
 		this.bg = this.add
@@ -23,8 +23,8 @@ export class Dialog extends Scene {
 				panelTopLeft.y,
 				"panel4",
 				0,
-				200,
-				60,
+				230,
+				80,
 				8,
 				8,
 				8,

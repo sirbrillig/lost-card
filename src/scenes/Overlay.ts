@@ -1,4 +1,5 @@
 import { Scene } from "phaser";
+import { DataKeys, Power } from "../shared";
 
 const heartSize: number = 18;
 const itemSize: number = 20;
@@ -74,6 +75,7 @@ export class Overlay extends Scene {
 	totalHearts: number = 0;
 	activeHearts: number = 0;
 	bg: Phaser.GameObjects.NineSlice;
+	selectedItemMarker: Phaser.GameObjects.Image;
 
 	constructor() {
 		super("Overlay");
@@ -104,6 +106,45 @@ export class Overlay extends Scene {
 			.setOrigin(0);
 		this.createHearts();
 		this.updateItems();
+		this.updateSelectedItem();
+	}
+
+	updateSelectedItem() {
+		const activePower: Power | undefined = this.registry.get(
+			DataKeys.ActivePower
+		);
+		if (!activePower) {
+			return;
+		}
+		const x = (() => {
+			switch (activePower) {
+				case "WindCard":
+					return (
+						this.cameras.main.x +
+						this.cameras.main.width -
+						itemSize * 1 -
+						itemSize / 2
+					);
+				case "IceCard":
+					return (
+						this.cameras.main.x +
+						this.cameras.main.width -
+						itemSize * 2 -
+						itemSize / 2
+					);
+			}
+		})();
+		const y = this.cameras.main.y + 20;
+		if (!x) {
+			throw new Error("No coordinates for active power");
+		}
+		if (!this.selectedItemMarker) {
+			this.selectedItemMarker = this.add
+				.image(x, y, "icons2", 10)
+				.setOrigin(0.5);
+		}
+		this.selectedItemMarker.setPosition(x, y);
+		this.selectedItemMarker.setDepth(8);
 	}
 
 	updateItems() {
@@ -166,6 +207,7 @@ export class Overlay extends Scene {
 		this.bg.setSize(this.getBackgroundWidth(), 20);
 
 		this.updateItems();
+		this.updateSelectedItem();
 	}
 
 	createHearts() {

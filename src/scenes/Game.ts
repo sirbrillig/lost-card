@@ -254,6 +254,20 @@ export class Game extends Scene {
 				this.activatePower();
 			}
 		});
+		this.input.keyboard.on("keydown-Z", () => {
+			// Rotate Active Power
+			switch (this.getActivePower()) {
+				case "WindCard":
+					this.setActivePower("IceCard");
+					break;
+				case "IceCard":
+					this.setActivePower("WindCard");
+					break;
+				default:
+					this.setActivePower("WindCard");
+					break;
+			}
+		});
 
 		this.setUpCamera();
 
@@ -317,6 +331,8 @@ export class Game extends Scene {
 
 	activatePower() {
 		this.player.body.setVelocity(0);
+		this.player.anims.stop();
+		this.setPlayerIdleFrame();
 		this.updateSwordHitbox();
 		this.playPowerAnimation();
 	}
@@ -823,7 +839,7 @@ export class Game extends Scene {
 		setTimeout(() => {
 			this.scene.launch("Dialog", {
 				heading: "The Ice Card",
-				text: "Press SHIFT to use it.",
+				text: "Press SHIFT to use it\r\nPress Z to change power",
 			});
 			this.setPlayerInvincible(false);
 			this.setPlayerStunned(false);
@@ -850,7 +866,7 @@ export class Game extends Scene {
 		setTimeout(() => {
 			this.scene.launch("Dialog", {
 				heading: "The Wind Card",
-				text: "Press SHIFT to use it.",
+				text: "Press SHIFT to use it\r\nPress Z to change power",
 			});
 			this.setPlayerInvincible(false);
 			this.setPlayerStunned(false);
