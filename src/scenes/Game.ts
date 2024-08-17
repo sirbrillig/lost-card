@@ -91,7 +91,11 @@ export class Game extends Scene {
 			throw new Error("Could not make tileset");
 		}
 
-		this.createPlayer();
+		const spawnPoint = this.getSpawnPoint();
+		this.createPlayer(
+			saveData?.playerX ?? spawnPoint.x,
+			saveData?.playerY ?? spawnPoint.y
+		);
 		this.attackSprite = this.add.sprite(
 			this.player.x,
 			this.player.y,
@@ -234,11 +238,6 @@ export class Game extends Scene {
 		MainEvents.on("freezePlayer", (setting: boolean) => {
 			this.setPlayerFrozen(setting);
 		});
-
-		if (saveData?.playerX) {
-			console.log("starting game with saved data", saveData);
-			this.movePlayerToPoint(saveData.playerX, saveData.playerY);
-		}
 	}
 
 	turnOffAllLanterns() {
@@ -970,6 +969,20 @@ export class Game extends Scene {
 	preload() {
 		const anims = this.anims;
 		anims.create({
+			key: "appear",
+			frames: anims.generateFrameNumbers("character_appear"),
+			frameRate: 20,
+			showOnStart: true,
+			hideOnComplete: true,
+		});
+		anims.create({
+			key: "white_fire_circle",
+			frames: anims.generateFrameNumbers("white_fire_circle"),
+			frameRate: 20,
+			showOnStart: true,
+			hideOnComplete: true,
+		});
+		anims.create({
 			key: "explode",
 			frames: anims.generateFrameNumbers("monster_explode1"),
 			frameRate: 20,
@@ -1084,17 +1097,19 @@ export class Game extends Scene {
 		});
 	}
 
-	createPlayer(): void {
+	getSpawnPoint(): { x: number; y: number } {
 		const spawnPoint = this.map.findObject(
 			"MetaObjects",
 			(obj) => obj.name === "Start Point"
 		);
-		this.player = this.physics.add.sprite(
-			spawnPoint?.x ?? 400,
-			spawnPoint?.y ?? 350,
-			"character-idle-down",
-			0
-		);
+		return {
+			x: spawnPoint?.x ?? 400,
+			y: spawnPoint?.y ?? 350,
+		};
+	}
+
+	createPlayer(x: number, y: number): void {
+		this.player = this.physics.add.sprite(x, y, "character-idle-down", 0);
 		this.player.setDataEnabled();
 		this.player.setDebugBodyColor(0x00ff00);
 		this.player.setDisplaySize(13, 24);
@@ -1111,6 +1126,27 @@ export class Game extends Scene {
 		this.updateSwordHitbox();
 
 		this.player.setCollideWorldBounds(true);
+		this.player.setVisible(false);
+		this.makePlayerAppear();
+	}
+
+	makePlayerAppear() {
+		const effect = this.add.sprite(
+			this.player.body.center.x + 3,
+			this.player.body.center.y + 5,
+			"character_appear",
+			0
+		);
+		effect.setDepth(5);
+		effect.anims.play("white_fire_circle", true);
+		effect.anims.chain("appear");
+		effect.on(Phaser.Animations.Events.ANIMATION_UPDATE, () => {
+			const name = effect.anims.getName();
+			const progress = effect.anims.getProgress();
+			if (name === "appear" && progress > 0.8) {
+				this.player.setVisible(true);
+			}
+		});
 	}
 
 	createEnemies(): void {
