@@ -1506,6 +1506,7 @@ export class Game extends Scene {
 			this.getPlayerHitPoints() > 0 &&
 			this.doesPlayerHaveSword() &&
 			!this.isPlayerFrozen() &&
+			!this.isPlayerStunned() &&
 			!this.isPlayerAttacking() &&
 			this.getTimeSinceLastAttack() > this.postAttackCooldown &&
 			!this.isPlayerUsingPower()
@@ -1531,6 +1532,7 @@ export class Game extends Scene {
 			this.getPlayerHitPoints() > 0 &&
 			this.doesPlayerHavePower() &&
 			!this.isPlayerFrozen() &&
+			!this.isPlayerStunned() &&
 			!this.isPlayerAttacking() &&
 			this.getTimeSinceLastAttack() > this.postAttackCooldown &&
 			!this.isPlayerUsingPower()
