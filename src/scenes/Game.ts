@@ -1035,6 +1035,9 @@ export class Game extends Scene {
 	updateSwordHitbox() {
 		this.sword.body.debugShowBody = false;
 		this.power.body.debugShowBody = false;
+		this.sword.body.debugShowVelocity = false;
+		this.power.body.debugShowVelocity = false;
+		this.sword.setVelocity(0);
 
 		// We update the sword/power hitbox on every frame even when not in use to
 		// make sure it stays in position relative to the player; otherwise the
@@ -1049,10 +1052,12 @@ export class Game extends Scene {
 
 		if (this.isPlayerSwordActive()) {
 			this.sword.body.debugShowBody = true;
+			this.sword.body.debugShowVelocity = true;
 			return;
 		}
 		if (this.isPlayerUsingPower()) {
 			this.power.body.debugShowBody = true;
+			this.power.body.debugShowVelocity = true;
 			return;
 		}
 	}
@@ -1232,6 +1237,7 @@ export class Game extends Scene {
 		);
 		this.sword.setDebugBodyColor(0x00fff0);
 		this.sword.setDepth(4);
+		this.sword.setPushable(false);
 
 		this.power = this.physics.add.sprite(
 			this.player.x,
