@@ -1,11 +1,11 @@
-import { TeleportToWater, PowerUp, IceAttack } from "./behaviors";
+import { TeleportToWater, PowerUp, RangedIceBall } from "./behaviors";
 import { isTileWithPropertiesObject } from "./shared";
 import { BaseMonster } from "./BaseMonster";
 
-type AllStates = "waterteleport" | "powerup" | "iceattack";
+type AllStates = "waterteleport" | "powerup" | "iceball";
 
 export class WaterDipper extends BaseMonster<AllStates> {
-	hitPoints: number = 2;
+	hitPoints: number = 4;
 
 	initSprites() {
 		this.anims.create({
@@ -54,7 +54,6 @@ export class WaterDipper extends BaseMonster<AllStates> {
 	doesCollideWithTile(
 		tile: Phaser.Tilemaps.Tile | Phaser.Types.Physics.Arcade.GameObjectWithBody
 	): boolean {
-		console.log(tile);
 		if (!isTileWithPropertiesObject(tile)) {
 			return true;
 		}
@@ -73,9 +72,9 @@ export class WaterDipper extends BaseMonster<AllStates> {
 			case "waterteleport":
 				return new TeleportToWater(state, "powerup");
 			case "powerup":
-				return new PowerUp(state, "iceattack");
-			case "iceattack":
-				return new IceAttack(state, "waterteleport");
+				return new PowerUp(state, "iceball");
+			case "iceball":
+				return new RangedIceBall(state, "waterteleport");
 		}
 	}
 }

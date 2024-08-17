@@ -460,3 +460,72 @@ export class IceAttack<AllStates extends string>
 
 	update(): void {}
 }
+
+export class RangedIceBall<AllStates extends string>
+	implements Behavior<AllStates, Phaser.GameObjects.Sprite>
+{
+	#nextState: AllStates;
+	name: AllStates;
+
+	constructor(name: AllStates, nextState: AllStates) {
+		this.name = name;
+		this.#nextState = nextState;
+	}
+
+	init(
+		sprite: Phaser.GameObjects.Sprite,
+		stateMachine: BehaviorMachineInterface<AllStates>,
+		enemyManager: EnemyManager
+	): void {
+		if (!sprite.body || !isDynamicSprite(sprite)) {
+			throw new Error("Could not update monster");
+		}
+		sprite.scene.anims.create({
+			key: "ice_ball",
+			frames: sprite.anims.generateFrameNumbers("ice_ball"),
+			frameRate: 50,
+			showOnStart: true,
+			hideOnComplete: true,
+			yoyo: true,
+		});
+		const effect = sprite.scene.add.sprite(
+			sprite.body.center.x,
+			sprite.body.center.y,
+			"ice_ball",
+			0
+		);
+		sprite.scene.physics.add.existing(effect);
+		effect.setDepth(5);
+		effect.anims.play(
+			{
+				key: "ice_ball",
+				repeat: 3,
+			},
+			true
+		);
+		if (!isDynamicSprite(effect)) {
+			throw new Error("Could not update ice ball");
+		}
+		effect.setDisplaySize(effect.body.width * 0.8, effect.body.height * 0.8);
+		effect.body.setSize(effect.body.width * 0.5, effect.body.height * 0.5);
+		sprite.scene.physics.moveToObject(effect, enemyManager.player, 120);
+
+		sprite.scene.physics.add.overlap(enemyManager.player, effect, () => {
+			MainEvents.emit(Events.EnemyHitPlayer, true);
+			effect.destroy();
+			stateMachine.popState();
+			stateMachine.pushState(this.#nextState);
+		});
+
+		sprite.once(Events.MonsterDying, () => {
+			effect?.destroy();
+		});
+		effect.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
+			effect.destroy();
+			stateMachine.popState();
+			stateMachine.pushState(this.#nextState);
+		});
+	}
+
+	update(): void {}
+}
