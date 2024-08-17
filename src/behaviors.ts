@@ -346,7 +346,7 @@ export class IceAttack<AllStates extends string>
 {
 	#nextState: AllStates;
 	name: AllStates;
-	#freezePlayerTime = 4000;
+	#freezePlayerTime = 3000;
 
 	constructor(name: AllStates, nextState: AllStates) {
 		this.name = name;
@@ -382,9 +382,12 @@ export class IceAttack<AllStates extends string>
 
 		sprite.scene.physics.add.overlap(enemyManager.player, effect, () => {
 			MainEvents.emit(Events.FreezePlayer, true);
-			setTimeout(() => {
-				MainEvents.emit(Events.FreezePlayer, false);
-			}, this.#freezePlayerTime);
+			sprite.scene.time.addEvent({
+				delay: this.#freezePlayerTime,
+				callback: () => {
+					MainEvents.emit(Events.FreezePlayer, false);
+				},
+			});
 		});
 
 		sprite.once(Events.MonsterDying, () => {
