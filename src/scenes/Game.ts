@@ -580,6 +580,9 @@ export class Game extends Scene {
 				if (!this.isPlayerUsingPower()) {
 					return;
 				}
+				if (this.getActivePower() !== "WindCard") {
+					return;
+				}
 				const isAffectedByPower = tile.data.get("affectedByWindCard");
 				if (!isAffectedByPower) {
 					return;
@@ -1367,7 +1370,7 @@ export class Game extends Scene {
 		if (this.isPlayerSwordActive()) {
 			this.sendHitToEnemy(enemy);
 		}
-		if (this.isPlayerUsingPower()) {
+		if (this.isPlayerUsingPower() && this.getActivePower() === "WindCard") {
 			this.pushEnemy(enemy);
 		}
 	}
