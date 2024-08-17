@@ -330,7 +330,9 @@ export class TeleportToWater<AllStates extends string>
 			return false;
 		});
 		if (tiles.length < 1) {
-			throw new Error("No water tiles in room to teleport to");
+			console.log("No water tiles in room to teleport to");
+			stateMachine.popState();
+			stateMachine.pushState(this.#nextState);
 		}
 		// Choose tile at random
 		const targetTile = tiles[Phaser.Math.Between(0, tiles.length - 1)];

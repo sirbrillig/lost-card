@@ -31,6 +31,7 @@ import {
 	loadSavedRegistry,
 	SaveData,
 	isEnemy,
+	isTileWithPropertiesObject,
 } from "../shared";
 
 export class Game extends Scene {
@@ -238,6 +239,15 @@ export class Game extends Scene {
 				this.playerHitEnemy(enemy);
 			}
 		);
+		this.physics.add.overlap(this.power, this.landLayer, (_, tile) => {
+			if (!isTilemapTile(tile)) {
+				return;
+			}
+			if (!this.isPlayerUsingPower() || this.getActivePower() !== "IceCard") {
+				return;
+			}
+			this.freezeWaterTile(tile);
+		});
 
 		if (!this.input.keyboard) {
 			throw new Error("No keyboard controls could be found");
@@ -316,6 +326,12 @@ export class Game extends Scene {
 		MainEvents.on(Events.FreezePlayer, (setting: boolean) => {
 			this.setPlayerFrozen(setting);
 		});
+	}
+
+	freezeWaterTile(tile: Phaser.Tilemaps.Tile) {
+		if (isTileWithPropertiesObject(tile) && tile.properties.isWater) {
+			this.enemyManager.map.removeTile(tile, 284);
+		}
 	}
 
 	turnOffAllLanterns() {
@@ -602,45 +618,56 @@ export class Game extends Scene {
 	}
 
 	checkForPowerHitTiles() {
+		if (!this.isPlayerUsingPower()) {
+			return;
+		}
+
 		this.createdTiles.forEach((tile) => {
 			if (this.physics.overlap(this.power, tile)) {
 				if (!tile.visible) {
 					return;
 				}
-				if (!this.isPlayerUsingPower()) {
-					return;
-				}
-				if (this.getActivePower() !== "WindCard") {
-					return;
-				}
-				const isAffectedByPower = tile.data.get("affectedByWindCard");
-				if (!isAffectedByPower) {
-					return;
-				}
 				if (!tile.x || !tile.y) {
 					return;
 				}
-				if (tile.data.get("beingPushed")) {
-					return;
+				switch (this.getActivePower()) {
+					case "WindCard":
+						this.checkForWindCardHitTile(tile);
+						break;
 				}
-				tile.data.set("beingPushed", true);
-				console.log("hit item", tile);
-
-				// The wind card pushes tiles.
-				const velocity = createVelocityForDirection(
-					this.windCardPushSpeed,
-					this.playerDirection
-				);
-				tile.body.setVelocity(velocity.x, velocity.y);
-				setTimeout(() => {
-					// Tile might have been destroyed before this happens
-					if (tile.body?.setVelocity) {
-						console.log("hit item complete");
-						tile.body.setVelocity(0, 0);
-						tile.data.set("beingPushed", false);
-					}
-				}, this.windCardPushTime);
 			}
+		});
+	}
+
+	checkForWindCardHitTile(
+		tile: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody
+	) {
+		const isAffectedByPower = tile.data.get("affectedByWindCard");
+		if (!isAffectedByPower) {
+			return;
+		}
+		if (tile.data.get("beingPushed")) {
+			return;
+		}
+		tile.data.set("beingPushed", true);
+		console.log("hit item", tile);
+
+		// The wind card pushes tiles.
+		const velocity = createVelocityForDirection(
+			this.windCardPushSpeed,
+			this.playerDirection
+		);
+		tile.body.setVelocity(velocity.x, velocity.y);
+		this.time.addEvent({
+			delay: this.windCardPushTime,
+			callback: () => {
+				// Tile might have been destroyed before this happens
+				if (tile.body?.setVelocity) {
+					console.log("hit item complete");
+					tile.body.setVelocity(0, 0);
+					tile.data.set("beingPushed", false);
+				}
+			},
 		});
 	}
 
@@ -1333,10 +1360,7 @@ export class Game extends Scene {
 
 	createEnemies(): void {
 		this.spawnPoints =
-			this.map.filterObjects("Creatures", (obj) => {
-				if (!isTilemapTile(obj)) {
-					return false;
-				}
+			this.map.filterObjects("Creatures", () => {
 				return true;
 			}) ?? [];
 	}
