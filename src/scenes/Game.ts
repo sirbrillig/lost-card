@@ -176,6 +176,9 @@ export class Game extends Scene {
 				}
 			},
 			(_, enemy) => {
+				if (this.isPlayerInvincible()) {
+					return false;
+				}
 				if (isDynamicSprite(enemy)) {
 					return enemy.visible && !enemy.data?.get("stunned");
 				}
