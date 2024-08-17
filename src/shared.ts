@@ -13,6 +13,7 @@ export const Events = {
 	MonsterDefeated: "defeated",
 	MonsterDying: "dying",
 	MonsterHit: "hit",
+	MonsterStun: "stun",
 	MonsterKillRequest: "kill",
 	EnemyHitPlayer: "enemyHitPlayer",
 	StunPlayer: "stunPlayer",

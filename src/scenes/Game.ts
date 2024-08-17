@@ -66,7 +66,8 @@ export class Game extends Scene {
 	roomTransitionFadeTime: number = 300;
 	sceneStartFadeTime: number = 1000;
 	postAppearInvincibilityTime: number = 1000;
-	icePowerVelocity: number = 60;
+	icePowerVelocity: number = 80;
+	iceCardFrozenTime: number = 3000;
 
 	map: Phaser.Tilemaps.Tilemap;
 	landLayer: Phaser.Tilemaps.TilemapLayer;
@@ -198,7 +199,7 @@ export class Game extends Scene {
 				this.playerHitEnemy(enemy);
 			}
 		);
-		this.physics.add.collider(
+		this.physics.add.overlap(
 			this.power,
 			this.enemyManager.enemies,
 			(_, enemy) => {
@@ -1372,6 +1373,23 @@ export class Game extends Scene {
 		}
 		if (this.isPlayerUsingPower() && this.getActivePower() === "WindCard") {
 			this.pushEnemy(enemy);
+		}
+		if (this.isPlayerUsingPower() && this.getActivePower() === "IceCard") {
+			this.freezeEnemy(enemy);
+		}
+	}
+
+	freezeEnemy(enemy: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody) {
+		if (enemy.data.get(DataKeys.Hittable) === true) {
+			enemy.emit(Events.MonsterStun, true);
+			enemy.setTint(0x0000ff);
+			this.time.addEvent({
+				delay: this.iceCardFrozenTime,
+				callback: () => {
+					enemy?.emit(Events.MonsterStun, false);
+					enemy?.clearTint();
+				},
+			});
 		}
 	}
 

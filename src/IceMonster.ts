@@ -1,4 +1,4 @@
-import { isDynamicSprite, Events } from "./shared";
+import { isDynamicSprite, Events, DataKeys } from "./shared";
 import { BehaviorMachineInterface, Behavior, StateMachine } from "./behavior";
 import { RandomlyWalk, PowerUp, IceAttack } from "./behaviors";
 import { EnemyManager } from "./EnemyManager";
@@ -38,6 +38,9 @@ export class IceMonster extends Phaser.Physics.Arcade.Sprite {
 		this.setDataEnabled();
 		this.data.set("hittable", true);
 		this.on(Events.MonsterHit, this.hit);
+		this.on(Events.MonsterStun, (setting: boolean) => {
+			this.data.set(DataKeys.Stunned, setting);
+		});
 		this.on(Events.MonsterKillRequest, this.kill);
 
 		this.initSprites();
@@ -96,7 +99,9 @@ export class IceMonster extends Phaser.Physics.Arcade.Sprite {
 			body.stop();
 			return;
 		}
-		if (this.data.get("stunned")) {
+		if (this.data.get(DataKeys.Stunned)) {
+			body.stop();
+			body.setVelocity(0);
 			return;
 		}
 
@@ -161,7 +166,7 @@ export class IceMonster extends Phaser.Physics.Arcade.Sprite {
 	kill() {
 		this.emit(Events.MonsterDying);
 		this.setVelocity(0);
-		this.data.set("stunned", true);
+		this.data.set(DataKeys.Stunned, true);
 		this.setOrigin(0.5, 0.3);
 		this.anims.play("explode", true);
 		this.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {

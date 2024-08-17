@@ -382,7 +382,7 @@ export class IceAttack<AllStates extends string>
 
 		sprite.scene.physics.add.overlap(enemyManager.player, effect, () => {
 			MainEvents.emit(Events.FreezePlayer, true);
-			sprite.scene.time.addEvent({
+			sprite?.scene?.time.addEvent({
 				delay: this.#freezePlayerTime,
 				callback: () => {
 					MainEvents.emit(Events.FreezePlayer, false);
