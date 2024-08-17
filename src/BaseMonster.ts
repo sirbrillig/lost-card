@@ -59,6 +59,12 @@ export class BaseMonster<AllStates extends string> extends Phaser.Physics.Arcade
 		throw new Error("constructNewBehaviorFor must be overridden");
 	}
 
+	doesCollideWithTile(
+		_: Phaser.Tilemaps.Tile | Phaser.Types.Physics.Arcade.GameObjectWithBody
+	): boolean {
+		return true;
+	}
+
 	update() {
 		if (!this.body || !isDynamicSprite(this)) {
 			throw new Error("Could not update monster");

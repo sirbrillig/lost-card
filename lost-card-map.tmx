@@ -2958,26 +2958,31 @@
   <tile id="590">
    <properties>
     <property name="collides" type="bool" value="true"/>
+    <property name="isWater" type="bool" value="false"/>
    </properties>
   </tile>
   <tile id="591">
    <properties>
     <property name="collides" type="bool" value="true"/>
+    <property name="isWater" type="bool" value="true"/>
    </properties>
   </tile>
   <tile id="592">
    <properties>
     <property name="collides" type="bool" value="true"/>
+    <property name="isWater" type="bool" value="true"/>
    </properties>
   </tile>
   <tile id="593">
    <properties>
     <property name="collides" type="bool" value="true"/>
+    <property name="isWater" type="bool" value="true"/>
    </properties>
   </tile>
   <tile id="594">
    <properties>
     <property name="collides" type="bool" value="true"/>
+    <property name="isWater" type="bool" value="false"/>
    </properties>
   </tile>
   <tile id="595">
@@ -3163,26 +3168,31 @@
   <tile id="631">
    <properties>
     <property name="collides" type="bool" value="true"/>
+    <property name="isWater" type="bool" value="true"/>
    </properties>
   </tile>
   <tile id="632">
    <properties>
     <property name="collides" type="bool" value="false"/>
+    <property name="isWater" type="bool" value="true"/>
    </properties>
   </tile>
   <tile id="633">
    <properties>
     <property name="collides" type="bool" value="true"/>
+    <property name="isWater" type="bool" value="true"/>
    </properties>
   </tile>
   <tile id="634">
    <properties>
     <property name="collides" type="bool" value="false"/>
+    <property name="isWater" type="bool" value="true"/>
    </properties>
   </tile>
   <tile id="635">
    <properties>
     <property name="collides" type="bool" value="true"/>
+    <property name="isWater" type="bool" value="true"/>
    </properties>
   </tile>
   <tile id="636">
@@ -3368,26 +3378,31 @@
   <tile id="672">
    <properties>
     <property name="collides" type="bool" value="true"/>
+    <property name="isWater" type="bool" value="true"/>
    </properties>
   </tile>
   <tile id="673">
    <properties>
     <property name="collides" type="bool" value="true"/>
+    <property name="isWater" type="bool" value="true"/>
    </properties>
   </tile>
   <tile id="674">
    <properties>
     <property name="collides" type="bool" value="true"/>
+    <property name="isWater" type="bool" value="true"/>
    </properties>
   </tile>
   <tile id="675">
    <properties>
     <property name="collides" type="bool" value="true"/>
+    <property name="isWater" type="bool" value="true"/>
    </properties>
   </tile>
   <tile id="676">
    <properties>
     <property name="collides" type="bool" value="true"/>
+    <property name="isWater" type="bool" value="true"/>
    </properties>
   </tile>
   <tile id="677">
@@ -3573,26 +3588,31 @@
   <tile id="713">
    <properties>
     <property name="collides" type="bool" value="true"/>
+    <property name="isWater" type="bool" value="true"/>
    </properties>
   </tile>
   <tile id="714">
    <properties>
     <property name="collides" type="bool" value="true"/>
+    <property name="isWater" type="bool" value="true"/>
    </properties>
   </tile>
   <tile id="715">
    <properties>
     <property name="collides" type="bool" value="true"/>
+    <property name="isWater" type="bool" value="true"/>
    </properties>
   </tile>
   <tile id="716">
    <properties>
     <property name="collides" type="bool" value="true"/>
+    <property name="isWater" type="bool" value="true"/>
    </properties>
   </tile>
   <tile id="717">
    <properties>
     <property name="collides" type="bool" value="true"/>
+    <property name="isWater" type="bool" value="true"/>
    </properties>
   </tile>
   <tile id="718">
@@ -3778,26 +3798,31 @@
   <tile id="754">
    <properties>
     <property name="collides" type="bool" value="true"/>
+    <property name="isWater" type="bool" value="false"/>
    </properties>
   </tile>
   <tile id="755">
    <properties>
     <property name="collides" type="bool" value="true"/>
+    <property name="isWater" type="bool" value="true"/>
    </properties>
   </tile>
   <tile id="756">
    <properties>
     <property name="collides" type="bool" value="true"/>
+    <property name="isWater" type="bool" value="true"/>
    </properties>
   </tile>
   <tile id="757">
    <properties>
     <property name="collides" type="bool" value="true"/>
+    <property name="isWater" type="bool" value="true"/>
    </properties>
   </tile>
   <tile id="758">
    <properties>
     <property name="collides" type="bool" value="true"/>
+    <property name="isWater" type="bool" value="false"/>
    </properties>
   </tile>
   <tile id="759">

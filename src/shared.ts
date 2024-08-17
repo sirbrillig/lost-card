@@ -1,3 +1,5 @@
+import { BaseMonster } from "./BaseMonster";
+
 // 0 is up, 1 is right, 2 is down, 3 is left
 export const SpriteUp = 0;
 export const SpriteRight = 1;
@@ -543,4 +545,11 @@ export function loadSavedData(): SaveData | undefined {
 		return undefined;
 	}
 	return saveData;
+}
+
+export function isEnemy(
+	sprite: Phaser.GameObjects.Sprite
+): sprite is BaseMonster<"test"> {
+	const test = sprite as BaseMonster<"test">;
+	return "hitPoints" in test;
 }

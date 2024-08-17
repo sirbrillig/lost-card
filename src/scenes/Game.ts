@@ -3,6 +3,7 @@ import { MainEvents } from "../MainEvents";
 import { EnemyManager } from "../EnemyManager";
 import { MonsterA } from "../MonsterA";
 import { IceMonster } from "../IceMonster";
+import { WaterDipper } from "../WaterDipper";
 import { BossA } from "../BossA";
 import {
 	Powers,
@@ -29,6 +30,7 @@ import {
 	loadSavedData,
 	loadSavedRegistry,
 	SaveData,
+	isEnemy,
 } from "../shared";
 
 export class Game extends Scene {
@@ -117,11 +119,39 @@ export class Game extends Scene {
 		this.createEnemies();
 
 		this.landLayer = this.createTileLayer("Background", tilesetTile, 0);
-		this.setTileLayerCollisions(this.landLayer, this.player);
-		this.setTileLayerCollisions(this.landLayer, this.enemyManager.enemies);
+		this.physics.add.collider(this.landLayer, this.player);
+		this.physics.add.collider(
+			this.landLayer,
+			this.enemyManager.enemies,
+			undefined,
+			(enemy, tile) => {
+				if (!isDynamicSprite(enemy)) {
+					console.error(enemy);
+					throw new Error("Non-sprite ran into something");
+				}
+				if (!isEnemy(enemy)) {
+					throw new Error("Non-enemy ran into something");
+				}
+				return enemy.doesCollideWithTile(tile);
+			}
+		);
 		this.stuffLayer = this.createTileLayer("Stuff", tilesetTile, 0);
-		this.setTileLayerCollisions(this.stuffLayer, this.player);
-		this.setTileLayerCollisions(this.stuffLayer, this.enemyManager.enemies);
+		this.physics.add.collider(this.stuffLayer, this.player);
+		this.physics.add.collider(
+			this.stuffLayer,
+			this.enemyManager.enemies,
+			undefined,
+			(enemy, tile) => {
+				if (!isDynamicSprite(enemy)) {
+					console.error(enemy);
+					throw new Error("Non-sprite ran into something");
+				}
+				if (!isEnemy(enemy)) {
+					throw new Error("Non-enemy ran into something");
+				}
+				return enemy.doesCollideWithTile(tile);
+			}
+		);
 
 		this.createDoors();
 		this.createAppearingTiles();
@@ -129,7 +159,7 @@ export class Game extends Scene {
 		this.createSavePoints();
 
 		// Enemies collide with doors but players can pass through them.
-		this.setTileLayerCollisions(this.createdDoors, this.enemyManager.enemies);
+		this.physics.add.collider(this.createdDoors, this.enemyManager.enemies);
 
 		MainEvents.on(Events.EnemyHitPlayer, () => {
 			this.enemyHitPlayer();
@@ -674,16 +704,31 @@ export class Game extends Scene {
 			tile.data.set("hidden", false);
 			tile.body.pushable = false;
 			this.physics.add.collider(this.player, tile);
-			this.physics.add.collider(this.enemyManager.enemies, tile, (_, enemy) => {
-				if (!isDynamicSprite(enemy)) {
-					return;
+			this.physics.add.collider(
+				this.enemyManager.enemies,
+				tile,
+				(_, enemy) => {
+					if (!isDynamicSprite(enemy)) {
+						return;
+					}
+					if (tile.body.velocity.x === 0 && tile.body.velocity.y === 0) {
+						return;
+					}
+					console.log("hit enemy with rock");
+					this.sendHitToEnemy(enemy);
+				},
+				(tile, enemy) => {
+					if (!isDynamicSprite(enemy)) {
+						console.error(enemy);
+						throw new Error("Non-sprite ran into something");
+					}
+					if (!isEnemy(enemy)) {
+						console.error(enemy);
+						throw new Error("Non-enemy ran into something");
+					}
+					return enemy.doesCollideWithTile(tile);
 				}
-				if (tile.body.velocity.x === 0 && tile.body.velocity.y === 0) {
-					return;
-				}
-				console.log("hit enemy with rock");
-				this.sendHitToEnemy(enemy);
-			});
+			);
 			this.physics.add.collider(this.stuffLayer, tile);
 			// Allow destroying rocks by pushing into walls so you can't block
 			// yourself in a room.
@@ -1321,8 +1366,7 @@ export class Game extends Scene {
 					break;
 				}
 				case "WaterDipper": {
-					// FIXME
-					const monster = new IceMonster(
+					const monster = new WaterDipper(
 						this,
 						this.enemyManager,
 						point.x,
@@ -1360,7 +1404,7 @@ export class Game extends Scene {
 		});
 
 		// It seems that we may need to do this again when enemies changes?
-		this.setTileLayerCollisions(this.createdDoors, this.enemyManager.enemies);
+		this.physics.add.collider(this.createdDoors, this.enemyManager.enemies);
 	}
 
 	playerHitEnemy(
