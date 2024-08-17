@@ -4,7 +4,7 @@ import { EnemyManager } from "./EnemyManager";
 
 export class BaseMonster<AllStates extends string> extends Phaser.Physics.Arcade
 	.Sprite {
-	#stateMachine: BehaviorMachineInterface<AllStates>;
+	stateMachine: BehaviorMachineInterface<AllStates>;
 	#currentPlayingState: Behavior<AllStates, BaseMonster<AllStates>> | undefined;
 	#enemyManager: EnemyManager;
 	#isBeingHit: boolean = false;
@@ -21,7 +21,7 @@ export class BaseMonster<AllStates extends string> extends Phaser.Physics.Arcade
 		super(scene, x, y, "monsters1", 51);
 
 		this.#enemyManager = enemyManager;
-		this.#stateMachine = new StateMachine(this.getInitialState());
+		this.stateMachine = new StateMachine(this.getInitialState());
 
 		scene.add.existing(this);
 		scene.physics.add.existing(this);
@@ -33,8 +33,10 @@ export class BaseMonster<AllStates extends string> extends Phaser.Physics.Arcade
 		this.setDepth(1);
 		this.setSize(this.width * 0.35, this.height * 0.35);
 		this.setOffset(this.body.offset.x, this.body.offset.y + 9);
+		this.setCollideWorldBounds(true);
 		this.setPushable(false);
 		this.setDataEnabled();
+		this.data.set(DataKeys.MonsterPosition, new Phaser.Math.Vector2(x, y));
 		this.data.set(DataKeys.Hittable, true);
 		this.on(Events.MonsterHit, this.hit);
 		this.on(Events.MonsterStun, this.setStunned);
@@ -71,7 +73,7 @@ export class BaseMonster<AllStates extends string> extends Phaser.Physics.Arcade
 			return;
 		}
 
-		const state = this.#stateMachine.getCurrentState();
+		const state = this.stateMachine.getCurrentState();
 
 		// Take init actions
 		if (state !== this.#currentPlayingState?.name) {
@@ -81,7 +83,7 @@ export class BaseMonster<AllStates extends string> extends Phaser.Physics.Arcade
 			}
 			this.#currentPlayingState.init(
 				this,
-				this.#stateMachine,
+				this.stateMachine,
 				this.#enemyManager
 			);
 			return;
@@ -90,22 +92,25 @@ export class BaseMonster<AllStates extends string> extends Phaser.Physics.Arcade
 		// Take update actions
 		this.#currentPlayingState?.update(
 			this,
-			this.#stateMachine,
+			this.stateMachine,
 			this.#enemyManager
 		);
 	}
 
 	hit() {
-		if (!this.isHittable()) {
+		if (!this.baseIsHittable()) {
 			return;
 		}
 
 		this.#isBeingHit = true;
 		this.tint = 0xff0000;
-		setTimeout(() => {
-			this.clearTint();
-			this.#isBeingHit = false;
-		}, this.#freeTimeAfterHit);
+		this.scene.time.addEvent({
+			delay: this.#freeTimeAfterHit,
+			callback: () => {
+				this.clearTint();
+				this.#isBeingHit = false;
+			},
+		});
 		this.hitPoints -= 1;
 
 		if (this.hitPoints <= 0) {
@@ -114,7 +119,7 @@ export class BaseMonster<AllStates extends string> extends Phaser.Physics.Arcade
 	}
 
 	setStunned(setting: boolean) {
-		if (!this.isHittable()) {
+		if (!this.baseIsHittable()) {
 			return;
 		}
 		this.data.set(DataKeys.Stunned, setting);
@@ -132,7 +137,11 @@ export class BaseMonster<AllStates extends string> extends Phaser.Physics.Arcade
 		});
 	}
 
+	baseIsHittable(): boolean {
+		return !this.#isBeingHit && this.isHittable();
+	}
+
 	isHittable(): boolean {
-		return !this.#isBeingHit;
+		return true;
 	}
 }

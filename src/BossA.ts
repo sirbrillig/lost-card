@@ -1,17 +1,12 @@
-import { isDynamicSprite, Events, DataKeys } from "./shared";
+import { Events } from "./shared";
 import { EnemyManager } from "./EnemyManager";
-import { Behavior, BehaviorMachineInterface, StateMachine } from "./behavior";
 import { WaitForActive, Roar, SpawnEnemies, PostSpawn } from "./behaviors";
+import { BaseMonster } from "./BaseMonster";
 
 type AllStates = "initial" | "roar1" | "spawn1" | "spawn2" | "idle1" | "idle2";
 
-export class BossA extends Phaser.Physics.Arcade.Sprite {
-	#isBeingHit: boolean = false;
-	#freeTimeAfterHit: number = 600;
-	#hitPoints: number = 6;
-	#stateMachine: BehaviorMachineInterface<AllStates>;
-	#currentPlayingState: Behavior<AllStates, BossA> | undefined;
-	#enemyManager: EnemyManager;
+export class BossA extends BaseMonster<AllStates> {
+	hitPoints: number = 6;
 
 	constructor(
 		scene: Phaser.Scene,
@@ -19,33 +14,19 @@ export class BossA extends Phaser.Physics.Arcade.Sprite {
 		x: number,
 		y: number
 	) {
-		super(scene, x, y, "bosses1", 84);
-
-		this.#enemyManager = enemyManager;
-
-		scene.add.existing(this);
-		scene.physics.add.existing(this);
+		super(scene, enemyManager, x, y);
 
 		if (!this.body) {
 			throw new Error("Could not create monster");
 		}
 
-		this.setDepth(1);
 		this.setSize(this.width * 0.6, this.height * 0.65);
 		this.setOffset(this.body.offset.x, this.body.offset.y + 10);
 		this.setOrigin(0.5, 0.75);
-		this.setCollideWorldBounds(true);
-		this.setPushable(false);
-		this.setScale(1);
-		this.setDataEnabled();
-		this.data.set(DataKeys.MonsterPosition, new Phaser.Math.Vector2(x, y));
-		this.data.set(DataKeys.Hittable, true);
-		this.on(Events.MonsterHit, this.hit);
-		this.on(Events.MonsterKillRequest, this.kill);
+	}
 
-		this.#stateMachine = new StateMachine("initial");
-
-		this.initSprites();
+	getInitialState(): AllStates {
+		return "initial";
 	}
 
 	initSprites() {
@@ -85,87 +66,20 @@ export class BossA extends Phaser.Physics.Arcade.Sprite {
 		});
 	}
 
-	update() {
-		if (!this.body || !isDynamicSprite(this)) {
-			throw new Error("Could not update monster");
-		}
-		this.data.set(DataKeys.Hittable, this.isHittable());
-
-		const body = this.body;
-		if (!this.active) {
-			body.stop();
-			return;
-		}
-
-		if (this.data.get("stunned")) {
-			return;
-		}
-
-		const state = this.#stateMachine.getCurrentState();
-
-		// Take init actions
-		if (state !== this.#currentPlayingState?.name) {
-			console.log(
-				"state has changed from",
-				this.#currentPlayingState?.name,
-				"to",
-				state
-			);
-			switch (state) {
-				case "initial":
-					this.#currentPlayingState = new WaitForActive(state, "roar1");
-					break;
-				case "roar1":
-					this.#currentPlayingState = new Roar(state, "spawn1");
-					break;
-				case "spawn1":
-					this.#currentPlayingState = new SpawnEnemies(state, "spawn2");
-					break;
-				case "spawn2":
-					this.#currentPlayingState = new SpawnEnemies(state, "idle1");
-					break;
-				case "idle1":
-					this.#currentPlayingState = new PostSpawn(state, "idle2");
-					break;
-				case "idle2":
-					this.#currentPlayingState = new PostSpawn(state, "roar1");
-					break;
-			}
-			if (!this.#currentPlayingState) {
-				throw new Error("No state active");
-			}
-			this.#currentPlayingState.init(
-				this,
-				this.#stateMachine,
-				this.#enemyManager
-			);
-			return;
-		}
-
-		// Take update actions
-		this.#currentPlayingState?.update(
-			this,
-			this.#stateMachine,
-			this.#enemyManager
-		);
-	}
-
-	hit() {
-		if (!this.isHittable()) {
-			return;
-		}
-		console.log("hit boss");
-
-		this.#isBeingHit = true;
-		this.tint = 0xff0000;
-		setTimeout(() => {
-			this.clearTint();
-			this.#isBeingHit = false;
-		}, this.#freeTimeAfterHit);
-		this.#hitPoints -= 1;
-
-		if (this.#hitPoints === 0) {
-			this.kill();
+	constructNewBehaviorFor(state: AllStates) {
+		switch (state) {
+			case "initial":
+				return new WaitForActive(state, "roar1");
+			case "roar1":
+				return new Roar(state, "spawn1");
+			case "spawn1":
+				return new SpawnEnemies(state, "spawn2");
+			case "spawn2":
+				return new SpawnEnemies(state, "idle1");
+			case "idle1":
+				return new PostSpawn(state, "idle2");
+			case "idle2":
+				return new PostSpawn(state, "roar1");
 		}
 	}
 
@@ -184,9 +98,8 @@ export class BossA extends Phaser.Physics.Arcade.Sprite {
 
 	isHittable(): boolean {
 		return (
-			this.#stateMachine.getCurrentState() !== "initial" &&
-			!this.#stateMachine.getCurrentState().includes("roar") &&
-			!this.#isBeingHit
+			this.stateMachine.getCurrentState() !== "initial" &&
+			!this.stateMachine.getCurrentState().includes("roar")
 		);
 	}
 }
