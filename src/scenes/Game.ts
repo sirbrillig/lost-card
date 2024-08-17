@@ -61,6 +61,7 @@ export class Game extends Scene {
 	saveCooldown: number = 30000;
 	preGameOverTime: number = 2500;
 	roomTransitionFadeTime: number = 300;
+	sceneStartFadeTime: number = 1000;
 
 	map: Phaser.Tilemaps.Tilemap;
 	landLayer: Phaser.Tilemaps.TilemapLayer;
@@ -77,6 +78,7 @@ export class Game extends Scene {
 	}
 
 	create(saveData: SaveData | undefined) {
+		this.cameras.main.fadeIn(this.sceneStartFadeTime);
 		this.map = this.make.tilemap({ key: "map" });
 		const tilesetTile = this.map.addTilesetImage(
 			"Dungeon_Tiles",
