@@ -6,6 +6,7 @@ import {
 	SpriteLeft,
 	SpriteRight,
 	Events,
+	DataKeys,
 } from "./shared";
 import { EnemyManager } from "./EnemyManager";
 import { Behavior, BehaviorMachineInterface } from "./behavior";
@@ -44,10 +45,12 @@ export class WaitForActive<AllStates extends string>
 	}
 
 	#isPlayerNear(sprite: Phaser.GameObjects.Sprite): boolean {
-		const playerPosition: Phaser.Math.Vector2 =
-			sprite.scene.data.get("playerPosition");
-		const monsterPosition: Phaser.Math.Vector2 =
-			sprite.data.get("monsterPosition");
+		const playerPosition: Phaser.Math.Vector2 = sprite.scene.data.get(
+			DataKeys.PlayerPosition
+		);
+		const monsterPosition: Phaser.Math.Vector2 = sprite.data.get(
+			DataKeys.MonsterPosition
+		);
 		const distance = monsterPosition.distance(playerPosition);
 		if (distance > this.#distanceToActivate) {
 			return false;

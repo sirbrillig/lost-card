@@ -19,6 +19,13 @@ export const Events = {
 	FreezePlayer: "freezePlayer",
 };
 
+export const DataKeys = {
+	Stunned: "stunned",
+	Hittable: "hittable",
+	MonsterPosition: "monsterPosition",
+	PlayerPosition: "playerPosition",
+};
+
 export function isDynamicSprite(
 	obj: unknown
 ): obj is Phaser.Types.Physics.Arcade.SpriteWithDynamicBody {

@@ -6,6 +6,7 @@ import { IceMonster } from "../IceMonster";
 import { BossA } from "../BossA";
 import {
 	Events,
+	DataKeys,
 	SpriteUp,
 	SpriteRight,
 	SpriteDown,
@@ -599,8 +600,9 @@ export class Game extends Scene {
 			}
 
 			const tilePosition = new Phaser.Math.Vector2(tile.body.x, tile.body.y);
-			const playerPosition: Phaser.Math.Vector2 =
-				this.data.get("playerPosition");
+			const playerPosition: Phaser.Math.Vector2 = this.data.get(
+				DataKeys.PlayerPosition
+			);
 			const distanceToActivate: number =
 				this.data.get("distanceToActivate") ?? this.distanceToActivateTransient;
 
@@ -1301,7 +1303,7 @@ export class Game extends Scene {
 	}
 
 	pushEnemy(enemy: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody) {
-		if (enemy.data.get("hittable") === true) {
+		if (enemy.data.get(DataKeys.Hittable) === true) {
 			enemy.data.set("stunned", true);
 			this.knockBack(
 				enemy.body,
@@ -1316,7 +1318,7 @@ export class Game extends Scene {
 	}
 
 	sendHitToEnemy(enemy: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody) {
-		if (enemy.data.get("hittable") === true) {
+		if (enemy.data.get(DataKeys.Hittable) === true) {
 			this.cameras.main.shake(200, 0.004);
 			enemy.emit(Events.MonsterHit);
 
@@ -1328,7 +1330,11 @@ export class Game extends Scene {
 				() => {}
 			);
 		} else {
-			console.log("enemy not hittable", enemy, enemy.data.get("hittable"));
+			console.log(
+				"enemy not hittable",
+				enemy,
+				enemy.data.get(DataKeys.Hittable)
+			);
 		}
 	}
 
@@ -1603,7 +1609,7 @@ export class Game extends Scene {
 	updatePlayer(): void {
 		this.updatePlayerTint();
 		this.data.set(
-			"playerPosition",
+			DataKeys.PlayerPosition,
 			new Phaser.Math.Vector2(this.player.x, this.player.y)
 		);
 

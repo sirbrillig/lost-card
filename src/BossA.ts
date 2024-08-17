@@ -1,4 +1,4 @@
-import { isDynamicSprite, Events } from "./shared";
+import { isDynamicSprite, Events, DataKeys } from "./shared";
 import { EnemyManager } from "./EnemyManager";
 import { Behavior, BehaviorMachineInterface, StateMachine } from "./behavior";
 import { WaitForActive, Roar, SpawnEnemies, PostSpawn } from "./behaviors";
@@ -38,8 +38,8 @@ export class BossA extends Phaser.Physics.Arcade.Sprite {
 		this.setPushable(false);
 		this.setScale(1);
 		this.setDataEnabled();
-		this.data.set("monsterPosition", new Phaser.Math.Vector2(x, y));
-		this.data.set("hittable", true);
+		this.data.set(DataKeys.MonsterPosition, new Phaser.Math.Vector2(x, y));
+		this.data.set(DataKeys.Hittable, true);
 		this.on(Events.MonsterHit, this.hit);
 		this.on(Events.MonsterKillRequest, this.kill);
 
@@ -89,7 +89,7 @@ export class BossA extends Phaser.Physics.Arcade.Sprite {
 		if (!this.body || !isDynamicSprite(this)) {
 			throw new Error("Could not update monster");
 		}
-		this.data.set("hittable", this.isHittable());
+		this.data.set(DataKeys.Hittable, this.isHittable());
 
 		const body = this.body;
 		if (!this.active) {
