@@ -258,13 +258,16 @@ export class Game extends Scene {
 			// Rotate Active Power
 			switch (this.getActivePower()) {
 				case "WindCard":
-					this.setActivePower("IceCard");
+					if (this.registry.get("hasIceCard")) {
+						this.setActivePower("IceCard");
+					}
 					break;
 				case "IceCard":
-					this.setActivePower("WindCard");
+					if (this.registry.get("hasWindCard")) {
+						this.setActivePower("WindCard");
+					}
 					break;
 				default:
-					this.setActivePower("WindCard");
 					break;
 			}
 		});
@@ -858,6 +861,7 @@ export class Game extends Scene {
 
 		// Play power animation
 		this.updateSwordHitboxForPower();
+		this.power.setVelocity(0, 0);
 		this.power.setRotation(Phaser.Math.DegToRad(0));
 		this.power.anims.play("character-right-power", true);
 
