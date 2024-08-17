@@ -5,7 +5,7 @@ import { BaseMonster } from "./BaseMonster";
 type AllStates = "waterteleport" | "powerup" | "iceball";
 
 export class WaterDipper extends BaseMonster<AllStates> {
-	hitPoints: number = 4;
+	hitPoints: number = 6;
 
 	initSprites() {
 		this.anims.create({
