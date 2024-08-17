@@ -1,50 +1,10 @@
-import { isDynamicSprite, Events, DataKeys } from "./shared";
-import { BehaviorMachineInterface, Behavior, StateMachine } from "./behavior";
 import { RandomlyWalk, PowerUp, IceAttack } from "./behaviors";
-import { EnemyManager } from "./EnemyManager";
+import { BaseMonster } from "./BaseMonster";
 
 type AllStates = "randomwalk" | "powerup" | "iceattack";
 
-export class IceMonster extends Phaser.Physics.Arcade.Sprite {
-	#stateMachine: BehaviorMachineInterface<AllStates>;
-	#currentPlayingState: Behavior<AllStates, IceMonster> | undefined;
-	#enemyManager: EnemyManager;
-	#hitPoints: number = 2;
-	#isBeingHit: boolean = false;
-	#freeTimeAfterHit: number = 600;
-
-	constructor(
-		scene: Phaser.Scene,
-		enemyManager: EnemyManager,
-		x: number,
-		y: number
-	) {
-		super(scene, x, y, "monsters1", 51);
-
-		this.#enemyManager = enemyManager;
-		this.#stateMachine = new StateMachine("randomwalk");
-
-		scene.add.existing(this);
-		scene.physics.add.existing(this);
-
-		if (!this.body) {
-			throw new Error("Could not create monster");
-		}
-
-		this.setDepth(1);
-		this.setSize(this.width * 0.35, this.height * 0.35);
-		this.setOffset(this.body.offset.x, this.body.offset.y + 9);
-		this.setPushable(false);
-		this.setDataEnabled();
-		this.data.set("hittable", true);
-		this.on(Events.MonsterHit, this.hit);
-		this.on(Events.MonsterStun, (setting: boolean) => {
-			this.data.set(DataKeys.Stunned, setting);
-		});
-		this.on(Events.MonsterKillRequest, this.kill);
-
-		this.initSprites();
-	}
+export class IceMonster extends BaseMonster<AllStates> {
+	hitPoints: number = 2;
 
 	initSprites() {
 		this.anims.create({
@@ -90,92 +50,18 @@ export class IceMonster extends Phaser.Physics.Arcade.Sprite {
 		});
 	}
 
-	update() {
-		if (!this.body || !isDynamicSprite(this)) {
-			throw new Error("Could not update monster");
-		}
-		const body = this.body;
-		if (!this.active) {
-			body.stop();
-			return;
-		}
-		if (this.data.get(DataKeys.Stunned)) {
-			body.stop();
-			body.setVelocity(0);
-			return;
-		}
-
-		const state = this.#stateMachine.getCurrentState();
-
-		// Take init actions
-		if (state !== this.#currentPlayingState?.name) {
-			console.log(
-				"state has changed from",
-				this.#currentPlayingState?.name,
-				"to",
-				state
-			);
-			switch (state) {
-				case "randomwalk":
-					this.#currentPlayingState = new RandomlyWalk(state, "powerup");
-					break;
-				case "powerup":
-					this.#currentPlayingState = new PowerUp(state, "iceattack");
-					break;
-				case "iceattack":
-					this.#currentPlayingState = new IceAttack(state, "randomwalk");
-					break;
-			}
-			if (!this.#currentPlayingState) {
-				throw new Error("No state active");
-			}
-			this.#currentPlayingState.init(
-				this,
-				this.#stateMachine,
-				this.#enemyManager
-			);
-			return;
-		}
-
-		// Take update actions
-		this.#currentPlayingState?.update(
-			this,
-			this.#stateMachine,
-			this.#enemyManager
-		);
+	getInitialState(): AllStates {
+		return "randomwalk";
 	}
 
-	hit() {
-		if (!this.isHittable()) {
-			return;
+	constructNewBehaviorFor(state: string) {
+		switch (state) {
+			case "randomwalk":
+				return new RandomlyWalk(state, "powerup");
+			case "powerup":
+				return new PowerUp(state, "iceattack");
+			case "iceattack":
+				return new IceAttack(state, "randomwalk");
 		}
-
-		this.#isBeingHit = true;
-		this.tint = 0xff0000;
-		setTimeout(() => {
-			this.clearTint();
-			this.#isBeingHit = false;
-		}, this.#freeTimeAfterHit);
-		this.#hitPoints -= 1;
-
-		if (this.#hitPoints === 0) {
-			this.kill();
-		}
-	}
-
-	kill() {
-		this.emit(Events.MonsterDying);
-		this.setVelocity(0);
-		this.data.set(DataKeys.Stunned, true);
-		this.setOrigin(0.5, 0.3);
-		this.anims.play("explode", true);
-		this.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
-			this.emit(Events.MonsterDefeated);
-			this.destroy();
-		});
-	}
-
-	isHittable(): boolean {
-		return !this.#isBeingHit;
 	}
 }

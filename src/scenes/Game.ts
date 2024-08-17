@@ -1395,14 +1395,13 @@ export class Game extends Scene {
 
 	pushEnemy(enemy: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody) {
 		if (enemy.data.get(DataKeys.Hittable) === true) {
-			enemy.data.set("stunned", true);
+			enemy.emit(Events.MonsterStun, true);
 			this.knockBack(
 				enemy.body,
 				this.windCardPushTime,
 				this.playerDirection,
 				() => {
-					// Enemy might be gone before stun ends
-					enemy?.data?.set("stunned", false);
+					enemy?.emit(Events.MonsterStun, false);
 				}
 			);
 		}
@@ -1494,11 +1493,14 @@ export class Game extends Scene {
 	) {
 		const bounceSpeed = this.knockBackSpeed;
 
-		setTimeout(() => {
-			body.setVelocityX(0);
-			body.setVelocityY(0);
-			completeCallback?.();
-		}, time);
+		this.time.addEvent({
+			delay: time,
+			callback: () => {
+				body.setVelocityX(0);
+				body.setVelocityY(0);
+				completeCallback?.();
+			},
+		});
 
 		body.setVelocityX(0);
 		body.setVelocityY(0);
