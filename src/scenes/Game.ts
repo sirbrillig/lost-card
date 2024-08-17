@@ -685,13 +685,29 @@ export class Game extends Scene {
 	}
 
 	showHiddenItem(name: string) {
-		this.createdItems.forEach((item) => {
-			if (item.name === name) {
-				if (item.data.get("hidden")) {
-					item.data.set("hidden", false);
-					item.setVisible(true);
-					item.setActive(true);
-				}
+		const item = this.createdItems.find((item) => item.name === name);
+		if (!item) {
+			return;
+		}
+		if (!item.data.get("hidden")) {
+			return;
+		}
+		const effect = this.add.sprite(
+			item.body.center.x,
+			item.body.center.y,
+			"character_appear",
+			0
+		);
+		effect.setDepth(5);
+		effect.anims.play("white_fire_circle", true);
+		effect.anims.chain("appear");
+		effect.on(Phaser.Animations.Events.ANIMATION_UPDATE, () => {
+			const name = effect.anims.getName();
+			const progress = effect.anims.getProgress();
+			if (name === "appear" && progress > 0.8) {
+				item.data.set("hidden", false);
+				item.setVisible(true);
+				item.setActive(true);
 			}
 		});
 	}
