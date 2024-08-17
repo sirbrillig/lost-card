@@ -194,6 +194,7 @@ export class Game extends Scene {
 		}
 		this.cursors = this.input.keyboard.createCursorKeys();
 		this.input.keyboard.on("keydown-D", () => {
+			// Cheat: show hitboxes
 			if (this.debugGraphic) {
 				this.debugGraphic.destroy();
 				this.debugGraphic = undefined;
@@ -201,14 +202,24 @@ export class Game extends Scene {
 				this.debugGraphic = this.physics.world.createDebugGraphic();
 			}
 		});
+		this.input.keyboard.on("keydown-H", () => {
+			// Cheat: restore all HP
+			this.setPlayerHitPoints(
+				this.registry.get("playerTotalHitPoints") ?? this.playerInitialHitPoints
+			);
+		});
 		this.input.keyboard.on("keydown-P", () => {
+			// Cheat: gain all items
 			this.equipSword();
 			this.equipWindCard();
+			this.equipIceCard();
 		});
 		this.input.keyboard.on("keydown-S", () => {
+			// Cheat: save
 			this.saveGame();
 		});
 		this.input.keyboard.on("keydown-L", () => {
+			// Cheat: load
 			this.loadLastSave();
 		});
 		this.input.keyboard.on("keydown-SPACE", () => {
@@ -708,6 +719,9 @@ export class Game extends Scene {
 				case "WindCard":
 					this.pickUpWindCard();
 					break;
+				case "IceCard":
+					this.pickUpIceCard();
+					break;
 				case "Heart":
 					this.pickUpHeart();
 					break;
@@ -754,6 +768,32 @@ export class Game extends Scene {
 		playerTotalHitPoints += 1;
 		this.registry.set("playerTotalHitPoints", playerTotalHitPoints);
 		this.setPlayerHitPoints(playerTotalHitPoints);
+	}
+
+	pickUpIceCard() {
+		this.equipIceCard();
+
+		// Face right
+		this.playerDirection = SpriteRight;
+		this.setPlayerIdleFrame();
+
+		// Play power animation
+		this.updateSwordHitboxForPower();
+		this.sword.setRotation(Phaser.Math.DegToRad(0));
+		// FIXME
+		this.sword.anims.play("character-right-power", true);
+
+		this.setPlayerStunned(true);
+		setTimeout(() => {
+			this.scene.launch("Dialog", {
+				heading: "The Ice Card",
+				text: "Press SHIFT to use it.",
+			});
+			this.setPlayerStunned(false);
+			this.input.keyboard?.once("keydown-SHIFT", () => {
+				this.scene.get("Dialog")?.scene.stop();
+			});
+		}, this.gotItemFreeze);
 	}
 
 	pickUpWindCard() {
@@ -1184,6 +1224,20 @@ export class Game extends Scene {
 					this.enemyManager.enemies.add(monster);
 					break;
 				}
+				case "WaterDipper": {
+					// FIXME
+					const monster = new IceMonster(
+						this,
+						this.enemyManager,
+						point.x,
+						point.y
+					);
+					monster.once("defeated", () => {
+						this.showHiddenItem("IceCard");
+					});
+					this.enemyManager.enemies.add(monster);
+					break;
+				}
 				case "IceMonster": {
 					const monster = new IceMonster(
 						this,
@@ -1370,6 +1424,10 @@ export class Game extends Scene {
 		this.registry.set("hasWindCard", true);
 	}
 
+	equipIceCard(): void {
+		this.registry.set("hasIceCard", true);
+	}
+
 	canPlayerUsePower(): boolean {
 		return (
 			this.getPlayerHitPoints() > 0 &&
@@ -1382,7 +1440,10 @@ export class Game extends Scene {
 	}
 
 	doesPlayerHavePower(): boolean {
-		return this.registry.get("hasWindCard") === true;
+		return (
+			this.registry.get("hasWindCard") === true ||
+			this.registry.get("hasIceCard") === true
+		);
 	}
 
 	doesPlayerHaveSword(): boolean {
