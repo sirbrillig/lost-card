@@ -24,7 +24,10 @@ export const DataKeys = {
 	Hittable: "hittable",
 	MonsterPosition: "monsterPosition",
 	PlayerPosition: "playerPosition",
+	ActivePower: "activePower",
 };
+
+export type Powers = "IceCard" | "WindCard";
 
 export function isDynamicSprite(
 	obj: unknown
