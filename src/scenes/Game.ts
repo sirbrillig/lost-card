@@ -1275,7 +1275,7 @@ export class Game extends Scene {
 		this.player.setDataEnabled();
 		this.player.setDebugBodyColor(0x00ff00);
 		this.player.setDisplaySize(13, 24);
-		this.player.setSize(8, 14);
+		this.player.setSize(8, 10);
 		this.player.setDepth(1);
 		this.sword = this.physics.add.sprite(
 			this.player.x,
@@ -1480,6 +1480,9 @@ export class Game extends Scene {
 	}
 
 	gameOver() {
+		if (!this.scene.isActive()) {
+			return;
+		}
 		console.log("game over!");
 		this.cameras.main.fadeOut(1000, 0, 0, 0, (_: unknown, progress: number) => {
 			if (progress === 1) {
@@ -1510,9 +1513,12 @@ export class Game extends Scene {
 		this.setPlayerHitPoints(this.getPlayerHitPoints() - 1);
 
 		if (this.getPlayerHitPoints() <= 0) {
-			setTimeout(() => {
-				this.gameOver();
-			}, this.preGameOverTime);
+			this.time.addEvent({
+				delay: this.preGameOverTime,
+				callback: () => {
+					this.gameOver();
+				},
+			});
 			return;
 		}
 
