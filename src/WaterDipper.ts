@@ -1,8 +1,8 @@
-import { RandomlyWalk, PowerUp, IceAttack } from "./behaviors";
+import { TeleportToWater, PowerUp, IceAttack } from "./behaviors";
 import { isTileWithPropertiesObject } from "./shared";
 import { BaseMonster } from "./BaseMonster";
 
-type AllStates = "randomwalk" | "powerup" | "iceattack";
+type AllStates = "waterteleport" | "powerup" | "iceattack";
 
 export class WaterDipper extends BaseMonster<AllStates> {
 	hitPoints: number = 2;
@@ -65,17 +65,17 @@ export class WaterDipper extends BaseMonster<AllStates> {
 	}
 
 	getInitialState(): AllStates {
-		return "randomwalk";
+		return "waterteleport";
 	}
 
 	constructNewBehaviorFor(state: string) {
 		switch (state) {
-			case "randomwalk":
-				return new RandomlyWalk(state, "powerup");
+			case "waterteleport":
+				return new TeleportToWater(state, "powerup");
 			case "powerup":
 				return new PowerUp(state, "iceattack");
 			case "iceattack":
-				return new IceAttack(state, "randomwalk");
+				return new IceAttack(state, "waterteleport");
 		}
 	}
 }

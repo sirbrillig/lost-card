@@ -1,5 +1,6 @@
 import {
 	isDynamicSprite,
+	isTileWithPropertiesObject,
 	getDirectionOfSpriteMovement,
 	SpriteUp,
 	SpriteDown,
@@ -7,6 +8,7 @@ import {
 	SpriteRight,
 	Events,
 	DataKeys,
+	getTilesInRoom,
 } from "./shared";
 import { EnemyManager } from "./EnemyManager";
 import { Behavior, BehaviorMachineInterface } from "./behavior";
@@ -291,6 +293,62 @@ export class RandomlyWalk<AllStates extends string>
 				break;
 		}
 	}
+}
+
+export class TeleportToWater<AllStates extends string>
+	implements Behavior<AllStates, Phaser.GameObjects.Sprite>
+{
+	#postTeleportDelay = 1000;
+	#nextState: AllStates;
+	name: AllStates;
+
+	constructor(name: AllStates, nextState: AllStates) {
+		this.name = name;
+		this.#nextState = nextState;
+	}
+
+	init(
+		sprite: Phaser.GameObjects.Sprite,
+		stateMachine: BehaviorMachineInterface<AllStates>,
+		enemyManager: EnemyManager
+	): void {
+		if (!isDynamicSprite(sprite)) {
+			throw new Error("invalid sprite");
+		}
+		if (!enemyManager.activeRoom) {
+			throw new Error("Cannot create monster outside of room");
+		}
+		sprite.body.setVelocity(0);
+		// Get all water tiles in room
+		const tiles = getTilesInRoom(
+			enemyManager.map,
+			enemyManager.activeRoom
+		).filter((tile) => {
+			if (isTileWithPropertiesObject(tile) && tile.properties.isWater) {
+				return true;
+			}
+			return false;
+		});
+		if (tiles.length < 1) {
+			throw new Error("No water tiles in room to teleport to");
+		}
+		// Choose tile at random
+		const targetTile = tiles[Phaser.Math.Between(0, tiles.length - 1)];
+		const x = targetTile.pixelX + targetTile.width / 2;
+		// Move to tile
+		sprite.setPosition(x, targetTile.pixelY);
+
+		// Move to next state
+		sprite.scene.time.addEvent({
+			delay: this.#postTeleportDelay,
+			callback: () => {
+				stateMachine.popState();
+				stateMachine.pushState(this.#nextState);
+			},
+		});
+	}
+
+	update() {}
 }
 
 export class PowerUp<AllStates extends string>

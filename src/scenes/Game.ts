@@ -74,7 +74,6 @@ export class Game extends Scene {
 	map: Phaser.Tilemaps.Tilemap;
 	landLayer: Phaser.Tilemaps.TilemapLayer;
 	stuffLayer: Phaser.Tilemaps.TilemapLayer;
-	activeRoom: Phaser.Types.Tilemaps.TiledObject | undefined;
 	createdDoors: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody[] = [];
 	createdSavePoints: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody[] = [];
 	createdTiles: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody[] = [];
@@ -115,7 +114,7 @@ export class Game extends Scene {
 		this.attackSprite.setDepth(4);
 		this.attackSprite.setVisible(false);
 
-		this.enemyManager = new EnemyManager(this, this.player);
+		this.enemyManager = new EnemyManager(this, this.player, this.map);
 		this.createEnemies();
 
 		this.landLayer = this.createTileLayer("Background", tilesetTile, 0);
@@ -507,7 +506,7 @@ export class Game extends Scene {
 
 		camera.startFollow(this.player);
 
-		this.activeRoom = room;
+		this.enemyManager.activeRoom = room;
 		this.enteredRoomAt = this.time.now;
 		hideAllRoomsExcept(
 			this.map,
@@ -646,8 +645,8 @@ export class Game extends Scene {
 	}
 
 	updateAppearingTiles() {
-		const transientTiles = this.activeRoom
-			? getItemsInRoom(this.createdTiles, this.activeRoom)
+		const transientTiles = this.enemyManager.activeRoom
+			? getItemsInRoom(this.createdTiles, this.enemyManager.activeRoom)
 			: [];
 
 		// Don't consider tiles which are already visible.
@@ -952,7 +951,7 @@ export class Game extends Scene {
 
 		// if the player enters a door, move the camera to that room
 		const room = getRoomForPoint(this.map, this.player.x, this.player.y);
-		if (room !== this.activeRoom) {
+		if (room !== this.enemyManager.activeRoom) {
 			console.log("moving camera to room", room);
 			this.moveCameraToRoom(room);
 		}
@@ -1344,10 +1343,18 @@ export class Game extends Scene {
 
 	createEnemiesInRoom() {
 		this.spawnPoints.forEach((point) => {
-			if (point.x === undefined || point.y === undefined || !this.activeRoom) {
+			if (
+				point.x === undefined ||
+				point.y === undefined ||
+				!this.enemyManager.activeRoom
+			) {
 				return;
 			}
-			const isEnemyInRoom = isPointInRoom(point.x, point.y, this.activeRoom);
+			const isEnemyInRoom = isPointInRoom(
+				point.x,
+				point.y,
+				this.enemyManager.activeRoom
+			);
 			if (!isEnemyInRoom) {
 				return;
 			}
