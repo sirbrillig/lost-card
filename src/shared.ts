@@ -12,7 +12,7 @@ export type SpriteDirection =
 export const Events = {
 	MonsterDefeated: "defeated",
 	MonsterDying: "dying",
-	MonsterHit: "dying",
+	MonsterHit: "hit",
 	MonsterKillRequest: "kill",
 	EnemyHitPlayer: "enemyHitPlayer",
 	StunPlayer: "stunPlayer",

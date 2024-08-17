@@ -85,13 +85,13 @@ export class Roar<AllStates extends string>
 			},
 			true
 		);
-		MainEvents.emit("stunPlayer", true);
+		MainEvents.emit(Events.StunPlayer, true);
 		sprite.scene.cameras.main.shake(2000, 0.009);
 		sprite.once(
 			Phaser.Animations.Events.ANIMATION_COMPLETE,
 			(anim: Phaser.Animations.Animation) => {
 				console.log("roar complete", anim);
-				MainEvents.emit("stunPlayer", false);
+				MainEvents.emit(Events.StunPlayer, false);
 				stateMachine.popState();
 				stateMachine.pushState(this.#nextState);
 			}
@@ -169,10 +169,11 @@ export class SpawnEnemies<AllStates extends string>
 			sprite.body.y + sprite.body.height
 		);
 		monster.once(Phaser.GameObjects.Events.DESTROY, () => {
-			sprite.data.set("spawnedEnemyCount", spawnedEnemyCount - 1);
+			sprite?.data?.set("spawnedEnemyCount", spawnedEnemyCount - 1);
 		});
 		enemyManager.enemies.add(monster);
 		sprite.once(Events.MonsterDying, () => {
+			console.log("spawner is dying so killing spawned creatures");
 			monster.emit(Events.MonsterKillRequest);
 		});
 	}
@@ -380,9 +381,9 @@ export class IceAttack<AllStates extends string>
 		effect.anims.play("ice_attack", true);
 
 		sprite.scene.physics.add.overlap(enemyManager.player, effect, () => {
-			MainEvents.emit("freezePlayer", true);
+			MainEvents.emit(Events.FreezePlayer, true);
 			setTimeout(() => {
-				MainEvents.emit("freezePlayer", false);
+				MainEvents.emit(Events.FreezePlayer, false);
 			}, this.#freezePlayerTime);
 		});
 
