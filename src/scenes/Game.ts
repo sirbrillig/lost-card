@@ -1126,6 +1126,7 @@ export class Game extends Scene {
 		this.updateSwordHitbox();
 
 		this.player.setCollideWorldBounds(true);
+		this.setPlayerStunned(true);
 		this.player.setVisible(false);
 		this.makePlayerAppear();
 	}
@@ -1144,6 +1145,7 @@ export class Game extends Scene {
 			const name = effect.anims.getName();
 			const progress = effect.anims.getProgress();
 			if (name === "appear" && progress > 0.8) {
+				this.setPlayerStunned(false);
 				this.player.setVisible(true);
 			}
 		});
