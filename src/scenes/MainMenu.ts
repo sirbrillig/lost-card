@@ -11,6 +11,7 @@ export class MainMenu extends Scene {
 	}
 
 	create() {
+		this.selectedButton = 0;
 		this.add.image(0, 0, "Mountain-Dusk").setOrigin(0, 0);
 
 		this.add
