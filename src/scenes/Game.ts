@@ -1037,6 +1037,7 @@ export class Game extends Scene {
 			key: "white_fire_circle",
 			frames: anims.generateFrameNumbers("white_fire_circle"),
 			frameRate: 20,
+			repeat: 2,
 			showOnStart: true,
 			hideOnComplete: true,
 		});
