@@ -64,6 +64,7 @@ export class Game extends Scene {
 	preGameOverTime: number = 2500;
 	roomTransitionFadeTime: number = 300;
 	sceneStartFadeTime: number = 1000;
+	postAppearInvincibilityTime: number = 1000;
 
 	map: Phaser.Tilemaps.Tilemap;
 	landLayer: Phaser.Tilemaps.TilemapLayer;
@@ -804,12 +805,14 @@ export class Game extends Scene {
 		// FIXME
 		this.sword.anims.play("character-right-power", true);
 
+		this.setPlayerInvincible(true);
 		this.setPlayerStunned(true);
 		setTimeout(() => {
 			this.scene.launch("Dialog", {
 				heading: "The Ice Card",
 				text: "Press SHIFT to use it.",
 			});
+			this.setPlayerInvincible(false);
 			this.setPlayerStunned(false);
 			this.input.keyboard?.once("keydown-SHIFT", () => {
 				this.scene.get("Dialog")?.scene.stop();
@@ -829,12 +832,14 @@ export class Game extends Scene {
 		this.sword.setRotation(Phaser.Math.DegToRad(0));
 		this.sword.anims.play("character-right-power", true);
 
+		this.setPlayerInvincible(true);
 		this.setPlayerStunned(true);
 		setTimeout(() => {
 			this.scene.launch("Dialog", {
 				heading: "The Wind Card",
 				text: "Press SHIFT to use it.",
 			});
+			this.setPlayerInvincible(false);
 			this.setPlayerStunned(false);
 			this.input.keyboard?.once("keydown-SHIFT", () => {
 				this.scene.get("Dialog")?.scene.stop();
@@ -845,12 +850,14 @@ export class Game extends Scene {
 	pickUpSword() {
 		this.equipSword();
 		this.player.anims.play("character-down-attack", true);
+		this.setPlayerInvincible(true);
 		this.setPlayerStunned(true);
 		setTimeout(() => {
 			this.scene.launch("Dialog", {
 				heading: "You found a sword!",
 				text: "Press SPACE to swing.",
 			});
+			this.setPlayerInvincible(false);
 			this.setPlayerStunned(false);
 			this.input.keyboard?.once("keydown-SPACE", () => {
 				this.scene.get("Dialog")?.scene.stop();
@@ -1188,12 +1195,13 @@ export class Game extends Scene {
 		this.updateSwordHitbox();
 
 		this.player.setCollideWorldBounds(true);
-		this.setPlayerStunned(true);
-		this.player.setVisible(false);
 		this.makePlayerAppear();
 	}
 
 	makePlayerAppear() {
+		this.setPlayerInvincible(true);
+		this.setPlayerStunned(true);
+		this.player.setVisible(false);
 		const effect = this.add.sprite(
 			this.player.body.center.x + 3,
 			this.player.body.center.y + 5,
@@ -1209,6 +1217,12 @@ export class Game extends Scene {
 			if (name === "appear" && progress > 0.8) {
 				this.setPlayerStunned(false);
 				this.player.setVisible(true);
+				this.time.addEvent({
+					delay: this.postAppearInvincibilityTime,
+					callback: () => {
+						this.setPlayerInvincible(false);
+					},
+				});
 			}
 		});
 	}
@@ -1350,7 +1364,7 @@ export class Game extends Scene {
 	}
 
 	enemyHitPlayer(): void {
-		if (this.framesSincePlayerHit > 0) {
+		if (this.framesSincePlayerHit > 0 || this.isPlayerInvincible()) {
 			return;
 		}
 		console.log("player got hit!");
@@ -1482,6 +1496,14 @@ export class Game extends Scene {
 
 	setPlayerStunned(setting: boolean) {
 		this.player.data?.set("stunPlayer", setting);
+	}
+
+	setPlayerInvincible(setting: boolean) {
+		this.player.data?.set("invinciblePlayer", setting);
+	}
+
+	isPlayerInvincible(): boolean {
+		return this.player.data?.get("invinciblePlayer");
 	}
 
 	isPlayerFrozen(): boolean {
