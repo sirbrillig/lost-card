@@ -1,4 +1,4 @@
-import { isDynamicSprite } from "./shared";
+import { isDynamicSprite, Events } from "./shared";
 import { BehaviorMachineInterface, Behavior, StateMachine } from "./behavior";
 import { RandomlyWalk } from "./behaviors";
 import { EnemyManager } from "./EnemyManager";
@@ -34,8 +34,8 @@ export class MonsterA extends Phaser.Physics.Arcade.Sprite {
 		this.setPushable(false);
 		this.setDataEnabled();
 		this.data.set("hittable", true);
-		this.on("hit", this.hit);
-		this.on("kill", this.hit);
+		this.on(Events.MonsterHit, this.hit);
+		this.on(Events.MonsterKillRequest, this.hit);
 
 		this.initSprites();
 	}

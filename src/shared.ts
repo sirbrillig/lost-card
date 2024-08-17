@@ -9,6 +9,16 @@ export type SpriteDirection =
 	| typeof SpriteDown
 	| typeof SpriteLeft;
 
+export const Events = {
+	MonsterDefeated: "defeated",
+	MonsterDying: "dying",
+	MonsterHit: "dying",
+	MonsterKillRequest: "kill",
+	EnemyHitPlayer: "enemyHitPlayer",
+	StunPlayer: "stunPlayer",
+	FreezePlayer: "freezePlayer",
+};
+
 export function isDynamicSprite(
 	obj: unknown
 ): obj is Phaser.Types.Physics.Arcade.SpriteWithDynamicBody {

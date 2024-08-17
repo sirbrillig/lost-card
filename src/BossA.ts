@@ -1,4 +1,4 @@
-import { isDynamicSprite } from "./shared";
+import { isDynamicSprite, Events } from "./shared";
 import { EnemyManager } from "./EnemyManager";
 import { Behavior, BehaviorMachineInterface, StateMachine } from "./behavior";
 import { WaitForActive, Roar, SpawnEnemies, PostSpawn } from "./behaviors";
@@ -40,7 +40,8 @@ export class BossA extends Phaser.Physics.Arcade.Sprite {
 		this.setDataEnabled();
 		this.data.set("monsterPosition", new Phaser.Math.Vector2(x, y));
 		this.data.set("hittable", true);
-		this.on("hit", this.hit);
+		this.on(Events.MonsterHit, this.hit);
+		this.on(Events.MonsterKillRequest, this.kill);
 
 		this.#stateMachine = new StateMachine("initial");
 
@@ -164,17 +165,21 @@ export class BossA extends Phaser.Physics.Arcade.Sprite {
 		this.#hitPoints -= 1;
 
 		if (this.#hitPoints === 0) {
-			this.emit("dying");
-			this.setVelocity(0);
-			this.data.set("stunned", true);
-			this.setOrigin(0.5, 0.3);
-			this.setDisplaySize(this.width * 2, this.height * 2);
-			this.anims.play("explode-boss", true);
-			this.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
-				this.emit("defeated");
-				this.destroy();
-			});
+			this.kill();
 		}
+	}
+
+	kill() {
+		this.emit(Events.MonsterDying);
+		this.setVelocity(0);
+		this.data.set("stunned", true);
+		this.setOrigin(0.5, 0.3);
+		this.setDisplaySize(this.width * 2, this.height * 2);
+		this.anims.play("explode-boss", true);
+		this.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
+			this.emit(Events.MonsterDefeated);
+			this.destroy();
+		});
 	}
 
 	isHittable(): boolean {

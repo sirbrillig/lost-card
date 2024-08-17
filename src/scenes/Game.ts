@@ -5,6 +5,7 @@ import { MonsterA } from "../MonsterA";
 import { IceMonster } from "../IceMonster";
 import { BossA } from "../BossA";
 import {
+	Events,
 	SpriteUp,
 	SpriteRight,
 	SpriteDown,
@@ -125,7 +126,7 @@ export class Game extends Scene {
 		// Enemies collide with doors but players can pass through them.
 		this.setTileLayerCollisions(this.createdDoors, this.enemyManager.enemies);
 
-		MainEvents.on("enemyHitPlayer", () => {
+		MainEvents.on(Events.EnemyHitPlayer, () => {
 			this.enemyHitPlayer();
 		});
 
@@ -244,11 +245,11 @@ export class Game extends Scene {
 
 		this.createOverlay();
 
-		MainEvents.on("stunPlayer", (setting: boolean) =>
+		MainEvents.on(Events.StunPlayer, (setting: boolean) =>
 			this.setPlayerStunned(setting)
 		);
 
-		MainEvents.on("freezePlayer", (setting: boolean) => {
+		MainEvents.on(Events.FreezePlayer, (setting: boolean) => {
 			this.setPlayerFrozen(setting);
 		});
 	}
@@ -1269,7 +1270,7 @@ export class Game extends Scene {
 				}
 				case "BossA": {
 					const boss = new BossA(this, this.enemyManager, point.x, point.y);
-					boss.once("defeated", () => {
+					boss.once(Events.MonsterDefeated, () => {
 						this.showHiddenItem("WindCard");
 					});
 					this.enemyManager.enemies.add(boss);
@@ -1317,7 +1318,7 @@ export class Game extends Scene {
 	sendHitToEnemy(enemy: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody) {
 		if (enemy.data.get("hittable") === true) {
 			this.cameras.main.shake(200, 0.004);
-			enemy.emit("hit");
+			enemy.emit(Events.MonsterHit);
 
 			// Knock the player back a bit when they hit an enemy.
 			this.knockBack(

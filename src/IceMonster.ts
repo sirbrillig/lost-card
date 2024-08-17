@@ -1,4 +1,4 @@
-import { isDynamicSprite } from "./shared";
+import { isDynamicSprite, Events } from "./shared";
 import { BehaviorMachineInterface, Behavior, StateMachine } from "./behavior";
 import { RandomlyWalk, PowerUp, IceAttack } from "./behaviors";
 import { EnemyManager } from "./EnemyManager";
@@ -37,8 +37,8 @@ export class IceMonster extends Phaser.Physics.Arcade.Sprite {
 		this.setPushable(false);
 		this.setDataEnabled();
 		this.data.set("hittable", true);
-		this.on("hit", this.hit);
-		this.on("kill", this.hit);
+		this.on(Events.MonsterHit, this.hit);
+		this.on(Events.MonsterKillRequest, this.kill);
 
 		this.initSprites();
 	}
@@ -154,16 +154,20 @@ export class IceMonster extends Phaser.Physics.Arcade.Sprite {
 		this.#hitPoints -= 1;
 
 		if (this.#hitPoints === 0) {
-			this.emit("dying");
-			this.setVelocity(0);
-			this.data.set("stunned", true);
-			this.setOrigin(0.5, 0.3);
-			this.anims.play("explode", true);
-			this.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
-				this.emit("defeated");
-				this.destroy();
-			});
+			this.kill();
 		}
+	}
+
+	kill() {
+		this.emit(Events.MonsterDying);
+		this.setVelocity(0);
+		this.data.set("stunned", true);
+		this.setOrigin(0.5, 0.3);
+		this.anims.play("explode", true);
+		this.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
+			this.emit(Events.MonsterDefeated);
+			this.destroy();
+		});
 	}
 
 	isHittable(): boolean {

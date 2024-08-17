@@ -5,6 +5,7 @@ import {
 	SpriteDown,
 	SpriteLeft,
 	SpriteRight,
+	Events,
 } from "./shared";
 import { EnemyManager } from "./EnemyManager";
 import { Behavior, BehaviorMachineInterface } from "./behavior";
@@ -168,8 +169,8 @@ export class SpawnEnemies<AllStates extends string>
 			sprite.data.set("spawnedEnemyCount", spawnedEnemyCount - 1);
 		});
 		enemyManager.enemies.add(monster);
-		sprite.once("dying", () => {
-			monster.emit("kill");
+		sprite.once(Events.MonsterDying, () => {
+			monster.emit(Events.MonsterKillRequest);
 		});
 	}
 
@@ -323,7 +324,7 @@ export class PowerUp<AllStates extends string>
 		effect.setDepth(5);
 		effect.setAlpha(0.7);
 		effect.anims.play("powerup", true);
-		sprite.once(Phaser.GameObjects.Events.DESTROY, () => {
+		sprite.once(Events.MonsterDying, () => {
 			effect?.destroy();
 		});
 		effect.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
@@ -382,7 +383,7 @@ export class IceAttack<AllStates extends string>
 			}, this.#freezePlayerTime);
 		});
 
-		sprite.once(Phaser.GameObjects.Events.DESTROY, () => {
+		sprite.once(Events.MonsterDying, () => {
 			effect?.destroy();
 		});
 		effect.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
