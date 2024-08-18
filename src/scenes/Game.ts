@@ -71,6 +71,7 @@ export class Game extends Scene {
 	postAppearInvincibilityTime: number = 1000;
 	icePowerVelocity: number = 80;
 	iceCardFrozenTime: number = 3000;
+	iceMeltTime: number = 4000;
 
 	map: Phaser.Tilemaps.Tilemap;
 	landLayer: Phaser.Tilemaps.TilemapLayer;
@@ -329,9 +330,39 @@ export class Game extends Scene {
 	}
 
 	freezeWaterTile(tile: Phaser.Tilemaps.Tile) {
-		if (isTileWithPropertiesObject(tile) && tile.properties.isWater) {
-			this.enemyManager.map.removeTile(tile, 284);
+		if (!isTileWithPropertiesObject(tile) || !tile.properties.isWater) {
+			return;
 		}
+		const iceTileFrame = 284;
+		this.enemyManager.map.removeTile(tile, iceTileFrame);
+		this.time.addEvent({
+			delay: this.iceMeltTime,
+			callback: () => this.meltFrozenTile(tile),
+		});
+	}
+
+	meltFrozenTile(tile: Phaser.Tilemaps.Tile) {
+		if (!isTileWithPropertiesObject(tile) || !tile.properties.isWater) {
+			return;
+		}
+		if (this.physics.overlapTiles(this.player, [tile])) {
+			// Do not melt the tile we stand on.
+			this.time.addEvent({
+				delay: this.iceMeltTime,
+				callback: () => this.meltFrozenTile(tile),
+			});
+			return;
+		}
+
+		this.enemyManager.map.removeTile(tile);
+		this.enemyManager.map.putTileAt(
+			tile,
+			tile.x,
+			tile.y,
+			true,
+			tile.layer.name
+		);
+		this.landLayer.setCollisionByProperty({ collides: true });
 	}
 
 	turnOffAllLanterns() {
