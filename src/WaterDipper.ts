@@ -1,4 +1,5 @@
 import { TeleportToWater, PowerUp, RangedIceBall } from "./behaviors";
+import { EnemyManager } from "./EnemyManager";
 import { isTileWithPropertiesObject } from "./shared";
 import { BaseMonster } from "./BaseMonster";
 
@@ -6,6 +7,15 @@ type AllStates = "waterteleport" | "powerup" | "iceball";
 
 export class WaterDipper extends BaseMonster<AllStates> {
 	hitPoints: number = 6;
+
+	constructor(
+		scene: Phaser.Scene,
+		enemyManager: EnemyManager,
+		x: number,
+		y: number
+	) {
+		super(scene, enemyManager, x, y, "monsters1", 51);
+	}
 
 	initSprites() {
 		this.anims.create({

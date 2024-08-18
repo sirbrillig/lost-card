@@ -1,10 +1,20 @@
 import { RandomlyWalk, PowerUp, IceAttack } from "./behaviors";
+import { EnemyManager } from "./EnemyManager";
 import { BaseMonster } from "./BaseMonster";
 
 type AllStates = "randomwalk" | "powerup" | "iceattack";
 
 export class IceMonster extends BaseMonster<AllStates> {
 	hitPoints: number = 2;
+
+	constructor(
+		scene: Phaser.Scene,
+		enemyManager: EnemyManager,
+		x: number,
+		y: number
+	) {
+		super(scene, enemyManager, x, y, "monsters1", 51);
+	}
 
 	initSprites() {
 		this.anims.create({

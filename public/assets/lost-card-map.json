@@ -1875,6 +1875,18 @@
                  "width":0,
                  "x":2214.76,
                  "y":2056.11
+                }, 
+                {
+                 "height":0,
+                 "id":372,
+                 "name":"IceBoss",
+                 "point":true,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":1928.68615483456,
+                 "y":2725.9877931256
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -1958,6 +1970,24 @@
                  "width":16,
                  "x":1777.65783234101,
                  "y":2403.27899257074
+                }, 
+                {
+                 "gid":2666,
+                 "height":16,
+                 "id":373,
+                 "name":"IceCrystal",
+                 "properties":[
+                        {
+                         "name":"hidden",
+                         "type":"bool",
+                         "value":true
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":16,
+                 "x":1920.68615483456,
+                 "y":2654.32187600385
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -5287,7 +5317,7 @@
          "y":0
         }],
  "nextlayerid":13,
- "nextobjectid":372,
+ "nextobjectid":374,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.0",

@@ -5,6 +5,7 @@ import { MonsterA } from "../MonsterA";
 import { IceMonster } from "../IceMonster";
 import { WaterDipper } from "../WaterDipper";
 import { BossA } from "../BossA";
+import { IceBoss } from "../IceBoss";
 import {
 	Powers,
 	Events,
@@ -1454,6 +1455,14 @@ export class Game extends Scene {
 					const boss = new BossA(this, this.enemyManager, point.x, point.y);
 					boss.once(Events.MonsterDefeated, () => {
 						this.showHiddenItem("WindCard");
+					});
+					this.enemyManager.enemies.add(boss);
+					break;
+				}
+				case "IceBoss": {
+					const boss = new IceBoss(this, this.enemyManager, point.x, point.y);
+					boss.once(Events.MonsterDefeated, () => {
+						this.showHiddenItem("IceCrystal");
 					});
 					this.enemyManager.enemies.add(boss);
 					break;

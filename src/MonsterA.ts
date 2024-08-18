@@ -1,9 +1,19 @@
 import { RandomlyWalk } from "./behaviors";
+import { EnemyManager } from "./EnemyManager";
 import { BaseMonster } from "./BaseMonster";
 
 type AllStates = "randomwalk";
 
 export class MonsterA extends BaseMonster<AllStates> {
+	constructor(
+		scene: Phaser.Scene,
+		enemyManager: EnemyManager,
+		x: number,
+		y: number
+	) {
+		super(scene, enemyManager, x, y, "monsters1", 54);
+	}
+
 	getInitialState(): AllStates {
 		return "randomwalk";
 	}

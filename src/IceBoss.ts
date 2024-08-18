@@ -1,11 +1,11 @@
 import { Events } from "./shared";
 import { EnemyManager } from "./EnemyManager";
-import { WaitForActive, Roar, SpawnEnemies, PostSpawn } from "./behaviors";
+import { WaitForActive, Roar, PostSpawn } from "./behaviors";
 import { BaseMonster } from "./BaseMonster";
 
-type AllStates = "initial" | "roar1" | "spawn1" | "spawn2" | "idle1" | "idle2";
+type AllStates = "initial" | "roar1" | "idle1";
 
-export class BossA extends BaseMonster<AllStates> {
+export class IceBoss extends BaseMonster<AllStates> {
 	hitPoints: number = 6;
 
 	constructor(
@@ -14,7 +14,7 @@ export class BossA extends BaseMonster<AllStates> {
 		x: number,
 		y: number
 	) {
-		super(scene, enemyManager, x, y, "bosses1", 48);
+		super(scene, enemyManager, x, y, "bosses1", 6);
 
 		if (!this.body) {
 			throw new Error("Could not create monster");
@@ -33,17 +33,8 @@ export class BossA extends BaseMonster<AllStates> {
 		this.anims.create({
 			key: "roar",
 			frames: this.anims.generateFrameNumbers("bosses1", {
-				start: 48,
-				end: 50,
-			}),
-			frameRate: 10,
-			repeat: 8,
-		});
-		this.anims.create({
-			key: "spawn",
-			frames: this.anims.generateFrameNumbers("bosses1", {
-				start: 72,
-				end: 74,
+				start: 6,
+				end: 8,
 			}),
 			frameRate: 10,
 			repeat: 8,
@@ -51,8 +42,8 @@ export class BossA extends BaseMonster<AllStates> {
 		this.anims.create({
 			key: "idle",
 			frames: this.anims.generateFrameNumbers("bosses1", {
-				start: 60,
-				end: 62,
+				start: 6,
+				end: 8,
 			}),
 			frameRate: 10,
 			repeat: 8,
@@ -71,15 +62,9 @@ export class BossA extends BaseMonster<AllStates> {
 			case "initial":
 				return new WaitForActive(state, "roar1");
 			case "roar1":
-				return new Roar(state, "spawn1");
-			case "spawn1":
-				return new SpawnEnemies(state, "spawn2");
-			case "spawn2":
-				return new SpawnEnemies(state, "idle1");
+				return new Roar(state, "idle1");
 			case "idle1":
-				return new PostSpawn(state, "idle2");
-			case "idle2":
-				return new PostSpawn(state, "roar1");
+				return new PostSpawn(state, "idle1");
 		}
 	}
 

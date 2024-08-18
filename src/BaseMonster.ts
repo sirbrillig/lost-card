@@ -16,9 +16,11 @@ export class BaseMonster<AllStates extends string> extends Phaser.Physics.Arcade
 		scene: Phaser.Scene,
 		enemyManager: EnemyManager,
 		x: number,
-		y: number
+		y: number,
+		texture: string,
+		initialFrame: number
 	) {
-		super(scene, x, y, "monsters1", 51);
+		super(scene, x, y, texture, initialFrame);
 
 		this.#enemyManager = enemyManager;
 		this.stateMachine = new StateMachine(this.getInitialState());
