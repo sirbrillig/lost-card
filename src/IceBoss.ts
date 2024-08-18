@@ -1,10 +1,16 @@
 import { Events } from "./shared";
 import { isTileWithPropertiesObject } from "./shared";
 import { EnemyManager } from "./EnemyManager";
-import { WaitForActive, Roar, PostSpawn, LeftRightMarch } from "./behaviors";
+import {
+	WaitForActive,
+	Roar,
+	LeftRightMarch,
+	IceBeam,
+	PowerUp,
+} from "./behaviors";
 import { BaseMonster } from "./BaseMonster";
 
-type AllStates = "initial" | "roar1" | "idle1" | "leftrightmarch";
+type AllStates = "initial" | "roar1" | "leftrightmarch" | "powerup" | "icebeam";
 
 export class IceBoss extends BaseMonster<AllStates> {
 	hitPoints: number = 6;
@@ -94,11 +100,13 @@ export class IceBoss extends BaseMonster<AllStates> {
 			case "initial":
 				return new WaitForActive(state, "roar1");
 			case "roar1":
-				return new Roar(state, "idle1");
-			case "idle1":
-				return new PostSpawn(state, "leftrightmarch");
+				return new Roar(state, "leftrightmarch");
 			case "leftrightmarch":
-				return new LeftRightMarch(state, "idle1");
+				return new LeftRightMarch(state, "powerup");
+			case "powerup":
+				return new PowerUp(state, "icebeam");
+			case "icebeam":
+				return new IceBeam(state, "leftrightmarch");
 		}
 	}
 

@@ -1,4 +1,5 @@
 import {
+	isTilemapTile,
 	isDynamicSprite,
 	isTileWithPropertiesObject,
 	getDirectionOfSpriteMovement,
@@ -298,7 +299,7 @@ export class RandomlyWalk<AllStates extends string>
 export class LeftRightMarch<AllStates extends string>
 	implements Behavior<AllStates, Phaser.GameObjects.Sprite>
 {
-	#enemySpeed = 60;
+	#enemySpeed = 70;
 	#minWalkTime = 600;
 	#maxWalkTime = 4000;
 	#nextState: AllStates;
@@ -316,6 +317,20 @@ export class LeftRightMarch<AllStates extends string>
 		if (!isDynamicSprite(sprite)) {
 			throw new Error("invalid sprite");
 		}
+
+		const direction =
+			Phaser.Math.Between(0, 1) === 1 ? SpriteLeft : SpriteRight;
+		switch (direction) {
+			case SpriteRight:
+				sprite.anims.play("right", true);
+				sprite.body.setVelocityX(this.#enemySpeed);
+				break;
+			case SpriteLeft:
+				sprite.anims.play("left", true);
+				sprite.body.setVelocityX(-this.#enemySpeed);
+				break;
+		}
+
 		sprite.scene.time.addEvent({
 			delay: this.#getWalkingTime(),
 			callback: () => {
@@ -331,29 +346,7 @@ export class LeftRightMarch<AllStates extends string>
 		return Phaser.Math.Between(this.#minWalkTime, this.#maxWalkTime);
 	}
 
-	update(sprite: Phaser.GameObjects.Sprite) {
-		if (!isDynamicSprite(sprite)) {
-			return;
-		}
-		// If we are not moving, move in a random direction. If we are moving, keep
-		// moving in that direction.
-		const previousDirection = getDirectionOfSpriteMovement(sprite.body);
-		if (previousDirection) {
-			return;
-		}
-		const direction =
-			Phaser.Math.Between(0, 1) === 1 ? SpriteLeft : SpriteRight;
-		switch (direction) {
-			case SpriteRight:
-				sprite.anims.play("right", true);
-				sprite.body.setVelocityX(this.#enemySpeed);
-				break;
-			case SpriteLeft:
-				sprite.anims.play("left", true);
-				sprite.body.setVelocityX(-this.#enemySpeed);
-				break;
-		}
-	}
+	update() {}
 }
 
 export class TeleportToWater<AllStates extends string>
@@ -588,6 +581,142 @@ export class RangedIceBall<AllStates extends string>
 			stateMachine.popState();
 			stateMachine.pushState(this.#nextState);
 		});
+	}
+
+	update(): void {}
+}
+
+export class IceBeam<AllStates extends string>
+	implements Behavior<AllStates, Phaser.GameObjects.Sprite>
+{
+	#nextState: AllStates;
+	iceMeltTime = 4000;
+	attackSpeed = 150;
+	name: AllStates;
+
+	constructor(name: AllStates, nextState: AllStates) {
+		this.name = name;
+		this.#nextState = nextState;
+	}
+
+	init(
+		sprite: Phaser.GameObjects.Sprite,
+		stateMachine: BehaviorMachineInterface<AllStates>,
+		enemyManager: EnemyManager
+	): void {
+		if (!sprite.body || !isDynamicSprite(sprite)) {
+			throw new Error("Could not update monster");
+		}
+		sprite.scene.anims.create({
+			key: "ice_beam",
+			frames: sprite.anims.generateFrameNumbers("ice_beam"),
+			frameRate: 50,
+			showOnStart: true,
+			hideOnComplete: true,
+			yoyo: true,
+		});
+		const effect = sprite.scene.add.sprite(
+			sprite.body.center.x,
+			sprite.body.center.y,
+			"ice_beam",
+			0
+		);
+		sprite.scene.physics.add.existing(effect);
+		effect.setDepth(5);
+		effect.anims.play(
+			{
+				key: "ice_beam",
+				repeat: 4,
+			},
+			true
+		);
+		if (!isDynamicSprite(effect)) {
+			throw new Error("Could not update ice beam");
+		}
+		effect.setDisplaySize(effect.body.width * 0.8, effect.body.height * 0.8);
+		effect.body.setSize(effect.body.width * 0.5, effect.body.height * 0.5);
+		sprite.scene.physics.moveToObject(
+			effect,
+			enemyManager.player,
+			this.attackSpeed
+		);
+
+		const landLayer = enemyManager.map.getLayer("Background");
+		if (!landLayer) {
+			throw new Error("Could not find land layer for ice beam");
+		}
+		sprite.scene.physics.add.overlap(
+			effect,
+			landLayer.tilemapLayer,
+			(_, tile) => {
+				if (!isTilemapTile(tile)) {
+					return;
+				}
+				this.freezeWaterTile(tile, sprite, enemyManager);
+			}
+		);
+
+		sprite.scene.physics.add.overlap(enemyManager.player, effect, () => {
+			MainEvents.emit(Events.EnemyHitPlayer, true);
+			effect.destroy();
+			stateMachine.popState();
+			stateMachine.pushState(this.#nextState);
+		});
+
+		sprite.once(Events.MonsterDying, () => {
+			effect?.destroy();
+		});
+		effect.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
+			effect.destroy();
+			stateMachine.popState();
+			stateMachine.pushState(this.#nextState);
+		});
+	}
+
+	freezeWaterTile(
+		tile: Phaser.Tilemaps.Tile,
+		sprite: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody,
+		enemyManager: EnemyManager
+	) {
+		if (!isTileWithPropertiesObject(tile) || !tile.properties.isWater) {
+			return;
+		}
+		const iceTileFrame = 284;
+		enemyManager.map.removeTile(tile, iceTileFrame);
+		sprite.scene.time.addEvent({
+			delay: this.iceMeltTime,
+			callback: () => this.meltFrozenTile(tile, sprite, enemyManager),
+		});
+	}
+
+	meltFrozenTile(
+		tile: Phaser.Tilemaps.Tile,
+		sprite: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody,
+		enemyManager: EnemyManager
+	) {
+		if (
+			!isTileWithPropertiesObject(tile) ||
+			!tile.properties.isWater ||
+			!sprite?.scene
+		) {
+			return;
+		}
+		if (sprite.scene.physics.overlapTiles(enemyManager.player, [tile])) {
+			// Do not melt the tile we stand on.
+			sprite.scene.time.addEvent({
+				delay: this.iceMeltTime,
+				callback: () => this.meltFrozenTile(tile, sprite, enemyManager),
+			});
+			return;
+		}
+
+		enemyManager.map.removeTile(tile);
+		enemyManager.map.putTileAt(tile, tile.x, tile.y, true, tile.layer.name);
+		const landLayer = enemyManager.map.getLayer("Background");
+		if (!landLayer) {
+			throw new Error("Could not find land layer for ice beam");
+		}
+		landLayer.tilemapLayer.setCollisionByProperty({ collides: true });
 	}
 
 	update(): void {}

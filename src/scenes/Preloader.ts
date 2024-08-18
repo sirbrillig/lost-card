@@ -128,6 +128,10 @@ export class Preloader extends Scene {
 			frameHeight: 38,
 		});
 
+		this.load.spritesheet("ice_beam", "ice_beam.png", {
+			frameWidth: 32,
+			frameHeight: 32,
+		});
 		this.load.spritesheet("ice_ball", "ice_ball.png", {
 			frameWidth: 32,
 			frameHeight: 32,

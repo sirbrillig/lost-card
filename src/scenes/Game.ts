@@ -134,6 +134,9 @@ export class Game extends Scene {
 				if (!isEnemy(enemy)) {
 					throw new Error("Non-enemy ran into something");
 				}
+				// FIXME: this seems to allow walking through any collision, not just
+				// the ones we want, probably by setting the sprite to whatever mode it
+				// gets in when placed entirely within collidable tles.
 				return enemy.doesCollideWithTile(tile);
 			}
 		);
