@@ -1505,7 +1505,7 @@ export class Game extends Scene {
 					);
 					boss.once(Events.MonsterDefeated, () => {
 						this.showHiddenItem("WindCard");
-						this.showHiddenItem("Potion");
+						this.showHiddenItem("Heart");
 					});
 					this.enemyManager.enemies.add(boss);
 					break;
@@ -1514,7 +1514,7 @@ export class Game extends Scene {
 					const boss = new IceBoss(this, this.enemyManager, point.x, point.y);
 					boss.once(Events.MonsterDefeated, () => {
 						this.showHiddenItem("IceCrystal");
-						this.showHiddenItem("Potion");
+						this.showHiddenItem("Heart");
 					});
 					this.enemyManager.enemies.add(boss);
 					break;
