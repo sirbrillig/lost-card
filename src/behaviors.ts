@@ -111,6 +111,7 @@ export class SpawnEnemies<AllStates extends string>
 	implements Behavior<AllStates, Phaser.GameObjects.Sprite>
 {
 	#nextState: AllStates;
+	// FIXME: this will be per behavior not per monster
 	#maxSpawnedEnemies: number = 16;
 	name: AllStates;
 
@@ -326,6 +327,7 @@ export class LeftRightMarch<AllStates extends string>
 			throw new Error("invalid sprite");
 		}
 
+		// FIXME: can we go the opposite direction as last time? unfortunately it's a different class instance.
 		const direction =
 			Phaser.Math.Between(0, 1) === 1 ? SpriteLeft : SpriteRight;
 		switch (direction) {
