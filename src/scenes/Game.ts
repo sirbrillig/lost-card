@@ -1025,8 +1025,8 @@ export class Game extends Scene {
 
 	updateSwordHitboxForAttack() {
 		// Add hitbox for sword in direction of sprite
-		const swordWidth = 34; // for down/up
-		const swordHeight = 20; // for down/up
+		const swordWidth = 36; // for down/up
+		const swordHeight = 22; // for down/up
 		const width = (() => {
 			if (
 				this.playerDirection === SpriteLeft ||
@@ -1325,7 +1325,7 @@ export class Game extends Scene {
 		this.player.setSize(8, 12);
 		this.player.setOffset(
 			this.player.body.offset.x,
-			this.player.body.offset.y + 5
+			this.player.body.offset.y + 3
 		);
 		this.player.setDepth(1);
 		this.sword = this.physics.add.sprite(
