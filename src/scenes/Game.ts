@@ -26,7 +26,7 @@ import {
 	createVelocityForDirection,
 	isPointInRoom,
 	invertSpriteDirection,
-	hasGid,
+	hasId,
 	createSpritesFromObjectLayer,
 	loadSavedData,
 	loadSavedRegistry,
@@ -510,18 +510,18 @@ export class Game extends Scene {
 	shouldCreateLayerObject(
 		layerObject: Phaser.Types.Tilemaps.TiledObject
 	): boolean {
-		if (!layerObject.gid) {
+		if (!layerObject.id) {
 			return true;
 		}
 		const itemsRemoved: Array<number> = this.registry.get("itemsRemoved") ?? [];
-		return !itemsRemoved.includes(layerObject.gid);
+		return !itemsRemoved.includes(layerObject.id);
 	}
 
 	recordObjectIdOnSprite(
 		layerObject: Phaser.Types.Tilemaps.TiledObject,
 		sprite: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody
 	): void {
-		sprite.data.set("objectGid", layerObject.gid);
+		sprite.data.set("objectId", layerObject.id);
 	}
 
 	createTileLayer(
@@ -933,10 +933,10 @@ export class Game extends Scene {
 		);
 		const itemsRemoved = this.registry.get("itemsRemoved") ?? [];
 		const itemObject = this.map.findObject("Items", (obj) => {
-			if (!hasGid(obj)) {
+			if (!hasId(obj)) {
 				return false;
 			}
-			if (obj.gid === itemToRemove.data.get("objectGid")) {
+			if (obj.id === itemToRemove.data.get("objectId")) {
 				return true;
 			}
 			return false;
@@ -944,7 +944,7 @@ export class Game extends Scene {
 		if (!itemObject) {
 			return;
 		}
-		itemsRemoved.push(itemObject.gid);
+		itemsRemoved.push(itemObject.id);
 		this.registry.set("itemsRemoved", itemsRemoved);
 		itemToRemove.destroy();
 	}
