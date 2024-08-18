@@ -1,10 +1,10 @@
 import { Events } from "./shared";
 import { isTileWithPropertiesObject } from "./shared";
 import { EnemyManager } from "./EnemyManager";
-import { WaitForActive, Roar, PostSpawn } from "./behaviors";
+import { WaitForActive, Roar, PostSpawn, LeftRightMarch } from "./behaviors";
 import { BaseMonster } from "./BaseMonster";
 
-type AllStates = "initial" | "roar1" | "idle1";
+type AllStates = "initial" | "roar1" | "idle1" | "leftrightmarch";
 
 export class IceBoss extends BaseMonster<AllStates> {
 	hitPoints: number = 6;
@@ -56,6 +56,25 @@ export class IceBoss extends BaseMonster<AllStates> {
 			repeat: 4,
 			repeatDelay: 2,
 		});
+
+		this.anims.create({
+			key: "left",
+			frames: this.anims.generateFrameNumbers("bosses1", {
+				start: 18,
+				end: 20,
+			}),
+			frameRate: 10,
+			repeat: -1,
+		});
+		this.anims.create({
+			key: "right",
+			frames: this.anims.generateFrameNumbers("bosses1", {
+				start: 30,
+				end: 32,
+			}),
+			frameRate: 10,
+			repeat: -1,
+		});
 	}
 
 	doesCollideWithTile(
@@ -77,7 +96,9 @@ export class IceBoss extends BaseMonster<AllStates> {
 			case "roar1":
 				return new Roar(state, "idle1");
 			case "idle1":
-				return new PostSpawn(state, "idle1");
+				return new PostSpawn(state, "leftrightmarch");
+			case "leftrightmarch":
+				return new LeftRightMarch(state, "idle1");
 		}
 	}
 

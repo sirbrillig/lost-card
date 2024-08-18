@@ -295,6 +295,67 @@ export class RandomlyWalk<AllStates extends string>
 	}
 }
 
+export class LeftRightMarch<AllStates extends string>
+	implements Behavior<AllStates, Phaser.GameObjects.Sprite>
+{
+	#enemySpeed = 60;
+	#minWalkTime = 600;
+	#maxWalkTime = 4000;
+	#nextState: AllStates;
+	name: AllStates;
+
+	constructor(name: AllStates, nextState: AllStates) {
+		this.name = name;
+		this.#nextState = nextState;
+	}
+
+	init(
+		sprite: Phaser.GameObjects.Sprite,
+		stateMachine: BehaviorMachineInterface<AllStates>
+	): void {
+		if (!isDynamicSprite(sprite)) {
+			throw new Error("invalid sprite");
+		}
+		sprite.scene.time.addEvent({
+			delay: this.#getWalkingTime(),
+			callback: () => {
+				// sprite may have been destroyed before this happens
+				sprite?.body?.setVelocity(0);
+				stateMachine.popState();
+				stateMachine.pushState(this.#nextState);
+			},
+		});
+	}
+
+	#getWalkingTime(): number {
+		return Phaser.Math.Between(this.#minWalkTime, this.#maxWalkTime);
+	}
+
+	update(sprite: Phaser.GameObjects.Sprite) {
+		if (!isDynamicSprite(sprite)) {
+			return;
+		}
+		// If we are not moving, move in a random direction. If we are moving, keep
+		// moving in that direction.
+		const previousDirection = getDirectionOfSpriteMovement(sprite.body);
+		if (previousDirection) {
+			return;
+		}
+		const direction =
+			Phaser.Math.Between(0, 1) === 1 ? SpriteLeft : SpriteRight;
+		switch (direction) {
+			case SpriteRight:
+				sprite.anims.play("right", true);
+				sprite.body.setVelocityX(this.#enemySpeed);
+				break;
+			case SpriteLeft:
+				sprite.anims.play("left", true);
+				sprite.body.setVelocityX(-this.#enemySpeed);
+				break;
+		}
+	}
+}
+
 export class TeleportToWater<AllStates extends string>
 	implements Behavior<AllStates, Phaser.GameObjects.Sprite>
 {
