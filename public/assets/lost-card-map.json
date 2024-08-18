@@ -2431,24 +2431,6 @@
                  "y":2401.6170212766
                 }, 
                 {
-                 "gid":2818,
-                 "height":16,
-                 "id":377,
-                 "name":"Heart",
-                 "properties":[
-                        {
-                         "name":"hidden",
-                         "type":"bool",
-                         "value":true
-                        }],
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":16,
-                 "x":1901.66166724799,
-                 "y":2653.84862664478
-                }, 
-                {
                  "gid":2791,
                  "height":16,
                  "id":378,
@@ -2495,6 +2477,24 @@
                  "width":16,
                  "x":1032.23080621895,
                  "y":2631.01650905594
+                }, 
+                {
+                 "gid":2818,
+                 "height":16,
+                 "id":406,
+                 "name":"Heart",
+                 "properties":[
+                        {
+                         "name":"hidden",
+                         "type":"bool",
+                         "value":true
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":16,
+                 "x":1887.92488381651,
+                 "y":2656.03515538554
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -5848,7 +5848,7 @@
          "y":0
         }],
  "nextlayerid":13,
- "nextobjectid":406,
+ "nextobjectid":407,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.0",

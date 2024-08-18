@@ -207,20 +207,6 @@ export class Overlay extends Scene {
 			this.items.push(new PotionItem(this, 0, "icons3", 2, "Potion"));
 		}
 		if (
-			this.registry.get("hasSword") &&
-			!this.items.some((item) => item.name === "Sword")
-		) {
-			this.items.push(
-				new Item(
-					this,
-					this.items.length,
-					"dungeon_tiles_sprites",
-					1315,
-					"Sword"
-				)
-			);
-		}
-		if (
 			this.registry.get("hasWindCard") &&
 			!this.items.some((item) => item.name === "WindCard")
 		) {
