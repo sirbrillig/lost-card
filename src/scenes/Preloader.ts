@@ -94,8 +94,10 @@ export class Preloader extends Scene {
 			margin: 1,
 		});
 		this.load.spritesheet("character-run-up", "character_run_up.png", {
-			frameWidth: 17,
-			frameHeight: 29,
+			frameWidth: 15,
+			frameHeight: 26,
+			spacing: 2,
+			margin: 1,
 		});
 		this.load.spritesheet("character-run-left", "character_run_left.png", {
 			frameWidth: 17,
