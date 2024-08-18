@@ -25,6 +25,7 @@ export const Events = {
 export const DataKeys = {
 	Stunned: "stunned",
 	Hittable: "hittable",
+	Freezable: "freezable",
 	MonsterPosition: "monsterPosition",
 	PlayerPosition: "playerPosition",
 	ActivePower: "activePower",

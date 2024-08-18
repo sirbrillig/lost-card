@@ -1,4 +1,4 @@
-import { Events } from "./shared";
+import { Events, DataKeys } from "./shared";
 import { isTileWithPropertiesObject } from "./shared";
 import { EnemyManager } from "./EnemyManager";
 import {
@@ -13,7 +13,7 @@ import { BaseMonster } from "./BaseMonster";
 type AllStates = "initial" | "roar1" | "leftrightmarch" | "powerup" | "icebeam";
 
 export class IceBoss extends BaseMonster<AllStates> {
-	hitPoints: number = 6;
+	hitPoints: number = 8;
 
 	constructor(
 		scene: Phaser.Scene,
@@ -30,6 +30,7 @@ export class IceBoss extends BaseMonster<AllStates> {
 		this.setSize(this.width * 0.6, this.height * 0.65);
 		this.setOffset(this.body.offset.x, this.body.offset.y + 10);
 		this.setOrigin(0.5, 0.75);
+		this.data.set(DataKeys.Freezable, false);
 	}
 
 	getInitialState(): AllStates {

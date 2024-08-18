@@ -1498,7 +1498,10 @@ export class Game extends Scene {
 	}
 
 	freezeEnemy(enemy: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody) {
-		if (enemy.data.get(DataKeys.Hittable) === true) {
+		if (
+			enemy.data.get(DataKeys.Hittable) &&
+			enemy.data.get(DataKeys.Freezable)
+		) {
 			enemy.emit(Events.MonsterStun, true);
 			enemy.setTint(0x0000ff);
 			this.time.addEvent({

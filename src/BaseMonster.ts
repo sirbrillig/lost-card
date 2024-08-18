@@ -40,6 +40,7 @@ export class BaseMonster<AllStates extends string> extends Phaser.Physics.Arcade
 		this.setDataEnabled();
 		this.data.set(DataKeys.MonsterPosition, new Phaser.Math.Vector2(x, y));
 		this.data.set(DataKeys.Hittable, true);
+		this.data.set(DataKeys.Freezable, true);
 		this.on(Events.MonsterHit, this.hit);
 		this.on(Events.MonsterStun, this.setStunned);
 		this.on(Events.MonsterKillRequest, this.kill);
