@@ -1,4 +1,5 @@
 import { Events } from "./shared";
+import { isTileWithPropertiesObject } from "./shared";
 import { EnemyManager } from "./EnemyManager";
 import { WaitForActive, Roar, PostSpawn } from "./behaviors";
 import { BaseMonster } from "./BaseMonster";
@@ -55,6 +56,18 @@ export class IceBoss extends BaseMonster<AllStates> {
 			repeat: 4,
 			repeatDelay: 2,
 		});
+	}
+
+	doesCollideWithTile(
+		tile: Phaser.Tilemaps.Tile | Phaser.Types.Physics.Arcade.GameObjectWithBody
+	): boolean {
+		if (!isTileWithPropertiesObject(tile)) {
+			return true;
+		}
+		if (tile.properties.isWater) {
+			return false;
+		}
+		return true;
 	}
 
 	constructNewBehaviorFor(state: AllStates) {
