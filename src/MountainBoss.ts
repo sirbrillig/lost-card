@@ -1,9 +1,21 @@
 import { Events } from "./shared";
 import { EnemyManager } from "./EnemyManager";
-import { WaitForActive, Roar, SpawnEnemies, PostSpawn } from "./behaviors";
+import {
+	WaitForActive,
+	Roar,
+	SpawnEnemies,
+	PostSpawn,
+	LeftRightMarch,
+} from "./behaviors";
 import { BaseMonster } from "./BaseMonster";
 
-type AllStates = "initial" | "roar1" | "spawn1" | "spawn2" | "idle1" | "idle2";
+type AllStates =
+	| "initial"
+	| "roar1"
+	| "spawn1"
+	| "spawn2"
+	| "idle1"
+	| "leftrightmarch";
 
 export class MountainBoss extends BaseMonster<AllStates> {
 	hitPoints: number = 6;
@@ -42,20 +54,19 @@ export class MountainBoss extends BaseMonster<AllStates> {
 		this.anims.create({
 			key: "spawn",
 			frames: this.anims.generateFrameNumbers("bosses1", {
-				start: 72,
-				end: 74,
+				frames: [48, 49, 50, 60, 61, 62, 72, 73, 74, 84, 85, 86],
 			}),
-			frameRate: 10,
-			repeat: 8,
+			frameRate: 20,
+			repeat: 2,
 		});
 		this.anims.create({
 			key: "idle",
 			frames: this.anims.generateFrameNumbers("bosses1", {
-				start: 60,
-				end: 62,
+				start: 48,
+				end: 50,
 			}),
 			frameRate: 10,
-			repeat: 8,
+			repeat: 6,
 		});
 		this.anims.create({
 			key: "explode-boss",
@@ -63,6 +74,25 @@ export class MountainBoss extends BaseMonster<AllStates> {
 			frameRate: 24,
 			repeat: 4,
 			repeatDelay: 2,
+		});
+
+		this.anims.create({
+			key: "left",
+			frames: this.anims.generateFrameNumbers("bosses1", {
+				start: 60,
+				end: 62,
+			}),
+			frameRate: 10,
+			repeat: -1,
+		});
+		this.anims.create({
+			key: "right",
+			frames: this.anims.generateFrameNumbers("bosses1", {
+				start: 72,
+				end: 74,
+			}),
+			frameRate: 10,
+			repeat: -1,
 		});
 	}
 
@@ -77,9 +107,9 @@ export class MountainBoss extends BaseMonster<AllStates> {
 			case "spawn2":
 				return new SpawnEnemies(state, "idle1");
 			case "idle1":
-				return new PostSpawn(state, "idle2");
-			case "idle2":
-				return new PostSpawn(state, "roar1");
+				return new PostSpawn(state, "leftrightmarch");
+			case "leftrightmarch":
+				return new LeftRightMarch(state, "roar1");
 		}
 	}
 

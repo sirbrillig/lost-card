@@ -2,7 +2,7 @@ import { RandomlyWalk } from "./behaviors";
 import { EnemyManager } from "./EnemyManager";
 import { BaseMonster } from "./BaseMonster";
 
-type AllStates = "randomwalk";
+type AllStates = "randomwalk1" | "randomwalk2";
 
 export class MonsterA extends BaseMonster<AllStates> {
 	constructor(
@@ -15,7 +15,7 @@ export class MonsterA extends BaseMonster<AllStates> {
 	}
 
 	getInitialState(): AllStates {
-		return "randomwalk";
+		return "randomwalk1";
 	}
 
 	initSprites() {
@@ -64,8 +64,10 @@ export class MonsterA extends BaseMonster<AllStates> {
 
 	constructNewBehaviorFor(state: string) {
 		switch (state) {
-			case "randomwalk":
-				return new RandomlyWalk(state, "randomwalk");
+			case "randomwalk1":
+				return new RandomlyWalk(state, "randomwalk2");
+			case "randomwalk2":
+				return new RandomlyWalk(state, "randomwalk1");
 		}
 	}
 }
