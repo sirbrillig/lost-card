@@ -777,65 +777,68 @@ export class Game extends Scene {
 			tile.data.get("previewBeforeAppear") ?? 0;
 		tile.setVisible(true);
 		tile.alpha = 0.4;
-		setTimeout(() => {
-			tile.alpha = 1;
-			tile.data.set("hidden", false);
-			tile.body.pushable = false;
-			this.physics.add.collider(this.player, tile);
-			this.physics.add.collider(
-				this.enemyManager.enemies,
-				tile,
-				(_, enemy) => {
-					if (!isDynamicSprite(enemy)) {
+		this.time.addEvent({
+			delay: previewBeforeAppear,
+			callback: () => {
+				tile.alpha = 1;
+				tile.data.set("hidden", false);
+				tile.body.pushable = false;
+				this.physics.add.collider(this.player, tile);
+				this.physics.add.collider(
+					this.enemyManager.enemies,
+					tile,
+					(_, enemy) => {
+						if (!isDynamicSprite(enemy)) {
+							return;
+						}
+						if (tile.body.velocity.x === 0 && tile.body.velocity.y === 0) {
+							return;
+						}
+						console.log("hit enemy with rock");
+						this.sendHitToEnemy(enemy);
+					},
+					(tile, enemy) => {
+						if (!isDynamicSprite(enemy)) {
+							console.error(enemy);
+							throw new Error("Non-sprite ran into something");
+						}
+						if (!isEnemy(enemy)) {
+							console.error(enemy);
+							throw new Error("Non-enemy ran into something");
+						}
+						return enemy.doesCollideWithTile(tile);
+					}
+				);
+				this.physics.add.collider(this.stuffLayer, tile);
+				// Allow destroying rocks by pushing into walls so you can't block
+				// yourself in a room.
+				this.physics.add.collider(this.landLayer, tile, (collideTile) => {
+					if (!isDynamicSprite(collideTile)) {
 						return;
 					}
-					if (tile.body.velocity.x === 0 && tile.body.velocity.y === 0) {
+					if (collideTile.data.get("beingPushed")) {
+						console.log("hit wall with rock");
+						this.destroyCreatedTile(tile);
+					}
+				});
+				this.physics.add.collider(this.createdDoors, tile, (_, collideTile) => {
+					if (!isDynamicSprite(collideTile)) {
 						return;
 					}
-					console.log("hit enemy with rock");
-					this.sendHitToEnemy(enemy);
-				},
-				(tile, enemy) => {
-					if (!isDynamicSprite(enemy)) {
-						console.error(enemy);
-						throw new Error("Non-sprite ran into something");
+					if (collideTile.data.get("beingPushed")) {
+						console.log("hit door with rock");
+						this.destroyCreatedTile(tile);
 					}
-					if (!isEnemy(enemy)) {
-						console.error(enemy);
-						throw new Error("Non-enemy ran into something");
-					}
-					return enemy.doesCollideWithTile(tile);
-				}
-			);
-			this.physics.add.collider(this.stuffLayer, tile);
-			// Allow destroying rocks by pushing into walls so you can't block
-			// yourself in a room.
-			this.physics.add.collider(this.landLayer, tile, (collideTile) => {
-				if (!isDynamicSprite(collideTile)) {
-					return;
-				}
-				if (collideTile.data.get("beingPushed")) {
-					console.log("hit wall with rock");
-					this.destroyCreatedTile(tile);
-				}
-			});
-			this.physics.add.collider(this.createdDoors, tile, (_, collideTile) => {
-				if (!isDynamicSprite(collideTile)) {
-					return;
-				}
-				if (collideTile.data.get("beingPushed")) {
-					console.log("hit door with rock");
-					this.destroyCreatedTile(tile);
-				}
-			});
+				});
 
-			if (this.physics.overlap(this.player, tile)) {
-				console.log("hit player with tile");
-				this.enemyHitPlayer();
-			}
+				if (this.physics.overlap(this.player, tile)) {
+					console.log("hit player with tile");
+					this.enemyHitPlayer();
+				}
 
-			this.createdTiles.push(tile);
-		}, previewBeforeAppear);
+				this.createdTiles.push(tile);
+			},
+		});
 	}
 
 	hideHiddenItems() {
@@ -977,17 +980,20 @@ export class Game extends Scene {
 
 		this.setPlayerInvincible(true);
 		this.setPlayerStunned(true);
-		setTimeout(() => {
-			this.scene.launch("Dialog", {
-				heading: "The Ice Card",
-				text: "Press SHIFT to use it\r\nPress Z to change power",
-			});
-			this.setPlayerInvincible(false);
-			this.setPlayerStunned(false);
-			this.input.keyboard?.once("keydown-SHIFT", () => {
-				this.scene.get("Dialog")?.scene.stop();
-			});
-		}, this.gotItemFreeze);
+		this.time.addEvent({
+			delay: this.gotItemFreeze,
+			callback: () => {
+				this.scene.launch("Dialog", {
+					heading: "The Ice Card",
+					text: "Press SHIFT to use it\r\nPress Z to change power",
+				});
+				this.setPlayerInvincible(false);
+				this.setPlayerStunned(false);
+				this.input.keyboard?.once("keydown-SHIFT", () => {
+					this.scene.get("Dialog")?.scene.stop();
+				});
+			},
+		});
 	}
 
 	pickUpWindCard() {
@@ -1005,17 +1011,20 @@ export class Game extends Scene {
 
 		this.setPlayerInvincible(true);
 		this.setPlayerStunned(true);
-		setTimeout(() => {
-			this.scene.launch("Dialog", {
-				heading: "The Wind Card",
-				text: "Press SHIFT to use it\r\nPress Z to change power",
-			});
-			this.setPlayerInvincible(false);
-			this.setPlayerStunned(false);
-			this.input.keyboard?.once("keydown-SHIFT", () => {
-				this.scene.get("Dialog")?.scene.stop();
-			});
-		}, this.gotItemFreeze);
+		this.time.addEvent({
+			delay: this.gotItemFreeze,
+			callback: () => {
+				this.scene.launch("Dialog", {
+					heading: "The Wind Card",
+					text: "Press SHIFT to use it\r\nPress Z to change power",
+				});
+				this.setPlayerInvincible(false);
+				this.setPlayerStunned(false);
+				this.input.keyboard?.once("keydown-SHIFT", () => {
+					this.scene.get("Dialog")?.scene.stop();
+				});
+			},
+		});
 	}
 
 	pickUpPotion() {
@@ -1036,17 +1045,20 @@ export class Game extends Scene {
 		this.player.anims.play("character-down-attack", true);
 		this.setPlayerInvincible(true);
 		this.setPlayerStunned(true);
-		setTimeout(() => {
-			this.scene.launch("Dialog", {
-				heading: "You found a sword!",
-				text: "Press SPACE to swing.",
-			});
-			this.setPlayerInvincible(false);
-			this.setPlayerStunned(false);
-			this.input.keyboard?.once("keydown-SPACE", () => {
-				this.scene.get("Dialog")?.scene.stop();
-			});
-		}, this.gotItemFreeze);
+		this.time.addEvent({
+			delay: this.gotItemFreeze,
+			callback: () => {
+				this.scene.launch("Dialog", {
+					heading: "You found a sword!",
+					text: "Press SPACE to swing.",
+				});
+				this.setPlayerInvincible(false);
+				this.setPlayerStunned(false);
+				this.input.keyboard?.once("keydown-SPACE", () => {
+					this.scene.get("Dialog")?.scene.stop();
+				});
+			},
+		});
 	}
 
 	movePlayerToPoint(x: number, y: number) {
@@ -1609,11 +1621,14 @@ export class Game extends Scene {
 		this.cameras.main.shake(300, 0.009);
 		this.cameras.main.zoomTo(1.5, 600, "Linear", false, (_, progress) => {
 			if (progress === 1) {
-				setTimeout(() => {
-					if (this.getPlayerHitPoints() > 0) {
-						this.cameras.main.zoomTo(1, 400, "Linear", true);
-					}
-				}, 0);
+				this.time.addEvent({
+					delay: 0,
+					callback: () => {
+						if (this.getPlayerHitPoints() > 0) {
+							this.cameras.main.zoomTo(1, 400, "Linear", true);
+						}
+					},
+				});
 			}
 		});
 		this.setPlayerHitPoints(this.getPlayerHitPoints() - 1);
@@ -1628,12 +1643,15 @@ export class Game extends Scene {
 			return;
 		}
 
-		setTimeout(() => {
-			if (this.getPlayerHitPoints() > 0) {
-				this.framesSincePlayerHit = 0;
-				this.enemyCollider.active = true;
-			}
-		}, this.postHitInvincibilityTime);
+		this.time.addEvent({
+			delay: this.postHitInvincibilityTime,
+			callback: () => {
+				if (this.getPlayerHitPoints() > 0) {
+					this.framesSincePlayerHit = 0;
+					this.enemyCollider.active = true;
+				}
+			},
+		});
 
 		this.isPlayerBeingKnockedBack = true;
 		this.knockBack(
