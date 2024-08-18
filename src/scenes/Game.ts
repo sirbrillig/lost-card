@@ -1223,12 +1223,6 @@ export class Game extends Scene {
 			repeat: -1,
 		});
 		anims.create({
-			key: "character-idle-right",
-			frames: anims.generateFrameNumbers("character-idle-right"),
-			frameRate: 7,
-			repeat: -1,
-		});
-		anims.create({
 			key: "character-idle-left",
 			frames: anims.generateFrameNumbers("character-idle-left"),
 			frameRate: 7,
@@ -1238,15 +1232,6 @@ export class Game extends Scene {
 		anims.create({
 			key: "character-down-walk",
 			frames: anims.generateFrameNumbers("character-run-down"),
-			frameRate: 14,
-			repeat: -1,
-		});
-		anims.create({
-			key: "character-right-walk",
-			frames: anims.generateFrameNumbers("character-run-right", {
-				start: 7,
-				end: 0,
-			}),
 			frameRate: 14,
 			repeat: -1,
 		});
@@ -1836,11 +1821,13 @@ export class Game extends Scene {
 
 		this.player.body.velocity.normalize().scale(this.getPlayerSpeed());
 
+		this.player.setFlipX(false);
 		if (this.cursors.left.isDown) {
 			this.player.anims.play("character-left-walk", true);
 			this.playerDirection = SpriteLeft;
 		} else if (this.cursors.right.isDown) {
-			this.player.anims.play("character-right-walk", true);
+			this.player.setFlipX(true);
+			this.player.anims.play("character-left-walk", true);
 			this.playerDirection = SpriteRight;
 		} else if (this.cursors.down.isDown) {
 			this.player.anims.play("character-down-walk", true);
@@ -1919,12 +1906,14 @@ export class Game extends Scene {
 
 	setPlayerIdleFrame() {
 		// If the player stops moving, stop animations and reset the image to an idle frame in the correct direction.
+		this.player.setFlipX(false);
 		switch (this.playerDirection) {
 			case SpriteLeft:
 				this.player.anims.play("character-idle-left", true);
 				return;
 			case SpriteRight:
-				this.player.anims.play("character-idle-right", true);
+				this.player.setFlipX(true);
+				this.player.anims.play("character-idle-left", true);
 				return;
 			case SpriteUp:
 				this.player.anims.play("character-idle-up", true);

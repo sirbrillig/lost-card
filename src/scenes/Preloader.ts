@@ -83,13 +83,9 @@ export class Preloader extends Scene {
 			frameWidth: 15,
 			frameHeight: 26,
 		});
-		this.load.spritesheet("character-idle-right", "character_idle_right.png", {
-			frameWidth: 15,
-			frameHeight: 26,
-		});
 		this.load.spritesheet("character-idle-left", "character_idle_left.png", {
 			frameWidth: 15,
-			frameHeight: 26,
+			frameHeight: 24,
 		});
 		this.load.spritesheet("character-run-down", "character_run_down.png", {
 			frameWidth: 17,
@@ -100,10 +96,6 @@ export class Preloader extends Scene {
 			frameHeight: 29,
 		});
 		this.load.spritesheet("character-run-left", "character_run_left.png", {
-			frameWidth: 17,
-			frameHeight: 24,
-		});
-		this.load.spritesheet("character-run-right", "character_run_right.png", {
 			frameWidth: 17,
 			frameHeight: 24,
 		});
