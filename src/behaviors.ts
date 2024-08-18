@@ -113,7 +113,8 @@ export class SpawnEnemies<AllStates extends string>
 	implements Behavior<AllStates, Phaser.GameObjects.Sprite>
 {
 	#nextState: AllStates;
-	#maxSpawnedEnemies: number = 16;
+	#maxSpawnedEnemies: number = 18;
+	#enemiesToSpawn: number = 6;
 	name: AllStates;
 
 	constructor(name: AllStates, nextState: AllStates) {
@@ -138,10 +139,9 @@ export class SpawnEnemies<AllStates extends string>
 			true
 		);
 
-		this.#addEnemy(sprite, enemyManager);
-		this.#addEnemy(sprite, enemyManager);
-		this.#addEnemy(sprite, enemyManager);
-		this.#addEnemy(sprite, enemyManager);
+		for (let x = 0; x < this.#enemiesToSpawn; x++) {
+			this.#addEnemy(sprite, enemyManager);
+		}
 
 		sprite.once(
 			Phaser.Animations.Events.ANIMATION_COMPLETE,
