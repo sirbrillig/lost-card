@@ -29,6 +29,7 @@ export const DataKeys = {
 	MonsterPosition: "monsterPosition",
 	PlayerPosition: "playerPosition",
 	ActivePower: "activePower",
+	PotionCount: "potionCount",
 };
 
 export type Powers = "IceCard" | "WindCard";

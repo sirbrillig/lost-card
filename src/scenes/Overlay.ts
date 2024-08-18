@@ -1,5 +1,5 @@
 import { Scene } from "phaser";
-import { DataKeys, Power } from "../shared";
+import { DataKeys, Powers } from "../shared";
 
 const heartSize: number = 18;
 const itemSize: number = 20;
@@ -9,6 +9,7 @@ const activeFrame = 29;
 
 class Item {
 	image: Phaser.GameObjects.Image;
+	scene: Phaser.Scene;
 	name: string;
 
 	constructor(
@@ -28,10 +29,43 @@ class Item {
 			.setOrigin(1);
 		this.image = image;
 		this.name = name;
+		this.scene = scene;
 	}
+
+	update() {}
 
 	destroy() {
 		this.image.destroy();
+	}
+}
+
+class PotionItem extends Item {
+	totalPotions: number = 0;
+	countLabel: Phaser.GameObjects.BitmapText;
+
+	constructor(
+		scene: Phaser.Scene,
+		count: number,
+		texture: string,
+		frame: number,
+		name: string
+	) {
+		super(scene, count, texture, frame, name);
+		this.countLabel = scene.add
+			.bitmapText(
+				this.image.x - this.image.width + 2,
+				this.image.y - 4,
+				"RetroGamingWhiteSmall",
+				`${this.totalPotions}`,
+				12
+			)
+			.setDepth(9)
+			.setOrigin(0.5);
+	}
+
+	update() {
+		this.totalPotions = this.scene.registry.get(DataKeys.PotionCount) ?? 0;
+		this.countLabel.setText(`${this.totalPotions}`);
 	}
 }
 
@@ -83,6 +117,10 @@ export class Overlay extends Scene {
 
 	create() {
 		console.log("creating overlay");
+		this.items.forEach((item) => item.destroy());
+		this.items = [];
+		this.hearts.forEach((item) => item.destroy());
+		this.hearts = [];
 		this.totalHearts = this.registry.get("playerTotalHitPoints") ?? 0;
 		this.activeHearts = this.registry.get("playerHitPoints") ?? 0;
 		this.bg = this.add
@@ -110,7 +148,7 @@ export class Overlay extends Scene {
 	}
 
 	updateSelectedItem() {
-		const activePower: Power | undefined = this.registry.get(
+		const activePower: Powers | undefined = this.registry.get(
 			DataKeys.ActivePower
 		);
 		if (!activePower) {
@@ -148,12 +186,21 @@ export class Overlay extends Scene {
 	}
 
 	updateItems() {
+		if (!this.items.some((item) => item.name === "Potion")) {
+			this.items.push(new PotionItem(this, 0, "icons3", 2, "Potion"));
+		}
 		if (
 			this.registry.get("hasSword") &&
 			!this.items.some((item) => item.name === "Sword")
 		) {
 			this.items.push(
-				new Item(this, 0, "dungeon_tiles_sprites", 1315, "Sword")
+				new Item(
+					this,
+					this.items.length,
+					"dungeon_tiles_sprites",
+					1315,
+					"Sword"
+				)
 			);
 		}
 		if (
@@ -172,6 +219,8 @@ export class Overlay extends Scene {
 				new Item(this, this.items.length, "icons3", 47, "IceCard")
 			);
 		}
+
+		this.items.forEach((item) => item.update());
 	}
 
 	getBackgroundWidth() {

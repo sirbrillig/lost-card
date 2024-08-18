@@ -254,6 +254,24 @@ export class Game extends Scene {
 			this.freezeWaterTile(tile);
 		});
 
+		this.createInputs();
+		this.setUpCamera();
+
+		this.hideAllTransientTiles();
+		this.hideHiddenItems();
+
+		this.createOverlay();
+
+		MainEvents.on(Events.StunPlayer, (setting: boolean) =>
+			this.setPlayerStunned(setting)
+		);
+
+		MainEvents.on(Events.FreezePlayer, (setting: boolean) => {
+			this.setPlayerFrozen(setting);
+		});
+	}
+
+	createInputs() {
 		if (!this.input.keyboard) {
 			throw new Error("No keyboard controls could be found");
 		}
@@ -316,20 +334,19 @@ export class Game extends Scene {
 					break;
 			}
 		});
-
-		this.setUpCamera();
-
-		this.hideAllTransientTiles();
-		this.hideHiddenItems();
-
-		this.createOverlay();
-
-		MainEvents.on(Events.StunPlayer, (setting: boolean) =>
-			this.setPlayerStunned(setting)
-		);
-
-		MainEvents.on(Events.FreezePlayer, (setting: boolean) => {
-			this.setPlayerFrozen(setting);
+		this.input.keyboard.on("keydown-X", () => {
+			// Use Potion
+			const totalHitPoints =
+				this.registry.get("playerTotalHitPoints") ??
+				this.playerInitialHitPoints;
+			if (this.getPlayerHitPoints() === totalHitPoints) {
+				return;
+			}
+			const potionCount = this.getPotionCount();
+			if (potionCount > 0) {
+				this.setPotionCount(potionCount - 1);
+				this.setPlayerHitPoints(totalHitPoints);
+			}
 		});
 	}
 
@@ -831,7 +848,15 @@ export class Game extends Scene {
 	}
 
 	showHiddenItem(name: string) {
-		const item = this.createdItems.find((item) => item.name === name);
+		const item = this.createdItems.find((item) => {
+			if (!this.enemyManager.activeRoom) {
+				return false;
+			}
+			return (
+				item.name === name &&
+				isPointInRoom(item.x, item.y, this.enemyManager.activeRoom)
+			);
+		});
 		if (!item) {
 			return;
 		}
@@ -879,6 +904,9 @@ export class Game extends Scene {
 			switch (touchingItem.name) {
 				case "Sword":
 					this.pickUpSword();
+					break;
+				case "Potion":
+					this.pickUpPotion();
 					break;
 				case "WindCard":
 					this.pickUpWindCard();
@@ -988,6 +1016,19 @@ export class Game extends Scene {
 				this.scene.get("Dialog")?.scene.stop();
 			});
 		}, this.gotItemFreeze);
+	}
+
+	pickUpPotion() {
+		this.setPotionCount(this.getPotionCount() + 1);
+
+		this.scene.launch("Dialog", {
+			heading: "A potion!",
+			text: "Press X to restore health\r\nPress SPACE to continue",
+		});
+
+		this.input.keyboard?.once("keydown-SPACE", () => {
+			this.scene.get("Dialog")?.scene.stop();
+		});
 	}
 
 	pickUpSword() {
@@ -1452,6 +1493,7 @@ export class Game extends Scene {
 					);
 					boss.once(Events.MonsterDefeated, () => {
 						this.showHiddenItem("WindCard");
+						this.showHiddenItem("Potion");
 					});
 					this.enemyManager.enemies.add(boss);
 					break;
@@ -1655,6 +1697,14 @@ export class Game extends Scene {
 			this.getTimeSinceLastAttack() > this.postAttackCooldown &&
 			!this.isPlayerUsingPower()
 		);
+	}
+
+	getPotionCount(): number {
+		return this.registry.get(DataKeys.PotionCount) ?? 0;
+	}
+
+	setPotionCount(count: number) {
+		this.registry.set(DataKeys.PotionCount, count);
 	}
 
 	equipSword(): void {
