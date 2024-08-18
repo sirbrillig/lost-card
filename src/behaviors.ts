@@ -252,28 +252,7 @@ export class RandomlyWalk<AllStates extends string>
 		if (!isDynamicSprite(sprite)) {
 			throw new Error("invalid sprite");
 		}
-		setTimeout(() => {
-			// sprite may have been destroyed before this happens
-			sprite?.body?.setVelocity(0);
-			stateMachine.popState();
-			stateMachine.pushState(this.#nextState);
-		}, this.#getWalkingTime());
-	}
 
-	#getWalkingTime(): number {
-		return Phaser.Math.Between(this.#minWalkTime, this.#maxWalkTime);
-	}
-
-	update(sprite: Phaser.GameObjects.Sprite) {
-		if (!isDynamicSprite(sprite)) {
-			return;
-		}
-		// If we are not moving, move in a random direction. If we are moving, keep
-		// moving in that direction.
-		const previousDirection = getDirectionOfSpriteMovement(sprite.body);
-		if (previousDirection) {
-			return;
-		}
 		const direction = Phaser.Math.Between(0, 3);
 		switch (direction) {
 			case SpriteUp:
@@ -293,7 +272,20 @@ export class RandomlyWalk<AllStates extends string>
 				sprite.body.setVelocityX(-this.#enemySpeed);
 				break;
 		}
+
+		setTimeout(() => {
+			// sprite may have been destroyed before this happens
+			sprite?.body?.setVelocity(0);
+			stateMachine.popState();
+			stateMachine.pushState(this.#nextState);
+		}, this.#getWalkingTime());
 	}
+
+	#getWalkingTime(): number {
+		return Phaser.Math.Between(this.#minWalkTime, this.#maxWalkTime);
+	}
+
+	update() {}
 }
 
 export class LeftRightMarch<AllStates extends string>
