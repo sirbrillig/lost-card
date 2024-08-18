@@ -7708,7 +7708,7 @@
    </properties>
    <point/>
   </object>
-  <object id="47" name="BossA" x="1463.38" y="173.435">
+  <object id="47" name="MountainBoss" x="1463.38" y="173.435">
    <properties>
     <property name="isBoss" type="bool" value="true"/>
     <property name="isMonster" type="bool" value="true"/>

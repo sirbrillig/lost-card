@@ -5,7 +5,7 @@ import { BaseMonster } from "./BaseMonster";
 
 type AllStates = "initial" | "roar1" | "spawn1" | "spawn2" | "idle1" | "idle2";
 
-export class BossA extends BaseMonster<AllStates> {
+export class MountainBoss extends BaseMonster<AllStates> {
 	hitPoints: number = 6;
 
 	constructor(
