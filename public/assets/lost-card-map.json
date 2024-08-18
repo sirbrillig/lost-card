@@ -2018,6 +2018,48 @@
                  "width":16,
                  "x":1474.43912949795,
                  "y":130.818358112476
+                }, 
+                {
+                 "gid":2791,
+                 "height":16,
+                 "id":376,
+                 "name":"Potion",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":16,
+                 "x":1796.15068015347,
+                 "y":2401.6170212766
+                }, 
+                {
+                 "gid":2791,
+                 "height":16,
+                 "id":377,
+                 "name":"Potion",
+                 "properties":[
+                        {
+                         "name":"hidden",
+                         "type":"bool",
+                         "value":true
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":16,
+                 "x":1901.66166724799,
+                 "y":2652.75061039414
+                }, 
+                {
+                 "gid":2791,
+                 "height":16,
+                 "id":378,
+                 "name":"Potion",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":16,
+                 "x":2000.83665065202,
+                 "y":1870.13109128346
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -5347,7 +5389,7 @@
          "y":0
         }],
  "nextlayerid":13,
- "nextobjectid":376,
+ "nextobjectid":379,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.0",

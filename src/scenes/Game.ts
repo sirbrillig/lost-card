@@ -1514,6 +1514,7 @@ export class Game extends Scene {
 					const boss = new IceBoss(this, this.enemyManager, point.x, point.y);
 					boss.once(Events.MonsterDefeated, () => {
 						this.showHiddenItem("IceCrystal");
+						this.showHiddenItem("Potion");
 					});
 					this.enemyManager.enemies.add(boss);
 					break;
