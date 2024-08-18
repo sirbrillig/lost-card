@@ -1,4 +1,6 @@
 import {
+	SpriteDirection,
+	invertSpriteDirection,
 	isTilemapTile,
 	isDynamicSprite,
 	isTileWithPropertiesObject,
@@ -111,7 +113,6 @@ export class SpawnEnemies<AllStates extends string>
 	implements Behavior<AllStates, Phaser.GameObjects.Sprite>
 {
 	#nextState: AllStates;
-	// FIXME: this will be per behavior not per monster
 	#maxSpawnedEnemies: number = 16;
 	name: AllStates;
 
@@ -235,7 +236,7 @@ export class RandomlyWalk<AllStates extends string>
 	implements Behavior<AllStates, Phaser.GameObjects.Sprite>
 {
 	#enemySpeed = 50;
-	#minWalkTime = 500;
+	#minWalkTime = 800;
 	#maxWalkTime = 4000;
 	#nextState: AllStates;
 	#active: boolean = true;
@@ -254,7 +255,15 @@ export class RandomlyWalk<AllStates extends string>
 			throw new Error("invalid sprite");
 		}
 
-		const direction = Phaser.Math.Between(0, 3);
+		const previousDirection: SpriteDirection | undefined =
+			sprite.data.get("direction");
+		let direction = Phaser.Math.Between(0, 3);
+		if (previousDirection !== undefined) {
+			while (direction === previousDirection) {
+				direction = Phaser.Math.Between(0, 3);
+			}
+		}
+		sprite.data.set("direction", direction);
 		switch (direction) {
 			case SpriteUp:
 				sprite.anims.play("up", true);
@@ -327,9 +336,13 @@ export class LeftRightMarch<AllStates extends string>
 			throw new Error("invalid sprite");
 		}
 
-		// FIXME: can we go the opposite direction as last time? unfortunately it's a different class instance.
-		const direction =
-			Phaser.Math.Between(0, 1) === 1 ? SpriteLeft : SpriteRight;
+		const previousDirection: SpriteDirection | undefined =
+			sprite.data.get("direction");
+		let direction = Phaser.Math.Between(0, 1) === 1 ? SpriteLeft : SpriteRight;
+		if (previousDirection !== undefined) {
+			direction = invertSpriteDirection(previousDirection);
+		}
+		sprite.data.set("direction", direction);
 		switch (direction) {
 			case SpriteRight:
 				sprite.anims.play("right", true);
