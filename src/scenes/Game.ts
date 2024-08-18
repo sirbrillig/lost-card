@@ -1338,6 +1338,10 @@ export class Game extends Scene {
 		this.player.setDebugBodyColor(0x00ff00);
 		this.player.setDisplaySize(13, 24);
 		this.player.setSize(8, 12);
+		this.player.setOffset(
+			this.player.body.offset.x,
+			this.player.body.offset.y + 5
+		);
 		this.player.setDepth(1);
 		this.sword = this.physics.add.sprite(
 			this.player.x,
