@@ -2,7 +2,6 @@ import {
 	isTilemapTile,
 	isDynamicSprite,
 	isTileWithPropertiesObject,
-	getDirectionOfSpriteMovement,
 	SpriteUp,
 	SpriteDown,
 	SpriteLeft,
@@ -238,6 +237,7 @@ export class RandomlyWalk<AllStates extends string>
 	#minWalkTime = 500;
 	#maxWalkTime = 4000;
 	#nextState: AllStates;
+	#active: boolean = true;
 	name: AllStates;
 
 	constructor(name: AllStates, nextState: AllStates) {
@@ -273,19 +273,35 @@ export class RandomlyWalk<AllStates extends string>
 				break;
 		}
 
-		setTimeout(() => {
-			// sprite may have been destroyed before this happens
-			sprite?.body?.setVelocity(0);
-			stateMachine.popState();
-			stateMachine.pushState(this.#nextState);
-		}, this.#getWalkingTime());
+		sprite.scene.time.addEvent({
+			delay: this.#getWalkingTime(),
+			callback: () => {
+				if (!this.#active) {
+					return;
+				}
+				sprite?.body?.setVelocity(0);
+				stateMachine.popState();
+				stateMachine.pushState(this.#nextState);
+			},
+		});
 	}
 
 	#getWalkingTime(): number {
 		return Phaser.Math.Between(this.#minWalkTime, this.#maxWalkTime);
 	}
 
-	update() {}
+	update(
+		sprite: Phaser.GameObjects.Sprite,
+		stateMachine: BehaviorMachineInterface<AllStates>
+	) {
+		if (sprite.body?.velocity.x === 0 && sprite.body.velocity.y === 0) {
+			if (!this.#active) {
+				return;
+			}
+			stateMachine.popState();
+			stateMachine.pushState(this.#nextState);
+		}
+	}
 }
 
 export class LeftRightMarch<AllStates extends string>
