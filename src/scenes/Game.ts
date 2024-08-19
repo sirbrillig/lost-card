@@ -1580,9 +1580,13 @@ export class Game extends Scene {
 			"MetaObjects",
 			(obj) => obj.name === "Start Point"
 		);
+		const tempSpawnPoint = this.map.findObject(
+			"MetaObjects",
+			(obj) => obj.name === "Temp Start"
+		);
 		return {
-			x: spawnPoint?.x ?? 400,
-			y: spawnPoint?.y ?? 350,
+			x: tempSpawnPoint?.x ?? spawnPoint?.x ?? 400,
+			y: tempSpawnPoint?.y ?? spawnPoint?.y ?? 350,
 		};
 	}
 
