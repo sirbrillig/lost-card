@@ -7152,6 +7152,16 @@
     <property name="isAffectedByFireCard" type="bool" value="true"/>
    </properties>
   </tile>
+  <tile id="112">
+   <properties>
+    <property name="affectedByFireCard" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="113">
+   <properties>
+    <property name="affectedByFireCard" type="bool" value="true"/>
+   </properties>
+  </tile>
   <tile id="124">
    <properties>
     <property name="doordirection" type="int" value="1"/>
@@ -7166,6 +7176,16 @@
   <tile id="144">
    <properties>
     <property name="isAffectedByFireCard" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="153">
+   <properties>
+    <property name="affectedByFireCard" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="154">
+   <properties>
+    <property name="affectedByFireCard" type="bool" value="true"/>
    </properties>
   </tile>
   <tile id="485">
@@ -8045,7 +8065,7 @@
   <object id="448" gid="2717" x="2849.14" y="1950.83" width="16" height="16"/>
   <object id="449" gid="2717" x="2896.53" y="2304.3" width="16" height="16"/>
  </objectgroup>
- <objectgroup id="7" name="Transients" visible="0">
+ <objectgroup id="7" name="Transients">
   <object id="144" name="Rock" gid="2260" x="1328.81" y="1068.33" width="12.163" height="12.163"/>
   <object id="161" name="Rock" gid="2260" x="1295.68" y="1120" width="12.163" height="12.163"/>
   <object id="323" name="Rock" gid="2260" x="1331.09" y="1118.93" width="12.163" height="12.163"/>
@@ -8338,9 +8358,9 @@
   <object id="418" gid="2301" x="1232.13" y="2304.31" width="16" height="16"/>
   <object id="419" gid="2301" x="1007.7" y="2240.83" width="16" height="16"/>
   <object id="420" gid="2301" x="1071.18" y="2320.81" width="16" height="16"/>
-  <object id="470" gid="1880" x="2848" y="2384" width="16" height="16"/>
-  <object id="471" gid="1880" x="2944" y="2384" width="16" height="16"/>
-  <object id="473" gid="1880" x="1952" y="1696" width="16" height="16"/>
-  <object id="474" gid="1880" x="1968" y="1696" width="16" height="16"/>
+  <object id="470" gid="1507" x="2848" y="2384" width="16" height="16"/>
+  <object id="471" gid="1507" x="2944" y="2384" width="16" height="16"/>
+  <object id="473" gid="1508" x="1952" y="1696" width="16" height="16"/>
+  <object id="474" gid="1548" x="1968" y="1696" width="16" height="16"/>
  </objectgroup>
 </map>

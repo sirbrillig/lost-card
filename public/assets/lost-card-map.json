@@ -6630,18 +6630,13 @@
                  "y":2320.81
                 }, 
                 {
-                 "gid":1880,
+                 "gid":1507,
                  "height":16,
                  "id":470,
                  "name":"",
                  "properties":[
                         {
                          "name":"affectedByFireCard",
-                         "type":"bool",
-                         "value":true
-                        }, 
-                        {
-                         "name":"collides",
                          "type":"bool",
                          "value":true
                         }],
@@ -6653,18 +6648,13 @@
                  "y":2384
                 }, 
                 {
-                 "gid":1880,
+                 "gid":1507,
                  "height":16,
                  "id":471,
                  "name":"",
                  "properties":[
                         {
                          "name":"affectedByFireCard",
-                         "type":"bool",
-                         "value":true
-                        }, 
-                        {
-                         "name":"collides",
                          "type":"bool",
                          "value":true
                         }],
@@ -6676,18 +6666,13 @@
                  "y":2384
                 }, 
                 {
-                 "gid":1880,
+                 "gid":1508,
                  "height":16,
                  "id":473,
                  "name":"",
                  "properties":[
                         {
                          "name":"affectedByFireCard",
-                         "type":"bool",
-                         "value":true
-                        }, 
-                        {
-                         "name":"collides",
                          "type":"bool",
                          "value":true
                         }],
@@ -6699,18 +6684,13 @@
                  "y":1696
                 }, 
                 {
-                 "gid":1880,
+                 "gid":1548,
                  "height":16,
                  "id":474,
                  "name":"",
                  "properties":[
                         {
                          "name":"affectedByFireCard",
-                         "type":"bool",
-                         "value":true
-                        }, 
-                        {
-                         "name":"collides",
                          "type":"bool",
                          "value":true
                         }],
@@ -6723,7 +6703,7 @@
                 }],
          "opacity":1,
          "type":"objectgroup",
-         "visible":false,
+         "visible":true,
          "x":0,
          "y":0
         }],
@@ -20260,6 +20240,24 @@
                         }]
                 }, 
                 {
+                 "id":112,
+                 "properties":[
+                        {
+                         "name":"affectedByFireCard",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":113,
+                 "properties":[
+                        {
+                         "name":"affectedByFireCard",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
                  "id":124,
                  "properties":[
                         {
@@ -20287,6 +20285,24 @@
                  "properties":[
                         {
                          "name":"isAffectedByFireCard",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":153,
+                 "properties":[
+                        {
+                         "name":"affectedByFireCard",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":154,
+                 "properties":[
+                        {
+                         "name":"affectedByFireCard",
                          "type":"bool",
                          "value":true
                         }]
