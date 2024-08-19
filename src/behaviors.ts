@@ -289,6 +289,7 @@ export class RandomlyWalk<AllStates extends string>
 				if (!this.#active) {
 					return;
 				}
+				this.#active = false;
 				sprite?.body?.setVelocity(0);
 				stateMachine.popState();
 				stateMachine.pushState(this.#nextState);
@@ -308,6 +309,7 @@ export class RandomlyWalk<AllStates extends string>
 			if (!this.#active) {
 				return;
 			}
+			this.#active = false;
 			stateMachine.popState();
 			stateMachine.pushState(this.#nextState);
 		}
