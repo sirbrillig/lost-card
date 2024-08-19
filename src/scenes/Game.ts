@@ -74,7 +74,6 @@ export class Game extends Scene {
 	iceCardFrozenTime: number = 3000;
 	iceMeltTime: number = 4000;
 	plantCardVelocity: number = 80;
-	plantCardPullTime: number = 100;
 
 	map: Phaser.Tilemaps.Tilemap;
 	landLayer: Phaser.Tilemaps.TilemapLayer;
@@ -216,18 +215,31 @@ export class Game extends Scene {
 			this.player,
 			this.enemyManager.enemies,
 			(player, enemy) => {
-				if (isDynamicSprite(player) && isDynamicSprite(enemy)) {
-					this.enemyHitPlayer();
+				if (!isDynamicSprite(player) || !isDynamicSprite(enemy)) {
+					return;
 				}
+				// FIXME: for some reason the creature stops before it hits the player
+				if (enemy.data.get("isPlantCardGrappleActive")) {
+					console.log("end pulling monster");
+					enemy?.emit(Events.MonsterStun, false);
+					enemy.data.set("isPlantCardGrappleActive", false);
+					this.power.anims.stop();
+					this.power.visible = false;
+					return;
+				}
+				this.enemyHitPlayer();
 			},
 			(_, enemy) => {
+				if (!isDynamicSprite(enemy)) {
+					return false;
+				}
+				if (enemy.data.get("isPlantCardGrappleActive")) {
+					return true;
+				}
 				if (this.isPlayerInvincible()) {
 					return false;
 				}
-				if (isDynamicSprite(enemy)) {
-					return enemy.visible && !enemy.data?.get("stunned");
-				}
-				return false;
+				return enemy.visible && !enemy.data?.get("stunned");
 			}
 		);
 
@@ -657,6 +669,20 @@ export class Game extends Scene {
 			if (!isDynamicSprite(enemy)) {
 				return;
 			}
+			if (enemy.data.get("isPlantCardGrappleActive")) {
+				const distance = Phaser.Math.Distance.BetweenPoints(
+					enemy.body.center,
+					this.player.body.center
+				);
+				if (distance < 30) {
+					// FIXME: for some reason the creature stops when it gets about 30px away but I have no idea why
+					enemy.emit(Events.MonsterStun, false);
+					enemy.data.set("isPlantCardGrappleActive", false);
+					this.power.anims.stop();
+					this.power.visible = false;
+				}
+			}
+
 			// Note that enemies should avoid rendering if they are not active!
 			enemy.update();
 		});
@@ -1669,17 +1695,21 @@ export class Game extends Scene {
 	}
 
 	pullEnemy(enemy: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody) {
-		if (enemy.data.get(DataKeys.Hittable) === true) {
-			enemy.emit(Events.MonsterStun, true);
-			this.knockBack(
-				enemy.body,
-				this.plantCardPullTime,
-				invertSpriteDirection(this.playerDirection),
-				() => {
-					enemy?.emit(Events.MonsterStun, false);
-				}
-			);
+		if (enemy.data.get(DataKeys.Hittable) !== true) {
+			return;
 		}
+		if (enemy.data.get("isPlantCardGrappleActive")) {
+			return;
+		}
+		console.log("pulling monster");
+		enemy.emit(Events.MonsterStun, true);
+		enemy.data.set("isPlantCardGrappleActive", true);
+
+		this.physics.moveToObject(enemy, this.player, 120);
+
+		// FIXME: do we need this?
+		// this.power.anims.pause();
+		this.power.body.stop();
 	}
 
 	sendHitToEnemy(enemy: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody) {

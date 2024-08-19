@@ -9,7 +9,6 @@ export class BaseMonster<AllStates extends string> extends Phaser.Physics.Arcade
 	#enemyManager: EnemyManager;
 	#isBeingHit: boolean = false;
 	#freeTimeAfterHit: number = 600;
-	#wasStunned: boolean = false;
 
 	hitPoints: number = 1;
 
@@ -77,17 +76,9 @@ export class BaseMonster<AllStates extends string> extends Phaser.Physics.Arcade
 			this.body.stop();
 			return;
 		}
-		if (this.data.get(DataKeys.Stunned) && !this.#wasStunned) {
-			this.#wasStunned = true;
-			// If stunned, we want it to stop moving on its own, but sometimes we
-			// want to stun a creature and push it which sets its velocity.
-			this.body.setVelocity(0);
-			return;
-		}
 		if (this.data.get(DataKeys.Stunned)) {
 			return;
 		}
-		this.#wasStunned = false;
 
 		const state = this.stateMachine.getCurrentState();
 
@@ -139,6 +130,7 @@ export class BaseMonster<AllStates extends string> extends Phaser.Physics.Arcade
 			return;
 		}
 		this.data.set(DataKeys.Stunned, setting);
+		this.setVelocity(0);
 	}
 
 	kill() {
