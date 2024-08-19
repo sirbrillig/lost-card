@@ -7636,7 +7636,11 @@
     <property name="doorto" type="object" value="389"/>
    </properties>
   </object>
-  <object id="391" gid="2554" x="1488" y="2176" width="16" height="16"/>
+  <object id="391" gid="2554" x="1488" y="2176" width="16" height="16">
+   <properties>
+    <property name="doorto" type="object" value="392"/>
+   </properties>
+  </object>
   <object id="392" gid="2677" x="1488" y="2160" width="16" height="16">
    <properties>
     <property name="doorto" type="object" value="391"/>

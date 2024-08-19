@@ -74,6 +74,7 @@ export class Game extends Scene {
 	iceCardFrozenTime: number = 3000;
 	iceMeltTime: number = 4000;
 	plantCardVelocity: number = 80;
+	plantCardPullTime: number = 100;
 
 	map: Phaser.Tilemaps.Tilemap;
 	landLayer: Phaser.Tilemaps.TilemapLayer;
@@ -1631,7 +1632,9 @@ export class Game extends Scene {
 		if (this.isPlayerUsingPower() && this.getActivePower() === "IceCard") {
 			this.freezeEnemy(enemy);
 		}
-		// FIXME: do something with plant card
+		if (this.isPlayerUsingPower() && this.getActivePower() === "PlantCard") {
+			this.pullEnemy(enemy);
+		}
 	}
 
 	freezeEnemy(enemy: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody) {
@@ -1658,6 +1661,20 @@ export class Game extends Scene {
 				enemy.body,
 				this.windCardPushTime,
 				this.playerDirection,
+				() => {
+					enemy?.emit(Events.MonsterStun, false);
+				}
+			);
+		}
+	}
+
+	pullEnemy(enemy: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody) {
+		if (enemy.data.get(DataKeys.Hittable) === true) {
+			enemy.emit(Events.MonsterStun, true);
+			this.knockBack(
+				enemy.body,
+				this.plantCardPullTime,
+				invertSpriteDirection(this.playerDirection),
 				() => {
 					enemy?.emit(Events.MonsterStun, false);
 				}
