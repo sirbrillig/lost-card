@@ -408,6 +408,22 @@ export class Game extends Scene {
 			true,
 			tile.layer.name
 		);
+		if (
+			this.enemyManager.activeRoom &&
+			!isPointInRoom(tile.x, tile.y, this.enemyManager.activeRoom)
+		) {
+			hideAllRoomsExcept(
+				this.map,
+				this.enemyManager.enemies,
+				[
+					...this.createdItems,
+					...this.createdTiles,
+					...this.createdDoors,
+					...this.createdSavePoints,
+				],
+				this.enemyManager.activeRoom
+			);
+		}
 		this.landLayer.setCollisionByProperty({ collides: true });
 	}
 
