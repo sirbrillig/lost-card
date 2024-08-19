@@ -73,6 +73,7 @@ export class Game extends Scene {
 	icePowerVelocity: number = 80;
 	iceCardFrozenTime: number = 3000;
 	iceMeltTime: number = 4000;
+	plantCardVelocity: number = 80;
 
 	map: Phaser.Tilemaps.Tilemap;
 	landLayer: Phaser.Tilemaps.TilemapLayer;
@@ -1912,6 +1913,12 @@ export class Game extends Scene {
 		switch (this.playerDirection) {
 			case SpriteUp:
 				switch (this.getActivePower()) {
+					case "PlantCard":
+						this.power.setRotation(Phaser.Math.DegToRad(90));
+						this.power.setVelocity(0, -this.plantCardVelocity);
+						this.power.anims.play("plant-power-right", true);
+						this.power.setFlipX(true);
+						break;
 					case "IceCard":
 						this.power.setRotation(Phaser.Math.DegToRad(90));
 						this.power.setVelocity(0, -this.icePowerVelocity);
@@ -1928,7 +1935,7 @@ export class Game extends Scene {
 				this.power.setRotation(Phaser.Math.DegToRad(0));
 				switch (this.getActivePower()) {
 					case "PlantCard":
-						this.power.setVelocity(this.icePowerVelocity, 0); // FIXME: use own velocity setting
+						this.power.setVelocity(this.plantCardVelocity, 0);
 						this.power.anims.play("plant-power-right", true);
 						break;
 					case "IceCard":
@@ -1942,6 +1949,11 @@ export class Game extends Scene {
 				break;
 			case SpriteDown:
 				switch (this.getActivePower()) {
+					case "PlantCard":
+						this.power.setRotation(Phaser.Math.DegToRad(90));
+						this.power.setVelocity(0, this.plantCardVelocity);
+						this.power.anims.play("plant-power-right", true);
+						break;
 					case "IceCard":
 						this.power.setRotation(Phaser.Math.DegToRad(90));
 						this.power.setVelocity(0, this.icePowerVelocity);
@@ -1957,7 +1969,7 @@ export class Game extends Scene {
 				this.power.setRotation(Phaser.Math.DegToRad(0));
 				switch (this.getActivePower()) {
 					case "PlantCard":
-						this.power.setVelocity(-this.icePowerVelocity, 0); // FIXME: use own velocity setting
+						this.power.setVelocity(-this.plantCardVelocity, 0);
 						this.power.anims.play("plant-power-right", true);
 						this.power.setFlipX(true);
 						break;
