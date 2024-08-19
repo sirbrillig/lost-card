@@ -1052,6 +1052,9 @@ export class Game extends Scene {
 				case "Heart":
 					this.pickUpHeart();
 					break;
+				case "Key":
+					this.pickUpKey();
+					break;
 				default:
 					return;
 			}
@@ -1087,6 +1090,25 @@ export class Game extends Scene {
 
 	setPlayerHitPoints(hitPoints: number) {
 		this.registry.set("playerHitPoints", hitPoints);
+	}
+
+	setKeyCount(count: number) {
+		this.registry.set(DataKeys.KeyCount, count);
+	}
+
+	getKeyCount(): number {
+		return this.registry.get(DataKeys.KeyCount) ?? 0;
+	}
+
+	pickUpKey() {
+		this.setKeyCount(this.getKeyCount() + 1);
+		this.scene.launch("Dialog", {
+			heading: "A Key",
+			text: "Get six for the gold door\r\nPress SPACE to continue",
+		});
+		this.input.keyboard?.once("keydown-SPACE", () => {
+			this.scene.get("Dialog")?.scene.stop();
+		});
 	}
 
 	pickUpHeart() {
@@ -1726,6 +1748,7 @@ export class Game extends Scene {
 					boss.once(Events.MonsterDefeated, () => {
 						this.showHiddenItem("WindCard");
 						this.showHiddenItem("Heart");
+						this.showHiddenItem("Key");
 					});
 					this.enemyManager.enemies.add(boss);
 					break;
@@ -1733,8 +1756,8 @@ export class Game extends Scene {
 				case "IceBoss": {
 					const boss = new IceBoss(this, this.enemyManager, point.x, point.y);
 					boss.once(Events.MonsterDefeated, () => {
-						this.showHiddenItem("IceCrystal");
 						this.showHiddenItem("Heart");
+						this.showHiddenItem("Key");
 					});
 					this.enemyManager.enemies.add(boss);
 					break;

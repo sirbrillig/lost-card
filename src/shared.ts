@@ -30,6 +30,7 @@ export const DataKeys = {
 	PlayerPosition: "playerPosition",
 	ActivePower: "activePower",
 	PotionCount: "potionCount",
+	KeyCount: "keyCount",
 };
 
 export type Powers = "IceCard" | "WindCard" | "PlantCard" | "FireCard";

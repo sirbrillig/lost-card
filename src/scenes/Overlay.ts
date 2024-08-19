@@ -110,6 +110,8 @@ export class Overlay extends Scene {
 	activeHearts: number = 0;
 	bg: Phaser.GameObjects.NineSlice;
 	selectedItemMarker: Phaser.GameObjects.Image;
+	keyCountIcon: Phaser.GameObjects.Image;
+	keyCountLabel: Phaser.GameObjects.BitmapText;
 
 	constructor() {
 		super("Overlay");
@@ -216,6 +218,34 @@ export class Overlay extends Scene {
 		this.selectedItemMarker.setDepth(8);
 	}
 
+	updateKeys() {
+		const x = this.cameras.main.x + this.cameras.main.width - itemSize / 2;
+		const y = this.cameras.main.y + 30;
+		if (!this.keyCountIcon) {
+			this.keyCountIcon = this.add.image(x, y, "icons3", 28).setOrigin(0.5);
+			this.keyCountIcon.setPosition(x, y);
+			this.keyCountIcon.setDepth(8);
+		}
+
+		if (!this.keyCountLabel) {
+			this.keyCountLabel = this.add
+				.bitmapText(
+					this.keyCountIcon.x - 6,
+					this.keyCountIcon.y + 6,
+					"RetroGamingWhiteSmall",
+					"0",
+					12
+				)
+				.setDepth(9)
+				.setOrigin(0.5);
+		}
+		this.keyCountLabel.setText(`${this.getKeyCount()}`);
+	}
+
+	getKeyCount(): number {
+		return this.registry.get(DataKeys.KeyCount) ?? 0;
+	}
+
 	updateItems() {
 		if (!this.items.some((item) => item.name === "Potion")) {
 			this.items.push(new PotionItem(this, 0, "icons3", 2, "Potion"));
@@ -289,6 +319,7 @@ export class Overlay extends Scene {
 		this.bg.setSize(this.getBackgroundWidth(), 20);
 
 		this.updateItems();
+		this.updateKeys();
 		this.updateSelectedItem();
 	}
 
