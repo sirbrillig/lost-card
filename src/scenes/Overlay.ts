@@ -9,8 +9,10 @@ const activeFrame = 29;
 
 class Item {
 	image: Phaser.GameObjects.Image;
+	selectedItemMarker: Phaser.GameObjects.Image;
 	scene: Phaser.Scene;
 	name: string;
+	isSelected: boolean = false;
 
 	constructor(
 		scene: Phaser.Scene,
@@ -32,7 +34,25 @@ class Item {
 		this.scene = scene;
 	}
 
-	update() {}
+	update() {
+		if (!this.isSelected) {
+			this.selectedItemMarker?.setVisible(false);
+			return;
+		}
+
+		if (!this.selectedItemMarker) {
+			this.selectedItemMarker = this.scene.add
+				.image(
+					this.image.x - this.image.width / 2,
+					this.image.y + 4,
+					"icons2",
+					10
+				)
+				.setOrigin(0.5)
+				.setDepth(8);
+		}
+		this.selectedItemMarker.setVisible(true);
+	}
 
 	destroy() {
 		this.image.destroy();
@@ -109,7 +129,6 @@ export class Overlay extends Scene {
 	totalHearts: number = 0;
 	activeHearts: number = 0;
 	bg: Phaser.GameObjects.NineSlice;
-	selectedItemMarker: Phaser.GameObjects.Image;
 	keyCountIcon: Phaser.GameObjects.Image;
 	keyCountLabel: Phaser.GameObjects.BitmapText;
 
@@ -173,49 +192,13 @@ export class Overlay extends Scene {
 		if (!activePower) {
 			return;
 		}
-		const x = (() => {
-			switch (activePower) {
-				case "WindCard":
-					return (
-						this.cameras.main.x +
-						this.cameras.main.width -
-						itemSize * 1 -
-						itemSize / 2
-					);
-				case "IceCard":
-					return (
-						this.cameras.main.x +
-						this.cameras.main.width -
-						itemSize * 2 -
-						itemSize / 2
-					);
-				case "PlantCard":
-					return (
-						this.cameras.main.x +
-						this.cameras.main.width -
-						itemSize * 3 -
-						itemSize / 2
-					);
-				case "FireCard":
-					return (
-						this.cameras.main.x +
-						this.cameras.main.width -
-						itemSize * 4 -
-						itemSize / 2
-					);
+		this.items.forEach((item) => {
+			if (item.name === activePower) {
+				item.isSelected = true;
+			} else {
+				item.isSelected = false;
 			}
-		})();
-		const y = this.cameras.main.y + 20;
-		if (!x) {
-			throw new Error("No coordinates for active power on overlay");
-		}
-		if (!this.selectedItemMarker) {
-			this.selectedItemMarker = this.add
-				.image(x, y, "icons2", 10)
-				.setOrigin(0.5);
-		}
-		this.selectedItemMarker.setPosition(x, y);
-		this.selectedItemMarker.setDepth(8);
+		});
 	}
 
 	updateKeys() {
@@ -280,6 +263,14 @@ export class Overlay extends Scene {
 		) {
 			this.items.push(
 				new Item(this, this.items.length, "icons3", 55, "FireCard")
+			);
+		}
+		if (
+			this.registry.get("hasSpiritCard") &&
+			!this.items.some((item) => item.name === "SpiritCard")
+		) {
+			this.items.push(
+				new Item(this, this.items.length, "icons3", 24, "SpiritCard")
 			);
 		}
 

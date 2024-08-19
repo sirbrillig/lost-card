@@ -318,6 +318,7 @@ export class Game extends Scene {
 			this.equipIceCard();
 			this.equipPlantCard();
 			this.equipFireCard();
+			this.equipSpiritCard();
 		});
 		this.input.keyboard.on("keydown-S", () => {
 			// Cheat: save
@@ -346,6 +347,7 @@ export class Game extends Scene {
 				"IceCard",
 				"PlantCard",
 				"FireCard",
+				"SpiritCard",
 			];
 			for (let x = 0; x < powerOrder.length; x++) {
 				if (this.getActivePower() !== powerOrder[x]) {
@@ -382,8 +384,11 @@ export class Game extends Scene {
 				return this.registry.get("hasPlantCard");
 			case "FireCard":
 				return this.registry.get("hasFireCard");
+			case "SpiritCard":
+				return this.registry.get("hasSpiritCard");
+			default:
+				return false;
 		}
-		return false;
 	}
 
 	freezeWaterTile(tile: Phaser.Tilemaps.Tile) {
@@ -1049,6 +1054,9 @@ export class Game extends Scene {
 				case "FireCard":
 					this.pickUpFireCard();
 					break;
+				case "SpiritCard":
+					this.pickUpSpiritCard();
+					break;
 				case "Heart":
 					this.pickUpHeart();
 					break;
@@ -1139,6 +1147,35 @@ export class Game extends Scene {
 			callback: () => {
 				this.scene.launch("Dialog", {
 					heading: "The Ice Card",
+					text: "Press SHIFT to use it\r\nPress Z to change power",
+				});
+				this.setPlayerInvincible(false);
+				this.setPlayerStunned(false);
+				this.input.keyboard?.once("keydown-SHIFT", () => {
+					this.scene.get("Dialog")?.scene.stop();
+				});
+			},
+		});
+	}
+
+	pickUpSpiritCard() {
+		this.equipSpiritCard();
+
+		// Face right
+		this.playerDirection = SpriteRight;
+		this.setPlayerIdleFrame();
+
+		// Play power animation
+		this.updateHitboxForPower();
+		this.power.anims.play("spirit-power", true);
+
+		this.setPlayerInvincible(true);
+		this.setPlayerStunned(true);
+		this.time.addEvent({
+			delay: this.gotItemFreeze,
+			callback: () => {
+				this.scene.launch("Dialog", {
+					heading: "The Spirit Card",
 					text: "Press SHIFT to use it\r\nPress Z to change power",
 				});
 				this.setPlayerInvincible(false);
@@ -2030,6 +2067,11 @@ export class Game extends Scene {
 		this.setActivePower("FireCard");
 	}
 
+	equipSpiritCard(): void {
+		this.registry.set("hasSpiritCard", true);
+		this.setActivePower("SpiritCard");
+	}
+
 	canPlayerUsePower(): boolean {
 		return (
 			this.getPlayerHitPoints() > 0 &&
@@ -2047,6 +2089,7 @@ export class Game extends Scene {
 			this.registry.get("hasWindCard") === true ||
 			this.registry.get("hasIceCard") === true ||
 			this.registry.get("hasFireCard") === true ||
+			this.registry.get("hasSpiritCard") === true ||
 			this.registry.get("hasPlantCard") === true
 		);
 	}
@@ -2117,6 +2160,9 @@ export class Game extends Scene {
 						this.power.anims.play("plant-power-right", true);
 						this.power.setFlipX(true);
 						break;
+					case "SpiritCard":
+						this.power.anims.play("spirit-power", true);
+						break;
 					case "FireCard":
 						this.power.setRotation(Phaser.Math.DegToRad(90));
 						this.power.setVelocity(0, -this.firePowerVelocity);
@@ -2142,6 +2188,9 @@ export class Game extends Scene {
 						this.power.setVelocity(this.plantCardVelocity, 0);
 						this.power.anims.play("plant-power-right", true);
 						break;
+					case "SpiritCard":
+						this.power.anims.play("spirit-power", true);
+						break;
 					case "FireCard":
 						this.power.setVelocity(this.firePowerVelocity, 0);
 						this.power.anims.play("fire-power-right", true);
@@ -2161,6 +2210,9 @@ export class Game extends Scene {
 						this.power.setRotation(Phaser.Math.DegToRad(90));
 						this.power.setVelocity(0, this.plantCardVelocity);
 						this.power.anims.play("plant-power-right", true);
+						break;
+					case "SpiritCard":
+						this.power.anims.play("spirit-power", true);
 						break;
 					case "FireCard":
 						this.power.setRotation(Phaser.Math.DegToRad(90));
@@ -2185,6 +2237,9 @@ export class Game extends Scene {
 						this.power.setVelocity(-this.plantCardVelocity, 0);
 						this.power.anims.play("plant-power-right", true);
 						this.power.setFlipX(true);
+						break;
+					case "SpiritCard":
+						this.power.anims.play("spirit-power", true);
 						break;
 					case "FireCard":
 						this.power.setVelocity(-this.firePowerVelocity, 0);

@@ -33,7 +33,12 @@ export const DataKeys = {
 	KeyCount: "keyCount",
 };
 
-export type Powers = "IceCard" | "WindCard" | "PlantCard" | "FireCard";
+export type Powers =
+	| "IceCard"
+	| "WindCard"
+	| "PlantCard"
+	| "FireCard"
+	| "SpiritCard";
 
 export function isDynamicSprite(
 	obj: unknown
