@@ -187,6 +187,13 @@ export class Overlay extends Scene {
 						itemSize * 2 -
 						itemSize / 2
 					);
+				case "PlantCard":
+					return (
+						this.cameras.main.x +
+						this.cameras.main.width -
+						itemSize * 3 -
+						itemSize / 2
+					);
 			}
 		})();
 		const y = this.cameras.main.y + 20;
@@ -220,6 +227,14 @@ export class Overlay extends Scene {
 		) {
 			this.items.push(
 				new Item(this, this.items.length, "icons3", 47, "IceCard")
+			);
+		}
+		if (
+			this.registry.get("hasPlantCard") &&
+			!this.items.some((item) => item.name === "PlantCard")
+		) {
+			this.items.push(
+				new Item(this, this.items.length, "icons3", 39, "PlantCard")
 			);
 		}
 

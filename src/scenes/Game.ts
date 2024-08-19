@@ -121,7 +121,12 @@ export class Game extends Scene {
 		this.createEnemies();
 
 		this.landLayer = this.createTileLayer("Background", tilesetTile, 0);
-		this.physics.add.collider(this.landLayer, this.player);
+		this.physics.add.collider(this.landLayer, this.player, undefined, () => {
+			if (this.player.data.get("isPlantCardGrappleActive")) {
+				return false;
+			}
+			return true;
+		});
 		this.physics.add.collider(
 			this.landLayer,
 			this.enemyManager.enemies,
@@ -296,6 +301,7 @@ export class Game extends Scene {
 			this.equipSword();
 			this.equipWindCard();
 			this.equipIceCard();
+			this.equipPlantCard();
 		});
 		this.input.keyboard.on("keydown-S", () => {
 			// Cheat: save
@@ -326,6 +332,11 @@ export class Game extends Scene {
 					}
 					break;
 				case "IceCard":
+					if (this.registry.get("hasPlantCard")) {
+						this.setActivePower("PlantCard");
+					}
+					break;
+				case "PlantCard":
 					if (this.registry.get("hasWindCard")) {
 						this.setActivePower("WindCard");
 					}
@@ -686,9 +697,34 @@ export class Game extends Scene {
 					case "WindCard":
 						this.checkForWindCardHitTile(tile);
 						break;
+					case "PlantCard":
+						this.checkForPlantCardHitTile(tile);
+						break;
 				}
 			}
 		});
+	}
+
+	checkForPlantCardHitTile(
+		tile: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody
+	) {
+		const isAffectedByPower = tile.data.get("affectedByPlantCard");
+		if (!isAffectedByPower) {
+			return;
+		}
+		if (
+			this.player.data.get("isPlantCardGrappleActive") ||
+			this.power.anims.isPaused
+		) {
+			return;
+		}
+		console.log("hit item with plant card", tile);
+
+		// The plant card moves you next to the target, over any land obstacle
+		this.player.data.set("isPlantCardGrappleActive", true);
+		this.physics.moveToObject(this.player, tile, 120);
+		this.power.anims.pause();
+		this.power.body.stop();
 	}
 
 	checkForWindCardHitTile(
@@ -702,7 +738,7 @@ export class Game extends Scene {
 			return;
 		}
 		tile.data.set("beingPushed", true);
-		console.log("hit item", tile);
+		console.log("hit item with wind card", tile);
 
 		// The wind card pushes tiles.
 		const velocity = createVelocityForDirection(
@@ -783,7 +819,15 @@ export class Game extends Scene {
 				tile.alpha = 1;
 				tile.data.set("hidden", false);
 				tile.body.pushable = false;
-				this.physics.add.collider(this.player, tile);
+				this.physics.add.collider(this.player, tile, () => {
+					if (this.player.data.get("isPlantCardGrappleActive")) {
+						console.log("end plant card");
+						// In case we were being pulled by the PlantCard
+						this.player.data.set("isPlantCardGrappleActive", false);
+						this.power.anims.stop();
+						this.power.visible = false;
+					}
+				});
 				this.physics.add.collider(
 					this.enemyManager.enemies,
 					tile,
@@ -911,6 +955,9 @@ export class Game extends Scene {
 				case "Potion":
 					this.pickUpPotion();
 					break;
+				case "PlantCard":
+					this.pickUpPlantCard();
+					break;
 				case "WindCard":
 					this.pickUpWindCard();
 					break;
@@ -985,6 +1032,37 @@ export class Game extends Scene {
 			callback: () => {
 				this.scene.launch("Dialog", {
 					heading: "The Ice Card",
+					text: "Press SHIFT to use it\r\nPress Z to change power",
+				});
+				this.setPlayerInvincible(false);
+				this.setPlayerStunned(false);
+				this.input.keyboard?.once("keydown-SHIFT", () => {
+					this.scene.get("Dialog")?.scene.stop();
+				});
+			},
+		});
+	}
+
+	pickUpPlantCard() {
+		this.equipPlantCard();
+
+		// Face right
+		this.playerDirection = SpriteRight;
+		this.setPlayerIdleFrame();
+
+		// Play power animation
+		this.updateSwordHitboxForPower();
+		this.power.setVelocity(0, 0);
+		this.power.setRotation(Phaser.Math.DegToRad(0));
+		this.power.anims.play("plant-power-right", true);
+
+		this.setPlayerInvincible(true);
+		this.setPlayerStunned(true);
+		this.time.addEvent({
+			delay: this.gotItemFreeze,
+			callback: () => {
+				this.scene.launch("Dialog", {
+					heading: "The Plant Card",
 					text: "Press SHIFT to use it\r\nPress Z to change power",
 				});
 				this.setPlayerInvincible(false);
@@ -1335,6 +1413,14 @@ export class Game extends Scene {
 		});
 
 		anims.create({
+			key: "plant-power-right",
+			frames: anims.generateFrameNumbers("plant-power"),
+			frameRate: 24,
+			showOnStart: true,
+			hideOnComplete: true,
+			yoyo: true,
+		});
+		anims.create({
 			key: "ice-power-right",
 			frames: anims.generateFrameNumbers("ice-power"),
 			frameRate: 24,
@@ -1544,6 +1630,7 @@ export class Game extends Scene {
 		if (this.isPlayerUsingPower() && this.getActivePower() === "IceCard") {
 			this.freezeEnemy(enemy);
 		}
+		// FIXME: do something with plant card
 	}
 
 	freezeEnemy(enemy: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody) {
@@ -1730,6 +1817,11 @@ export class Game extends Scene {
 		this.registry.set("hasSword", true);
 	}
 
+	equipPlantCard(): void {
+		this.registry.set("hasPlantCard", true);
+		this.setActivePower("PlantCard");
+	}
+
 	equipWindCard(): void {
 		this.registry.set("hasWindCard", true);
 		this.setActivePower("WindCard");
@@ -1755,7 +1847,8 @@ export class Game extends Scene {
 	doesPlayerHavePower(): boolean {
 		return (
 			this.registry.get("hasWindCard") === true ||
-			this.registry.get("hasIceCard") === true
+			this.registry.get("hasIceCard") === true ||
+			this.registry.get("hasPlantCard") === true
 		);
 	}
 
@@ -1834,6 +1927,10 @@ export class Game extends Scene {
 			case SpriteRight:
 				this.power.setRotation(Phaser.Math.DegToRad(0));
 				switch (this.getActivePower()) {
+					case "PlantCard":
+						this.power.setVelocity(this.icePowerVelocity, 0); // FIXME: use own velocity setting
+						this.power.anims.play("plant-power-right", true);
+						break;
 					case "IceCard":
 						this.power.setVelocity(this.icePowerVelocity, 0);
 						this.power.anims.play("ice-power-right", true);
@@ -1859,6 +1956,11 @@ export class Game extends Scene {
 			case SpriteLeft:
 				this.power.setRotation(Phaser.Math.DegToRad(0));
 				switch (this.getActivePower()) {
+					case "PlantCard":
+						this.power.setVelocity(-this.icePowerVelocity, 0); // FIXME: use own velocity setting
+						this.power.anims.play("plant-power-right", true);
+						this.power.setFlipX(true);
+						break;
 					case "IceCard":
 						this.power.setVelocity(-this.icePowerVelocity, 0);
 						this.power.anims.play("ice-power-right", true);
