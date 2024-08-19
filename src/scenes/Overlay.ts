@@ -194,11 +194,18 @@ export class Overlay extends Scene {
 						itemSize * 3 -
 						itemSize / 2
 					);
+				case "FireCard":
+					return (
+						this.cameras.main.x +
+						this.cameras.main.width -
+						itemSize * 4 -
+						itemSize / 2
+					);
 			}
 		})();
 		const y = this.cameras.main.y + 20;
 		if (!x) {
-			throw new Error("No coordinates for active power");
+			throw new Error("No coordinates for active power on overlay");
 		}
 		if (!this.selectedItemMarker) {
 			this.selectedItemMarker = this.add
@@ -235,6 +242,14 @@ export class Overlay extends Scene {
 		) {
 			this.items.push(
 				new Item(this, this.items.length, "icons3", 39, "PlantCard")
+			);
+		}
+		if (
+			this.registry.get("hasFireCard") &&
+			!this.items.some((item) => item.name === "FireCard")
+		) {
+			this.items.push(
+				new Item(this, this.items.length, "icons3", 55, "FireCard")
 			);
 		}
 

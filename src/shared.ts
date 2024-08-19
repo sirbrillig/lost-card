@@ -32,7 +32,7 @@ export const DataKeys = {
 	PotionCount: "potionCount",
 };
 
-export type Powers = "IceCard" | "WindCard" | "PlantCard";
+export type Powers = "IceCard" | "WindCard" | "PlantCard" | "FireCard";
 
 export function isDynamicSprite(
 	obj: unknown

@@ -74,6 +74,7 @@ export class Game extends Scene {
 	iceCardFrozenTime: number = 3000;
 	iceMeltTime: number = 4000;
 	plantCardVelocity: number = 80;
+	firePowerVelocity: number = 120;
 
 	map: Phaser.Tilemaps.Tilemap;
 	landLayer: Phaser.Tilemaps.TilemapLayer;
@@ -316,6 +317,7 @@ export class Game extends Scene {
 			this.equipWindCard();
 			this.equipIceCard();
 			this.equipPlantCard();
+			this.equipFireCard();
 		});
 		this.input.keyboard.on("keydown-S", () => {
 			// Cheat: save
@@ -339,24 +341,19 @@ export class Game extends Scene {
 		});
 		this.input.keyboard.on("keydown-Z", () => {
 			// Rotate Active Power
-			switch (this.getActivePower()) {
-				case "WindCard":
-					if (this.registry.get("hasIceCard")) {
-						this.setActivePower("IceCard");
-					}
-					break;
-				case "IceCard":
-					if (this.registry.get("hasPlantCard")) {
-						this.setActivePower("PlantCard");
-					}
-					break;
-				case "PlantCard":
-					if (this.registry.get("hasWindCard")) {
-						this.setActivePower("WindCard");
-					}
-					break;
-				default:
-					break;
+			const powerOrder: Powers[] = [
+				"WindCard",
+				"IceCard",
+				"PlantCard",
+				"FireCard",
+			];
+			for (let x = 0; x < powerOrder.length; x++) {
+				if (this.getActivePower() !== powerOrder[x]) {
+					continue;
+				}
+				const nextPower = powerOrder[x + 1] ?? powerOrder[0];
+				this.setActivePower(nextPower);
+				break;
 			}
 		});
 		this.input.keyboard.on("keydown-X", () => {
@@ -373,6 +370,20 @@ export class Game extends Scene {
 				this.setPlayerHitPoints(totalHitPoints);
 			}
 		});
+	}
+
+	isPowerEquipped(power: Powers): boolean {
+		switch (power) {
+			case "WindCard":
+				return this.registry.get("hasWindCard");
+			case "IceCard":
+				return this.registry.get("hasIceCard");
+			case "PlantCard":
+				return this.registry.get("hasPlantCard");
+			case "FireCard":
+				return this.registry.get("hasFireCard");
+		}
+		return false;
 	}
 
 	freezeWaterTile(tile: Phaser.Tilemaps.Tile) {
@@ -744,6 +755,9 @@ export class Game extends Scene {
 					case "PlantCard":
 						this.checkForPlantCardHitTile(tile);
 						break;
+					case "FireCard":
+						this.checkForFireCardHitTile(tile);
+						break;
 				}
 			}
 		});
@@ -800,6 +814,30 @@ export class Game extends Scene {
 					tile.data.set("beingPushed", false);
 				}
 			},
+		});
+	}
+
+	checkForFireCardHitTile(
+		tile: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody
+	) {
+		const isAffectedByPower = tile.data.get("affectedByFireCard");
+		if (!isAffectedByPower) {
+			return;
+		}
+		console.log("hit item with fire card", tile);
+
+		// The fire card destroys tiles.
+		this.createdTiles = this.createdTiles.filter((x) => x !== tile);
+		tile.destroy();
+
+		this.power.anims.stop();
+		this.power.setVisible(false);
+
+		const effect = this.add.sprite(tile.x, tile.y, "fire-power-right", 0);
+		effect.setDepth(5);
+		effect.anims.play("fire-power-right", true);
+		effect.on(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
+			effect.destroy();
 		});
 	}
 
@@ -1008,6 +1046,9 @@ export class Game extends Scene {
 				case "IceCard":
 					this.pickUpIceCard();
 					break;
+				case "FireCard":
+					this.pickUpFireCard();
+					break;
 				case "Heart":
 					this.pickUpHeart();
 					break;
@@ -1064,7 +1105,7 @@ export class Game extends Scene {
 		this.setPlayerIdleFrame();
 
 		// Play power animation
-		this.updateSwordHitboxForPower();
+		this.updateHitboxForPower();
 		this.power.setRotation(Phaser.Math.DegToRad(0));
 		this.power.setVelocity(this.icePowerVelocity, 0);
 		this.power.anims.play("ice-power-right", true);
@@ -1087,6 +1128,37 @@ export class Game extends Scene {
 		});
 	}
 
+	pickUpFireCard() {
+		this.equipFireCard();
+
+		// Face right
+		this.playerDirection = SpriteRight;
+		this.setPlayerIdleFrame();
+
+		// Play power animation
+		this.updateHitboxForPower();
+		this.power.setRotation(Phaser.Math.DegToRad(0));
+		this.power.setVelocity(this.firePowerVelocity, 0);
+		this.power.anims.play("fire-power-right", true);
+
+		this.setPlayerInvincible(true);
+		this.setPlayerStunned(true);
+		this.time.addEvent({
+			delay: this.gotItemFreeze,
+			callback: () => {
+				this.scene.launch("Dialog", {
+					heading: "The Fire Card",
+					text: "Press SHIFT to use it\r\nPress Z to change power",
+				});
+				this.setPlayerInvincible(false);
+				this.setPlayerStunned(false);
+				this.input.keyboard?.once("keydown-SHIFT", () => {
+					this.scene.get("Dialog")?.scene.stop();
+				});
+			},
+		});
+	}
+
 	pickUpPlantCard() {
 		this.equipPlantCard();
 
@@ -1095,7 +1167,7 @@ export class Game extends Scene {
 		this.setPlayerIdleFrame();
 
 		// Play power animation
-		this.updateSwordHitboxForPower();
+		this.updateHitboxForPower();
 		this.power.setVelocity(0, 0);
 		this.power.setRotation(Phaser.Math.DegToRad(0));
 		this.power.anims.play("plant-power-right", true);
@@ -1126,7 +1198,7 @@ export class Game extends Scene {
 		this.setPlayerIdleFrame();
 
 		// Play power animation
-		this.updateSwordHitboxForPower();
+		this.updateHitboxForPower();
 		this.power.setVelocity(0, 0);
 		this.power.setRotation(Phaser.Math.DegToRad(0));
 		this.power.anims.play("character-right-power", true);
@@ -1272,8 +1344,11 @@ export class Game extends Scene {
 		return [xOffset, yOffset];
 	}
 
-	updateSwordHitboxForPower() {
+	updateHitboxForPower() {
 		const width = (() => {
+			if (this.getActivePower() === "FireCard") {
+				return 12;
+			}
 			if (
 				this.playerDirection === SpriteLeft ||
 				this.playerDirection === SpriteRight
@@ -1283,6 +1358,9 @@ export class Game extends Scene {
 			return 10;
 		})();
 		const height = (() => {
+			if (this.getActivePower() === "FireCard") {
+				return 12;
+			}
 			if (
 				this.playerDirection === SpriteUp ||
 				this.playerDirection === SpriteDown
@@ -1293,6 +1371,7 @@ export class Game extends Scene {
 		})();
 
 		this.power.body.setSize(width, height);
+
 		const [xOffset, yOffset] = this.getPowerOffset();
 
 		this.power.x = this.player.x + xOffset;
@@ -1331,7 +1410,7 @@ export class Game extends Scene {
 			this.sword.setVisible(false);
 			this.power.setVisible(false);
 			this.updateSwordHitboxForAttack();
-			this.updateSwordHitboxForPower();
+			this.updateHitboxForPower();
 			return;
 		}
 
@@ -1467,6 +1546,13 @@ export class Game extends Scene {
 		anims.create({
 			key: "ice-power-right",
 			frames: anims.generateFrameNumbers("ice-power"),
+			frameRate: 24,
+			showOnStart: true,
+			hideOnComplete: true,
+		});
+		anims.create({
+			key: "fire-power-right",
+			frames: anims.generateFrameNumbers("fire-power"),
 			frameRate: 24,
 			showOnStart: true,
 			hideOnComplete: true,
@@ -1676,6 +1762,22 @@ export class Game extends Scene {
 		}
 		if (this.isPlayerUsingPower() && this.getActivePower() === "PlantCard") {
 			this.pullEnemy(enemy);
+		}
+		if (this.isPlayerUsingPower() && this.getActivePower() === "FireCard") {
+			this.sendHitToEnemy(enemy);
+			this.power.anims.stop();
+			this.power.setVisible(false);
+			const effect = this.add.sprite(
+				enemy.body.center.x,
+				enemy.body.center.y,
+				"fire-power-right",
+				0
+			);
+			effect.setDepth(5);
+			effect.anims.play("fire-power-right", true);
+			effect.on(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
+				effect.destroy();
+			});
 		}
 	}
 
@@ -1896,6 +1998,11 @@ export class Game extends Scene {
 		this.setActivePower("IceCard");
 	}
 
+	equipFireCard(): void {
+		this.registry.set("hasFireCard", true);
+		this.setActivePower("FireCard");
+	}
+
 	canPlayerUsePower(): boolean {
 		return (
 			this.getPlayerHitPoints() > 0 &&
@@ -1912,6 +2019,7 @@ export class Game extends Scene {
 		return (
 			this.registry.get("hasWindCard") === true ||
 			this.registry.get("hasIceCard") === true ||
+			this.registry.get("hasFireCard") === true ||
 			this.registry.get("hasPlantCard") === true
 		);
 	}
@@ -1982,6 +2090,12 @@ export class Game extends Scene {
 						this.power.anims.play("plant-power-right", true);
 						this.power.setFlipX(true);
 						break;
+					case "FireCard":
+						this.power.setRotation(Phaser.Math.DegToRad(90));
+						this.power.setVelocity(0, -this.firePowerVelocity);
+						this.power.anims.play("fire-power-right", true);
+						this.power.setFlipX(true);
+						break;
 					case "IceCard":
 						this.power.setRotation(Phaser.Math.DegToRad(90));
 						this.power.setVelocity(0, -this.icePowerVelocity);
@@ -2001,6 +2115,10 @@ export class Game extends Scene {
 						this.power.setVelocity(this.plantCardVelocity, 0);
 						this.power.anims.play("plant-power-right", true);
 						break;
+					case "FireCard":
+						this.power.setVelocity(this.firePowerVelocity, 0);
+						this.power.anims.play("fire-power-right", true);
+						break;
 					case "IceCard":
 						this.power.setVelocity(this.icePowerVelocity, 0);
 						this.power.anims.play("ice-power-right", true);
@@ -2016,6 +2134,11 @@ export class Game extends Scene {
 						this.power.setRotation(Phaser.Math.DegToRad(90));
 						this.power.setVelocity(0, this.plantCardVelocity);
 						this.power.anims.play("plant-power-right", true);
+						break;
+					case "FireCard":
+						this.power.setRotation(Phaser.Math.DegToRad(90));
+						this.power.setVelocity(0, this.firePowerVelocity);
+						this.power.anims.play("fire-power-right", true);
 						break;
 					case "IceCard":
 						this.power.setRotation(Phaser.Math.DegToRad(90));
@@ -2034,6 +2157,11 @@ export class Game extends Scene {
 					case "PlantCard":
 						this.power.setVelocity(-this.plantCardVelocity, 0);
 						this.power.anims.play("plant-power-right", true);
+						this.power.setFlipX(true);
+						break;
+					case "FireCard":
+						this.power.setVelocity(-this.firePowerVelocity, 0);
+						this.power.anims.play("fire-power-right", true);
 						this.power.setFlipX(true);
 						break;
 					case "IceCard":
