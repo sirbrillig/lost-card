@@ -242,6 +242,12 @@ export class Game extends Scene {
 				if (enemy.data.get("isPlantCardGrappleActive")) {
 					return true;
 				}
+				if (
+					this.isPlayerUsingPower() &&
+					this.getActivePower() === "SpiritCard"
+				) {
+					return false;
+				}
 				if (this.isPlayerInvincible()) {
 					return false;
 				}
