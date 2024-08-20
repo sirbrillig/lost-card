@@ -3,6 +3,7 @@ import { MainEvents } from "../MainEvents";
 import { EnemyManager } from "../EnemyManager";
 import { MonsterA } from "../MonsterA";
 import { IceMonster } from "../IceMonster";
+import { FireMonster } from "../FireMonster";
 import { WaterDipper } from "../WaterDipper";
 import { MountainBoss } from "../MountainBoss";
 import { IceBoss } from "../IceBoss";
@@ -1931,6 +1932,16 @@ export class Game extends Scene {
 				}
 				case "IceMonster": {
 					const monster = new IceMonster(
+						this,
+						this.enemyManager,
+						point.x,
+						point.y
+					);
+					this.enemyManager.enemies.add(monster);
+					break;
+				}
+				case "FireMonster": {
+					const monster = new FireMonster(
 						this,
 						this.enemyManager,
 						point.x,

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.0" orientation="orthogonal" renderorder="right-down" width="200" height="200" tilewidth="16" tileheight="16" infinite="0" nextlayerid="14" nextobjectid="559">
+<map version="1.10" tiledversion="1.11.0" orientation="orthogonal" renderorder="right-down" width="200" height="200" tilewidth="16" tileheight="16" infinite="0" nextlayerid="14" nextobjectid="568">
  <editorsettings>
   <export target="public/assets/lost-card-map.json" format="json"/>
  </editorsettings>
@@ -7997,7 +7997,7 @@
   <object id="5" name="Start Point" x="1935.89" y="1107.99">
    <point/>
   </object>
-  <object id="548" name="Temp Start" x="2233.25" y="1476.36">
+  <object id="548" name="Temp Start" x="2461.11" y="1883.91">
    <point/>
   </object>
  </objectgroup>
@@ -8224,6 +8224,24 @@
   <object id="372" name="IceBoss" x="1928.69" y="2725.99">
    <point/>
   </object>
+  <object id="562" name="FireMonster" x="2632.61" y="1847.13">
+   <point/>
+  </object>
+  <object id="563" name="FireMonster" x="2696.01" y="1880.65">
+   <point/>
+  </object>
+  <object id="567" name="FireMonster" x="2737.72" y="1971.32">
+   <point/>
+  </object>
+  <object id="564" name="FireMonster" x="2670.07" y="2010.32">
+   <point/>
+  </object>
+  <object id="565" name="FireMonster" x="2860.88" y="1878.79">
+   <point/>
+  </object>
+  <object id="566" name="FireMonster" x="2860.88" y="1878.79">
+   <point/>
+  </object>
  </objectgroup>
  <objectgroup id="8" name="Items">
   <object id="173" name="Sword" gid="2710" x="1504" y="1376" width="11.3856" height="11.3856"/>
@@ -8273,6 +8291,8 @@
   </object>
   <object id="543" name="Key" gid="2817" x="1051.28" y="2632.16" width="16" height="16"/>
   <object id="544" name="Key" gid="2817" x="2543.42" y="1521.01" width="16" height="16"/>
+  <object id="559" name="Key" gid="2817" x="2895.72" y="2530.85" width="16" height="16"/>
+  <object id="560" name="Heart" gid="2818" x="2864.49" y="2529.33" width="16" height="16"/>
  </objectgroup>
  <objectgroup id="11" name="SavePoints">
   <object id="244" gid="2717" x="1600" y="1664" width="16" height="16"/>

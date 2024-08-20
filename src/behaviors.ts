@@ -11,6 +11,7 @@ import {
 	Events,
 	DataKeys,
 	getTilesInRoom,
+	createVelocityForDirection,
 } from "./shared";
 import { EnemyManager } from "./EnemyManager";
 import { Behavior, BehaviorMachineInterface } from "./behavior";
@@ -239,7 +240,6 @@ export class RandomlyWalk<AllStates extends string>
 	#minWalkTime = 800;
 	#maxWalkTime = 4000;
 	#nextState: AllStates;
-	#active: boolean = true;
 	name: AllStates;
 
 	constructor(name: AllStates, nextState: AllStates) {
@@ -255,35 +255,17 @@ export class RandomlyWalk<AllStates extends string>
 			throw new Error("invalid sprite");
 		}
 
-		const direction = this.#getWalkingDirection(sprite);
+		const direction = getWalkingDirection(sprite);
 		this.#walkInDirection(sprite, direction);
 
 		sprite.scene.time.addEvent({
 			delay: this.#getWalkingTime(),
 			callback: () => {
-				if (!this.#active) {
-					return;
-				}
-				this.#active = false;
 				sprite?.body?.setVelocity(0);
 				stateMachine.popState();
 				stateMachine.pushState(this.#nextState);
 			},
 		});
-	}
-
-	#getWalkingDirection(
-		sprite: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody
-	): SpriteDirection {
-		const previousDirection: SpriteDirection | undefined =
-			sprite.data.get("direction");
-		let direction = Phaser.Math.Between(0, 3);
-		if (previousDirection !== undefined) {
-			while (direction === previousDirection) {
-				direction = Phaser.Math.Between(0, 3);
-			}
-		}
-		return direction as SpriteDirection;
 	}
 
 	#getWalkingTime(): number {
@@ -295,24 +277,9 @@ export class RandomlyWalk<AllStates extends string>
 		direction: SpriteDirection
 	) {
 		sprite.data.set("direction", direction);
-		switch (direction) {
-			case SpriteUp:
-				sprite.anims.play("up", true);
-				sprite.body.setVelocityY(-this.#enemySpeed);
-				break;
-			case SpriteRight:
-				sprite.anims.play("right", true);
-				sprite.body.setVelocityX(this.#enemySpeed);
-				break;
-			case SpriteDown:
-				sprite.anims.play("down", true);
-				sprite.body.setVelocityY(this.#enemySpeed);
-				break;
-			case SpriteLeft:
-				sprite.anims.play("left", true);
-				sprite.body.setVelocityX(-this.#enemySpeed);
-				break;
-		}
+		const velocity = createVelocityForDirection(this.#enemySpeed, direction);
+		sprite.body.setVelocity(velocity.x, velocity.y);
+		sprite.anims.play(getWalkAnimationKeyForDirection(direction), true);
 	}
 
 	update(sprite: Phaser.GameObjects.Sprite) {
@@ -321,10 +288,7 @@ export class RandomlyWalk<AllStates extends string>
 		}
 		// If you hit a wall, change direction.
 		if (sprite.body?.velocity.x === 0 && sprite.body.velocity.y === 0) {
-			if (!this.#active) {
-				return;
-			}
-			const direction = this.#getWalkingDirection(sprite);
+			const direction = getWalkingDirection(sprite);
 			this.#walkInDirection(sprite, direction);
 		}
 	}
@@ -625,6 +589,109 @@ export class RangedIceBall<AllStates extends string>
 	update(): void {}
 }
 
+export class WalkWithFire<AllStates extends string>
+	implements Behavior<AllStates, Phaser.GameObjects.Sprite>
+{
+	#nextState: AllStates;
+	name: AllStates;
+	#effect: Phaser.GameObjects.Sprite;
+	#enemySpeed = 50;
+
+	constructor(name: AllStates, nextState: AllStates) {
+		this.name = name;
+		this.#nextState = nextState;
+	}
+
+	init(
+		sprite: Phaser.GameObjects.Sprite,
+		stateMachine: BehaviorMachineInterface<AllStates>,
+		enemyManager: EnemyManager
+	): void {
+		if (!sprite.body || !isDynamicSprite(sprite)) {
+			throw new Error("Could not update monster");
+		}
+		const direction = getWalkingDirection(sprite);
+		this.#walkInDirection(sprite, direction);
+
+		sprite.scene.anims.create({
+			key: "fire-power",
+			frames: sprite.anims.generateFrameNumbers("fire-power"),
+			frameRate: 24,
+			showOnStart: true,
+			hideOnComplete: true,
+			repeat: 2,
+		});
+		this.#effect = sprite.scene.add.sprite(
+			sprite.body.center.x,
+			sprite.body.center.y,
+			"fire-power",
+			0
+		);
+		sprite.scene.physics.add.existing(this.#effect);
+		this.#effect.setDepth(5);
+		this.#effect.anims.play(
+			{
+				key: "fire-power",
+				repeat: 3,
+			},
+			true
+		);
+		if (!isDynamicSprite(this.#effect)) {
+			throw new Error("Could not update fire ball");
+		}
+		this.#effect.setDisplaySize(
+			this.#effect.body.width * 0.8,
+			this.#effect.body.height * 0.8
+		);
+		this.#effect.body.setSize(
+			this.#effect.body.width * 0.5,
+			this.#effect.body.height * 0.5
+		);
+		sprite.scene.physics.add.overlap(enemyManager.player, this.#effect, () => {
+			MainEvents.emit(Events.EnemyHitPlayer, true);
+			this.#effect.destroy();
+			stateMachine.popState();
+			stateMachine.pushState(this.#nextState);
+		});
+
+		sprite.once(Events.MonsterDying, () => {
+			this.#effect?.destroy();
+		});
+		this.#effect.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
+			this.#effect.destroy();
+			stateMachine.popState();
+			stateMachine.pushState(this.#nextState);
+		});
+	}
+
+	#walkInDirection(
+		sprite: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody,
+		direction: SpriteDirection
+	) {
+		sprite.data.set("direction", direction);
+		const velocity = createVelocityForDirection(this.#enemySpeed, direction);
+		sprite.body.setVelocity(velocity.x, velocity.y);
+		sprite.anims.play(getWalkAnimationKeyForDirection(direction), true);
+	}
+
+	update(sprite: Phaser.GameObjects.Sprite): void {
+		if (!isDynamicSprite(sprite)) {
+			throw new Error("Could not update fire ball");
+		}
+		// If you hit a wall, change direction.
+		if (sprite.body?.velocity.x === 0 && sprite.body.velocity.y === 0) {
+			const direction = getWalkingDirection(sprite);
+			this.#walkInDirection(sprite, direction);
+		}
+		Phaser.Actions.RotateAroundDistance(
+			[this.#effect],
+			sprite.body.center,
+			Phaser.Math.DegToRad(5),
+			25
+		);
+	}
+}
+
 export class IceBeam<AllStates extends string>
 	implements Behavior<AllStates, Phaser.GameObjects.Sprite>
 {
@@ -759,4 +826,31 @@ export class IceBeam<AllStates extends string>
 	}
 
 	update(): void {}
+}
+
+function getWalkAnimationKeyForDirection(direction: SpriteDirection): string {
+	switch (direction) {
+		case SpriteUp:
+			return "up";
+		case SpriteRight:
+			return "right";
+		case SpriteDown:
+			return "down";
+		case SpriteLeft:
+			return "left";
+	}
+}
+
+function getWalkingDirection(
+	sprite: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody
+): SpriteDirection {
+	const previousDirection: SpriteDirection | undefined =
+		sprite.data.get("direction");
+	let direction = Phaser.Math.Between(0, 3);
+	if (previousDirection !== undefined) {
+		while (direction === previousDirection) {
+			direction = Phaser.Math.Between(0, 3);
+		}
+	}
+	return direction as SpriteDirection;
 }
