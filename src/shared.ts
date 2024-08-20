@@ -411,6 +411,9 @@ export function createSpritesFromObjectLayer(
 			if (tileset.name === "Icons") {
 				tilesetKey = "icons4";
 			}
+			if (tileset.name === "Cards") {
+				tilesetKey = "cards";
+			}
 		}
 		if (!tilesetKey) {
 			console.warn(`No tileset key found for layer object "${obj.gid}"`, obj);

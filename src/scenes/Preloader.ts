@@ -63,6 +63,10 @@ export class Preloader extends Scene {
 			frameWidth: 16,
 			frameHeight: 16,
 		});
+		this.load.spritesheet("cards", "cards.png", {
+			frameWidth: 16,
+			frameHeight: 16,
+		});
 
 		this.load.spritesheet(
 			"dungeon_tiles_sprites",

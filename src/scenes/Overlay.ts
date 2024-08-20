@@ -238,7 +238,7 @@ export class Overlay extends Scene {
 			!this.items.some((item) => item.name === "WindCard")
 		) {
 			this.items.push(
-				new Item(this, this.items.length, "icons3", 31, "WindCard")
+				new Item(this, this.items.length, "cards", 44, "WindCard")
 			);
 		}
 		if (
@@ -246,7 +246,7 @@ export class Overlay extends Scene {
 			!this.items.some((item) => item.name === "IceCard")
 		) {
 			this.items.push(
-				new Item(this, this.items.length, "icons3", 47, "IceCard")
+				new Item(this, this.items.length, "cards", 19, "IceCard")
 			);
 		}
 		if (
@@ -254,7 +254,7 @@ export class Overlay extends Scene {
 			!this.items.some((item) => item.name === "PlantCard")
 		) {
 			this.items.push(
-				new Item(this, this.items.length, "icons3", 39, "PlantCard")
+				new Item(this, this.items.length, "cards", 25, "PlantCard")
 			);
 		}
 		if (
@@ -262,7 +262,7 @@ export class Overlay extends Scene {
 			!this.items.some((item) => item.name === "FireCard")
 		) {
 			this.items.push(
-				new Item(this, this.items.length, "icons3", 55, "FireCard")
+				new Item(this, this.items.length, "cards", 18, "FireCard")
 			);
 		}
 		if (
@@ -270,7 +270,7 @@ export class Overlay extends Scene {
 			!this.items.some((item) => item.name === "SpiritCard")
 		) {
 			this.items.push(
-				new Item(this, this.items.length, "icons3", 24, "SpiritCard")
+				new Item(this, this.items.length, "cards", 37, "SpiritCard")
 			);
 		}
 

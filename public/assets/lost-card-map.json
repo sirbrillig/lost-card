@@ -3750,7 +3750,7 @@
                  "y":1598.73
                 }, 
                 {
-                 "gid":2820,
+                 "gid":2897,
                  "height":16,
                  "id":176,
                  "name":"WindCard",
@@ -3768,7 +3768,7 @@
                  "y":130.901
                 }, 
                 {
-                 "gid":2836,
+                 "gid":2872,
                  "height":16,
                  "id":349,
                  "name":"IceCard",
@@ -3852,7 +3852,7 @@
                  "y":1870.13
                 }, 
                 {
-                 "gid":2828,
+                 "gid":2878,
                  "height":16,
                  "id":403,
                  "name":"PlantCard",
@@ -3906,7 +3906,7 @@
                  "y":1839.14
                 }, 
                 {
-                 "gid":2844,
+                 "gid":2871,
                  "height":16,
                  "id":472,
                  "name":"FireCard",
@@ -3918,7 +3918,7 @@
                  "y":2160
                 }, 
                 {
-                 "gid":2821,
+                 "gid":2866,
                  "height":16,
                  "id":506,
                  "name":"CloudCard",
@@ -3930,7 +3930,7 @@
                  "y":1584.26308239919
                 }, 
                 {
-                 "gid":2813,
+                 "gid":2890,
                  "height":16,
                  "id":537,
                  "name":"SpiritCard",
@@ -22008,6 +22008,19 @@
          "name":"Icons",
          "spacing":0,
          "tilecount":64,
+         "tileheight":16,
+         "tilewidth":16
+        }, 
+        {
+         "columns":14,
+         "firstgid":2853,
+         "image":"cards.png",
+         "imageheight":80,
+         "imagewidth":224,
+         "margin":0,
+         "name":"Cards",
+         "spacing":0,
+         "tilecount":70,
          "tileheight":16,
          "tilewidth":16
         }],
