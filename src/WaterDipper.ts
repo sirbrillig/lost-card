@@ -14,42 +14,15 @@ export class WaterDipper extends BaseMonster<AllStates> {
 		x: number,
 		y: number
 	) {
-		super(scene, enemyManager, x, y, "monsters1", 51);
+		super(scene, enemyManager, x, y, "monsters3", 6);
 	}
 
 	initSprites() {
 		this.anims.create({
-			key: "down",
-			frames: this.anims.generateFrameNumbers("monsters1", {
-				start: 51,
-				end: 53,
-			}),
-			frameRate: 10,
-			repeat: -1,
-		});
-		this.anims.create({
-			key: "left",
-			frames: this.anims.generateFrameNumbers("monsters1", {
-				start: 63,
-				end: 65,
-			}),
-			frameRate: 10,
-			repeat: -1,
-		});
-		this.anims.create({
-			key: "right",
-			frames: this.anims.generateFrameNumbers("monsters1", {
-				start: 75,
-				end: 77,
-			}),
-			frameRate: 10,
-			repeat: -1,
-		});
-		this.anims.create({
-			key: "up",
-			frames: this.anims.generateFrameNumbers("monsters1", {
-				start: 87,
-				end: 89,
+			key: "idle",
+			frames: this.anims.generateFrameNumbers("monsters3", {
+				start: 6,
+				end: 8,
 			}),
 			frameRate: 10,
 			repeat: -1,
