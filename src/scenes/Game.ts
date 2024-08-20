@@ -53,6 +53,7 @@ export class Game extends Scene {
 
 	// Config
 	characterSpeed: number = 90;
+	cloudCardSpeed: number = 450;
 	postAttackCooldown: number = 150;
 	postHitPlayerKnockback: number = 120;
 	postHitEnemyKnockback: number = 50;
@@ -75,6 +76,7 @@ export class Game extends Scene {
 	iceMeltTime: number = 4000;
 	plantCardVelocity: number = 80;
 	firePowerVelocity: number = 120;
+	gateCloseSpeed: number = 200;
 
 	map: Phaser.Tilemaps.Tilemap;
 	landLayer: Phaser.Tilemaps.TilemapLayer;
@@ -661,6 +663,83 @@ export class Game extends Scene {
 		);
 
 		this.createEnemiesInRoom();
+
+		this.closeGatePillars();
+	}
+
+	openGatePillars() {
+		// Note: make sure there's only one per room
+		const gatePillar = this.createdTiles.find(
+			(tile) =>
+				tile.name === "GatePillar" &&
+				tile.visible === true &&
+				!tile.data.get("openGate")
+		);
+		if (!gatePillar) {
+			return;
+		}
+		console.log("opening gate pillars");
+		const gatePosition = new Phaser.Math.Vector2(gatePillar.x, gatePillar.y);
+		gatePillar.data.set("openGate", true);
+		this.createdTiles
+			.filter((tile) => tile.name === "GateWall" && tile.visible === true)
+			.forEach((tile) => {
+				if (!tile.data.get("originalPosition")) {
+					const tilePosition = new Phaser.Math.Vector2(tile.x, tile.y);
+					tile.data.set("originalPosition", tilePosition);
+				}
+				this.tweens.killTweensOf(tile);
+				this.tweens.add({
+					targets: tile,
+					x: gatePosition.x,
+					y: gatePosition.y,
+					duration: this.gateCloseSpeed * 2,
+				});
+			});
+	}
+
+	updateGatePillars() {
+		const gatePillar = this.createdTiles.find(
+			(tile) => tile.name === "GatePillar" && tile.visible === true
+		);
+		if (!gatePillar) {
+			return;
+		}
+		const gatePosition = new Phaser.Math.Vector2(gatePillar.x, gatePillar.y);
+		const distance = Phaser.Math.Distance.BetweenPoints(
+			gatePosition,
+			this.player.body.center
+		);
+		if (distance > 60) {
+			this.openGatePillars();
+			return;
+		}
+		this.closeGatePillars();
+	}
+
+	closeGatePillars() {
+		const gatePillar = this.createdTiles.find(
+			(tile) => tile.name === "GatePillar" && tile.data?.get("openGate")
+		);
+		if (!gatePillar) {
+			return;
+		}
+		gatePillar.data.set("openGate", false);
+		this.createdTiles
+			.filter((tile) => tile.name === "GateWall")
+			.forEach((tile) => {
+				const tilePosition = tile.data.get("originalPosition");
+				if (tilePosition) {
+					console.log("closing gate pillars");
+					this.tweens.killTweensOf(tile);
+					this.tweens.add({
+						targets: tile,
+						x: tilePosition.x,
+						y: tilePosition.y,
+						duration: this.gateCloseSpeed,
+					});
+				}
+			});
 	}
 
 	handleCollideDoor(door: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody) {
@@ -735,6 +814,7 @@ export class Game extends Scene {
 		});
 		this.updatePlayer();
 		this.updateRoom();
+		this.updateGatePillars();
 	}
 
 	updateRoom() {
@@ -1379,9 +1459,6 @@ export class Game extends Scene {
 	}
 
 	getPlayerSpeed(): number {
-		if (this.isPlayerUsingPower() && this.getActivePower() === "CloudCard") {
-			return this.characterSpeed * 3;
-		}
 		return this.characterSpeed;
 	}
 
@@ -1691,7 +1768,7 @@ export class Game extends Scene {
 		anims.create({
 			key: "cloud-power",
 			frames: anims.generateFrameNumbers("cloud-power"),
-			frameRate: 35,
+			frameRate: 55,
 			showOnStart: true,
 			hideOnComplete: true,
 		});
@@ -2257,7 +2334,7 @@ export class Game extends Scene {
 						break;
 					case "CloudCard":
 						this.power.anims.play("cloud-power", true);
-						this.player.setVelocity(0, -this.characterSpeed * 3);
+						this.player.setVelocity(0, -this.cloudCardSpeed);
 						this.player.anims.play("character-up-walk");
 						break;
 					case "SpiritCard":
@@ -2296,7 +2373,7 @@ export class Game extends Scene {
 						break;
 					case "CloudCard":
 						this.power.anims.play("cloud-power", true);
-						this.player.setVelocity(this.characterSpeed * 3, 0);
+						this.player.setVelocity(this.cloudCardSpeed, 0);
 						this.player.anims.play("character-left-walk");
 						this.player.setFlipX(true);
 						break;
@@ -2331,7 +2408,7 @@ export class Game extends Scene {
 						break;
 					case "CloudCard":
 						this.power.anims.play("cloud-power", true);
-						this.player.setVelocity(0, this.characterSpeed * 3);
+						this.player.setVelocity(0, this.cloudCardSpeed);
 						this.player.anims.play("character-down-walk");
 						break;
 					case "SpiritCard":
@@ -2369,7 +2446,7 @@ export class Game extends Scene {
 						break;
 					case "CloudCard":
 						this.power.anims.play("cloud-power", true);
-						this.player.setVelocity(-this.characterSpeed * 3, 0);
+						this.player.setVelocity(-this.cloudCardSpeed, 0);
 						this.player.anims.play("character-left-walk");
 						break;
 					case "SpiritCard":
@@ -2442,13 +2519,6 @@ export class Game extends Scene {
 		} else {
 			this.setPlayerIdleFrame();
 		}
-
-		const isMoving =
-			this.player.body.velocity.x !== 0 || this.player.body.velocity.y !== 0;
-		if (isMoving) {
-			this.maybeChangeRoom();
-			this.maybePickUpItem();
-		}
 	}
 
 	getPlayerTint(): number {
@@ -2507,6 +2577,13 @@ export class Game extends Scene {
 		this.updateSwordHitbox();
 		this.updatePowerHitboxPosition();
 		this.updatePlayerMovement();
+
+		const isMoving =
+			this.player.body.velocity.x !== 0 || this.player.body.velocity.y !== 0;
+		if (isMoving) {
+			this.maybeChangeRoom();
+			this.maybePickUpItem();
+		}
 	}
 
 	setPlayerIdleFrame() {
