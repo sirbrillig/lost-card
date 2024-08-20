@@ -38,6 +38,7 @@ export type Powers =
 	| "WindCard"
 	| "PlantCard"
 	| "FireCard"
+	| "CloudCard"
 	| "SpiritCard";
 
 export function isDynamicSprite(

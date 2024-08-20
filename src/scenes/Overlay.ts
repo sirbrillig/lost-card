@@ -273,6 +273,14 @@ export class Overlay extends Scene {
 				new Item(this, this.items.length, "cards", 37, "SpiritCard")
 			);
 		}
+		if (
+			this.registry.get("hasCloudCard") &&
+			!this.items.some((item) => item.name === "CloudCard")
+		) {
+			this.items.push(
+				new Item(this, this.items.length, "cards", 13, "CloudCard")
+			);
+		}
 
 		this.items.forEach((item) => item.update());
 	}

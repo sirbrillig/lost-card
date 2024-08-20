@@ -330,6 +330,7 @@ export class Game extends Scene {
 			this.equipPlantCard();
 			this.equipFireCard();
 			this.equipSpiritCard();
+			this.equipCloudCard();
 		});
 		this.input.keyboard.on("keydown-S", () => {
 			// Cheat: save
@@ -359,6 +360,7 @@ export class Game extends Scene {
 				"PlantCard",
 				"FireCard",
 				"SpiritCard",
+				"CloudCard",
 			];
 			for (let x = 0; x < powerOrder.length; x++) {
 				if (this.getActivePower() !== powerOrder[x]) {
@@ -397,6 +399,8 @@ export class Game extends Scene {
 				return this.registry.get("hasFireCard");
 			case "SpiritCard":
 				return this.registry.get("hasSpiritCard");
+			case "CloudCard":
+				return this.registry.get("hasCloudCard");
 			default:
 				return false;
 		}
@@ -504,10 +508,6 @@ export class Game extends Scene {
 		this.setPlayerIdleFrame();
 		this.updateSwordHitbox();
 		this.playPowerAnimation();
-
-		if (this.getActivePower() === "SpiritCard") {
-			// FIXME: pass through Stuff layer
-		}
 	}
 
 	loadLastSave() {
@@ -1072,6 +1072,9 @@ export class Game extends Scene {
 				case "SpiritCard":
 					this.pickUpSpiritCard();
 					break;
+				case "CloudCard":
+					this.pickUpCloudCard();
+					break;
 				case "Heart":
 					this.pickUpHeart();
 					break;
@@ -1197,6 +1200,35 @@ export class Game extends Scene {
 			callback: () => {
 				this.scene.launch("Dialog", {
 					heading: "The Spirit Card",
+					text: "Press SHIFT to use it\r\nPress Z to change power",
+				});
+				this.setPlayerInvincible(false);
+				this.setPlayerStunned(false);
+				this.input.keyboard?.once("keydown-SHIFT", () => {
+					this.scene.get("Dialog")?.scene.stop();
+				});
+			},
+		});
+	}
+
+	pickUpCloudCard() {
+		this.equipCloudCard();
+
+		// Face right
+		this.playerDirection = SpriteRight;
+		this.setPlayerIdleFrame();
+
+		// Play power animation
+		this.updatePowerHitboxPosition();
+		this.power.anims.play("cloud-power", true);
+
+		this.setPlayerInvincible(true);
+		this.setPlayerStunned(true);
+		this.time.addEvent({
+			delay: this.gotItemFreeze,
+			callback: () => {
+				this.scene.launch("Dialog", {
+					heading: "The Cloud Card",
 					text: "Press SHIFT to use it\r\nPress Z to change power",
 				});
 				this.setPlayerInvincible(false);
@@ -1347,6 +1379,9 @@ export class Game extends Scene {
 	}
 
 	getPlayerSpeed(): number {
+		if (this.isPlayerUsingPower() && this.getActivePower() === "CloudCard") {
+			return this.characterSpeed * 3;
+		}
 		return this.characterSpeed;
 	}
 
@@ -1381,7 +1416,7 @@ export class Game extends Scene {
 	}
 
 	getPowerOffset() {
-		if (this.getActivePower() === "SpiritCard") {
+		if (["SpiritCard", "CloudCard"].includes(this.getActivePower() as string)) {
 			return [0, 0];
 		}
 		const xOffset = (() => {
@@ -1428,13 +1463,16 @@ export class Game extends Scene {
 	}
 
 	updatePowerHitboxPosition() {
-		if (this.isPlayerUsingPower() && this.getActivePower() !== "SpiritCard") {
+		if (
+			this.isPlayerUsingPower() &&
+			!["SpiritCard"].includes(this.getActivePower() as string)
+		) {
 			// We don't want to touch the power hitbox if a power is already animating.
 			return;
 		}
 
 		const width = (() => {
-			if (this.getActivePower() === "SpiritCard") {
+			if (["SpiritCard"].includes(this.getActivePower() as string)) {
 				return 12;
 			}
 			if (this.getActivePower() === "FireCard") {
@@ -1449,7 +1487,7 @@ export class Game extends Scene {
 			return 10;
 		})();
 		const height = (() => {
-			if (this.getActivePower() === "SpiritCard") {
+			if (["SpiritCard"].includes(this.getActivePower() as string)) {
 				return 12;
 			}
 			if (this.getActivePower() === "FireCard") {
@@ -1647,6 +1685,13 @@ export class Game extends Scene {
 			key: "fire-power-right",
 			frames: anims.generateFrameNumbers("fire-power"),
 			frameRate: 24,
+			showOnStart: true,
+			hideOnComplete: true,
+		});
+		anims.create({
+			key: "cloud-power",
+			frames: anims.generateFrameNumbers("cloud-power"),
+			frameRate: 35,
 			showOnStart: true,
 			hideOnComplete: true,
 		});
@@ -2114,6 +2159,11 @@ export class Game extends Scene {
 		this.setActivePower("SpiritCard");
 	}
 
+	equipCloudCard(): void {
+		this.registry.set("hasCloudCard", true);
+		this.setActivePower("CloudCard");
+	}
+
 	canPlayerUsePower(): boolean {
 		return (
 			this.getPlayerHitPoints() > 0 &&
@@ -2132,6 +2182,7 @@ export class Game extends Scene {
 			this.registry.get("hasIceCard") === true ||
 			this.registry.get("hasFireCard") === true ||
 			this.registry.get("hasSpiritCard") === true ||
+			this.registry.get("hasCloudCard") === true ||
 			this.registry.get("hasPlantCard") === true
 		);
 	}
@@ -2204,6 +2255,11 @@ export class Game extends Scene {
 						this.power.anims.play("plant-power-right", true);
 						this.power.setFlipX(true);
 						break;
+					case "CloudCard":
+						this.power.anims.play("cloud-power", true);
+						this.player.setVelocity(0, -this.characterSpeed * 3);
+						this.player.anims.play("character-up-walk");
+						break;
 					case "SpiritCard":
 						this.power.anims.play("spirit-power", true);
 						this.power.setAlpha(0.5);
@@ -2238,6 +2294,12 @@ export class Game extends Scene {
 						this.power.setVelocity(this.plantCardVelocity, 0);
 						this.power.anims.play("plant-power-right", true);
 						break;
+					case "CloudCard":
+						this.power.anims.play("cloud-power", true);
+						this.player.setVelocity(this.characterSpeed * 3, 0);
+						this.player.anims.play("character-left-walk");
+						this.player.setFlipX(true);
+						break;
 					case "SpiritCard":
 						this.power.anims.play("spirit-power", true);
 						this.power.setAlpha(0.5);
@@ -2266,6 +2328,11 @@ export class Game extends Scene {
 						this.power.setRotation(Phaser.Math.DegToRad(90));
 						this.power.setVelocity(0, this.plantCardVelocity);
 						this.power.anims.play("plant-power-right", true);
+						break;
+					case "CloudCard":
+						this.power.anims.play("cloud-power", true);
+						this.player.setVelocity(0, this.characterSpeed * 3);
+						this.player.anims.play("character-down-walk");
 						break;
 					case "SpiritCard":
 						this.power.anims.play("spirit-power", true);
@@ -2300,6 +2367,11 @@ export class Game extends Scene {
 						this.power.anims.play("plant-power-right", true);
 						this.power.setFlipX(true);
 						break;
+					case "CloudCard":
+						this.power.anims.play("cloud-power", true);
+						this.player.setVelocity(-this.characterSpeed * 3, 0);
+						this.player.anims.play("character-left-walk");
+						break;
 					case "SpiritCard":
 						this.power.anims.play("spirit-power", true);
 						this.power.setAlpha(0.5);
@@ -2332,7 +2404,10 @@ export class Game extends Scene {
 			return;
 		}
 
-		if (this.isPlayerUsingPower() && this.getActivePower() !== "SpiritCard") {
+		if (
+			this.isPlayerUsingPower() &&
+			!["SpiritCard"].includes(this.getActivePower() as string)
+		) {
 			return;
 		}
 
