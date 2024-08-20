@@ -255,6 +255,26 @@ export class RandomlyWalk<AllStates extends string>
 			throw new Error("invalid sprite");
 		}
 
+		const direction = this.#getWalkingDirection(sprite);
+		this.#walkInDirection(sprite, direction);
+
+		sprite.scene.time.addEvent({
+			delay: this.#getWalkingTime(),
+			callback: () => {
+				if (!this.#active) {
+					return;
+				}
+				this.#active = false;
+				sprite?.body?.setVelocity(0);
+				stateMachine.popState();
+				stateMachine.pushState(this.#nextState);
+			},
+		});
+	}
+
+	#getWalkingDirection(
+		sprite: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody
+	): SpriteDirection {
 		const previousDirection: SpriteDirection | undefined =
 			sprite.data.get("direction");
 		let direction = Phaser.Math.Between(0, 3);
@@ -263,6 +283,17 @@ export class RandomlyWalk<AllStates extends string>
 				direction = Phaser.Math.Between(0, 3);
 			}
 		}
+		return direction as SpriteDirection;
+	}
+
+	#getWalkingTime(): number {
+		return Phaser.Math.Between(this.#minWalkTime, this.#maxWalkTime);
+	}
+
+	#walkInDirection(
+		sprite: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody,
+		direction: SpriteDirection
+	) {
 		sprite.data.set("direction", direction);
 		switch (direction) {
 			case SpriteUp:
@@ -282,36 +313,19 @@ export class RandomlyWalk<AllStates extends string>
 				sprite.body.setVelocityX(-this.#enemySpeed);
 				break;
 		}
-
-		sprite.scene.time.addEvent({
-			delay: this.#getWalkingTime(),
-			callback: () => {
-				if (!this.#active) {
-					return;
-				}
-				this.#active = false;
-				sprite?.body?.setVelocity(0);
-				stateMachine.popState();
-				stateMachine.pushState(this.#nextState);
-			},
-		});
 	}
 
-	#getWalkingTime(): number {
-		return Phaser.Math.Between(this.#minWalkTime, this.#maxWalkTime);
-	}
-
-	update(
-		sprite: Phaser.GameObjects.Sprite,
-		stateMachine: BehaviorMachineInterface<AllStates>
-	) {
+	update(sprite: Phaser.GameObjects.Sprite) {
+		if (!isDynamicSprite(sprite)) {
+			throw new Error("invalid sprite");
+		}
+		// If you hit a wall, change direction.
 		if (sprite.body?.velocity.x === 0 && sprite.body.velocity.y === 0) {
 			if (!this.#active) {
 				return;
 			}
-			this.#active = false;
-			stateMachine.popState();
-			stateMachine.pushState(this.#nextState);
+			const direction = this.#getWalkingDirection(sprite);
+			this.#walkInDirection(sprite, direction);
 		}
 	}
 }
