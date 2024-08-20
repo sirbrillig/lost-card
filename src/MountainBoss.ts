@@ -4,7 +4,7 @@ import {
 	WaitForActive,
 	Roar,
 	SpawnEnemies,
-	PostSpawn,
+	Idle,
 	LeftRightMarch,
 } from "./behaviors";
 import { BaseMonster } from "./BaseMonster";
@@ -107,7 +107,7 @@ export class MountainBoss extends BaseMonster<AllStates> {
 			case "spawn2":
 				return new SpawnEnemies(state, "idle1");
 			case "idle1":
-				return new PostSpawn(state, "leftrightmarch");
+				return new Idle(state, "leftrightmarch", "idle");
 			case "leftrightmarch":
 				return new LeftRightMarch(state, "roar1");
 		}

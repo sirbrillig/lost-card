@@ -3729,14 +3729,38 @@
                 {
                  "height":0,
                  "id":563,
-                 "name":"FireMonster",
+                 "name":"FireSpout",
                  "point":true,
                  "rotation":0,
                  "type":"",
                  "visible":true,
                  "width":0,
-                 "x":2696.00699504518,
-                 "y":1880.64704167881
+                 "x":2719.58120848248,
+                 "y":1879.74034116199
+                }, 
+                {
+                 "height":0,
+                 "id":570,
+                 "name":"FireSpout",
+                 "point":true,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":2668.8059795406,
+                 "y":1803.57749774917
+                }, 
+                {
+                 "height":0,
+                 "id":569,
+                 "name":"FireSpout",
+                 "point":true,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":2638.88486248556,
+                 "y":1954.99648405799
                 }, 
                 {
                  "height":0,
@@ -8043,7 +8067,7 @@
          "y":0
         }],
  "nextlayerid":14,
- "nextobjectid":568,
+ "nextobjectid":571,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.0",

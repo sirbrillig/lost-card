@@ -190,15 +190,17 @@ export class SpawnEnemies<AllStates extends string>
 	}
 }
 
-export class PostSpawn<AllStates extends string>
+export class Idle<AllStates extends string>
 	implements Behavior<AllStates, Phaser.GameObjects.Sprite>
 {
 	#nextState: AllStates;
+	#animationKey: string;
 	name: AllStates;
 
-	constructor(name: AllStates, nextState: AllStates) {
+	constructor(name: AllStates, nextState: AllStates, animationKey: string) {
 		this.name = name;
 		this.#nextState = nextState;
+		this.#animationKey = animationKey;
 	}
 
 	init(
@@ -208,29 +210,15 @@ export class PostSpawn<AllStates extends string>
 		if (!sprite.body || !isDynamicSprite(sprite)) {
 			throw new Error("Could not update monster");
 		}
-		console.log("post-spawn");
 		sprite.body.stop();
-		sprite.anims.play(
-			{
-				key: "idle",
-			},
-			true
-		);
-		sprite.once(
-			Phaser.Animations.Events.ANIMATION_COMPLETE,
-			(anim: Phaser.Animations.Animation) => {
-				console.log("post-spawn complete", anim);
-				stateMachine.popState();
-				stateMachine.pushState(this.#nextState);
-			}
-		);
+		sprite.anims.play(this.#animationKey, true);
+		sprite.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
+			stateMachine.popState();
+			stateMachine.pushState(this.#nextState);
+		});
 	}
 
-	update(sprite: Phaser.GameObjects.Sprite): void {
-		if (!sprite.body || !isDynamicSprite(sprite)) {
-			throw new Error("Could not update monster");
-		}
-	}
+	update(): void {}
 }
 
 export class RandomlyWalk<AllStates extends string>
@@ -505,6 +493,76 @@ export class IceAttack<AllStates extends string>
 					MainEvents.emit(Events.FreezePlayer, false);
 				},
 			});
+		});
+
+		sprite.once(Events.MonsterDying, () => {
+			effect?.destroy();
+		});
+		effect.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
+			effect.destroy();
+			stateMachine.popState();
+			stateMachine.pushState(this.#nextState);
+		});
+	}
+
+	update(): void {}
+}
+
+export class RangedFireBall<AllStates extends string>
+	implements Behavior<AllStates, Phaser.GameObjects.Sprite>
+{
+	#nextState: AllStates;
+	#speed: 50;
+	name: AllStates;
+
+	constructor(name: AllStates, nextState: AllStates) {
+		this.name = name;
+		this.#nextState = nextState;
+	}
+
+	init(
+		sprite: Phaser.GameObjects.Sprite,
+		stateMachine: BehaviorMachineInterface<AllStates>,
+		enemyManager: EnemyManager
+	): void {
+		if (!sprite.body || !isDynamicSprite(sprite)) {
+			throw new Error("Could not update monster");
+		}
+		sprite.scene.anims.create({
+			key: "fire-power",
+			frames: sprite.anims.generateFrameNumbers("fire-power"),
+			frameRate: 50,
+			showOnStart: true,
+			hideOnComplete: true,
+			yoyo: true,
+		});
+		const effect = sprite.scene.add.sprite(
+			sprite.body.center.x,
+			sprite.body.center.y,
+			"fire-power",
+			0
+		);
+		sprite.scene.physics.add.existing(effect);
+		effect.setDepth(5);
+		effect.anims.play(
+			{
+				key: "fire-power",
+				repeat: 3,
+			},
+			true
+		);
+		if (!isDynamicSprite(effect)) {
+			throw new Error("Could not update fire ball");
+		}
+		effect.setDisplaySize(effect.body.width * 0.8, effect.body.height * 0.8);
+		effect.body.setSize(effect.body.width * 0.5, effect.body.height * 0.5);
+		sprite.scene.physics.moveToObject(effect, enemyManager.player, this.#speed);
+
+		sprite.scene.physics.add.overlap(enemyManager.player, effect, () => {
+			MainEvents.emit(Events.EnemyHitPlayer, true);
+			effect.destroy();
+			stateMachine.popState();
+			stateMachine.pushState(this.#nextState);
 		});
 
 		sprite.once(Events.MonsterDying, () => {

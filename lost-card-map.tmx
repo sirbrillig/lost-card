@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.0" orientation="orthogonal" renderorder="right-down" width="200" height="200" tilewidth="16" tileheight="16" infinite="0" nextlayerid="14" nextobjectid="568">
+<map version="1.10" tiledversion="1.11.0" orientation="orthogonal" renderorder="right-down" width="200" height="200" tilewidth="16" tileheight="16" infinite="0" nextlayerid="14" nextobjectid="571">
  <editorsettings>
   <export target="public/assets/lost-card-map.json" format="json"/>
  </editorsettings>
@@ -8227,7 +8227,13 @@
   <object id="562" name="FireMonster" x="2632.61" y="1847.13">
    <point/>
   </object>
-  <object id="563" name="FireMonster" x="2696.01" y="1880.65">
+  <object id="563" name="FireSpout" x="2719.58" y="1879.74">
+   <point/>
+  </object>
+  <object id="570" name="FireSpout" x="2668.81" y="1803.58">
+   <point/>
+  </object>
+  <object id="569" name="FireSpout" x="2638.88" y="1955">
    <point/>
   </object>
   <object id="567" name="FireMonster" x="2737.72" y="1971.32">
