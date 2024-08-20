@@ -1,5 +1,6 @@
 import { Scene } from "phaser";
-import { DataKeys, Powers } from "../shared";
+import { MainEvents } from "../MainEvents";
+import { DataKeys, Powers, Events } from "../shared";
 
 const heartSize: number = 18;
 const itemSize: number = 20;
@@ -131,6 +132,7 @@ export class Overlay extends Scene {
 	bg: Phaser.GameObjects.NineSlice;
 	keyCountIcon: Phaser.GameObjects.Image;
 	keyCountLabel: Phaser.GameObjects.BitmapText;
+	saveMessageTime = 1000;
 
 	constructor() {
 		super("Overlay");
@@ -166,6 +168,26 @@ export class Overlay extends Scene {
 		this.createHearts();
 		this.updateItems();
 		this.updateSelectedItem();
+
+		MainEvents.on(Events.GameSaved, () => {
+			const savedText = this.add
+				.bitmapText(
+					this.cameras.main.x + this.cameras.main.width - 35,
+					this.cameras.main.y + this.cameras.main.height - 16,
+					"RetroGamingWhiteSmall",
+					"Saved",
+					12
+				)
+				.setDepth(9)
+				.setOrigin(0.5);
+
+			this.time.addEvent({
+				delay: this.saveMessageTime,
+				callback: () => {
+					savedText.destroy();
+				},
+			});
+		});
 
 		if (!this.input.keyboard) {
 			throw new Error("No keyboard controls could be found");

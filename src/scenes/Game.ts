@@ -479,6 +479,7 @@ export class Game extends Scene {
 					...this.createdItems,
 					...this.createdTiles,
 					...this.createdDoors,
+					...this.createdFinalDoors,
 					...this.createdSavePoints,
 				],
 				this.enemyManager.activeRoom
@@ -555,6 +556,7 @@ export class Game extends Scene {
 		localStorage.setItem("lost-card-save", JSON.stringify(this.getSaveData()));
 		console.log(this.getSaveData());
 		console.log("game saved");
+		MainEvents.emit(Events.GameSaved);
 	}
 
 	getSaveData() {
@@ -695,6 +697,7 @@ export class Game extends Scene {
 				...this.createdItems,
 				...this.createdTiles,
 				...this.createdDoors,
+				...this.createdFinalDoors,
 				...this.createdSavePoints,
 			],
 			room

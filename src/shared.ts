@@ -20,6 +20,7 @@ export const Events = {
 	EnemyHitPlayer: "enemyHitPlayer",
 	StunPlayer: "stunPlayer",
 	FreezePlayer: "freezePlayer",
+	GameSaved: "gameSaved",
 };
 
 export const DataKeys = {
