@@ -1416,6 +1416,10 @@ export class Game extends Scene {
 	}
 
 	pickUpPotion() {
+		const playerTotalHitPoints =
+			this.registry.get("playerTotalHitPoints") ?? this.playerInitialHitPoints;
+		this.setPlayerHitPoints(playerTotalHitPoints);
+
 		this.setPotionCount(this.getPotionCount() + 1);
 
 		this.scene.launch("Dialog", {
