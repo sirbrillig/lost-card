@@ -83,6 +83,7 @@ export class Game extends Scene {
 	map: Phaser.Tilemaps.Tilemap;
 	landLayer: Phaser.Tilemaps.TilemapLayer;
 	stuffLayer: Phaser.Tilemaps.TilemapLayer;
+	createdFinalDoors: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody[] = [];
 	createdDoors: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody[] = [];
 	createdSavePoints: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody[] = [];
 	createdTiles: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody[] = [];
@@ -175,9 +176,16 @@ export class Game extends Scene {
 		);
 
 		this.createDoors();
+		this.createFinalDoors();
 		this.createAppearingTiles();
 		this.createItems();
 		this.createSavePoints();
+
+		this.physics.add.collider(
+			this.createdFinalDoors,
+			this.player,
+			this.checkEndGame.bind(this)
+		);
 
 		// Enemies collide with doors but players can pass through them.
 		this.physics.add.collider(this.createdDoors, this.enemyManager.enemies);
@@ -303,6 +311,23 @@ export class Game extends Scene {
 
 		MainEvents.on(Events.FreezePlayer, (setting: boolean) => {
 			this.setPlayerFrozen(setting);
+		});
+	}
+
+	checkEndGame() {
+		if (this.getKeyCount() < 6) {
+			this.scene.launch("Dialog", {
+				heading: "Gold door",
+				text: "Get six keys to open\r\nPress SPACE to continue",
+			});
+			this.input.keyboard?.once("keydown-SPACE", () => {
+				this.scene.get("Dialog")?.scene.stop();
+			});
+			return;
+		}
+		this.scene.launch("Dialog", {
+			heading: "You win!",
+			text: "Congratulations",
 		});
 	}
 
@@ -546,6 +571,17 @@ export class Game extends Scene {
 			"SavePoints",
 			this.shouldCreateLayerObject.bind(this),
 			this.recordObjectIdOnSprite
+		).map((item) => {
+			item.body.pushable = false;
+			return item;
+		});
+	}
+
+	createFinalDoors() {
+		this.createdFinalDoors = createSpritesFromObjectLayer(
+			this.map,
+			"FinalDoor",
+			undefined
 		).map((item) => {
 			item.body.pushable = false;
 			return item;

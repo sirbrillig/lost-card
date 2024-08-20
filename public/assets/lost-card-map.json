@@ -2594,18 +2594,6 @@
                  "width":0,
                  "x":1935.89,
                  "y":1107.99
-                }, 
-                {
-                 "height":0,
-                 "id":548,
-                 "name":"Temp Start",
-                 "point":true,
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":0,
-                 "x":2484.68851250339,
-                 "y":1889.3549604628
                 }],
          "opacity":1,
          "properties":[
