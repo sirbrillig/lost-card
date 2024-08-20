@@ -136,6 +136,10 @@ export class Preloader extends Scene {
 			frameWidth: 32,
 			frameHeight: 32,
 		});
+		this.load.spritesheet("spirit-power", "spirit_power.png", {
+			frameWidth: 32,
+			frameHeight: 32,
+		});
 		this.load.spritesheet("fire-power", "fire_power.png", {
 			frameWidth: 32,
 			frameHeight: 32,

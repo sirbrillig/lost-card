@@ -148,7 +148,12 @@ export class Game extends Scene {
 			}
 		);
 		this.stuffLayer = this.createTileLayer("Stuff", tilesetTile, 0);
-		this.physics.add.collider(this.stuffLayer, this.player);
+		this.physics.add.collider(this.stuffLayer, this.player, undefined, () => {
+			if (this.isPlayerUsingPower() && this.getActivePower() === "SpiritCard") {
+				return false;
+			}
+			return true;
+		});
 		this.physics.add.collider(
 			this.stuffLayer,
 			this.enemyManager.enemies,
@@ -493,6 +498,10 @@ export class Game extends Scene {
 		this.setPlayerIdleFrame();
 		this.updateSwordHitbox();
 		this.playPowerAnimation();
+
+		if (this.getActivePower() === "SpiritCard") {
+			// FIXME: pass through Stuff layer
+		}
 	}
 
 	loadLastSave() {
@@ -1135,7 +1144,7 @@ export class Game extends Scene {
 		this.setPlayerIdleFrame();
 
 		// Play power animation
-		this.updateHitboxForPower();
+		this.updatePowerHitboxPosition();
 		this.power.setRotation(Phaser.Math.DegToRad(0));
 		this.power.setVelocity(this.icePowerVelocity, 0);
 		this.power.anims.play("ice-power-right", true);
@@ -1166,8 +1175,14 @@ export class Game extends Scene {
 		this.setPlayerIdleFrame();
 
 		// Play power animation
-		this.updateHitboxForPower();
+		this.updatePowerHitboxPosition();
 		this.power.anims.play("spirit-power", true);
+		this.power.setAlpha(0.5);
+		this.player.setAlpha(0.5);
+		this.power.on(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
+			this.power.setAlpha(1);
+			this.player.setAlpha(1);
+		});
 
 		this.setPlayerInvincible(true);
 		this.setPlayerStunned(true);
@@ -1195,7 +1210,7 @@ export class Game extends Scene {
 		this.setPlayerIdleFrame();
 
 		// Play power animation
-		this.updateHitboxForPower();
+		this.updatePowerHitboxPosition();
 		this.power.setRotation(Phaser.Math.DegToRad(0));
 		this.power.setVelocity(this.firePowerVelocity, 0);
 		this.power.anims.play("fire-power-right", true);
@@ -1226,7 +1241,7 @@ export class Game extends Scene {
 		this.setPlayerIdleFrame();
 
 		// Play power animation
-		this.updateHitboxForPower();
+		this.updatePowerHitboxPosition();
 		this.power.setVelocity(0, 0);
 		this.power.setRotation(Phaser.Math.DegToRad(0));
 		this.power.anims.play("plant-power-right", true);
@@ -1257,7 +1272,7 @@ export class Game extends Scene {
 		this.setPlayerIdleFrame();
 
 		// Play power animation
-		this.updateHitboxForPower();
+		this.updatePowerHitboxPosition();
 		this.power.setVelocity(0, 0);
 		this.power.setRotation(Phaser.Math.DegToRad(0));
 		this.power.anims.play("character-right-power", true);
@@ -1360,6 +1375,9 @@ export class Game extends Scene {
 	}
 
 	getPowerOffset() {
+		if (this.getActivePower() === "SpiritCard") {
+			return [0, 0];
+		}
 		const xOffset = (() => {
 			if (this.playerDirection === SpriteLeft) {
 				return -18;
@@ -1403,8 +1421,16 @@ export class Game extends Scene {
 		return [xOffset, yOffset];
 	}
 
-	updateHitboxForPower() {
+	updatePowerHitboxPosition() {
+		if (this.isPlayerUsingPower() && this.getActivePower() !== "SpiritCard") {
+			// We don't want to touch the power hitbox if a power is already animating.
+			return;
+		}
+
 		const width = (() => {
+			if (this.getActivePower() === "SpiritCard") {
+				return 12;
+			}
 			if (this.getActivePower() === "FireCard") {
 				return 12;
 			}
@@ -1417,6 +1443,9 @@ export class Game extends Scene {
 			return 10;
 		})();
 		const height = (() => {
+			if (this.getActivePower() === "SpiritCard") {
+				return 12;
+			}
 			if (this.getActivePower() === "FireCard") {
 				return 12;
 			}
@@ -1432,7 +1461,6 @@ export class Game extends Scene {
 		this.power.body.setSize(width, height);
 
 		const [xOffset, yOffset] = this.getPowerOffset();
-
 		this.power.x = this.player.x + xOffset;
 		this.power.y = this.player.y + yOffset;
 	}
@@ -1469,7 +1497,7 @@ export class Game extends Scene {
 			this.sword.setVisible(false);
 			this.power.setVisible(false);
 			this.updateSwordHitboxForAttack();
-			this.updateHitboxForPower();
+			this.updatePowerHitboxPosition();
 			return;
 		}
 
@@ -1615,6 +1643,14 @@ export class Game extends Scene {
 			frameRate: 24,
 			showOnStart: true,
 			hideOnComplete: true,
+		});
+		anims.create({
+			key: "spirit-power",
+			frames: anims.generateFrameNumbers("spirit-power"),
+			frameRate: 24,
+			showOnStart: true,
+			hideOnComplete: true,
+			repeat: 2,
 		});
 		anims.create({
 			key: "character-right-power",
@@ -2151,6 +2187,8 @@ export class Game extends Scene {
 	playPowerAnimation(): void {
 		this.power.setVelocity(0);
 		this.power.setFlipX(false);
+		this.power.setAlpha(1);
+		this.player.setAlpha(1);
 		switch (this.playerDirection) {
 			case SpriteUp:
 				switch (this.getActivePower()) {
@@ -2162,6 +2200,12 @@ export class Game extends Scene {
 						break;
 					case "SpiritCard":
 						this.power.anims.play("spirit-power", true);
+						this.power.setAlpha(0.5);
+						this.player.setAlpha(0.5);
+						this.power.on(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
+							this.power.setAlpha(1);
+							this.player.setAlpha(1);
+						});
 						break;
 					case "FireCard":
 						this.power.setRotation(Phaser.Math.DegToRad(90));
@@ -2190,6 +2234,12 @@ export class Game extends Scene {
 						break;
 					case "SpiritCard":
 						this.power.anims.play("spirit-power", true);
+						this.power.setAlpha(0.5);
+						this.player.setAlpha(0.5);
+						this.power.on(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
+							this.power.setAlpha(1);
+							this.player.setAlpha(1);
+						});
 						break;
 					case "FireCard":
 						this.power.setVelocity(this.firePowerVelocity, 0);
@@ -2213,6 +2263,12 @@ export class Game extends Scene {
 						break;
 					case "SpiritCard":
 						this.power.anims.play("spirit-power", true);
+						this.power.setAlpha(0.5);
+						this.player.setAlpha(0.5);
+						this.power.on(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
+							this.power.setAlpha(1);
+							this.player.setAlpha(1);
+						});
 						break;
 					case "FireCard":
 						this.power.setRotation(Phaser.Math.DegToRad(90));
@@ -2240,6 +2296,12 @@ export class Game extends Scene {
 						break;
 					case "SpiritCard":
 						this.power.anims.play("spirit-power", true);
+						this.power.setAlpha(0.5);
+						this.player.setAlpha(0.5);
+						this.power.on(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
+							this.power.setAlpha(1);
+							this.player.setAlpha(1);
+						});
 						break;
 					case "FireCard":
 						this.power.setVelocity(-this.firePowerVelocity, 0);
@@ -2260,11 +2322,11 @@ export class Game extends Scene {
 	}
 
 	updatePlayerMovement(): void {
-		if (
-			this.isPlayerAttacking() ||
-			this.isPlayerUsingPower() ||
-			this.isPlayerBeingKnockedBack
-		) {
+		if (this.isPlayerAttacking() || this.isPlayerBeingKnockedBack) {
+			return;
+		}
+
+		if (this.isPlayerUsingPower() && this.getActivePower() !== "SpiritCard") {
 			return;
 		}
 
@@ -2362,6 +2424,7 @@ export class Game extends Scene {
 		}
 
 		this.updateSwordHitbox();
+		this.updatePowerHitboxPosition();
 		this.updatePlayerMovement();
 	}
 
