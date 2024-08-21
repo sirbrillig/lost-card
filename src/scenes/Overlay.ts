@@ -1,6 +1,13 @@
 import { Scene } from "phaser";
 import { MainEvents } from "../MainEvents";
-import { DataKeys, Powers, Events } from "../shared";
+import {
+	DataKeys,
+	Powers,
+	Events,
+	powerOrder,
+	getPowerEquippedKey,
+	getIconForPower,
+} from "../shared";
 
 const heartSize: number = 18;
 const itemSize: number = 20;
@@ -57,6 +64,7 @@ class Item {
 
 	destroy() {
 		this.image.destroy();
+		this.selectedItemMarker?.destroy();
 	}
 }
 
@@ -87,6 +95,11 @@ class PotionItem extends Item {
 	update() {
 		this.totalPotions = this.scene.registry.get(DataKeys.PotionCount) ?? 0;
 		this.countLabel.setText(`${this.totalPotions}`);
+	}
+
+	destroy() {
+		this.image.destroy();
+		this.countLabel.destroy();
 	}
 }
 
@@ -168,6 +181,11 @@ export class Overlay extends Scene {
 		this.createHearts();
 		this.updateItems();
 		this.updateSelectedItem();
+
+		MainEvents.on(Events.PowerEquipped, () => {
+			this.items.forEach((item) => item.destroy());
+			this.items = [];
+		});
 
 		MainEvents.on(Events.GameSaved, () => {
 			const savedText = this.add
@@ -255,54 +273,19 @@ export class Overlay extends Scene {
 		if (!this.items.some((item) => item.name === "Potion")) {
 			this.items.push(new PotionItem(this, 0, "icons3", 2, "Potion"));
 		}
-		if (
-			this.registry.get("hasWindCard") &&
-			!this.items.some((item) => item.name === "WindCard")
-		) {
+
+		powerOrder.forEach((power) => {
+			if (!this.registry.get(getPowerEquippedKey(power))) {
+				return;
+			}
+			if (this.items.some((item) => item.name === power)) {
+				return;
+			}
+			const icon = getIconForPower(power);
 			this.items.push(
-				new Item(this, this.items.length, "cards", 44, "WindCard")
+				new Item(this, this.items.length, icon.texture, icon.frame, power)
 			);
-		}
-		if (
-			this.registry.get("hasIceCard") &&
-			!this.items.some((item) => item.name === "IceCard")
-		) {
-			this.items.push(
-				new Item(this, this.items.length, "cards", 19, "IceCard")
-			);
-		}
-		if (
-			this.registry.get("hasPlantCard") &&
-			!this.items.some((item) => item.name === "PlantCard")
-		) {
-			this.items.push(
-				new Item(this, this.items.length, "cards", 25, "PlantCard")
-			);
-		}
-		if (
-			this.registry.get("hasFireCard") &&
-			!this.items.some((item) => item.name === "FireCard")
-		) {
-			this.items.push(
-				new Item(this, this.items.length, "cards", 18, "FireCard")
-			);
-		}
-		if (
-			this.registry.get("hasSpiritCard") &&
-			!this.items.some((item) => item.name === "SpiritCard")
-		) {
-			this.items.push(
-				new Item(this, this.items.length, "cards", 37, "SpiritCard")
-			);
-		}
-		if (
-			this.registry.get("hasCloudCard") &&
-			!this.items.some((item) => item.name === "CloudCard")
-		) {
-			this.items.push(
-				new Item(this, this.items.length, "cards", 13, "CloudCard")
-			);
-		}
+		});
 
 		this.items.forEach((item) => item.update());
 	}

@@ -21,6 +21,7 @@ export const Events = {
 	StunPlayer: "stunPlayer",
 	FreezePlayer: "freezePlayer",
 	GameSaved: "gameSaved",
+	PowerEquipped: "PowerEquipped",
 };
 
 export const DataKeys = {
@@ -41,6 +42,56 @@ export type Powers =
 	| "FireCard"
 	| "CloudCard"
 	| "SpiritCard";
+
+export const powerOrder: Powers[] = [
+	"WindCard",
+	"IceCard",
+	"PlantCard",
+	"FireCard",
+	"SpiritCard",
+	"CloudCard",
+];
+
+export function getPowerEquippedKey(power: Powers): string {
+	switch (power) {
+		case "WindCard":
+			return "hasWindCard";
+		case "IceCard":
+			return "hasIceCard";
+		case "PlantCard":
+			return "hasPlantCard";
+		case "FireCard":
+			return "hasFireCard";
+		case "SpiritCard":
+			return "hasSpiritCard";
+		case "CloudCard":
+			return "hasCloudCard";
+		default:
+			throw new Error(`Unknown power ${power}`);
+	}
+}
+
+export function getIconForPower(power: Powers): {
+	texture: string;
+	frame: number;
+} {
+	switch (power) {
+		case "WindCard":
+			return { texture: "cards", frame: 44 };
+		case "IceCard":
+			return { texture: "cards", frame: 19 };
+		case "PlantCard":
+			return { texture: "cards", frame: 25 };
+		case "FireCard":
+			return { texture: "cards", frame: 18 };
+		case "SpiritCard":
+			return { texture: "cards", frame: 37 };
+		case "CloudCard":
+			return { texture: "cards", frame: 13 };
+		default:
+			throw new Error(`Unknown power ${power}`);
+	}
+}
 
 export function isDynamicSprite(
 	obj: unknown

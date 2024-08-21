@@ -35,6 +35,8 @@ import {
 	SaveData,
 	isEnemy,
 	isTileWithPropertiesObject,
+	powerOrder,
+	getPowerEquippedKey,
 } from "../shared";
 
 export class Game extends Scene {
@@ -354,12 +356,12 @@ export class Game extends Scene {
 		this.input.keyboard.on("keydown-P", () => {
 			// Cheat: gain all items
 			this.equipSword();
-			this.equipWindCard();
-			this.equipIceCard();
-			this.equipPlantCard();
-			this.equipFireCard();
-			this.equipSpiritCard();
-			this.equipCloudCard();
+			this.equipPower("WindCard");
+			this.equipPower("IceCard");
+			this.equipPower("PlantCard");
+			this.equipPower("FireCard");
+			this.equipPower("SpiritCard");
+			this.equipPower("CloudCard");
 		});
 		this.input.keyboard.on("keydown-S", () => {
 			// Cheat: save
@@ -383,14 +385,6 @@ export class Game extends Scene {
 		});
 		this.input.keyboard.on("keydown-Z", () => {
 			// Rotate Active Power
-			const powerOrder: Powers[] = [
-				"WindCard",
-				"IceCard",
-				"PlantCard",
-				"FireCard",
-				"SpiritCard",
-				"CloudCard",
-			];
 			const available = powerOrder.filter((power) =>
 				this.isPowerEquipped(power)
 			);
@@ -420,22 +414,7 @@ export class Game extends Scene {
 	}
 
 	isPowerEquipped(power: Powers): boolean {
-		switch (power) {
-			case "WindCard":
-				return this.registry.get("hasWindCard");
-			case "IceCard":
-				return this.registry.get("hasIceCard");
-			case "PlantCard":
-				return this.registry.get("hasPlantCard");
-			case "FireCard":
-				return this.registry.get("hasFireCard");
-			case "SpiritCard":
-				return this.registry.get("hasSpiritCard");
-			case "CloudCard":
-				return this.registry.get("hasCloudCard");
-			default:
-				return false;
-		}
+		return this.registry.get(getPowerEquippedKey(power));
 	}
 
 	freezeWaterTile(tile: Phaser.Tilemaps.Tile) {
@@ -1270,7 +1249,7 @@ export class Game extends Scene {
 	}
 
 	pickUpIceCard() {
-		this.equipIceCard();
+		this.equipPower("IceCard");
 
 		// Face right
 		this.playerDirection = SpriteRight;
@@ -1301,7 +1280,7 @@ export class Game extends Scene {
 	}
 
 	pickUpSpiritCard() {
-		this.equipSpiritCard();
+		this.equipPower("SpiritCard");
 
 		// Face right
 		this.playerDirection = SpriteRight;
@@ -1336,7 +1315,7 @@ export class Game extends Scene {
 	}
 
 	pickUpCloudCard() {
-		this.equipCloudCard();
+		this.equipPower("CloudCard");
 
 		// Face right
 		this.playerDirection = SpriteRight;
@@ -1365,7 +1344,7 @@ export class Game extends Scene {
 	}
 
 	pickUpFireCard() {
-		this.equipFireCard();
+		this.equipPower("FireCard");
 
 		// Face right
 		this.playerDirection = SpriteRight;
@@ -1396,7 +1375,7 @@ export class Game extends Scene {
 	}
 
 	pickUpPlantCard() {
-		this.equipPlantCard();
+		this.equipPower("PlantCard");
 
 		// Face right
 		this.playerDirection = SpriteRight;
@@ -1427,7 +1406,7 @@ export class Game extends Scene {
 	}
 
 	pickUpWindCard() {
-		this.equipWindCard();
+		this.equipPower("WindCard");
 
 		// Face right
 		this.playerDirection = SpriteRight;
@@ -2279,34 +2258,10 @@ export class Game extends Scene {
 		this.registry.set("hasSword", true);
 	}
 
-	equipPlantCard(): void {
-		this.registry.set("hasPlantCard", true);
-		this.setActivePower("PlantCard");
-	}
-
-	equipWindCard(): void {
-		this.registry.set("hasWindCard", true);
-		this.setActivePower("WindCard");
-	}
-
-	equipIceCard(): void {
-		this.registry.set("hasIceCard", true);
-		this.setActivePower("IceCard");
-	}
-
-	equipFireCard(): void {
-		this.registry.set("hasFireCard", true);
-		this.setActivePower("FireCard");
-	}
-
-	equipSpiritCard(): void {
-		this.registry.set("hasSpiritCard", true);
-		this.setActivePower("SpiritCard");
-	}
-
-	equipCloudCard(): void {
-		this.registry.set("hasCloudCard", true);
-		this.setActivePower("CloudCard");
+	equipPower(power: Powers): void {
+		this.registry.set(getPowerEquippedKey(power), true);
+		this.setActivePower(power);
+		MainEvents.emit(Events.PowerEquipped);
 	}
 
 	canPlayerUsePower(): boolean {
