@@ -1,6 +1,5 @@
 import {
 	SpriteDirection,
-	invertSpriteDirection,
 	isTilemapTile,
 	isDynamicSprite,
 	isTileWithPropertiesObject,
@@ -25,9 +24,12 @@ export class WaitForActive<AllStates extends string>
 	#nextState: AllStates;
 	name: AllStates;
 
-	constructor(name: AllStates, nextState: AllStates) {
+	constructor(name: AllStates, nextState: AllStates, distance?: number) {
 		this.name = name;
 		this.#nextState = nextState;
+		if (distance) {
+			this.#distanceToActivate = distance;
+		}
 	}
 
 	init(sprite: Phaser.GameObjects.Sprite): void {
@@ -230,9 +232,26 @@ export class RandomlyWalk<AllStates extends string>
 	#nextState: AllStates;
 	name: AllStates;
 
-	constructor(name: AllStates, nextState: AllStates) {
+	constructor(
+		name: AllStates,
+		nextState: AllStates,
+		config?: {
+			speed?: number;
+			minWalkTime?: number;
+			maxWalkTime?: number;
+		}
+	) {
 		this.name = name;
 		this.#nextState = nextState;
+		if (config?.speed) {
+			this.#enemySpeed = config.speed;
+		}
+		if (config?.minWalkTime) {
+			this.#minWalkTime = config.minWalkTime;
+		}
+		if (config?.maxWalkTime) {
+			this.#maxWalkTime = config.maxWalkTime;
+		}
 	}
 
 	init(
@@ -507,12 +526,20 @@ export class RangedFireBall<AllStates extends string>
 	implements Behavior<AllStates, Phaser.GameObjects.Sprite>
 {
 	#nextState: AllStates;
-	#speed: 50;
+	#speed = 50;
+	#postAttackTime = 1000;
 	name: AllStates;
 
-	constructor(name: AllStates, nextState: AllStates) {
+	constructor(
+		name: AllStates,
+		nextState: AllStates,
+		speed: number,
+		postAttackTime: number
+	) {
 		this.name = name;
 		this.#nextState = nextState;
+		this.#speed = speed;
+		this.#postAttackTime = postAttackTime;
 	}
 
 	init(
@@ -542,7 +569,7 @@ export class RangedFireBall<AllStates extends string>
 		effect.anims.play(
 			{
 				key: "fire-power",
-				repeat: 3,
+				repeat: 6,
 			},
 			true
 		);
@@ -563,10 +590,17 @@ export class RangedFireBall<AllStates extends string>
 		sprite.once(Events.MonsterDying, () => {
 			effect?.destroy();
 		});
+
+		sprite.scene.time.addEvent({
+			delay: this.#postAttackTime,
+			callback: () => {
+				stateMachine.popState();
+				stateMachine.pushState(this.#nextState);
+			},
+		});
+
 		effect.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
 			effect.destroy();
-			stateMachine.popState();
-			stateMachine.pushState(this.#nextState);
 		});
 	}
 

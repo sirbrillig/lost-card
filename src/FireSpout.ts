@@ -55,7 +55,7 @@ export class FireSpout extends BaseMonster<AllStates> {
 			case "idle1":
 				return new Idle(state, "spitfire", "appear");
 			case "spitfire":
-				return new RangedFireBall(state, "idle2");
+				return new RangedFireBall(state, "idle2", 50, 1000);
 			case "idle2":
 				return new Idle(state, "idle3", "disappear");
 			case "idle3":

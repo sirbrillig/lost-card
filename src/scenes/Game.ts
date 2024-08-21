@@ -8,6 +8,7 @@ import { FireSpout } from "../FireSpout";
 import { WaterDipper } from "../WaterDipper";
 import { MountainBoss } from "../MountainBoss";
 import { IceBoss } from "../IceBoss";
+import { FireBoss } from "../FireBoss";
 import {
 	Powers,
 	Events,
@@ -2010,6 +2011,15 @@ export class Game extends Scene {
 					this.enemyManager.enemies.add(boss);
 					break;
 				}
+				case "FireBoss": {
+					const boss = new FireBoss(this, this.enemyManager, point.x, point.y);
+					boss.once(Events.MonsterDefeated, () => {
+						this.showHiddenItem("Heart");
+						this.showHiddenItem("Key");
+					});
+					this.enemyManager.enemies.add(boss);
+					break;
+				}
 				default:
 					throw new Error(`Unknown enemy type "${enemyType}"`);
 			}
@@ -2163,6 +2173,7 @@ export class Game extends Scene {
 		this.setPlayerHitPoints(this.getPlayerHitPoints() - 1);
 
 		if (this.getPlayerHitPoints() <= 0) {
+			this.setPlayerInvincible(true);
 			this.time.addEvent({
 				delay: this.preGameOverTime,
 				callback: () => {
