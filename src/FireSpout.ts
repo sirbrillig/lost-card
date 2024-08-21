@@ -13,13 +13,13 @@ export class FireSpout extends BaseMonster<AllStates> {
 		x: number,
 		y: number
 	) {
-		super(scene, enemyManager, x, y, "monsters2", 3);
+		super(scene, enemyManager, x, y, "monsters1", 3);
 	}
 
 	initSprites() {
 		this.anims.create({
 			key: "idle",
-			frames: this.anims.generateFrameNumbers("monsters2", {
+			frames: this.anims.generateFrameNumbers("monsters1", {
 				frames: [3],
 			}),
 			frameRate: 10,
@@ -27,14 +27,14 @@ export class FireSpout extends BaseMonster<AllStates> {
 		});
 		this.anims.create({
 			key: "appear",
-			frames: this.anims.generateFrameNumbers("monsters2", {
+			frames: this.anims.generateFrameNumbers("monsters1", {
 				frames: [3, 4, 5, 15, 16, 17, 27, 28, 29],
 			}),
 			frameRate: 10,
 		});
 		this.anims.create({
 			key: "disappear",
-			frames: this.anims.generateFrameNumbers("monsters2", {
+			frames: this.anims.generateFrameNumbers("monsters1", {
 				frames: [3, 4, 5, 15, 16, 17, 27, 28, 29].reverse(),
 			}),
 			frameRate: 10,
