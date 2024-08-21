@@ -8,6 +8,7 @@ import { FireMonster } from "../FireMonster";
 import { FireSpout } from "../FireSpout";
 import { WaterDipper } from "../WaterDipper";
 import { MountainBoss } from "../MountainBoss";
+import { PlantSpitter } from "../PlantSpitter";
 import { IceBoss } from "../IceBoss";
 import { FireBoss } from "../FireBoss";
 import {
@@ -133,12 +134,21 @@ export class Game extends Scene {
 		this.createEnemies();
 
 		this.landLayer = this.createTileLayer("Background", tilesetTile, 0);
-		this.physics.add.collider(this.landLayer, this.player, undefined, () => {
-			if (this.player.data.get("isPlantCardGrappleActive")) {
-				return false;
+		this.physics.add.collider(
+			this.landLayer,
+			this.player,
+			(_, tile) => {
+				if (isTileWithPropertiesObject(tile) && tile.properties.hurts) {
+					this.enemyHitPlayer();
+				}
+			},
+			() => {
+				if (this.player.data.get("isPlantCardGrappleActive")) {
+					return false;
+				}
+				return true;
 			}
-			return true;
-		});
+		);
 		this.physics.add.collider(
 			this.landLayer,
 			this.enemyManager.enemies,
@@ -272,7 +282,7 @@ export class Game extends Scene {
 			}
 		);
 
-		this.physics.add.collider(
+		this.physics.add.overlap(
 			this.sword,
 			this.enemyManager.enemies,
 			(_, enemy) => {
@@ -1982,6 +1992,16 @@ export class Game extends Scene {
 				}
 				case "FireSpout": {
 					const monster = new FireSpout(
+						this,
+						this.enemyManager,
+						point.x,
+						point.y
+					);
+					this.enemyManager.enemies.add(monster);
+					break;
+				}
+				case "PlantSpitter": {
+					const monster = new PlantSpitter(
 						this,
 						this.enemyManager,
 						point.x,

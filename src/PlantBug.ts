@@ -5,6 +5,9 @@ import { BaseMonster } from "./BaseMonster";
 type AllStates = "wait" | "follow";
 
 export class PlantBug extends BaseMonster<AllStates> {
+	awareDistance: number = 90;
+	speed: number = 50;
+
 	constructor(
 		scene: Phaser.Scene,
 		enemyManager: EnemyManager,
@@ -70,12 +73,12 @@ export class PlantBug extends BaseMonster<AllStates> {
 		switch (state) {
 			case "wait":
 				return new WaitForActive(state, "follow", {
-					distance: 90,
+					distance: this.awareDistance,
 				});
 			case "follow":
 				return new FollowPlayer(state, "wait", {
-					speed: 50,
-					awareDistance: 90,
+					speed: this.speed,
+					awareDistance: this.awareDistance,
 				});
 		}
 	}

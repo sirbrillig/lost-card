@@ -137,11 +137,41 @@ export class SpawnEnemies<AllStates extends string>
 	#nextState: AllStates;
 	#maxSpawnedEnemies: number = 18;
 	#enemiesToSpawn: number = 6;
+	#createMonster: (
+		scene: Phaser.Scene,
+		enemyManager: EnemyManager,
+		x: number,
+		y: number
+	) => Phaser.GameObjects.Sprite = (scene, enemyManager, x, y) => {
+		return new MountainMonster(scene, enemyManager, x, y);
+	};
 	name: AllStates;
 
-	constructor(name: AllStates, nextState: AllStates) {
+	constructor(
+		name: AllStates,
+		nextState: AllStates,
+		config?: {
+			enemiesToSpawn?: number;
+			maxSpawnedEnemies?: number;
+			createMonster: (
+				scene: Phaser.Scene,
+				enemyManager: EnemyManager,
+				x: number,
+				y: number
+			) => Phaser.GameObjects.Sprite;
+		}
+	) {
 		this.name = name;
 		this.#nextState = nextState;
+		if (config?.enemiesToSpawn) {
+			this.#enemiesToSpawn = config.enemiesToSpawn;
+		}
+		if (config?.maxSpawnedEnemies) {
+			this.#maxSpawnedEnemies = config.maxSpawnedEnemies;
+		}
+		if (config?.createMonster) {
+			this.#createMonster = config.createMonster;
+		}
 	}
 
 	init(
@@ -152,7 +182,6 @@ export class SpawnEnemies<AllStates extends string>
 		if (!sprite.body || !isDynamicSprite(sprite)) {
 			throw new Error("Could not update monster");
 		}
-		console.log("spawn");
 		sprite.body.stop();
 		sprite.anims.play(
 			{
@@ -165,14 +194,10 @@ export class SpawnEnemies<AllStates extends string>
 			this.#addEnemy(sprite, enemyManager);
 		}
 
-		sprite.once(
-			Phaser.Animations.Events.ANIMATION_COMPLETE,
-			(anim: Phaser.Animations.Animation) => {
-				console.log("spawn complete", anim);
-				stateMachine.popState();
-				stateMachine.pushState(this.#nextState);
-			}
-		);
+		sprite.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
+			stateMachine.popState();
+			stateMachine.pushState(this.#nextState);
+		});
 	}
 
 	#addEnemy(sprite: Phaser.GameObjects.Sprite, enemyManager: EnemyManager) {
@@ -188,7 +213,7 @@ export class SpawnEnemies<AllStates extends string>
 
 		sprite.data.set("spawnedEnemyCount", spawnedEnemyCount + 1);
 
-		const monster = new MountainMonster(
+		const monster = this.#createMonster(
 			sprite.scene,
 			enemyManager,
 			sprite.body.x + 5,
@@ -1006,12 +1031,15 @@ export class FollowPlayer<AllStates extends string>
 		if (!isDynamicSprite(sprite)) {
 			throw new Error("invalid sprite");
 		}
+		if (!enemyManager.player.body) {
+			return;
+		}
 
-		if (this.#awareDistance && enemyManager.player.body) {
-			const distance = Phaser.Math.Distance.BetweenPoints(
-				sprite.body.center,
-				enemyManager.player.body.center
-			);
+		const distance = Phaser.Math.Distance.BetweenPoints(
+			sprite.body.center,
+			enemyManager.player.body.center
+		);
+		if (this.#awareDistance) {
 			if (distance > this.#awareDistance) {
 				sprite.body.stop();
 				stateMachine.popState();
@@ -1020,7 +1048,17 @@ export class FollowPlayer<AllStates extends string>
 			}
 		}
 
-		sprite.scene.physics.moveToObject(sprite, enemyManager.player, this.#speed);
+		// If we are extremely close we don't need to change course.
+		if (distance < 10) {
+			return;
+		}
+
+		sprite.scene.physics.moveTo(
+			sprite,
+			enemyManager.player.body.center.x,
+			enemyManager.player.body.center.y,
+			this.#speed
+		);
 		const direction = getDirectionOfSpriteMovement(sprite.body);
 		if (!direction) {
 			return;
