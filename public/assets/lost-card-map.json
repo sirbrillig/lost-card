@@ -2594,6 +2594,18 @@
                  "width":0,
                  "x":1935.89,
                  "y":1107.99
+                }, 
+                {
+                 "height":0,
+                 "id":583,
+                 "name":"Temp Start",
+                 "point":true,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":2863.85873719615,
+                 "y":2276.41033481119
                 }],
          "opacity":1,
          "properties":[
@@ -3735,8 +3747,56 @@
                  "type":"",
                  "visible":true,
                  "width":0,
-                 "x":3099.49,
-                 "y":2158.1
+                 "x":3053.6254532946,
+                 "y":2156.18897722061
+                }, 
+                {
+                 "height":0,
+                 "id":579,
+                 "name":"FireSpout",
+                 "point":true,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":2968.77604188962,
+                 "y":2157.33559088824
+                }, 
+                {
+                 "height":0,
+                 "id":580,
+                 "name":"FireSpout",
+                 "point":true,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":2968.77604188962,
+                 "y":2157.33559088824
+                }, 
+                {
+                 "height":0,
+                 "id":581,
+                 "name":"FireSpout",
+                 "point":true,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":2886.98426693166,
+                 "y":2156.18897722061
+                }, 
+                {
+                 "height":0,
+                 "id":582,
+                 "name":"FireSpout",
+                 "point":true,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":2806.72131019722,
+                 "y":2156.18897722061
                 }, 
                 {
                  "height":0,
@@ -8223,7 +8283,7 @@
          "y":0
         }],
  "nextlayerid":14,
- "nextobjectid":579,
+ "nextobjectid":584,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.0",
