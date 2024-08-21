@@ -2,6 +2,7 @@ import { Scene } from "phaser";
 import { MainEvents } from "../MainEvents";
 import { EnemyManager } from "../EnemyManager";
 import { MountainMonster } from "../MountainMonster";
+import { PlantBug } from "../PlantBug";
 import { IceMonster } from "../IceMonster";
 import { FireMonster } from "../FireMonster";
 import { FireSpout } from "../FireSpout";
@@ -1938,6 +1939,16 @@ export class Game extends Scene {
 			switch (enemyType) {
 				case "MountainMonster": {
 					const monster = new MountainMonster(
+						this,
+						this.enemyManager,
+						point.x,
+						point.y
+					);
+					this.enemyManager.enemies.add(monster);
+					break;
+				}
+				case "PlantBug": {
+					const monster = new PlantBug(
 						this,
 						this.enemyManager,
 						point.x,

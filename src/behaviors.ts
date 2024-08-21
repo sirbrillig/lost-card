@@ -1,4 +1,5 @@
 import {
+	getDirectionOfSpriteMovement,
 	SpriteDirection,
 	isTilemapTile,
 	isDynamicSprite,
@@ -8,7 +9,6 @@ import {
 	SpriteLeft,
 	SpriteRight,
 	Events,
-	DataKeys,
 	getTilesInRoom,
 	createVelocityForDirection,
 } from "./shared";
@@ -21,48 +21,67 @@ export class WaitForActive<AllStates extends string>
 	implements Behavior<AllStates, Phaser.GameObjects.Sprite>
 {
 	#distanceToActivate: number = 100;
+	#maxWaitTime: number | undefined;
 	#nextState: AllStates;
 	name: AllStates;
 
-	constructor(name: AllStates, nextState: AllStates, distance?: number) {
+	constructor(
+		name: AllStates,
+		nextState: AllStates,
+		config?: {
+			distance?: number;
+			maxWaitTime?: number | undefined;
+		}
+	) {
 		this.name = name;
 		this.#nextState = nextState;
-		if (distance) {
-			this.#distanceToActivate = distance;
+		if (config?.distance) {
+			this.#distanceToActivate = config.distance;
+		}
+		if (config?.maxWaitTime) {
+			this.#maxWaitTime = config.maxWaitTime;
 		}
 	}
 
-	init(sprite: Phaser.GameObjects.Sprite): void {
+	init(
+		sprite: Phaser.GameObjects.Sprite,
+		stateMachine: BehaviorMachineInterface<AllStates>
+	): void {
 		if (!sprite.body || !isDynamicSprite(sprite)) {
 			throw new Error("Could not update monster");
 		}
-		console.log("waiting for player");
 		sprite.body.stop();
+
+		if (this.#maxWaitTime) {
+			sprite.scene.time.addEvent({
+				delay: this.#maxWaitTime,
+				callback: () => {
+					stateMachine.popState();
+					stateMachine.pushState(this.#nextState);
+				},
+			});
+		}
 	}
 
 	update(
 		sprite: Phaser.GameObjects.Sprite,
-		stateMachine: BehaviorMachineInterface<AllStates>
+		stateMachine: BehaviorMachineInterface<AllStates>,
+		enemyManager: EnemyManager
 	): void {
-		if (this.#isPlayerNear(sprite)) {
-			console.log("waiting ended");
+		if (!enemyManager.player.body) {
+			return;
+		}
+		if (!isDynamicSprite(sprite)) {
+			throw new Error("Could not update monster");
+		}
+		const distance = Phaser.Math.Distance.BetweenPoints(
+			sprite.body.center,
+			enemyManager.player.body.center
+		);
+		if (distance < this.#distanceToActivate) {
 			stateMachine.popState();
 			stateMachine.pushState(this.#nextState);
 		}
-	}
-
-	#isPlayerNear(sprite: Phaser.GameObjects.Sprite): boolean {
-		const playerPosition: Phaser.Math.Vector2 = sprite.scene.data.get(
-			DataKeys.PlayerPosition
-		);
-		const monsterPosition: Phaser.Math.Vector2 = sprite.data.get(
-			DataKeys.MonsterPosition
-		);
-		const distance = monsterPosition.distance(playerPosition);
-		if (distance > this.#distanceToActivate) {
-			return false;
-		}
-		return true;
 	}
 }
 
@@ -925,6 +944,89 @@ function getWalkAnimationKeyForDirection(direction: SpriteDirection): string {
 			return "down";
 		case SpriteLeft:
 			return "left";
+	}
+}
+
+export class FollowPlayer<AllStates extends string>
+	implements Behavior<AllStates, Phaser.GameObjects.Sprite>
+{
+	#nextState: AllStates;
+	name: AllStates;
+	#followTime: number | undefined;
+	#awareDistance: number | undefined;
+	#speed: number = 30;
+
+	constructor(
+		name: AllStates,
+		nextState: AllStates,
+		config?: {
+			speed?: number;
+			followTime?: number;
+			awareDistance?: number;
+		}
+	) {
+		this.name = name;
+		this.#nextState = nextState;
+		if (config?.followTime) {
+			this.#followTime = config.followTime;
+		}
+		if (config?.awareDistance) {
+			this.#awareDistance = config.awareDistance;
+		}
+		if (config?.speed) {
+			this.#speed = config.speed;
+		}
+	}
+
+	init(
+		sprite: Phaser.GameObjects.Sprite,
+		stateMachine: BehaviorMachineInterface<AllStates>
+	): void {
+		if (!isDynamicSprite(sprite)) {
+			throw new Error("invalid sprite");
+		}
+
+		if (this.#followTime) {
+			sprite.scene.time.addEvent({
+				delay: this.#followTime,
+				callback: () => {
+					sprite?.body?.setVelocity(0);
+					stateMachine.popState();
+					stateMachine.pushState(this.#nextState);
+				},
+			});
+		}
+	}
+
+	update(
+		sprite: Phaser.GameObjects.Sprite,
+		stateMachine: BehaviorMachineInterface<AllStates>,
+		enemyManager: EnemyManager
+	): void {
+		if (!isDynamicSprite(sprite)) {
+			throw new Error("invalid sprite");
+		}
+
+		if (this.#awareDistance && enemyManager.player.body) {
+			const distance = Phaser.Math.Distance.BetweenPoints(
+				sprite.body.center,
+				enemyManager.player.body.center
+			);
+			if (distance > this.#awareDistance) {
+				sprite.body.stop();
+				stateMachine.popState();
+				stateMachine.pushState(this.#nextState);
+				return;
+			}
+		}
+
+		sprite.scene.physics.moveToObject(sprite, enemyManager.player, this.#speed);
+		const direction = getDirectionOfSpriteMovement(sprite.body);
+		if (!direction) {
+			return;
+		}
+		sprite.data.set("direction", direction);
+		sprite.anims.play(getWalkAnimationKeyForDirection(direction), true);
 	}
 }
 

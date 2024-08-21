@@ -2597,15 +2597,15 @@
                 }, 
                 {
                  "height":0,
-                 "id":583,
+                 "id":586,
                  "name":"Temp Start",
                  "point":true,
                  "rotation":0,
                  "type":"",
                  "visible":true,
                  "width":0,
-                 "x":2852.28,
-                 "y":2292.86
+                 "x":1324.93768857405,
+                 "y":1710.61261970353
                 }],
          "opacity":1,
          "properties":[
@@ -3893,6 +3893,54 @@
                  "width":0,
                  "x":1479.29,
                  "y":1833.68
+                }, 
+                {
+                 "height":0,
+                 "id":590,
+                 "name":"PlantBug",
+                 "point":true,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":1482.08966404032,
+                 "y":1931.66824141103
+                }, 
+                {
+                 "height":0,
+                 "id":587,
+                 "name":"PlantBug",
+                 "point":true,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":1334.50737391513,
+                 "y":1821.28148782146
+                }, 
+                {
+                 "height":0,
+                 "id":588,
+                 "name":"PlantBug",
+                 "point":true,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":1399.29959884814,
+                 "y":2011.65864256289
+                }, 
+                {
+                 "height":0,
+                 "id":589,
+                 "name":"PlantBug",
+                 "point":true,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":1176.12637963444,
+                 "y":1899.67208095029
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -8319,7 +8367,7 @@
          "y":0
         }],
  "nextlayerid":14,
- "nextobjectid":586,
+ "nextobjectid":591,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.0",
