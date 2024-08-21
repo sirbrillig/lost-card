@@ -21,7 +21,7 @@ export class PlantBug extends BaseMonster<AllStates> {
 	initSprites() {
 		this.anims.create({
 			key: "down",
-			frames: this.anims.generateFrameNumbers("monsters1", {
+			frames: this.anims.generateFrameNumbers("monsters3", {
 				start: 48,
 				end: 50,
 			}),
@@ -30,7 +30,7 @@ export class PlantBug extends BaseMonster<AllStates> {
 		});
 		this.anims.create({
 			key: "left",
-			frames: this.anims.generateFrameNumbers("monsters1", {
+			frames: this.anims.generateFrameNumbers("monsters3", {
 				start: 60,
 				end: 62,
 			}),
@@ -39,7 +39,7 @@ export class PlantBug extends BaseMonster<AllStates> {
 		});
 		this.anims.create({
 			key: "right",
-			frames: this.anims.generateFrameNumbers("monsters1", {
+			frames: this.anims.generateFrameNumbers("monsters3", {
 				start: 72,
 				end: 74,
 			}),
@@ -48,7 +48,7 @@ export class PlantBug extends BaseMonster<AllStates> {
 		});
 		this.anims.create({
 			key: "up",
-			frames: this.anims.generateFrameNumbers("monsters1", {
+			frames: this.anims.generateFrameNumbers("monsters3", {
 				start: 84,
 				end: 86,
 			}),
