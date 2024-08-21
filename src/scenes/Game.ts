@@ -55,6 +55,7 @@ export class Game extends Scene {
 
 	framesSincePlayerHit: number = 0;
 	lastAttackedAt: number = 0;
+	lastPowerAt: number = 0;
 	playerDirection: SpriteDirection = SpriteDown;
 	enteredRoomAt: number = 0;
 	isPlayerBeingKnockedBack: boolean = false;
@@ -2305,6 +2306,10 @@ export class Game extends Scene {
 		return this.time.now - this.lastAttackedAt;
 	}
 
+	getTimeSinceLastPower(): number {
+		return this.time.now - this.lastPowerAt;
+	}
+
 	canPlayerAttack(): boolean {
 		return (
 			this.getPlayerHitPoints() > 0 &&
@@ -2342,7 +2347,7 @@ export class Game extends Scene {
 			!this.isPlayerFrozen() &&
 			!this.isPlayerStunned() &&
 			!this.isPlayerAttacking() &&
-			this.getTimeSinceLastAttack() > this.postPowerCooldown &&
+			this.getTimeSinceLastPower() > this.postPowerCooldown &&
 			!this.isPlayerUsingPower()
 		);
 	}
@@ -2413,7 +2418,7 @@ export class Game extends Scene {
 	}
 
 	playPowerAnimation(): void {
-		this.lastAttackedAt = this.time.now;
+		this.lastPowerAt = this.time.now;
 		this.power.setVelocity(0);
 		this.power.setFlipX(false);
 		this.power.setAlpha(1);
