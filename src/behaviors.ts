@@ -304,12 +304,7 @@ export class LeftRightMarch<AllStates extends string>
 			throw new Error("invalid sprite");
 		}
 
-		const previousDirection: SpriteDirection | undefined =
-			sprite.data.get("direction");
-		let direction = Phaser.Math.Between(0, 1) === 1 ? SpriteLeft : SpriteRight;
-		if (previousDirection !== undefined) {
-			direction = invertSpriteDirection(previousDirection);
-		}
+		const direction = getWalkingDirectionLeftRight(sprite);
 		sprite.data.set("direction", direction);
 		switch (direction) {
 			case SpriteRight:
@@ -908,6 +903,20 @@ function getWalkingDirection(
 	if (previousDirection !== undefined) {
 		while (direction === previousDirection) {
 			direction = Phaser.Math.Between(0, 3);
+		}
+	}
+	return direction as SpriteDirection;
+}
+
+function getWalkingDirectionLeftRight(
+	sprite: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody
+): SpriteDirection {
+	const previousDirection: SpriteDirection | undefined =
+		sprite.data.get("direction");
+	let direction = Phaser.Math.Between(0, 1) === 1 ? SpriteLeft : SpriteRight;
+	if (previousDirection !== undefined) {
+		while (direction === previousDirection) {
+			direction = Phaser.Math.Between(0, 1) === 1 ? SpriteLeft : SpriteRight;
 		}
 	}
 	return direction as SpriteDirection;
