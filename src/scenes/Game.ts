@@ -391,14 +391,17 @@ export class Game extends Scene {
 				"SpiritCard",
 				"CloudCard",
 			];
-			for (let x = 0; x < powerOrder.length; x++) {
-				if (this.getActivePower() !== powerOrder[x]) {
-					continue;
-				}
-				const nextPower = powerOrder[x + 1] ?? powerOrder[0];
-				this.setActivePower(nextPower);
-				break;
+			const available = powerOrder.filter((power) =>
+				this.isPowerEquipped(power)
+			);
+			console.log("avail", available);
+			const active = this.getActivePower();
+			if (!active) {
+				return;
 			}
+			const current = available.indexOf(active);
+			const nextPower = available[current + 1] ?? available[0];
+			this.setActivePower(nextPower);
 		});
 		this.input.keyboard.on("keydown-X", () => {
 			// Use Potion
