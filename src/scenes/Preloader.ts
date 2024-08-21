@@ -136,6 +136,10 @@ export class Preloader extends Scene {
 			frameWidth: 32,
 			frameHeight: 32,
 		});
+		this.load.spritesheet("green-ball", "green_ball.png", {
+			frameWidth: 32,
+			frameHeight: 32,
+		});
 		this.load.spritesheet("plant-power", "vine_right.png", {
 			frameWidth: 32,
 			frameHeight: 32,

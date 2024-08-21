@@ -566,6 +566,61 @@ export class IceAttack<AllStates extends string>
 	update(): void {}
 }
 
+export class SeekingVine<AllStates extends string>
+	implements Behavior<AllStates, Phaser.GameObjects.Sprite>
+{
+	#nextState: AllStates;
+	#speed = 50;
+	#postAttackTime = 1000;
+	name: AllStates;
+	#effect: Phaser.GameObjects.Sprite;
+
+	constructor(
+		name: AllStates,
+		nextState: AllStates,
+		speed: number,
+		postAttackTime: number
+	) {
+		this.name = name;
+		this.#nextState = nextState;
+		this.#speed = speed;
+		this.#postAttackTime = postAttackTime;
+	}
+
+	init(
+		sprite: Phaser.GameObjects.Sprite,
+		stateMachine: BehaviorMachineInterface<AllStates>,
+		enemyManager: EnemyManager
+	): void {
+		if (!sprite.body || !isDynamicSprite(sprite)) {
+			throw new Error("Could not update monster");
+		}
+		this.#effect = new Seeker(
+			sprite.scene,
+			enemyManager,
+			sprite.body.center.x,
+			sprite.body.center.y,
+			"green-ball",
+			0,
+			this.#speed
+		);
+
+		sprite.once(Events.MonsterDying, () => {
+			this.#effect?.destroy();
+		});
+
+		sprite.scene.time.addEvent({
+			delay: this.#postAttackTime,
+			callback: () => {
+				stateMachine.popState();
+				stateMachine.pushState(this.#nextState);
+			},
+		});
+	}
+
+	update(): void {}
+}
+
 export class RangedFireBall<AllStates extends string>
 	implements Behavior<AllStates, Phaser.GameObjects.Sprite>
 {
@@ -627,8 +682,6 @@ export class RangedFireBall<AllStates extends string>
 		sprite.scene.physics.add.overlap(enemyManager.player, effect, () => {
 			MainEvents.emit(Events.EnemyHitPlayer, true);
 			effect.destroy();
-			stateMachine.popState();
-			stateMachine.pushState(this.#nextState);
 		});
 
 		sprite.once(Events.MonsterDying, () => {
@@ -1094,4 +1147,98 @@ function getWalkingDirectionLeftRight(
 		}
 	}
 	return direction as SpriteDirection;
+}
+
+class Seeker extends Phaser.Physics.Arcade.Sprite {
+	#speed = 50;
+	#enemyManager: EnemyManager;
+	#beingDestroyed = false;
+
+	constructor(
+		scene: Phaser.Scene,
+		enemyManager: EnemyManager,
+		x: number,
+		y: number,
+		texture: string,
+		initialFrame: number,
+		speed: number
+	) {
+		super(scene, x, y, texture, initialFrame);
+		this.#speed = speed;
+		this.#enemyManager = enemyManager;
+		this.init();
+		this.addToDisplayList();
+		this.addToUpdateList();
+	}
+
+	init(): void {
+		this.scene.anims.create({
+			key: "green-ball",
+			frames: this.anims.generateFrameNumbers("green-ball"),
+			frameRate: 50,
+			showOnStart: true,
+			hideOnComplete: true,
+			yoyo: true,
+		});
+		this.scene.physics.add.existing(this);
+		this.setDepth(5);
+		this.anims.play(
+			{
+				key: "green-ball",
+				repeat: -1,
+			},
+			true
+		);
+		if (!isDynamicSprite(this)) {
+			throw new Error("Could not update plant ball");
+		}
+		this.setDisplaySize(this.body.width * 0.8, this.body.height * 0.8);
+		this.body.setSize(this.body.width * 0.5, this.body.height * 0.5);
+
+		this.scene.physics.add.overlap(this.#enemyManager.player, this, () => {
+			MainEvents.emit(Events.EnemyHitPlayer, true);
+			this.destroy();
+		});
+
+		this.scene.physics.add.overlap(this.#enemyManager.sword, this, () => {
+			if (!this.#enemyManager.sword.data.get("attackActive")) {
+				return;
+			}
+			this.body.stop();
+			this.#beingDestroyed = true;
+			this.setVisible(false);
+
+			this.scene.anims.create({
+				key: "fire-power",
+				frames: this.anims.generateFrameNumbers("fire-power"),
+				frameRate: 50,
+				showOnStart: true,
+				hideOnComplete: true,
+			});
+			const effect = this.scene.add.sprite(
+				this.body.center.x,
+				this.body.center.y,
+				"fire-power",
+				0
+			);
+			effect.setDepth(5);
+			effect.anims.play("fire-power", true);
+			effect.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
+				effect.destroy();
+				this.destroy();
+			});
+		});
+	}
+
+	preUpdate(time: number, delta: number): void {
+		super.preUpdate(time, delta);
+		if (this.#beingDestroyed) {
+			return;
+		}
+		this.scene?.physics.moveToObject(
+			this,
+			this.#enemyManager.player,
+			this.#speed
+		);
+	}
 }

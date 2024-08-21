@@ -10,6 +10,7 @@ import { WaterDipper } from "../WaterDipper";
 import { MountainBoss } from "../MountainBoss";
 import { PlantSpitter } from "../PlantSpitter";
 import { IceBoss } from "../IceBoss";
+import { PlantBoss } from "../PlantBoss";
 import { FireBoss } from "../FireBoss";
 import {
 	Powers,
@@ -130,7 +131,12 @@ export class Game extends Scene {
 		this.attackSprite.setDepth(4);
 		this.attackSprite.setVisible(false);
 
-		this.enemyManager = new EnemyManager(this, this.player, this.map);
+		this.enemyManager = new EnemyManager(
+			this,
+			this.player,
+			this.sword,
+			this.map
+		);
 		this.createEnemies();
 
 		this.landLayer = this.createTileLayer("Background", tilesetTile, 0);
@@ -493,6 +499,7 @@ export class Game extends Scene {
 	activateAttack() {
 		console.log("attack beginning");
 		this.player.body.setVelocity(0);
+		this.sword.data.set("attackActive", true);
 		this.updateSwordHitbox();
 
 		this.sword.setRotation(Phaser.Math.DegToRad(0));
@@ -522,6 +529,7 @@ export class Game extends Scene {
 
 		this.attackSprite.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
 			console.log("attack complete");
+			this.sword.data.set("attackActive", false);
 			this.attackSprite.setVisible(false);
 			this.player.setVisible(true);
 			this.lastAttackedAt = this.time.now;
@@ -1045,6 +1053,15 @@ export class Game extends Scene {
 						this.player.data.set("isPlantCardGrappleActive", false);
 						this.power.anims.stop();
 						this.power.visible = false;
+					}
+					if (tile.name === "TutorialSign") {
+						this.scene.launch("Dialog", {
+							heading: "The door is shut",
+							text: "The cards have been lost\r\nPress SPACE to continue",
+						});
+						this.input.keyboard?.once("keydown-SPACE", () => {
+							this.scene.get("Dialog")?.scene.stop();
+						});
 					}
 				});
 				this.physics.add.collider(
@@ -1871,6 +1888,7 @@ export class Game extends Scene {
 			"character-power-right",
 			4
 		);
+		this.sword.setDataEnabled();
 		this.sword.setDebugBodyColor(0x00fff0);
 		this.sword.setDepth(4);
 		this.sword.setPushable(false);
@@ -2037,6 +2055,15 @@ export class Game extends Scene {
 				}
 				case "IceBoss": {
 					const boss = new IceBoss(this, this.enemyManager, point.x, point.y);
+					boss.once(Events.MonsterDefeated, () => {
+						this.showHiddenItem("Heart");
+						this.showHiddenItem("Key");
+					});
+					this.enemyManager.enemies.add(boss);
+					break;
+				}
+				case "PlantBoss": {
+					const boss = new PlantBoss(this, this.enemyManager, point.x, point.y);
 					boss.once(Events.MonsterDefeated, () => {
 						this.showHiddenItem("Heart");
 						this.showHiddenItem("Key");
