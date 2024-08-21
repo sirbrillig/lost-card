@@ -60,6 +60,7 @@ export class Game extends Scene {
 	characterSpeed: number = 90;
 	cloudCardSpeed: number = 450;
 	postAttackCooldown: number = 150;
+	postPowerCooldown: number = 600;
 	postHitPlayerKnockback: number = 120;
 	postHitEnemyKnockback: number = 50;
 	postHitInvincibilityTime: number = 600;
@@ -381,6 +382,7 @@ export class Game extends Scene {
 		this.input.keyboard.on("keydown-SHIFT", () => {
 			// Power
 			if (this.canPlayerUsePower()) {
+				console.log("using power");
 				this.activatePower();
 			}
 		});
@@ -2282,7 +2284,7 @@ export class Game extends Scene {
 			!this.isPlayerFrozen() &&
 			!this.isPlayerStunned() &&
 			!this.isPlayerAttacking() &&
-			this.getTimeSinceLastAttack() > this.postAttackCooldown &&
+			this.getTimeSinceLastAttack() > this.postPowerCooldown &&
 			!this.isPlayerUsingPower()
 		);
 	}
@@ -2353,6 +2355,7 @@ export class Game extends Scene {
 	}
 
 	playPowerAnimation(): void {
+		this.lastAttackedAt = this.time.now;
 		this.power.setVelocity(0);
 		this.power.setFlipX(false);
 		this.power.setAlpha(1);
