@@ -113,16 +113,16 @@ export class FireBoss extends BaseMonster<AllStates> {
 				return new Roar(state, "walk");
 			case "walk":
 				return new RandomlyWalk(state, "attack1", {
-					speed: 50,
+					speed: 60,
 					minWalkTime: 2000,
 					maxWalkTime: 5000,
 				});
 			case "attack1":
-				return new RangedFireBall(state, "attack2", 130, 400);
+				return new RangedFireBall(state, "attack2", 130, 350);
 			case "attack2":
-				return new RangedFireBall(state, "attack3", 130, 400);
+				return new RangedFireBall(state, "attack3", 130, 350);
 			case "attack3":
-				return new RangedFireBall(state, "walk", 130, 400);
+				return new RangedFireBall(state, "walk", 130, 350);
 		}
 	}
 
