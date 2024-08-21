@@ -2604,8 +2604,8 @@
                  "type":"",
                  "visible":true,
                  "width":0,
-                 "x":2852.28113680616,
-                 "y":2292.86271431274
+                 "x":2852.28,
+                 "y":2292.86
                 }],
          "opacity":1,
          "properties":[
@@ -3328,7 +3328,7 @@
                 {
                  "height":0,
                  "id":45,
-                 "name":"MonsterA",
+                 "name":"MountainMonster",
                  "point":true,
                  "properties":[
                         {
@@ -3346,7 +3346,7 @@
                 {
                  "height":0,
                  "id":46,
-                 "name":"MonsterA",
+                 "name":"MountainMonster",
                  "point":true,
                  "properties":[
                         {
@@ -3387,7 +3387,7 @@
                 {
                  "height":0,
                  "id":62,
-                 "name":"MonsterA",
+                 "name":"MountainMonster",
                  "point":true,
                  "properties":[
                         {
@@ -3405,7 +3405,7 @@
                 {
                  "height":0,
                  "id":321,
-                 "name":"MonsterA",
+                 "name":"MountainMonster",
                  "point":true,
                  "properties":[
                         {
@@ -3423,7 +3423,7 @@
                 {
                  "height":0,
                  "id":335,
-                 "name":"MonsterA",
+                 "name":"MountainMonster",
                  "point":true,
                  "properties":[
                         {
@@ -3441,7 +3441,7 @@
                 {
                  "height":0,
                  "id":103,
-                 "name":"MonsterA",
+                 "name":"MountainMonster",
                  "point":true,
                  "properties":[
                         {
@@ -3459,7 +3459,7 @@
                 {
                  "height":0,
                  "id":104,
-                 "name":"MonsterA",
+                 "name":"MountainMonster",
                  "point":true,
                  "properties":[
                         {
@@ -3477,7 +3477,7 @@
                 {
                  "height":0,
                  "id":322,
-                 "name":"MonsterA",
+                 "name":"MountainMonster",
                  "point":true,
                  "properties":[
                         {
@@ -3495,7 +3495,7 @@
                 {
                  "height":0,
                  "id":326,
-                 "name":"MonsterA",
+                 "name":"MountainMonster",
                  "point":true,
                  "properties":[
                         {
@@ -3513,7 +3513,7 @@
                 {
                  "height":0,
                  "id":328,
-                 "name":"MonsterA",
+                 "name":"MountainMonster",
                  "point":true,
                  "properties":[
                         {
@@ -3531,7 +3531,7 @@
                 {
                  "height":0,
                  "id":106,
-                 "name":"MonsterA",
+                 "name":"MountainMonster",
                  "point":true,
                  "properties":[
                         {
@@ -3681,7 +3681,7 @@
                 {
                  "height":0,
                  "id":314,
-                 "name":"MonsterA",
+                 "name":"MountainMonster",
                  "point":true,
                  "rotation":0,
                  "type":"",
@@ -3747,8 +3747,8 @@
                  "type":"",
                  "visible":true,
                  "width":0,
-                 "x":3053.6254532946,
-                 "y":2156.18897722061
+                 "x":3053.63,
+                 "y":2156.19
                 }, 
                 {
                  "height":0,
@@ -3759,8 +3759,8 @@
                  "type":"",
                  "visible":true,
                  "width":0,
-                 "x":2968.77604188962,
-                 "y":2157.33559088824
+                 "x":2968.78,
+                 "y":2157.34
                 }, 
                 {
                  "height":0,
@@ -3771,8 +3771,8 @@
                  "type":"",
                  "visible":true,
                  "width":0,
-                 "x":2968.77604188962,
-                 "y":2157.33559088824
+                 "x":2968.78,
+                 "y":2157.34
                 }, 
                 {
                  "height":0,
@@ -3783,8 +3783,8 @@
                  "type":"",
                  "visible":true,
                  "width":0,
-                 "x":2886.98426693166,
-                 "y":2156.18897722061
+                 "x":2886.98,
+                 "y":2156.19
                 }, 
                 {
                  "height":0,
@@ -3795,8 +3795,8 @@
                  "type":"",
                  "visible":true,
                  "width":0,
-                 "x":2806.72131019722,
-                 "y":2156.18897722061
+                 "x":2806.72,
+                 "y":2156.19
                 }, 
                 {
                  "height":0,
@@ -3879,8 +3879,20 @@
                  "type":"",
                  "visible":true,
                  "width":0,
-                 "x":2729.36198875425,
-                 "y":2609.73318697399
+                 "x":2729.36,
+                 "y":2609.73
+                }, 
+                {
+                 "height":0,
+                 "id":585,
+                 "name":"PlantBug",
+                 "point":true,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":1479.29,
+                 "y":1833.68
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -3974,8 +3986,8 @@
                  "type":"",
                  "visible":true,
                  "width":16,
-                 "x":1297.70894009217,
-                 "y":975.803488698705
+                 "x":1297.71,
+                 "y":975.803
                 }, 
                 {
                  "gid":2818,
@@ -8307,7 +8319,7 @@
          "y":0
         }],
  "nextlayerid":14,
- "nextobjectid":585,
+ "nextobjectid":586,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.0",

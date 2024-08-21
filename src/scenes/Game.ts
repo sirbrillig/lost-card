@@ -1,7 +1,7 @@
 import { Scene } from "phaser";
 import { MainEvents } from "../MainEvents";
 import { EnemyManager } from "../EnemyManager";
-import { MonsterA } from "../MonsterA";
+import { MountainMonster } from "../MountainMonster";
 import { IceMonster } from "../IceMonster";
 import { FireMonster } from "../FireMonster";
 import { FireSpout } from "../FireSpout";
@@ -1936,8 +1936,8 @@ export class Game extends Scene {
 			console.log("creating monster at", point.x, point.y);
 			const enemyType = point.name;
 			switch (enemyType) {
-				case "MonsterA": {
-					const monster = new MonsterA(
+				case "MountainMonster": {
+					const monster = new MountainMonster(
 						this,
 						this.enemyManager,
 						point.x,

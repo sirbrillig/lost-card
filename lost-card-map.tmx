@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.0" orientation="orthogonal" renderorder="right-down" width="200" height="200" tilewidth="16" tileheight="16" infinite="0" nextlayerid="14" nextobjectid="585">
+<map version="1.10" tiledversion="1.11.0" orientation="orthogonal" renderorder="right-down" width="200" height="200" tilewidth="16" tileheight="16" infinite="0" nextlayerid="14" nextobjectid="586">
  <editorsettings>
   <export target="public/assets/lost-card-map.json" format="json"/>
  </editorsettings>
@@ -8113,13 +8113,13 @@
   <object id="516" name="SKCliff" x="1728" y="1280" width="352" height="80"/>
  </objectgroup>
  <objectgroup id="12" name="Creatures">
-  <object id="45" name="MonsterA" x="1391.67" y="1008.53">
+  <object id="45" name="MountainMonster" x="1391.67" y="1008.53">
    <properties>
     <property name="isMonster" type="bool" value="true"/>
    </properties>
    <point/>
   </object>
-  <object id="46" name="MonsterA" x="1391.88" y="1031.13">
+  <object id="46" name="MountainMonster" x="1391.88" y="1031.13">
    <properties>
     <property name="isMonster" type="bool" value="true"/>
    </properties>
@@ -8132,55 +8132,55 @@
    </properties>
    <point/>
   </object>
-  <object id="62" name="MonsterA" x="1366.85" y="803.438">
+  <object id="62" name="MountainMonster" x="1366.85" y="803.438">
    <properties>
     <property name="isMonster" type="bool" value="true"/>
    </properties>
    <point/>
   </object>
-  <object id="321" name="MonsterA" x="1399.34" y="664.769">
+  <object id="321" name="MountainMonster" x="1399.34" y="664.769">
    <properties>
     <property name="isMonster" type="bool" value="true"/>
    </properties>
    <point/>
   </object>
-  <object id="335" name="MonsterA" x="1418.57" y="684.896">
+  <object id="335" name="MountainMonster" x="1418.57" y="684.896">
    <properties>
     <property name="isMonster" type="bool" value="true"/>
    </properties>
    <point/>
   </object>
-  <object id="103" name="MonsterA" x="1281.42" y="1120">
+  <object id="103" name="MountainMonster" x="1281.42" y="1120">
    <properties>
     <property name="isMonster" type="bool" value="true"/>
    </properties>
    <point/>
   </object>
-  <object id="104" name="MonsterA" x="1317" y="1197.75">
+  <object id="104" name="MountainMonster" x="1317" y="1197.75">
    <properties>
     <property name="isMonster" type="bool" value="true"/>
    </properties>
    <point/>
   </object>
-  <object id="322" name="MonsterA" x="1431.45" y="1130.87">
+  <object id="322" name="MountainMonster" x="1431.45" y="1130.87">
    <properties>
     <property name="isMonster" type="bool" value="true"/>
    </properties>
    <point/>
   </object>
-  <object id="326" name="MonsterA" x="1431.09" y="1210.63">
+  <object id="326" name="MountainMonster" x="1431.09" y="1210.63">
    <properties>
     <property name="isMonster" type="bool" value="true"/>
    </properties>
    <point/>
   </object>
-  <object id="328" name="MonsterA" x="1385.67" y="1227.43">
+  <object id="328" name="MountainMonster" x="1385.67" y="1227.43">
    <properties>
     <property name="isMonster" type="bool" value="true"/>
    </properties>
    <point/>
   </object>
-  <object id="106" name="MonsterA" x="1260.63" y="1230.61">
+  <object id="106" name="MountainMonster" x="1260.63" y="1230.61">
    <properties>
     <property name="isMonster" type="bool" value="true"/>
    </properties>
@@ -8219,7 +8219,7 @@
   <object id="311" name="IceMonster" x="1904.34" y="2042.61">
    <point/>
   </object>
-  <object id="314" name="MonsterA" x="1193.2" y="1448.94">
+  <object id="314" name="MountainMonster" x="1193.2" y="1448.94">
    <point/>
   </object>
   <object id="350" name="WaterDipper" x="2214.76" y="2056.11">
@@ -8268,6 +8268,9 @@
    <point/>
   </object>
   <object id="584" name="FireBoss" x="2729.36" y="2609.73">
+   <point/>
+  </object>
+  <object id="585" name="PlantBug" x="1479.29" y="1833.68">
    <point/>
   </object>
  </objectgroup>

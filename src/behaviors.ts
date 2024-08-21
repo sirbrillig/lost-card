@@ -15,7 +15,7 @@ import {
 import { EnemyManager } from "./EnemyManager";
 import { Behavior, BehaviorMachineInterface } from "./behavior";
 import { MainEvents } from "./MainEvents";
-import { MonsterA } from "./MonsterA";
+import { MountainMonster } from "./MountainMonster";
 
 export class WaitForActive<AllStates extends string>
 	implements Behavior<AllStates, Phaser.GameObjects.Sprite>
@@ -169,7 +169,7 @@ export class SpawnEnemies<AllStates extends string>
 
 		sprite.data.set("spawnedEnemyCount", spawnedEnemyCount + 1);
 
-		const monster = new MonsterA(
+		const monster = new MountainMonster(
 			sprite.scene,
 			enemyManager,
 			sprite.body.x + 5,

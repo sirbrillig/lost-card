@@ -4,7 +4,7 @@ import { BaseMonster } from "./BaseMonster";
 
 type AllStates = "randomwalk1" | "randomwalk2";
 
-export class MonsterA extends BaseMonster<AllStates> {
+export class MountainMonster extends BaseMonster<AllStates> {
 	constructor(
 		scene: Phaser.Scene,
 		enemyManager: EnemyManager,
