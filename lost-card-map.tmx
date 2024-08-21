@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.0" orientation="orthogonal" renderorder="right-down" width="200" height="200" tilewidth="16" tileheight="16" infinite="0" nextlayerid="14" nextobjectid="578">
+<map version="1.10" tiledversion="1.11.0" orientation="orthogonal" renderorder="right-down" width="200" height="200" tilewidth="16" tileheight="16" infinite="0" nextlayerid="14" nextobjectid="579">
  <editorsettings>
   <export target="public/assets/lost-card-map.json" format="json"/>
  </editorsettings>
@@ -8266,8 +8266,8 @@
     <property name="hidden" type="bool" value="true"/>
    </properties>
   </object>
-  <object id="359" name="Heart" gid="2628" x="1777.66" y="2403.28" width="16" height="16"/>
   <object id="374" name="Potion" gid="2791" x="1470.52" y="381.114" width="16" height="16"/>
+  <object id="578" name="Potion" gid="2791" x="1297.71" y="975.803" width="16" height="16"/>
   <object id="375" name="Heart" gid="2818" x="1474.44" y="130.818" width="16" height="16">
    <properties>
     <property name="hidden" type="bool" value="true"/>

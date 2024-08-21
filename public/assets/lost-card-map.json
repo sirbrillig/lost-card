@@ -3882,18 +3882,6 @@
                  "y":2063.7
                 }, 
                 {
-                 "gid":2628,
-                 "height":16,
-                 "id":359,
-                 "name":"Heart",
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":16,
-                 "x":1777.66,
-                 "y":2403.28
-                }, 
-                {
                  "gid":2791,
                  "height":16,
                  "id":374,
@@ -3904,6 +3892,18 @@
                  "width":16,
                  "x":1470.52,
                  "y":381.114
+                }, 
+                {
+                 "gid":2791,
+                 "height":16,
+                 "id":578,
+                 "name":"Potion",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":16,
+                 "x":1297.70894009217,
+                 "y":975.803488698705
                 }, 
                 {
                  "gid":2818,
@@ -8223,7 +8223,7 @@
          "y":0
         }],
  "nextlayerid":14,
- "nextobjectid":578,
+ "nextobjectid":579,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.0",

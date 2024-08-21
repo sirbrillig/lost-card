@@ -69,7 +69,7 @@ export class Game extends Scene {
 	windCardPushTime: number = 100;
 	knockBackSpeed: number = 180;
 	distanceToActivateTransient: number = 30;
-	playerInitialHitPoints: number = 4;
+	playerInitialHitPoints: number = 3;
 	saveCooldown: number = 30000;
 	preGameOverTime: number = 2500;
 	roomTransitionFadeTime: number = 300;
