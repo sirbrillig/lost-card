@@ -1,4 +1,5 @@
 import { WaitForActive, FollowPlayer } from "./behaviors";
+import { isTileWithPropertiesObject } from "./shared";
 import { EnemyManager } from "./EnemyManager";
 import { BaseMonster } from "./BaseMonster";
 
@@ -59,6 +60,18 @@ export class SkyBlob extends BaseMonster<AllStates> {
 			frameRate: 10,
 			repeat: -1,
 		});
+	}
+
+	doesCollideWithTile(
+		tile: Phaser.Tilemaps.Tile | Phaser.Types.Physics.Arcade.GameObjectWithBody
+	) {
+		if (!isTileWithPropertiesObject(tile)) {
+			return true;
+		}
+		if (tile.properties.isSky) {
+			return false;
+		}
+		return true;
 	}
 
 	constructNewBehaviorFor(state: string) {
