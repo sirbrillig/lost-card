@@ -387,6 +387,9 @@ export class Game extends Scene {
 			}
 		});
 		this.input.keyboard.on("keydown-H", () => {
+			if (this.getPlayerHitPoints() <= 0) {
+				return;
+			}
 			// Cheat: restore all HP
 			this.setPlayerHitPoints(
 				this.registry.get("playerTotalHitPoints") ?? this.playerInitialHitPoints
@@ -424,6 +427,9 @@ export class Game extends Scene {
 			}
 		});
 		this.input.keyboard.on("keydown-X", () => {
+			if (this.getPlayerHitPoints() <= 0) {
+				return;
+			}
 			// Use Potion
 			const totalHitPoints =
 				this.registry.get("playerTotalHitPoints") ??
