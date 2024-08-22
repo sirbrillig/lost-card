@@ -41,7 +41,6 @@ import {
 	SaveData,
 	isEnemy,
 	isTileWithPropertiesObject,
-	powerOrder,
 	getPowerEquippedKey,
 } from "../shared";
 
@@ -411,20 +410,6 @@ export class Game extends Scene {
 				this.activatePower();
 			}
 		});
-		this.input.keyboard.on("keydown-Z", () => {
-			// Rotate Active Power
-			const available = powerOrder.filter((power) =>
-				this.isPowerEquipped(power)
-			);
-			console.log("avail", available);
-			const active = this.getActivePower();
-			if (!active) {
-				return;
-			}
-			const current = available.indexOf(active);
-			const nextPower = available[current + 1] ?? available[0];
-			this.setActivePower(nextPower);
-		});
 		this.input.keyboard.on("keydown-X", () => {
 			// Use Potion
 			const totalHitPoints =
@@ -439,10 +424,6 @@ export class Game extends Scene {
 				this.setPlayerHitPoints(totalHitPoints);
 			}
 		});
-	}
-
-	isPowerEquipped(power: Powers): boolean {
-		return this.registry.get(getPowerEquippedKey(power));
 	}
 
 	freezeWaterTile(tile: Phaser.Tilemaps.Tile) {

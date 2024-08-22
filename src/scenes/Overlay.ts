@@ -223,6 +223,31 @@ export class Overlay extends Scene {
 				});
 			}
 		});
+		this.input.keyboard.on("keydown-Z", () => {
+			// Rotate Active Power
+			const available = powerOrder.filter((power) =>
+				this.isPowerEquipped(power)
+			);
+			const active = this.getActivePower();
+			if (!active) {
+				return;
+			}
+			const current = available.indexOf(active);
+			const nextPower = available[current + 1] ?? available[0];
+			this.setActivePower(nextPower);
+		});
+	}
+
+	setActivePower(power: Powers): void {
+		this.registry.set(DataKeys.ActivePower, power);
+	}
+
+	isPowerEquipped(power: Powers): boolean {
+		return this.registry.get(getPowerEquippedKey(power));
+	}
+
+	getActivePower(): Powers | undefined {
+		return this.registry.get(DataKeys.ActivePower);
 	}
 
 	updateSelectedItem() {
