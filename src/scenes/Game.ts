@@ -2,6 +2,7 @@ import { Scene } from "phaser";
 import { MainEvents } from "../MainEvents";
 import { EnemyManager } from "../EnemyManager";
 import { MountainMonster } from "../MountainMonster";
+import { Ghost } from "../Ghost";
 import { CloudGoblin } from "../CloudGoblin";
 import { SkyBlob } from "../SkyBlob";
 import { PlantBug } from "../PlantBug";
@@ -1979,6 +1980,11 @@ export class Game extends Scene {
 						point.x,
 						point.y
 					);
+					this.enemyManager.enemies.add(monster);
+					break;
+				}
+				case "Ghost": {
+					const monster = new Ghost(this, this.enemyManager, point.x, point.y);
 					this.enemyManager.enemies.add(monster);
 					break;
 				}
