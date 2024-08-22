@@ -189,6 +189,10 @@ export class Preloader extends Scene {
 			frameWidth: 32,
 			frameHeight: 32,
 		});
+		this.load.spritesheet("slash-effect", "slash_effect.png", {
+			frameWidth: 32,
+			frameHeight: 32,
+		});
 		this.load.spritesheet("ice_attack", "ice_attack.png", {
 			frameWidth: 32,
 			frameHeight: 32,
@@ -206,6 +210,10 @@ export class Preloader extends Scene {
 			frameHeight: 32,
 		});
 		this.load.spritesheet("monsters3", "Monsters3.png", {
+			frameWidth: 32,
+			frameHeight: 32,
+		});
+		this.load.spritesheet("monsters4", "Monsters4.png", {
 			frameWidth: 32,
 			frameHeight: 32,
 		});

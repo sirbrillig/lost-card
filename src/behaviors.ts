@@ -504,6 +504,62 @@ export class PowerUp<AllStates extends string>
 	update(): void {}
 }
 
+export class BigSwing<AllStates extends string>
+	implements Behavior<AllStates, Phaser.GameObjects.Sprite>
+{
+	#nextState: AllStates;
+	name: AllStates;
+
+	constructor(name: AllStates, nextState: AllStates) {
+		this.name = name;
+		this.#nextState = nextState;
+	}
+
+	init(
+		sprite: Phaser.GameObjects.Sprite,
+		stateMachine: BehaviorMachineInterface<AllStates>,
+		enemyManager: EnemyManager
+	): void {
+		if (!sprite.body || !isDynamicSprite(sprite)) {
+			throw new Error("Could not update monster");
+		}
+		sprite.scene.anims.create({
+			key: "slash-effect",
+			frames: sprite.anims.generateFrameNumbers("slash-effect"),
+			frameRate: 24,
+			showOnStart: true,
+			hideOnComplete: true,
+			yoyo: true,
+		});
+		const effect = sprite.scene.add.sprite(
+			sprite.body.center.x,
+			sprite.body.center.y,
+			"slash-effect",
+			0
+		);
+		sprite.scene.physics.add.existing(effect);
+		effect.setSize(sprite.body.width * 4, sprite.body.height * 4);
+		effect.setDisplaySize(sprite.body.width * 4, sprite.body.height * 4);
+		effect.setDepth(5);
+		effect.anims.play("slash-effect", true);
+
+		sprite.scene.physics.add.overlap(enemyManager.player, effect, () => {
+			MainEvents.emit(Events.EnemyHitPlayer, true);
+		});
+
+		sprite.once(Events.MonsterDying, () => {
+			effect?.destroy();
+		});
+		effect.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
+			effect.destroy();
+			stateMachine.popState();
+			stateMachine.pushState(this.#nextState);
+		});
+	}
+
+	update(): void {}
+}
+
 export class IceAttack<AllStates extends string>
 	implements Behavior<AllStates, Phaser.GameObjects.Sprite>
 {

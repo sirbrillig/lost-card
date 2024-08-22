@@ -2594,6 +2594,18 @@
                  "width":0,
                  "x":1935.89,
                  "y":1107.99
+                }, 
+                {
+                 "height":0,
+                 "id":632,
+                 "name":"Temp Start",
+                 "point":true,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":950.103730792222,
+                 "y":1435.00123070431
                 }],
          "opacity":1,
          "properties":[
@@ -4037,6 +4049,18 @@
                  "width":0,
                  "x":1039.18076580588,
                  "y":2554.76402493321
+                }, 
+                {
+                 "height":0,
+                 "id":631,
+                 "name":"CloudGoblin",
+                 "point":true,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":950.806990400506,
+                 "y":1512.00815781146
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -8955,7 +8979,7 @@
          "y":0
         }],
  "nextlayerid":14,
- "nextobjectid":631,
+ "nextobjectid":633,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.0",
