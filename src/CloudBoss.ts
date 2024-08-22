@@ -129,9 +129,10 @@ export class CloudBoss extends BaseMonster<AllStates> {
 	}
 
 	kill() {
+		this.body?.stop();
+		this.stateMachine.empty();
+		this.data.set(DataKeys.Stunned, true);
 		this.emit(Events.MonsterDying);
-		this.setVelocity(0);
-		this.data.set("stunned", true);
 		this.setOrigin(0.5, 0.3);
 		this.setDisplaySize(this.width * 2, this.height * 2);
 		this.anims.play("explode-boss", true);
