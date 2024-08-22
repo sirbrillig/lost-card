@@ -3,6 +3,7 @@ import { MainEvents } from "../MainEvents";
 import { EnemyManager } from "../EnemyManager";
 import { MountainMonster } from "../MountainMonster";
 import { Ghost } from "../Ghost";
+import { Skeleton } from "../Skeleton";
 import { CloudGoblin } from "../CloudGoblin";
 import { SkyBlob } from "../SkyBlob";
 import { PlantBug } from "../PlantBug";
@@ -1982,6 +1983,16 @@ export class Game extends Scene {
 			switch (enemyType) {
 				case "MountainMonster": {
 					const monster = new MountainMonster(
+						this,
+						this.enemyManager,
+						point.x,
+						point.y
+					);
+					this.enemyManager.enemies.add(monster);
+					break;
+				}
+				case "Skeleton": {
+					const monster = new Skeleton(
 						this,
 						this.enemyManager,
 						point.x,
