@@ -35,6 +35,7 @@ export const DataKeys = {
 	PotionCount: "potionCount",
 	KeyCount: "keyCount",
 	SwordAttackAcive: "attackActive",
+	DefeatedBosses: "DefeatedBosses",
 };
 
 export type Powers =

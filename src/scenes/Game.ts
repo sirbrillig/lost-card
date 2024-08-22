@@ -2055,6 +2055,9 @@ export class Game extends Scene {
 					break;
 				}
 				case "MountainBoss": {
+					if (this.wasBossDefeated("MountainBoss")) {
+						break;
+					}
 					const boss = new MountainBoss(
 						this,
 						this.enemyManager,
@@ -2062,6 +2065,7 @@ export class Game extends Scene {
 						point.y
 					);
 					boss.once(Events.MonsterDefeated, () => {
+						this.markBossDefeated("MountainBoss");
 						this.showHiddenItem("WindCard");
 						this.showHiddenItem("Heart");
 						this.showHiddenItem("Key");
@@ -2070,8 +2074,12 @@ export class Game extends Scene {
 					break;
 				}
 				case "IceBoss": {
+					if (this.wasBossDefeated("IceBoss")) {
+						break;
+					}
 					const boss = new IceBoss(this, this.enemyManager, point.x, point.y);
 					boss.once(Events.MonsterDefeated, () => {
+						this.markBossDefeated("IceBoss");
 						this.showHiddenItem("Heart");
 						this.showHiddenItem("Key");
 					});
@@ -2079,8 +2087,12 @@ export class Game extends Scene {
 					break;
 				}
 				case "PlantBoss": {
+					if (this.wasBossDefeated("PlantBoss")) {
+						break;
+					}
 					const boss = new PlantBoss(this, this.enemyManager, point.x, point.y);
 					boss.once(Events.MonsterDefeated, () => {
+						this.markBossDefeated("PlantBoss");
 						this.showHiddenItem("Heart");
 						this.showHiddenItem("Key");
 					});
@@ -2088,8 +2100,12 @@ export class Game extends Scene {
 					break;
 				}
 				case "FireBoss": {
+					if (this.wasBossDefeated("FireBoss")) {
+						break;
+					}
 					const boss = new FireBoss(this, this.enemyManager, point.x, point.y);
 					boss.once(Events.MonsterDefeated, () => {
+						this.markBossDefeated("FireBoss");
 						this.showHiddenItem("Heart");
 						this.showHiddenItem("Key");
 					});
@@ -2105,6 +2121,17 @@ export class Game extends Scene {
 
 		// It seems that we may need to do this again when enemies changes?
 		this.physics.add.collider(this.createdDoors, this.enemyManager.enemies);
+	}
+
+	wasBossDefeated(name: string) {
+		const defeated = this.registry.get(DataKeys.DefeatedBosses) ?? [];
+		return defeated.includes(name);
+	}
+
+	markBossDefeated(name: string) {
+		const defeated = this.registry.get(DataKeys.DefeatedBosses) ?? [];
+		defeated.push(name);
+		this.registry.set(DataKeys.DefeatedBosses, defeated);
 	}
 
 	playerHitEnemy(
