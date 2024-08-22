@@ -560,12 +560,22 @@ export class Game extends Scene {
 		};
 	}
 
+	getTilesetKeyByName(name: string): string | undefined {
+		switch (name) {
+			case "Icons":
+				return "icons4";
+			case "Cards":
+				return "cards";
+		}
+	}
+
 	createSavePoints() {
 		this.createdSavePoints = createSpritesFromObjectLayer(
 			this.map,
 			"SavePoints",
-			this.shouldCreateLayerObject.bind(this),
-			this.recordObjectIdOnSprite
+			{
+				getTilesetKeyByName: this.getTilesetKeyByName.bind(this),
+			}
 		).map((item) => {
 			item.body.pushable = false;
 			return item;
@@ -576,7 +586,9 @@ export class Game extends Scene {
 		this.createdFinalDoors = createSpritesFromObjectLayer(
 			this.map,
 			"FinalDoor",
-			undefined
+			{
+				getTilesetKeyByName: this.getTilesetKeyByName.bind(this),
+			}
 		).map((item) => {
 			item.body.pushable = false;
 			return item;
@@ -584,12 +596,9 @@ export class Game extends Scene {
 	}
 
 	createDoors() {
-		this.createdDoors = createSpritesFromObjectLayer(
-			this.map,
-			"Doors",
-			this.shouldCreateLayerObject.bind(this),
-			this.recordObjectIdOnSprite
-		).map((item) => {
+		this.createdDoors = createSpritesFromObjectLayer(this.map, "Doors", {
+			getTilesetKeyByName: this.getTilesetKeyByName.bind(this),
+		}).map((item) => {
 			item.body.pushable = false;
 			item.body.setSize(item.body.width + 1, item.body.height + 1);
 			return item;
@@ -597,21 +606,19 @@ export class Game extends Scene {
 	}
 
 	createAppearingTiles() {
-		this.createdTiles = createSpritesFromObjectLayer(
-			this.map,
-			"Transients",
-			this.shouldCreateLayerObject.bind(this),
-			this.recordObjectIdOnSprite
-		);
+		this.createdTiles = createSpritesFromObjectLayer(this.map, "Transients", {
+			filterCallback: this.shouldCreateLayerObject.bind(this),
+			callback: this.recordObjectIdOnSprite.bind(this),
+			getTilesetKeyByName: this.getTilesetKeyByName.bind(this),
+		});
 	}
 
 	createItems() {
-		this.createdItems = createSpritesFromObjectLayer(
-			this.map,
-			"Items",
-			this.shouldCreateLayerObject.bind(this),
-			this.recordObjectIdOnSprite
-		);
+		this.createdItems = createSpritesFromObjectLayer(this.map, "Items", {
+			filterCallback: this.shouldCreateLayerObject.bind(this),
+			callback: this.recordObjectIdOnSprite.bind(this),
+			getTilesetKeyByName: this.getTilesetKeyByName.bind(this),
+		});
 	}
 
 	shouldCreateLayerObject(

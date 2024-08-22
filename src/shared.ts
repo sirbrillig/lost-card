@@ -424,11 +424,16 @@ export function getDoorDestinationCoordinates(
 export function createSpritesFromObjectLayer(
 	map: Phaser.Tilemaps.Tilemap,
 	layerName: string,
-	filterCallback?: (layerObject: Phaser.Types.Tilemaps.TiledObject) => boolean,
-	callback?: (
-		layerObject: Phaser.Types.Tilemaps.TiledObject,
-		sprite: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody
-	) => void
+	config?: {
+		filterCallback?: (
+			layerObject: Phaser.Types.Tilemaps.TiledObject
+		) => boolean;
+		callback?: (
+			layerObject: Phaser.Types.Tilemaps.TiledObject,
+			sprite: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody
+		) => void;
+		getTilesetKeyByName?: (tilesetName: string) => string | undefined;
+	}
 ): Phaser.Types.Physics.Arcade.SpriteWithDynamicBody[] {
 	const created: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody[] = [];
 	const gidToTextureMap: Record<string, Phaser.Tilemaps.Tileset> = {};
@@ -445,7 +450,7 @@ export function createSpritesFromObjectLayer(
 		);
 	}
 	layer.objects.forEach((obj) => {
-		const filterResult = filterCallback?.(obj) ?? true;
+		const filterResult = config?.filterCallback?.(obj) ?? true;
 		if (
 			!filterResult ||
 			!hasXandY(obj) ||
@@ -463,12 +468,7 @@ export function createSpritesFromObjectLayer(
 		}
 		let tilesetKey = tileset.image?.key;
 		if (!tilesetKey) {
-			if (tileset.name === "Icons") {
-				tilesetKey = "icons4";
-			}
-			if (tileset.name === "Cards") {
-				tilesetKey = "cards";
-			}
+			tilesetKey = config?.getTilesetKeyByName?.(tileset.name);
 		}
 		if (!tilesetKey) {
 			console.warn(`No tileset key found for layer object "${obj.gid}"`, obj);
@@ -524,7 +524,7 @@ export function createSpritesFromObjectLayer(
 			throw new Error("Created sprite is not dynamic");
 		}
 
-		callback?.(obj, sprite);
+		config?.callback?.(obj, sprite);
 
 		created.push(sprite);
 	});
