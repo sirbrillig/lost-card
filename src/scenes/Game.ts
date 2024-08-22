@@ -75,7 +75,9 @@ export class Game extends Scene {
 	gotItemFreeze: number = 1000;
 	windCardPushSpeed: number = 100;
 	windCardPushTime: number = 100;
-	knockBackSpeed: number = 180;
+	enemyKnockbackTime: number = 200;
+	enemyKnockBackSpeed: number = 300;
+	playerKnockBackSpeed: number = 150;
 	distanceToActivateTransient: number = 30;
 	playerInitialHitPoints: number = 3;
 	saveCooldown: number = 30000;
@@ -299,6 +301,9 @@ export class Game extends Scene {
 					throw new Error("Enemy sprite is not valid for hitboxing with sword");
 				}
 				this.playerHitEnemy(enemy);
+			},
+			() => {
+				return this.sword.data.get(DataKeys.SwordAttackAcive);
 			}
 		);
 		this.physics.add.overlap(
@@ -502,7 +507,7 @@ export class Game extends Scene {
 	activateAttack() {
 		console.log("attack beginning");
 		this.player.body.setVelocity(0);
-		this.sword.data.set("attackActive", true);
+		this.sword.data.set(DataKeys.SwordAttackAcive, true);
 		this.updateSwordHitbox();
 
 		this.sword.setRotation(Phaser.Math.DegToRad(0));
@@ -532,7 +537,7 @@ export class Game extends Scene {
 
 		this.attackSprite.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
 			console.log("attack complete");
-			this.sword.data.set("attackActive", false);
+			this.sword.data.set(DataKeys.SwordAttackAcive, false);
 			this.attackSprite.setVisible(false);
 			this.player.setVisible(true);
 			this.lastAttackedAt = this.time.now;
@@ -2167,14 +2172,16 @@ export class Game extends Scene {
 	}
 
 	pushEnemy(enemy: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody) {
-		if (enemy.data.get(DataKeys.Hittable) === true) {
-			enemy.emit(Events.MonsterStun, true);
+		if (enemy.data.get(DataKeys.Pushable) === true) {
+			// We can't use MonsterStun event here because it is too slow.
+			enemy.data.set(DataKeys.Stunned, true);
 			this.knockBack(
 				enemy.body,
-				this.windCardPushTime,
+				this.enemyKnockbackTime,
+				this.enemyKnockBackSpeed,
 				this.playerDirection,
 				() => {
-					enemy?.emit(Events.MonsterStun, false);
+					enemy.data.set(DataKeys.Stunned, false);
 				}
 			);
 		}
@@ -2207,9 +2214,13 @@ export class Game extends Scene {
 			this.knockBack(
 				this.player.body,
 				this.postHitEnemyKnockback,
+				this.playerKnockBackSpeed,
 				invertSpriteDirection(this.playerDirection),
 				() => {}
 			);
+
+			// Knock back monster when they are hit.
+			this.pushEnemy(enemy);
 		} else {
 			console.log(
 				"enemy not hittable",
@@ -2280,6 +2291,7 @@ export class Game extends Scene {
 		this.knockBack(
 			this.player.body,
 			this.postHitPlayerKnockback,
+			this.playerKnockBackSpeed,
 			invertSpriteDirection(this.playerDirection),
 			() => {
 				this.isPlayerBeingKnockedBack = false;
@@ -2292,34 +2304,31 @@ export class Game extends Scene {
 	knockBack(
 		body: Phaser.Physics.Arcade.Body,
 		time: number,
+		speed: number,
 		direction: SpriteDirection,
 		completeCallback?: () => void
 	) {
-		const bounceSpeed = this.knockBackSpeed;
-
 		this.time.addEvent({
 			delay: time,
 			callback: () => {
-				body.setVelocityX(0);
-				body.setVelocityY(0);
+				body.stop();
 				completeCallback?.();
 			},
 		});
 
-		body.setVelocityX(0);
-		body.setVelocityY(0);
+		body.stop();
 		switch (direction) {
 			case SpriteUp:
-				body.setVelocityY(-bounceSpeed);
+				body.setVelocityY(-speed);
 				break;
 			case SpriteRight:
-				body.setVelocityX(bounceSpeed);
+				body.setVelocityX(speed);
 				break;
 			case SpriteDown:
-				body.setVelocityY(bounceSpeed);
+				body.setVelocityY(speed);
 				break;
 			case SpriteLeft:
-				body.setVelocityX(-bounceSpeed);
+				body.setVelocityX(-speed);
 				break;
 		}
 	}

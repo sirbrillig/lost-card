@@ -27,12 +27,14 @@ export const Events = {
 export const DataKeys = {
 	Stunned: "stunned",
 	Hittable: "hittable",
+	Pushable: "pushable",
 	Freezable: "freezable",
 	MonsterPosition: "monsterPosition",
 	PlayerPosition: "playerPosition",
 	ActivePower: "activePower",
 	PotionCount: "potionCount",
 	KeyCount: "keyCount",
+	SwordAttackAcive: "attackActive",
 };
 
 export type Powers =

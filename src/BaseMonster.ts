@@ -32,6 +32,12 @@ export class BaseMonster<AllStates extends string> extends Phaser.Physics.Arcade
 			throw new Error("Could not create monster");
 		}
 
+		this.anims.create({
+			key: "explode",
+			frames: this.anims.generateFrameNumbers("monster_explode1"),
+			frameRate: 20,
+		});
+
 		this.setDepth(1);
 		this.setSize(this.width * 0.35, this.height * 0.35);
 		this.setOffset(this.body.offset.x, this.body.offset.y + 9);
@@ -40,6 +46,7 @@ export class BaseMonster<AllStates extends string> extends Phaser.Physics.Arcade
 		this.setDataEnabled();
 		this.data.set(DataKeys.MonsterPosition, new Phaser.Math.Vector2(x, y));
 		this.data.set(DataKeys.Hittable, true);
+		this.data.set(DataKeys.Pushable, true);
 		this.data.set(DataKeys.Freezable, true);
 		this.on(Events.MonsterHit, this.hit);
 		this.on(Events.MonsterStun, this.setStunned);
@@ -79,11 +86,14 @@ export class BaseMonster<AllStates extends string> extends Phaser.Physics.Arcade
 		if (this.data.get(DataKeys.Stunned)) {
 			return;
 		}
+		if (this.hitPoints <= 0) {
+			return;
+		}
 
 		const state = this.stateMachine.getCurrentState();
 
 		// Take init actions
-		if (state !== this.#currentPlayingState?.name) {
+		if (state && state !== this.#currentPlayingState?.name) {
 			this.#currentPlayingState = this.constructNewBehaviorFor(state);
 			if (!this.#currentPlayingState) {
 				throw new Error("No state active");
@@ -126,17 +136,15 @@ export class BaseMonster<AllStates extends string> extends Phaser.Physics.Arcade
 	}
 
 	setStunned(setting: boolean) {
-		if (!this.baseIsHittable()) {
-			return;
-		}
 		this.data.set(DataKeys.Stunned, setting);
 		this.setVelocity(0);
 	}
 
 	kill() {
-		this.emit(Events.MonsterDying);
-		this.setVelocity(0);
+		this.body?.stop();
+		this.stateMachine.empty();
 		this.data.set(DataKeys.Stunned, true);
+		this.emit(Events.MonsterDying);
 		this.setOrigin(0.5, 0.3);
 		this.anims.play("explode", true);
 		this.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {

@@ -4,9 +4,10 @@ export type Subscriber = (event: "init" | "update") => void;
 export type Unsubscribe = () => void;
 
 export interface BehaviorMachineInterface<Key extends string> {
-	getCurrentState(): Key;
+	getCurrentState(): Key | undefined;
 	pushState(state: Key): void;
 	popState(): void;
+	empty(): void;
 	update(): void;
 	subscribe(callback: Subscriber): Unsubscribe;
 }
@@ -31,7 +32,7 @@ export interface Behavior<
 export class StateMachine<AllStates extends string>
 	implements BehaviorMachineInterface<AllStates>
 {
-	#currentPlayingState: AllStates;
+	#currentPlayingState: AllStates | undefined;
 	#stateStack: Array<AllStates> = [];
 	#subscribers: Array<Subscriber> = [];
 
@@ -48,9 +49,14 @@ export class StateMachine<AllStates extends string>
 		this.#stateStack.pop();
 	}
 
-	getCurrentState(): AllStates {
+	empty() {
+		this.#currentPlayingState = undefined;
+		this.#stateStack = [];
+	}
+
+	getCurrentState(): AllStates | undefined {
 		if (!this.#stateStack[this.#stateStack.length - 1]) {
-			throw new Error("No states in state machine");
+			return undefined;
 		}
 		return this.#stateStack[this.#stateStack.length - 1];
 	}

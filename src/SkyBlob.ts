@@ -59,11 +59,6 @@ export class SkyBlob extends BaseMonster<AllStates> {
 			frameRate: 10,
 			repeat: -1,
 		});
-		this.anims.create({
-			key: "explode",
-			frames: this.anims.generateFrameNumbers("monster_explode1"),
-			frameRate: 20,
-		});
 	}
 
 	constructNewBehaviorFor(state: string) {

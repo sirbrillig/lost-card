@@ -1,4 +1,5 @@
 import {
+	DataKeys,
 	getDirectionOfSpriteMovement,
 	SpriteDirection,
 	isTilemapTile,
@@ -1143,6 +1144,9 @@ export class FollowPlayer<AllStates extends string>
 		if (!enemyManager.player.body) {
 			return;
 		}
+		if (sprite.data.get(DataKeys.Stunned)) {
+			return;
+		}
 
 		const distance = Phaser.Math.Distance.BetweenPoints(
 			sprite.body.center,
@@ -1257,7 +1261,7 @@ class Seeker extends Phaser.Physics.Arcade.Sprite {
 		});
 
 		this.scene.physics.add.overlap(this.#enemyManager.sword, this, () => {
-			if (!this.#enemyManager.sword.data.get("attackActive")) {
+			if (!this.#enemyManager.sword.data.get(DataKeys.SwordAttackAcive)) {
 				return;
 			}
 			this.body.stop();
