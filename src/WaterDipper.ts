@@ -1,4 +1,5 @@
 import { TeleportToWater, PowerUp, RangedIceBall } from "./behaviors";
+import { DataKeys } from "./shared";
 import { EnemyManager } from "./EnemyManager";
 import { isTileWithPropertiesObject } from "./shared";
 import { BaseMonster } from "./BaseMonster";
@@ -15,6 +16,7 @@ export class WaterDipper extends BaseMonster<AllStates> {
 		y: number
 	) {
 		super(scene, enemyManager, x, y, "monsters3", 6);
+		this.data.set(DataKeys.Pushable, false);
 	}
 
 	initSprites() {

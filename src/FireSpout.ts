@@ -1,4 +1,5 @@
 import { Idle, RangedFireBall } from "./behaviors";
+import { DataKeys } from "./shared";
 import { EnemyManager } from "./EnemyManager";
 import { BaseMonster } from "./BaseMonster";
 
@@ -14,6 +15,7 @@ export class FireSpout extends BaseMonster<AllStates> {
 		y: number
 	) {
 		super(scene, enemyManager, x, y, "monsters1", 3);
+		this.data.set(DataKeys.Pushable, false);
 	}
 
 	initSprites() {

@@ -1,4 +1,5 @@
 import { Idle, SpawnEnemies } from "./behaviors";
+import { DataKeys } from "./shared";
 import { EnemyManager } from "./EnemyManager";
 import { BaseMonster } from "./BaseMonster";
 import { PlantBug } from "./PlantBug";
@@ -17,6 +18,7 @@ export class PlantSpitter extends BaseMonster<AllStates> {
 	) {
 		super(scene, enemyManager, x, y, "monsters3", 3);
 		this.#enemyManager = enemyManager;
+		this.data.set(DataKeys.Pushable, false);
 	}
 
 	initSprites() {
