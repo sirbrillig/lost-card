@@ -93,7 +93,7 @@ export class CloudBoss extends BaseMonster<AllStates> {
 		if (!isTileWithPropertiesObject(tile)) {
 			return true;
 		}
-		if (tile.properties.isWater) {
+		if (tile.properties.isSky) {
 			return false;
 		}
 		return true;
