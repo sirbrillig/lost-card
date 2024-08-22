@@ -10,6 +10,7 @@ import { IceMonster } from "../IceMonster";
 import { FireMonster } from "../FireMonster";
 import { FireSpout } from "../FireSpout";
 import { WaterDipper } from "../WaterDipper";
+import { GreatGhost } from "../GreatGhost";
 import { MountainBoss } from "../MountainBoss";
 import { PlantSpitter } from "../PlantSpitter";
 import { IceBoss } from "../IceBoss";
@@ -1986,6 +1987,19 @@ export class Game extends Scene {
 				case "Ghost": {
 					const monster = new Ghost(this, this.enemyManager, point.x, point.y);
 					this.enemyManager.enemies.add(monster);
+					break;
+				}
+				case "GreatGhost": {
+					const monster = new GreatGhost(
+						this,
+						this.enemyManager,
+						point.x,
+						point.y
+					);
+					this.enemyManager.enemies.add(monster);
+					monster.once("defeated", () => {
+						this.showHiddenItem("SpiritCard");
+					});
 					break;
 				}
 				case "SkyBlob": {
