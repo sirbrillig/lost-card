@@ -13,6 +13,7 @@ import { MountainBoss } from "../MountainBoss";
 import { PlantSpitter } from "../PlantSpitter";
 import { IceBoss } from "../IceBoss";
 import { PlantBoss } from "../PlantBoss";
+import { CloudBoss } from "../CloudBoss";
 import { FireBoss } from "../FireBoss";
 import {
 	Powers,
@@ -2090,6 +2091,19 @@ export class Game extends Scene {
 					const boss = new IceBoss(this, this.enemyManager, point.x, point.y);
 					boss.once(Events.MonsterDefeated, () => {
 						this.markBossDefeated("IceBoss");
+						this.showHiddenItem("Heart");
+						this.showHiddenItem("Key");
+					});
+					this.enemyManager.enemies.add(boss);
+					break;
+				}
+				case "CloudBoss": {
+					if (this.wasBossDefeated("CloudBoss")) {
+						break;
+					}
+					const boss = new CloudBoss(this, this.enemyManager, point.x, point.y);
+					boss.once(Events.MonsterDefeated, () => {
+						this.markBossDefeated("CloudBoss");
 						this.showHiddenItem("Heart");
 						this.showHiddenItem("Key");
 					});

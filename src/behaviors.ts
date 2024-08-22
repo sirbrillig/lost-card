@@ -1082,6 +1082,125 @@ function getWalkAnimationKeyForDirection(direction: SpriteDirection): string {
 	}
 }
 
+export class SwoopAttack<AllStates extends string>
+	implements Behavior<AllStates, Phaser.GameObjects.Sprite>
+{
+	#nextState: AllStates;
+	name: AllStates;
+	#followTime: number | undefined;
+	#awareDistance: number | undefined;
+	#speed: number = 10;
+	#maxSpeed: number = 30;
+	#lastDistance = 0;
+
+	constructor(
+		name: AllStates,
+		nextState: AllStates,
+		config?: {
+			speed?: number;
+			maxSpeed?: number;
+			followTime?: number;
+			awareDistance?: number;
+		}
+	) {
+		this.name = name;
+		this.#nextState = nextState;
+		if (config?.followTime) {
+			this.#followTime = config.followTime;
+		}
+		if (config?.awareDistance) {
+			this.#awareDistance = config.awareDistance;
+		}
+		if (config?.speed) {
+			this.#speed = config.speed;
+		}
+		if (config?.maxSpeed) {
+			this.#maxSpeed = config.maxSpeed;
+		}
+	}
+
+	init(
+		sprite: Phaser.GameObjects.Sprite,
+		stateMachine: BehaviorMachineInterface<AllStates>
+	): void {
+		if (!isDynamicSprite(sprite)) {
+			throw new Error("invalid sprite");
+		}
+
+		if (this.#followTime) {
+			sprite.scene.time.addEvent({
+				delay: this.#followTime,
+				callback: () => {
+					sprite?.body?.setVelocity(0);
+					stateMachine.popState();
+					stateMachine.pushState(this.#nextState);
+				},
+			});
+		}
+	}
+
+	update(
+		sprite: Phaser.GameObjects.Sprite,
+		stateMachine: BehaviorMachineInterface<AllStates>,
+		enemyManager: EnemyManager
+	): void {
+		if (!isDynamicSprite(sprite)) {
+			throw new Error("invalid sprite");
+		}
+		if (!enemyManager.player.body) {
+			return;
+		}
+		if (sprite.data.get(DataKeys.Stunned)) {
+			return;
+		}
+
+		const distance = Phaser.Math.Distance.BetweenPoints(
+			sprite.body.center,
+			enemyManager.player.body.center
+		);
+		if (this.#awareDistance) {
+			if (distance > this.#awareDistance) {
+				sprite.body.stop();
+				stateMachine.popState();
+				stateMachine.pushState(this.#nextState);
+				return;
+			}
+		}
+
+		// If we are extremely close we don't need to change course.
+		if (distance < 10) {
+			return;
+		}
+
+		// If the distance is decreasing we don't need to change course.
+		if (distance < this.#lastDistance) {
+			return;
+		}
+		this.#lastDistance = distance;
+
+		sprite.scene.physics.accelerateTo(
+			sprite,
+			enemyManager.player.body.center.x,
+			enemyManager.player.body.center.y,
+			this.#speed,
+			this.#maxSpeed,
+			this.#maxSpeed
+		);
+		const direction = getDirectionOfSpriteMovement(sprite.body);
+		if (!direction) {
+			return;
+		}
+		sprite.data.set("direction", direction);
+		sprite.anims.play(
+			{
+				key: getWalkAnimationKeyForDirection(direction),
+				frameRate: 1,
+			},
+			true
+		);
+	}
+}
+
 export class FollowPlayer<AllStates extends string>
 	implements Behavior<AllStates, Phaser.GameObjects.Sprite>
 {

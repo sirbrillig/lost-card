@@ -1,12 +1,12 @@
 import { Events, DataKeys } from "./shared";
 import { isTileWithPropertiesObject } from "./shared";
 import { EnemyManager } from "./EnemyManager";
-import { WaitForActive, Roar, RandomlyWalk, SeekingVine } from "./behaviors";
+import { WaitForActive, Roar, RandomlyWalk, SwoopAttack } from "./behaviors";
 import { BaseMonster } from "./BaseMonster";
 
 type AllStates = "initial" | "roar1" | "walk" | "attack1" | "attack2";
 
-export class PlantBoss extends BaseMonster<AllStates> {
+export class CloudBoss extends BaseMonster<AllStates> {
 	hitPoints: number = 8;
 
 	constructor(
@@ -15,7 +15,7 @@ export class PlantBoss extends BaseMonster<AllStates> {
 		x: number,
 		y: number
 	) {
-		super(scene, enemyManager, x, y, "bosses1", 0);
+		super(scene, enemyManager, x, y, "bosses1", 9);
 
 		if (!this.body) {
 			throw new Error("Could not create monster");
@@ -35,10 +35,10 @@ export class PlantBoss extends BaseMonster<AllStates> {
 		this.anims.create({
 			key: "roar",
 			frames: this.anims.generateFrameNumbers("bosses1", {
-				start: 0,
-				end: 2,
+				start: 9,
+				end: 11,
 			}),
-			frameRate: 10,
+			frameRate: 8,
 			repeat: 8,
 		});
 		this.anims.create({
@@ -52,37 +52,37 @@ export class PlantBoss extends BaseMonster<AllStates> {
 		this.anims.create({
 			key: "down",
 			frames: this.anims.generateFrameNumbers("bosses1", {
-				start: 0,
-				end: 2,
+				start: 9,
+				end: 11,
 			}),
-			frameRate: 10,
+			frameRate: 8,
 			repeat: -1,
 		});
 		this.anims.create({
 			key: "left",
 			frames: this.anims.generateFrameNumbers("bosses1", {
-				start: 12,
-				end: 14,
+				start: 21,
+				end: 23,
 			}),
-			frameRate: 10,
+			frameRate: 8,
 			repeat: -1,
 		});
 		this.anims.create({
 			key: "right",
 			frames: this.anims.generateFrameNumbers("bosses1", {
-				start: 24,
-				end: 26,
+				start: 33,
+				end: 35,
 			}),
-			frameRate: 10,
+			frameRate: 8,
 			repeat: -1,
 		});
 		this.anims.create({
 			key: "up",
 			frames: this.anims.generateFrameNumbers("bosses1", {
-				start: 36,
-				end: 38,
+				start: 45,
+				end: 47,
 			}),
-			frameRate: 10,
+			frameRate: 8,
 			repeat: -1,
 		});
 	}
@@ -100,7 +100,6 @@ export class PlantBoss extends BaseMonster<AllStates> {
 	}
 
 	constructNewBehaviorFor(state: AllStates) {
-		const vineSpeed = 50;
 		switch (state) {
 			case "initial":
 				return new WaitForActive(state, "roar1");
@@ -108,14 +107,24 @@ export class PlantBoss extends BaseMonster<AllStates> {
 				return new Roar(state, "attack1");
 			case "walk":
 				return new RandomlyWalk(state, "attack1", {
-					speed: 60,
-					minWalkTime: 400,
-					maxWalkTime: 3000,
+					speed: 30,
+					minWalkTime: 1000,
+					maxWalkTime: 2500,
 				});
 			case "attack1":
-				return new SeekingVine(state, "attack2", vineSpeed, 550);
+				return new SwoopAttack(state, "attack2", {
+					awareDistance: 600,
+					speed: 250,
+					maxSpeed: 850,
+					followTime: 2000,
+				});
 			case "attack2":
-				return new SeekingVine(state, "walk", vineSpeed, 550);
+				return new SwoopAttack(state, "walk", {
+					awareDistance: 600,
+					speed: 250,
+					maxSpeed: 850,
+					followTime: 2000,
+				});
 		}
 	}
 
