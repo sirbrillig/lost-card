@@ -89,7 +89,7 @@ export function getIconForPower(power: Powers): {
 		case "SpiritCard":
 			return { texture: "cards", frame: 37 };
 		case "CloudCard":
-			return { texture: "cards", frame: 13 };
+			return { texture: "cards", frame: 20 };
 		default:
 			throw new Error(`Unknown power ${power}`);
 	}

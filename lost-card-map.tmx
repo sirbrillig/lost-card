@@ -8396,7 +8396,7 @@
   </object>
   <object id="407" name="Potion" gid="2791" x="1584.1" y="1839.14" width="16" height="16"/>
   <object id="472" name="FireCard" gid="2871" x="3136" y="2160" width="16" height="16"/>
-  <object id="506" name="CloudCard" gid="2866" x="768.709" y="1584.26" width="16" height="16"/>
+  <object id="506" name="CloudCard" gid="2873" x="768.709" y="1584.26" width="16" height="16"/>
   <object id="537" name="SpiritCard" gid="2890" x="2856.55" y="1639.37" width="16" height="16"/>
   <object id="538" name="Heart" gid="2818" x="2560.23" y="1522.74" width="16" height="16"/>
   <object id="539" name="Heart" gid="2818" x="433.23" y="1376.27" width="16" height="16"/>
