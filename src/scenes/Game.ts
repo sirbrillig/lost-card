@@ -75,7 +75,7 @@ export class Game extends Scene {
 	windCardPushSpeed: number = 100;
 	windCardPushTime: number = 100;
 	enemyKnockbackTime: number = 200;
-	enemyKnockBackSpeed: number = 300;
+	enemyKnockBackSpeed: number = 200;
 	playerKnockBackSpeed: number = 150;
 	distanceToActivateTransient: number = 30;
 	playerInitialHitPoints: number = 3;
@@ -148,11 +148,21 @@ export class Game extends Scene {
 			this.landLayer,
 			this.player,
 			(_, tile) => {
-				if (isTileWithPropertiesObject(tile) && tile.properties.hurts) {
-					this.enemyHitPlayer();
+				if (!isTileWithPropertiesObject(tile) || !tile.properties.hurts) {
+					return;
 				}
+				this.enemyHitPlayer();
 			},
-			() => {
+			(_, tile) => {
+				console.log(tile);
+				if (
+					isTileWithPropertiesObject(tile) &&
+					tile.properties.affectedBySpiritCard &&
+					this.isPlayerUsingPower() &&
+					this.getActivePower() === "SpiritCard"
+				) {
+					return false;
+				}
 				if (this.player.data.get("isPlantCardGrappleActive")) {
 					return false;
 				}
