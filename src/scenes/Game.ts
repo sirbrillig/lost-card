@@ -693,6 +693,7 @@ export class Game extends Scene {
 	}
 
 	moveCameraToRoom(room: Phaser.Types.Tilemaps.TiledObject) {
+		this.scene.get("Dialog")?.scene.stop();
 		const camera = this.cameras.main;
 
 		if (
