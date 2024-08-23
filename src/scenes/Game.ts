@@ -57,6 +57,7 @@ export class Game extends Scene {
 	attackSprite: Phaser.GameObjects.Sprite;
 	enemyManager: EnemyManager;
 	enemyCollider: Phaser.Physics.Arcade.Collider;
+	isGameOver: boolean = false;
 
 	framesSincePlayerHit: number = 0;
 	lastAttackedAt: number = 0;
@@ -115,6 +116,7 @@ export class Game extends Scene {
 	}
 
 	create(saveData: SaveData | undefined) {
+		this.isGameOver = false;
 		this.cameras.main.fadeIn(this.sceneStartFadeTime);
 		this.map = this.make.tilemap({ key: "map" });
 		const tilesetTile = this.map.addTilesetImage(
@@ -855,7 +857,7 @@ export class Game extends Scene {
 	}
 
 	checkForGameOver() {
-		if (this.getPlayerHitPoints() <= 0) {
+		if (this.getPlayerHitPoints() <= 0 && !this.isGameOver) {
 			this.setPlayerInvincible(true);
 			this.player.stop();
 			this.player.body.setVelocity(0);
@@ -1227,22 +1229,22 @@ export class Game extends Scene {
 					this.pickUpPotion();
 					break;
 				case "PlantCard":
-					this.pickUpPlantCard();
+					this.pickUpCard(touchingItem.name);
 					break;
 				case "WindCard":
-					this.pickUpWindCard();
+					this.pickUpCard(touchingItem.name);
 					break;
 				case "IceCard":
-					this.pickUpIceCard();
+					this.pickUpCard(touchingItem.name);
 					break;
 				case "FireCard":
-					this.pickUpFireCard();
+					this.pickUpCard(touchingItem.name);
 					break;
 				case "SpiritCard":
-					this.pickUpSpiritCard();
+					this.pickUpCard(touchingItem.name);
 					break;
 				case "CloudCard":
-					this.pickUpCloudCard();
+					this.pickUpCard(touchingItem.name);
 					break;
 				case "Heart":
 					this.pickUpHeart();
@@ -1314,184 +1316,72 @@ export class Game extends Scene {
 		this.setPlayerHitPoints(playerTotalHitPoints);
 	}
 
-	pickUpIceCard() {
-		this.equipPower("IceCard");
-
+	playCardAnimation(card: Powers) {
 		// Face right
 		this.playerDirection = SpriteRight;
 		this.setPlayerIdleFrame();
-
-		// Play power animation
 		this.updatePowerHitboxPosition();
 		this.power.setRotation(Phaser.Math.DegToRad(0));
-		this.power.setVelocity(this.icePowerVelocity, 0);
-		this.power.anims.play("ice-power-right", true);
-
-		this.setPlayerInvincible(true);
-		this.setPlayerStunned(true);
-		this.time.addEvent({
-			delay: this.gotItemFreeze,
-			callback: () => {
-				this.scene.launch("Dialog", {
-					heading: "The Ice Card",
-					text: "Press SHIFT to use it\r\nPress [ or ] to change power",
-				});
-				this.setPlayerInvincible(false);
-				this.setPlayerStunned(false);
-				this.input.keyboard?.once("keydown-SHIFT", () => {
-					this.scene.get("Dialog")?.scene.stop();
-				});
-			},
-		});
-	}
-
-	pickUpSpiritCard() {
-		this.equipPower("SpiritCard");
-
-		// Face right
-		this.playerDirection = SpriteRight;
-		this.setPlayerIdleFrame();
 
 		// Play power animation
-		this.updatePowerHitboxPosition();
-		this.power.anims.play("spirit-power", true);
-		this.power.setAlpha(0.5);
-		this.player.setAlpha(0.5);
-		this.power.on(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
-			this.power.setAlpha(1);
-			this.player.setAlpha(1);
-		});
-
-		this.setPlayerInvincible(true);
-		this.setPlayerStunned(true);
-		this.time.addEvent({
-			delay: this.gotItemFreeze,
-			callback: () => {
-				this.scene.launch("Dialog", {
-					heading: "The Spirit Card",
-					text: "Press SHIFT to use it\r\nPress [ or ] to change power",
+		switch (card) {
+			case "IceCard":
+				this.power.setVelocity(this.icePowerVelocity, 0);
+				this.power.anims.play("ice-power-right", true);
+				break;
+			case "SpiritCard":
+				this.power.anims.play("spirit-power", true);
+				this.power.setAlpha(0.5);
+				this.player.setAlpha(0.5);
+				this.power.on(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
+					this.power.setAlpha(1);
+					this.player.setAlpha(1);
 				});
-				this.setPlayerInvincible(false);
-				this.setPlayerStunned(false);
-				this.input.keyboard?.once("keydown-SHIFT", () => {
-					this.scene.get("Dialog")?.scene.stop();
-				});
-			},
-		});
+				break;
+			case "CloudCard":
+				this.power.anims.play("cloud-power", true);
+				break;
+			case "FireCard":
+				this.power.setVelocity(this.firePowerVelocity, 0);
+				this.power.anims.play("fire-power-right", true);
+				break;
+			case "PlantCard":
+				this.power.anims.play("plant-power-right", true);
+				break;
+			case "WindCard":
+				this.power.anims.play("character-right-power", true);
+				break;
+		}
 	}
 
-	pickUpCloudCard() {
-		this.equipPower("CloudCard");
-
-		// Face right
-		this.playerDirection = SpriteRight;
-		this.setPlayerIdleFrame();
-
-		// Play power animation
-		this.updatePowerHitboxPosition();
-		this.power.anims.play("cloud-power", true);
-
-		this.setPlayerInvincible(true);
-		this.setPlayerStunned(true);
-		this.time.addEvent({
-			delay: this.gotItemFreeze,
-			callback: () => {
-				this.scene.launch("Dialog", {
-					heading: "The Cloud Card",
-					text: "Press SHIFT to use it\r\nPress [ or ] to change power",
-				});
-				this.setPlayerInvincible(false);
-				this.setPlayerStunned(false);
-				this.input.keyboard?.once("keydown-SHIFT", () => {
-					this.scene.get("Dialog")?.scene.stop();
-				});
-			},
-		});
+	getCardNameForPower(card: Powers): string {
+		switch (card) {
+			case "IceCard":
+				return "Ice Card";
+			case "PlantCard":
+				return "Plant Card";
+			case "SpiritCard":
+				return "Spirit Card";
+			case "WindCard":
+				return "Wind Card";
+			case "FireCard":
+				return "Fire Card";
+			case "CloudCard":
+				return "Cloud Card";
+		}
 	}
 
-	pickUpFireCard() {
-		this.equipPower("FireCard");
-
-		// Face right
-		this.playerDirection = SpriteRight;
-		this.setPlayerIdleFrame();
-
-		// Play power animation
-		this.updatePowerHitboxPosition();
-		this.power.setRotation(Phaser.Math.DegToRad(0));
-		this.power.setVelocity(this.firePowerVelocity, 0);
-		this.power.anims.play("fire-power-right", true);
-
+	pickUpCard(card: Powers) {
+		this.equipPower(card);
+		this.playCardAnimation(card);
 		this.setPlayerInvincible(true);
 		this.setPlayerStunned(true);
 		this.time.addEvent({
 			delay: this.gotItemFreeze,
 			callback: () => {
 				this.scene.launch("Dialog", {
-					heading: "The Fire Card",
-					text: "Press SHIFT to use it\r\nPress [ or ] to change power",
-				});
-				this.setPlayerInvincible(false);
-				this.setPlayerStunned(false);
-				this.input.keyboard?.once("keydown-SHIFT", () => {
-					this.scene.get("Dialog")?.scene.stop();
-				});
-			},
-		});
-	}
-
-	pickUpPlantCard() {
-		this.equipPower("PlantCard");
-
-		// Face right
-		this.playerDirection = SpriteRight;
-		this.setPlayerIdleFrame();
-
-		// Play power animation
-		this.updatePowerHitboxPosition();
-		this.power.setVelocity(0, 0);
-		this.power.setRotation(Phaser.Math.DegToRad(0));
-		this.power.anims.play("plant-power-right", true);
-
-		this.setPlayerInvincible(true);
-		this.setPlayerStunned(true);
-		this.time.addEvent({
-			delay: this.gotItemFreeze,
-			callback: () => {
-				this.scene.launch("Dialog", {
-					heading: "The Plant Card",
-					text: "Press SHIFT to use it\r\nPress [ or ] to change power",
-				});
-				this.setPlayerInvincible(false);
-				this.setPlayerStunned(false);
-				this.input.keyboard?.once("keydown-SHIFT", () => {
-					this.scene.get("Dialog")?.scene.stop();
-				});
-			},
-		});
-	}
-
-	pickUpWindCard() {
-		this.equipPower("WindCard");
-
-		// Face right
-		this.playerDirection = SpriteRight;
-		this.setPlayerIdleFrame();
-
-		// Play power animation
-		this.updatePowerHitboxPosition();
-		this.power.setVelocity(0, 0);
-		this.power.setRotation(Phaser.Math.DegToRad(0));
-		this.power.anims.play("character-right-power", true);
-
-		this.setPlayerInvincible(true);
-		this.setPlayerStunned(true);
-		this.time.addEvent({
-			delay: this.gotItemFreeze,
-			callback: () => {
-				this.scene.launch("Dialog", {
-					heading: "The Wind Card",
-					text: "Press SHIFT to use it\r\nPress [ or ] to change power",
+					heading: this.getCardNameForPower(card),
+					text: "Press SHIFT to use\r\nPress [ or ] to change",
 				});
 				this.setPlayerInvincible(false);
 				this.setPlayerStunned(false);
@@ -2352,6 +2242,7 @@ export class Game extends Scene {
 			return;
 		}
 		console.log("game over!");
+		this.isGameOver = true;
 		this.cameras.main.fadeOut(1000, 0, 0, 0, (_: unknown, progress: number) => {
 			if (progress === 1) {
 				this.scene.stop();
@@ -2775,7 +2666,6 @@ export class Game extends Scene {
 		this.player.body.velocity.normalize().scale(this.getPlayerSpeed());
 		const isMoving =
 			this.player.body.velocity.x !== 0 || this.player.body.velocity.y !== 0;
-
 		if (!isMoving) {
 			this.setPlayerIdleFrame();
 		}
