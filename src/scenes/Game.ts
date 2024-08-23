@@ -85,7 +85,7 @@ export class Game extends Scene {
 	postHitEnemyKnockback: number = 50;
 	postHitInvincibilityTime: number = 600;
 	attackFrameRate: number = 35;
-	attackDelay: number = 8;
+	attackDelay: number = 0;
 	gotItemFreeze: number = 1000;
 	windCardPushSpeed: number = 100;
 	windCardPushTime: number = 100;
