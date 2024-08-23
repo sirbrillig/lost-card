@@ -1489,11 +1489,15 @@ export class Game extends Scene {
 
 		this.setPotionCount(this.getPotionCount() + 1);
 
+		if (this.registry.get("seenPotionDialog")) {
+			return;
+		}
+
 		this.scene.launch("Dialog", {
 			heading: "A potion!",
 			text: "Press X to restore health\r\nPress SPACE to continue",
 		});
-
+		this.registry.set("seenPotionDialog", true);
 		this.input.keyboard?.once("keydown-SPACE", () => {
 			this.scene.get("Dialog")?.scene.stop();
 		});
