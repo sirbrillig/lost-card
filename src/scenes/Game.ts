@@ -50,7 +50,6 @@ import {
 } from "../shared";
 
 export class Game extends Scene {
-	cursors: Phaser.Types.Input.Keyboard.CursorKeys;
 	debugGraphic: Phaser.GameObjects.Graphics | undefined;
 	player: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
 	sword: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
@@ -65,6 +64,11 @@ export class Game extends Scene {
 	playerDirection: SpriteDirection = SpriteDown;
 	enteredRoomAt: number = 0;
 	isPlayerBeingKnockedBack: boolean = false;
+
+	keyLeft: Phaser.Input.Keyboard.Key;
+	keyDown: Phaser.Input.Keyboard.Key;
+	keyRight: Phaser.Input.Keyboard.Key;
+	keyUp: Phaser.Input.Keyboard.Key;
 
 	// Config
 	characterSpeed: number = 90;
@@ -376,7 +380,14 @@ export class Game extends Scene {
 		if (!this.input.keyboard) {
 			throw new Error("No keyboard controls could be found");
 		}
-		this.cursors = this.input.keyboard.createCursorKeys();
+
+		this.keyLeft = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
+		this.keyDown = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S);
+		this.keyRight = this.input.keyboard.addKey(
+			Phaser.Input.Keyboard.KeyCodes.D
+		);
+		this.keyUp = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W);
+
 		this.input.keyboard.on("keydown-ONE", () => {
 			// Cheat: show hitboxes
 			if (this.debugGraphic) {
@@ -843,7 +854,23 @@ export class Game extends Scene {
 		);
 	}
 
+	checkForGameOver() {
+		if (this.getPlayerHitPoints() <= 0) {
+			this.setPlayerInvincible(true);
+			this.player.stop();
+			this.player.body.setVelocity(0);
+			this.enemyCollider.active = false;
+			this.time.addEvent({
+				delay: this.preGameOverTime,
+				callback: () => {
+					this.gameOver();
+				},
+			});
+		}
+	}
+
 	update() {
+		this.checkForGameOver();
 		this.enemyManager.enemies.getChildren().forEach((enemy) => {
 			if (!isDynamicSprite(enemy)) {
 				return;
@@ -2357,13 +2384,6 @@ export class Game extends Scene {
 		this.setPlayerHitPoints(this.getPlayerHitPoints() - 1);
 
 		if (this.getPlayerHitPoints() <= 0) {
-			this.setPlayerInvincible(true);
-			this.time.addEvent({
-				delay: this.preGameOverTime,
-				callback: () => {
-					this.gameOver();
-				},
-			});
 			return;
 		}
 
@@ -2490,10 +2510,13 @@ export class Game extends Scene {
 
 	setPlayerFrozen(setting: boolean) {
 		this.player.data?.set("freezePlayer", setting);
+		this.player.body.stop();
+		this.player.stop();
 	}
 
 	setPlayerStunned(setting: boolean) {
 		this.player.data?.set("stunPlayer", setting);
+		this.player.body.setVelocity(0);
 	}
 
 	setPlayerInvincible(setting: boolean) {
@@ -2697,47 +2720,63 @@ export class Game extends Scene {
 		}
 	}
 
-	updatePlayerMovement(): void {
+	canPlayerMove(): boolean {
 		if (this.isPlayerAttacking() || this.isPlayerBeingKnockedBack) {
-			return;
+			return false;
 		}
-
 		if (
 			this.isPlayerUsingPower() &&
 			!["SpiritCard"].includes(this.getActivePower() as string)
 		) {
+			return false;
+		}
+		if (this.isPlayerStunned()) {
+			return false;
+		}
+		if (this.isPlayerFrozen()) {
+			return false;
+		}
+		if (this.getPlayerHitPoints() <= 0) {
+			return false;
+		}
+		return true;
+	}
+
+	updatePlayerMovement(): void {
+		if (!this.canPlayerMove()) {
 			return;
 		}
 
 		this.player.body.setVelocity(0);
-		if (this.cursors.left.isDown) {
+
+		// Set velocity based on key press
+		if (this.keyLeft.isDown) {
+			this.player.setFlipX(false);
 			this.player.body.setVelocityX(-this.getPlayerSpeed());
-		} else if (this.cursors.right.isDown) {
+			this.playerDirection = SpriteLeft;
+			this.player.anims.play("character-left-walk", true);
+		} else if (this.keyRight.isDown) {
 			this.player.body.setVelocityX(this.getPlayerSpeed());
+			this.playerDirection = SpriteRight;
+			this.player.setFlipX(true);
+			this.player.anims.play("character-left-walk", true);
 		}
-		if (this.cursors.up.isDown) {
+		if (this.keyUp.isDown) {
+			this.player.setFlipX(false);
 			this.player.body.setVelocityY(-this.getPlayerSpeed());
-		} else if (this.cursors.down.isDown) {
+			this.player.anims.play("character-up-walk", true);
+			this.playerDirection = SpriteUp;
+		} else if (this.keyDown.isDown) {
 			this.player.body.setVelocityY(this.getPlayerSpeed());
+			this.playerDirection = SpriteDown;
+			this.player.anims.play("character-down-walk", true);
 		}
 
 		this.player.body.velocity.normalize().scale(this.getPlayerSpeed());
+		const isMoving =
+			this.player.body.velocity.x !== 0 || this.player.body.velocity.y !== 0;
 
-		this.player.setFlipX(false);
-		if (this.cursors.left.isDown) {
-			this.player.anims.play("character-left-walk", true);
-			this.playerDirection = SpriteLeft;
-		} else if (this.cursors.right.isDown) {
-			this.player.setFlipX(true);
-			this.player.anims.play("character-left-walk", true);
-			this.playerDirection = SpriteRight;
-		} else if (this.cursors.down.isDown) {
-			this.player.anims.play("character-down-walk", true);
-			this.playerDirection = SpriteDown;
-		} else if (this.cursors.up.isDown) {
-			this.player.anims.play("character-up-walk", true);
-			this.playerDirection = SpriteUp;
-		} else {
+		if (!isMoving) {
 			this.setPlayerIdleFrame();
 		}
 	}
@@ -2773,26 +2812,6 @@ export class Game extends Scene {
 
 		if (this.isPlayerBeingHit()) {
 			this.updatePlayerBeingHit();
-		}
-
-		if (this.isPlayerStunned()) {
-			this.player.body.setVelocity(0);
-			console.log("player stunned");
-			return;
-		}
-
-		if (this.isPlayerFrozen()) {
-			this.player.body.setVelocity(0);
-			this.player.stop();
-			console.log("player frozen");
-			return;
-		}
-
-		if (this.getPlayerHitPoints() <= 0) {
-			this.player.stop();
-			this.player.body.setVelocity(0);
-			this.enemyCollider.active = false;
-			return;
 		}
 
 		this.updateSwordHitbox();
