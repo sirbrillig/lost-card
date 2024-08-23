@@ -1314,7 +1314,7 @@ export class Game extends Scene {
 			callback: () => {
 				this.scene.launch("Dialog", {
 					heading: "The Ice Card",
-					text: "Press SHIFT to use it\r\nPress Z to change power",
+					text: "Press SHIFT to use it\r\nPress [ or ] to change power",
 				});
 				this.setPlayerInvincible(false);
 				this.setPlayerStunned(false);
@@ -1349,7 +1349,7 @@ export class Game extends Scene {
 			callback: () => {
 				this.scene.launch("Dialog", {
 					heading: "The Spirit Card",
-					text: "Press SHIFT to use it\r\nPress Z to change power",
+					text: "Press SHIFT to use it\r\nPress [ or ] to change power",
 				});
 				this.setPlayerInvincible(false);
 				this.setPlayerStunned(false);
@@ -1378,7 +1378,7 @@ export class Game extends Scene {
 			callback: () => {
 				this.scene.launch("Dialog", {
 					heading: "The Cloud Card",
-					text: "Press SHIFT to use it\r\nPress Z to change power",
+					text: "Press SHIFT to use it\r\nPress [ or ] to change power",
 				});
 				this.setPlayerInvincible(false);
 				this.setPlayerStunned(false);
@@ -1409,7 +1409,7 @@ export class Game extends Scene {
 			callback: () => {
 				this.scene.launch("Dialog", {
 					heading: "The Fire Card",
-					text: "Press SHIFT to use it\r\nPress Z to change power",
+					text: "Press SHIFT to use it\r\nPress [ or ] to change power",
 				});
 				this.setPlayerInvincible(false);
 				this.setPlayerStunned(false);
@@ -1440,7 +1440,7 @@ export class Game extends Scene {
 			callback: () => {
 				this.scene.launch("Dialog", {
 					heading: "The Plant Card",
-					text: "Press SHIFT to use it\r\nPress Z to change power",
+					text: "Press SHIFT to use it\r\nPress [ or ] to change power",
 				});
 				this.setPlayerInvincible(false);
 				this.setPlayerStunned(false);
@@ -1471,7 +1471,7 @@ export class Game extends Scene {
 			callback: () => {
 				this.scene.launch("Dialog", {
 					heading: "The Wind Card",
-					text: "Press SHIFT to use it\r\nPress Z to change power",
+					text: "Press SHIFT to use it\r\nPress [ or ] to change power",
 				});
 				this.setPlayerInvincible(false);
 				this.setPlayerStunned(false);

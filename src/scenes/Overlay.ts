@@ -223,7 +223,7 @@ export class Overlay extends Scene {
 				});
 			}
 		});
-		this.input.keyboard.on("keydown-Z", () => {
+		this.input.keyboard.on("keydown-OPEN_BRACKET", () => {
 			// Rotate Active Power
 			const available = powerOrder.filter((power) =>
 				this.isPowerEquipped(power)
@@ -234,6 +234,20 @@ export class Overlay extends Scene {
 			}
 			const current = available.indexOf(active);
 			const nextPower = available[current + 1] ?? available[0];
+			this.setActivePower(nextPower);
+		});
+		this.input.keyboard.on("keydown-CLOSED_BRACKET", () => {
+			// Rotate Active Power
+			const available = powerOrder.filter((power) =>
+				this.isPowerEquipped(power)
+			);
+			const active = this.getActivePower();
+			if (!active) {
+				return;
+			}
+			const current = available.indexOf(active);
+			const nextPower =
+				available[current - 1] ?? available[available.length - 1];
 			this.setActivePower(nextPower);
 		});
 	}
