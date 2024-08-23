@@ -3,6 +3,7 @@ import { Game as MainGame } from "./scenes/Game";
 import { GameOver } from "./scenes/GameOver";
 import { Overlay } from "./scenes/Overlay";
 import { Dialog } from "./scenes/Dialog";
+import { GameMap } from "./scenes/Map";
 import { MainMenu } from "./scenes/MainMenu";
 import { Preloader } from "./scenes/Preloader";
 
@@ -27,7 +28,16 @@ const config: Types.Core.GameConfig = {
 			debug: false,
 		},
 	},
-	scene: [Boot, Preloader, MainMenu, MainGame, GameOver, Overlay, Dialog],
+	scene: [
+		Boot,
+		Preloader,
+		MainMenu,
+		MainGame,
+		GameOver,
+		Overlay,
+		Dialog,
+		GameMap,
+	],
 };
 
 export default new Game(config);

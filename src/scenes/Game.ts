@@ -591,11 +591,7 @@ export class Game extends Scene {
 	}
 
 	getSaveData() {
-		return {
-			...this.registry.getAll(),
-			playerX: this.player.x,
-			playerY: this.player.y,
-		};
+		return this.registry.getAll();
 	}
 
 	getTilesetKeyByName(name: string): string | undefined {
@@ -2745,6 +2741,8 @@ export class Game extends Scene {
 			DataKeys.PlayerPosition,
 			new Phaser.Math.Vector2(this.player.x, this.player.y)
 		);
+		this.registry.set("playerX", this.player.x);
+		this.registry.set("playerY", this.player.y);
 
 		if (this.isPlayerBeingHit()) {
 			this.updatePlayerBeingHit();

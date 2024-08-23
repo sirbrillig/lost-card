@@ -213,14 +213,15 @@ export class Overlay extends Scene {
 		this.input.keyboard.on("keydown-ESC", () => {
 			// Pause
 			if (this.scene.isPaused("Game")) {
-				this.scene.get("Dialog")?.scene.stop();
+				this.scene.get("GameMap")?.scene.stop();
 				this.scene.resume("Game");
 			} else {
 				this.scene.pause("Game");
-				this.scene.launch("Dialog", {
-					heading: "Paused",
-					text: "Press ESC to resume",
-				});
+				this.scene.launch("GameMap");
+				// this.scene.launch("Dialog", {
+				// 	heading: "Paused",
+				// 	text: "Press ESC to resume",
+				// });
 			}
 		});
 		this.input.keyboard.on("keydown-OPEN_BRACKET", () => {
