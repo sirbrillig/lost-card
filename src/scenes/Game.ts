@@ -71,6 +71,11 @@ export class Game extends Scene {
 	keyRight: Phaser.Input.Keyboard.Key;
 	keyUp: Phaser.Input.Keyboard.Key;
 
+	keyA: Phaser.Input.Keyboard.Key;
+	keyS: Phaser.Input.Keyboard.Key;
+	keyD: Phaser.Input.Keyboard.Key;
+	keyW: Phaser.Input.Keyboard.Key;
+
 	// Config
 	characterSpeed: number = 90;
 	cloudCardSpeed: number = 450;
@@ -383,12 +388,21 @@ export class Game extends Scene {
 			throw new Error("No keyboard controls could be found");
 		}
 
-		this.keyLeft = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
-		this.keyDown = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S);
-		this.keyRight = this.input.keyboard.addKey(
-			Phaser.Input.Keyboard.KeyCodes.D
+		this.keyLeft = this.input.keyboard.addKey(
+			Phaser.Input.Keyboard.KeyCodes.LEFT
 		);
-		this.keyUp = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W);
+		this.keyDown = this.input.keyboard.addKey(
+			Phaser.Input.Keyboard.KeyCodes.DOWN
+		);
+		this.keyRight = this.input.keyboard.addKey(
+			Phaser.Input.Keyboard.KeyCodes.RIGHT
+		);
+		this.keyUp = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.UP);
+
+		this.keyA = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
+		this.keyS = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S);
+		this.keyD = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
+		this.keyW = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W);
 
 		this.input.keyboard.on("keydown-ONE", () => {
 			// Cheat: show hitboxes
@@ -2633,6 +2647,22 @@ export class Game extends Scene {
 		return true;
 	}
 
+	isPressingLeft(): boolean {
+		return this.keyLeft.isDown || this.keyA.isDown;
+	}
+
+	isPressingRight(): boolean {
+		return this.keyRight.isDown || this.keyD.isDown;
+	}
+
+	isPressingUp(): boolean {
+		return this.keyUp.isDown || this.keyW.isDown;
+	}
+
+	isPressingDown(): boolean {
+		return this.keyDown.isDown || this.keyS.isDown;
+	}
+
 	updatePlayerMovement(): void {
 		if (!this.canPlayerMove()) {
 			return;
@@ -2643,17 +2673,17 @@ export class Game extends Scene {
 		const previousDirection = this.playerDirection;
 
 		// Set velocity based on key press
-		if (this.keyLeft.isDown) {
+		if (this.isPressingLeft()) {
 			this.player.body.setVelocityX(-this.getPlayerSpeed());
 			this.playerDirection = SpriteLeft;
-		} else if (this.keyRight.isDown) {
+		} else if (this.isPressingRight()) {
 			this.player.body.setVelocityX(this.getPlayerSpeed());
 			this.playerDirection = SpriteRight;
 		}
-		if (this.keyUp.isDown) {
+		if (this.isPressingUp()) {
 			this.player.body.setVelocityY(-this.getPlayerSpeed());
 			this.playerDirection = SpriteUp;
-		} else if (this.keyDown.isDown) {
+		} else if (this.isPressingDown()) {
 			this.player.body.setVelocityY(this.getPlayerSpeed());
 			this.playerDirection = SpriteDown;
 		}
