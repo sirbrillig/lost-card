@@ -52,6 +52,10 @@ export class MainMenu extends Scene {
 			throw new Error("Keyboard could not be loaded");
 		}
 		this.cursors = cursors;
+
+		if (loadSavedData()) {
+			this.selectNextButton(1);
+		}
 	}
 
 	selectNextButton(change: number) {
