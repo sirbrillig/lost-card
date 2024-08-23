@@ -377,7 +377,7 @@ export class Game extends Scene {
 			throw new Error("No keyboard controls could be found");
 		}
 		this.cursors = this.input.keyboard.createCursorKeys();
-		this.input.keyboard.on("keydown-D", () => {
+		this.input.keyboard.on("keydown-ONE", () => {
 			// Cheat: show hitboxes
 			if (this.debugGraphic) {
 				this.debugGraphic.destroy();
@@ -386,7 +386,7 @@ export class Game extends Scene {
 				this.debugGraphic = this.physics.world.createDebugGraphic();
 			}
 		});
-		this.input.keyboard.on("keydown-H", () => {
+		this.input.keyboard.on("keydown-TWO", () => {
 			if (this.getPlayerHitPoints() <= 0) {
 				return;
 			}
@@ -395,7 +395,7 @@ export class Game extends Scene {
 				this.registry.get("playerTotalHitPoints") ?? this.playerInitialHitPoints
 			);
 		});
-		this.input.keyboard.on("keydown-P", () => {
+		this.input.keyboard.on("keydown-THREE", () => {
 			// Cheat: gain all items
 			this.equipSword();
 			this.equipPower("WindCard");
@@ -404,14 +404,6 @@ export class Game extends Scene {
 			this.equipPower("FireCard");
 			this.equipPower("SpiritCard");
 			this.equipPower("CloudCard");
-		});
-		this.input.keyboard.on("keydown-S", () => {
-			// Cheat: save
-			this.saveGame();
-		});
-		this.input.keyboard.on("keydown-L", () => {
-			// Cheat: load
-			this.loadLastSave();
 		});
 		this.input.keyboard.on("keydown-SPACE", () => {
 			// Attack
