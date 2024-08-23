@@ -16,6 +16,7 @@ import { MountainBoss } from "../MountainBoss";
 import { PlantSpitter } from "../PlantSpitter";
 import { IceBoss } from "../IceBoss";
 import { PlantBoss } from "../PlantBoss";
+import { SpiritBoss } from "../SpiritBoss";
 import { CloudBoss } from "../CloudBoss";
 import { FireBoss } from "../FireBoss";
 import {
@@ -120,7 +121,6 @@ export class Game extends Scene {
 			"Dungeon_Tiles_Sprites",
 			"dungeon_tiles_sprites"
 		);
-		console.log(this.map.tilesets);
 		if (!tilesetTile || !tilesetSprite) {
 			throw new Error("Could not make tileset");
 		}
@@ -158,7 +158,6 @@ export class Game extends Scene {
 				this.enemyHitPlayer();
 			},
 			(_, tile) => {
-				console.log(tile);
 				if (
 					isTileWithPropertiesObject(tile) &&
 					tile.properties.affectedBySpiritCard &&
@@ -2141,6 +2140,24 @@ export class Game extends Scene {
 					const boss = new CloudBoss(this, this.enemyManager, point.x, point.y);
 					boss.once(Events.MonsterDefeated, () => {
 						this.markBossDefeated("CloudBoss");
+						this.showHiddenItem("Heart");
+						this.showHiddenItem("Key");
+					});
+					this.enemyManager.enemies.add(boss);
+					break;
+				}
+				case "SpiritBoss": {
+					if (this.wasBossDefeated("SpiritBoss")) {
+						break;
+					}
+					const boss = new SpiritBoss(
+						this,
+						this.enemyManager,
+						point.x,
+						point.y
+					);
+					boss.once(Events.MonsterDefeated, () => {
+						this.markBossDefeated("SpiritBoss");
 						this.showHiddenItem("Heart");
 						this.showHiddenItem("Key");
 					});

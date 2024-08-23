@@ -620,3 +620,32 @@ export function isEnemy(
 	const test = sprite as BaseMonster<"test">;
 	return "hitPoints" in test;
 }
+
+export function moveHitboxInFrontOfSprite(
+	sprite: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody,
+	direction: SpriteDirection,
+	hitbox: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody
+) {
+	const xOffset = (() => {
+		if (direction === SpriteLeft) {
+			return -sprite.body.height / 2;
+		}
+		if (direction === SpriteRight) {
+			return sprite.body.height / 2;
+		}
+		return 0;
+	})();
+	const yOffset = (() => {
+		if (direction === SpriteUp) {
+			return -sprite.body.height / 2;
+		}
+		if (direction === SpriteDown) {
+			return sprite.body.height / 2;
+		}
+		return 0;
+	})();
+
+	hitbox.setOrigin(0.5);
+	hitbox.x = sprite.body.center.x + xOffset;
+	hitbox.y = sprite.body.center.y + yOffset;
+}

@@ -1,4 +1,5 @@
 import {
+	moveHitboxInFrontOfSprite,
 	DataKeys,
 	getDirectionOfSpriteMovement,
 	SpriteDirection,
@@ -104,7 +105,6 @@ export class Roar<AllStates extends string>
 		if (!sprite.body || !isDynamicSprite(sprite)) {
 			throw new Error("Could not update monster");
 		}
-		console.log("roar");
 		sprite.body.stop();
 		sprite.anims.play(
 			{
@@ -114,15 +114,11 @@ export class Roar<AllStates extends string>
 		);
 		MainEvents.emit(Events.StunPlayer, true);
 		sprite.scene.cameras.main.shake(2000, 0.009);
-		sprite.once(
-			Phaser.Animations.Events.ANIMATION_COMPLETE,
-			(anim: Phaser.Animations.Animation) => {
-				console.log("roar complete", anim);
-				MainEvents.emit(Events.StunPlayer, false);
-				stateMachine.popState();
-				stateMachine.pushState(this.#nextState);
-			}
-		);
+		sprite.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
+			MainEvents.emit(Events.StunPlayer, false);
+			stateMachine.popState();
+			stateMachine.pushState(this.#nextState);
+		});
 	}
 
 	update(sprite: Phaser.GameObjects.Sprite): void {
@@ -399,6 +395,91 @@ export class LeftRightMarch<AllStates extends string>
 	update() {}
 }
 
+export class RandomTeleport<AllStates extends string>
+	implements Behavior<AllStates, Phaser.GameObjects.Sprite>
+{
+	#postTeleportDelay = 1000;
+	#nextState: AllStates;
+	name: AllStates;
+
+	constructor(name: AllStates, nextState: AllStates) {
+		this.name = name;
+		this.#nextState = nextState;
+	}
+
+	init(
+		sprite: Phaser.GameObjects.Sprite,
+		stateMachine: BehaviorMachineInterface<AllStates>,
+		enemyManager: EnemyManager
+	): void {
+		if (!isDynamicSprite(sprite)) {
+			throw new Error("invalid sprite");
+		}
+		if (!enemyManager.activeRoom) {
+			throw new Error("Cannot create monster outside of room");
+		}
+		sprite.body.setVelocity(0);
+
+		sprite.scene.anims.create({
+			key: "teleport",
+			frames: sprite.anims.generateFrameNumbers("white_fire_circle"),
+			frameRate: 24,
+			repeat: 0,
+			showOnStart: true,
+			hideOnComplete: true,
+		});
+		const effect1 = sprite.scene.add.sprite(
+			sprite.body.center.x,
+			sprite.body.center.y,
+			"teleport",
+			0
+		);
+		effect1.setDepth(5);
+		effect1.anims.play("teleport", true);
+		sprite.once(Events.MonsterDying, () => {
+			effect1?.destroy();
+		});
+
+		// Get all tiles in room
+		const tiles = getTilesInRoom(enemyManager.map, enemyManager.activeRoom);
+		if (tiles.length < 1) {
+			console.log("No tiles in room to teleport to");
+			stateMachine.popState();
+			stateMachine.pushState(this.#nextState);
+		}
+		// Choose tile at random
+		const targetTile = tiles[Phaser.Math.Between(0, tiles.length - 1)];
+		const x = targetTile.pixelX + targetTile.width / 2;
+		// Move to tile
+		sprite.setPosition(x, targetTile.pixelY);
+
+		const effect2 = sprite.scene.add.sprite(
+			x,
+			targetTile.pixelY,
+			"teleport",
+			0
+		);
+		effect2.setDepth(8);
+		effect2.anims.play("teleport", true);
+		sprite.once(Events.MonsterDying, () => {
+			effect2?.destroy();
+		});
+
+		// Move to next state
+		sprite.scene.time.addEvent({
+			delay: this.#postTeleportDelay,
+			callback: () => {
+				effect1?.destroy();
+				effect2?.destroy();
+				stateMachine.popState();
+				stateMachine.pushState(this.#nextState);
+			},
+		});
+	}
+
+	update() {}
+}
+
 export class TeleportToWater<AllStates extends string>
 	implements Behavior<AllStates, Phaser.GameObjects.Sprite>
 {
@@ -503,6 +584,98 @@ export class PowerUp<AllStates extends string>
 	}
 
 	update(): void {}
+}
+
+export class SlashTowardPlayer<AllStates extends string>
+	implements Behavior<AllStates, Phaser.GameObjects.Sprite>
+{
+	#nextState: AllStates;
+	name: AllStates;
+	#speed = 100;
+	#hitboxSize = 30;
+	#effect: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
+
+	constructor(name: AllStates, nextState: AllStates) {
+		this.name = name;
+		this.#nextState = nextState;
+	}
+
+	init(
+		sprite: Phaser.GameObjects.Sprite,
+		stateMachine: BehaviorMachineInterface<AllStates>,
+		enemyManager: EnemyManager
+	): void {
+		if (
+			!sprite.body ||
+			!isDynamicSprite(sprite) ||
+			!isDynamicSprite(enemyManager.player)
+		) {
+			throw new Error("Could not update monster");
+		}
+
+		sprite.scene.physics.moveTo(
+			sprite,
+			enemyManager.player.body.center.x,
+			enemyManager.player.body.center.y,
+			this.#speed
+		);
+		const direction = getDirectionOfSpriteMovement(sprite.body);
+		if (!direction) {
+			return;
+		}
+		sprite.data.set("direction", direction);
+		sprite.anims.play(getWalkAnimationKeyForDirection(direction), true);
+
+		sprite.scene.anims.create({
+			key: "slash-effect",
+			frames: sprite.anims.generateFrameNumbers("slash-effect"),
+			frameRate: 24,
+			showOnStart: true,
+			hideOnComplete: true,
+			yoyo: true,
+		});
+		const effect = sprite.scene.add.sprite(
+			sprite.body.center.x,
+			sprite.body.center.y,
+			"slash-effect",
+			0
+		);
+		sprite.scene.physics.add.existing(effect);
+		if (!isDynamicSprite(effect)) {
+			throw new Error("Slash effect is broken");
+		}
+		this.#effect = effect;
+		this.#effect.setSize(this.#hitboxSize, this.#hitboxSize);
+		this.#effect.setDisplaySize(this.#hitboxSize, this.#hitboxSize);
+		this.#effect.setDepth(5);
+		moveHitboxInFrontOfSprite(sprite, direction, this.#effect);
+		this.#effect.anims.play("slash-effect", true);
+
+		sprite.scene.physics.add.overlap(enemyManager.player, this.#effect, () => {
+			MainEvents.emit(Events.EnemyHitPlayer, true);
+		});
+
+		sprite.once(Events.MonsterDying, () => {
+			this.#effect?.destroy();
+		});
+		this.#effect.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
+			this.#effect.destroy();
+			stateMachine.popState();
+			stateMachine.pushState(this.#nextState);
+		});
+	}
+
+	update(sprite: Phaser.GameObjects.Sprite): void {
+		if (!isDynamicSprite(sprite)) {
+			throw new Error("Could not update monster");
+		}
+
+		const direction = getDirectionOfSpriteMovement(sprite.body);
+		if (!direction) {
+			return;
+		}
+		moveHitboxInFrontOfSprite(sprite, direction, this.#effect);
+	}
 }
 
 export class BigSwing<AllStates extends string>
