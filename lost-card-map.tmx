@@ -8084,9 +8084,6 @@
   <object id="5" name="Start Point" x="1935.89" y="1107.99">
    <point/>
   </object>
-  <object id="686" name="Temp Start" x="2653.38" y="1698.69">
-   <point/>
-  </object>
  </objectgroup>
  <objectgroup id="13" name="FinalDoor">
   <object id="547" name="FinalDoor" gid="2135" x="1920" y="1088" width="16" height="16"/>
