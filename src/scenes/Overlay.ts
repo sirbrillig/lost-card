@@ -210,19 +210,17 @@ export class Overlay extends Scene {
 		if (!this.input.keyboard) {
 			throw new Error("No keyboard controls could be found");
 		}
+
+		// Prevent TAB from being taken by browser context
+		this.input.keyboard.addKey("TAB", true);
+		this.input.keyboard.on("keydown-TAB", () => {
+			this.togglePause();
+		});
 		this.input.keyboard.on("keydown-ESC", () => {
-			// Pause
-			if (this.scene.isPaused("Game")) {
-				this.scene.get("GameMap")?.scene.stop();
-				this.scene.resume("Game");
-			} else {
-				this.scene.pause("Game");
-				this.scene.launch("GameMap");
-				// this.scene.launch("Dialog", {
-				// 	heading: "Paused",
-				// 	text: "Press ESC to resume",
-				// });
-			}
+			this.togglePause();
+		});
+		this.input.keyboard.on("keydown-M", () => {
+			this.togglePause();
 		});
 		this.input.keyboard.on("keydown-OPEN_BRACKET", () => {
 			// Rotate Active Power
@@ -251,6 +249,21 @@ export class Overlay extends Scene {
 				available[current - 1] ?? available[available.length - 1];
 			this.setActivePower(nextPower);
 		});
+	}
+
+	togglePause() {
+		// Pause
+		if (this.scene.isPaused("Game")) {
+			this.scene.get("GameMap")?.scene.stop();
+			this.scene.resume("Game");
+		} else {
+			this.scene.pause("Game");
+			this.scene.launch("GameMap");
+			// this.scene.launch("Dialog", {
+			// 	heading: "Paused",
+			// 	text: "Press ESC to resume",
+			// });
+		}
 	}
 
 	setActivePower(power: Powers): void {
