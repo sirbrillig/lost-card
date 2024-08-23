@@ -2666,8 +2666,6 @@ export class Game extends Scene {
 
 		this.player.body.setVelocity(0);
 
-		const previousDirection = this.playerDirection;
-
 		// Set velocity based on key press
 		if (this.isPressingLeft()) {
 			this.player.body.setVelocityX(-this.getPlayerSpeed());
@@ -2684,31 +2682,20 @@ export class Game extends Scene {
 			this.playerDirection = SpriteDown;
 		}
 
-		const isMoving =
-			this.player.body.velocity.x !== 0 || this.player.body.velocity.y !== 0;
+		this.player.body.velocity.normalize().scale(this.getPlayerSpeed());
 
 		// Set animation based on direction (if multiple, just pick one)
-		if (isMoving && this.playerDirection !== previousDirection) {
-			switch (this.playerDirection) {
-				case SpriteLeft:
-					this.player.setFlipX(false);
-					this.player.anims.play("character-left-walk", true);
-					break;
-				case SpriteRight:
-					this.player.setFlipX(true);
-					this.player.anims.play("character-left-walk", true);
-					break;
-				case SpriteUp:
-					this.player.anims.play("character-up-walk", true);
-					break;
-				case SpriteDown:
-					this.player.anims.play("character-down-walk", true);
-					break;
-			}
-		}
-
-		this.player.body.velocity.normalize().scale(this.getPlayerSpeed());
-		if (!isMoving) {
+		if (this.isPressingLeft()) {
+			this.player.setFlipX(false);
+			this.player.anims.play("character-left-walk", true);
+		} else if (this.isPressingRight()) {
+			this.player.setFlipX(true);
+			this.player.anims.play("character-left-walk", true);
+		} else if (this.isPressingUp()) {
+			this.player.anims.play("character-up-walk", true);
+		} else if (this.isPressingDown()) {
+			this.player.anims.play("character-down-walk", true);
+		} else {
 			this.setPlayerIdleFrame();
 		}
 	}
