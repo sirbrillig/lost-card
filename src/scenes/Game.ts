@@ -101,7 +101,7 @@ export class Game extends Scene {
 	icePowerVelocity: number = 80;
 	iceCardFrozenTime: number = 3000;
 	iceMeltTime: number = 4000;
-	plantCardVelocity: number = 80;
+	plantCardVelocity: number = 140;
 	firePowerVelocity: number = 120;
 	gateCloseSpeed: number = 200;
 
@@ -194,9 +194,6 @@ export class Game extends Scene {
 				if (!isEnemy(enemy)) {
 					throw new Error("Non-enemy ran into something");
 				}
-				// FIXME: this seems to allow walking through any collision, not just
-				// the ones we want, probably by setting the sprite to whatever mode it
-				// gets in when placed entirely within collidable tles.
 				return enemy.doesCollideWithTile(tile);
 			}
 		);
@@ -284,9 +281,7 @@ export class Game extends Scene {
 				if (!isDynamicSprite(player) || !isDynamicSprite(enemy)) {
 					return;
 				}
-				// FIXME: for some reason the creature stops before it hits the player
 				if (enemy.data.get("isPlantCardGrappleActive")) {
-					console.log("end pulling monster");
 					enemy?.emit(Events.MonsterStun, false);
 					enemy.data.set("isPlantCardGrappleActive", false);
 					this.power.anims.stop();
@@ -892,7 +887,6 @@ export class Game extends Scene {
 					this.player.body.center
 				);
 				if (distance < 30) {
-					// FIXME: for some reason the creature stops when it gets about 30px away but I have no idea why
 					enemy.emit(Events.MonsterStun, false);
 					enemy.data.set("isPlantCardGrappleActive", false);
 					this.power.anims.stop();
@@ -971,7 +965,7 @@ export class Game extends Scene {
 
 		// The plant card moves you next to the target, over any land obstacle
 		this.player.data.set("isPlantCardGrappleActive", true);
-		this.physics.moveToObject(this.player, tile, 120);
+		this.physics.moveToObject(this.player, tile, this.plantCardVelocity);
 		this.power.anims.pause();
 		this.power.body.stop();
 	}
@@ -2211,13 +2205,12 @@ export class Game extends Scene {
 			return;
 		}
 		console.log("pulling monster");
-		enemy.emit(Events.MonsterStun, true);
+		// We can't use MonsterStun event here because it is too slow.
+		enemy.data.set(DataKeys.Stunned, true);
+		enemy.body.stop();
 		enemy.data.set("isPlantCardGrappleActive", true);
 
-		this.physics.moveToObject(enemy, this.player, 120);
-
-		// FIXME: do we need this?
-		// this.power.anims.pause();
+		this.physics.moveToObject(enemy, this.player, this.plantCardVelocity);
 		this.power.body.stop();
 	}
 
