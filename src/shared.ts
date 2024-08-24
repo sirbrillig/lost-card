@@ -37,6 +37,8 @@ export const DataKeys = {
 	DefeatedBosses: "DefeatedBosses",
 };
 
+export type Region = "MK" | "IK" | "CK" | "FK" | "PK" | "SK";
+
 export type Powers =
 	| "IceCard"
 	| "WindCard"
@@ -379,6 +381,45 @@ export function hideAllRoomsExcept(
 			});
 		}
 	});
+}
+
+export function getRegionName(code: Region) {
+	switch (code) {
+		case "MK":
+			return "Mountain Kingdom";
+		case "CK":
+			return "Cloud Kingdom";
+		case "IK":
+			return "Ice Kingdom";
+		case "PK":
+			return "Plant Kingdom";
+		case "FK":
+			return "Fire Kingdom";
+		case "SK":
+			return "Spirit Kingdom";
+	}
+}
+
+export function getRegionFromRoomName(name: string): Region {
+	if (name.startsWith("MK")) {
+		return "MK";
+	}
+	if (name.startsWith("CK")) {
+		return "CK";
+	}
+	if (name.startsWith("PK")) {
+		return "PK";
+	}
+	if (name.startsWith("FK")) {
+		return "FK";
+	}
+	if (name.startsWith("SK")) {
+		return "SK";
+	}
+	if (name.startsWith("IK")) {
+		return "IK";
+	}
+	throw new Error(`Unknown region for room ${name}`);
 }
 
 export function getDoorDestinationCoordinates(

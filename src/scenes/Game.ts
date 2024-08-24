@@ -47,6 +47,8 @@ import {
 	isEnemy,
 	isTileWithPropertiesObject,
 	getPowerEquippedKey,
+	getRegionFromRoomName,
+	getRegionName,
 } from "../shared";
 
 export class Game extends Scene {
@@ -105,6 +107,7 @@ export class Game extends Scene {
 	plantCardVelocity: number = 140;
 	firePowerVelocity: number = 120;
 	gateCloseSpeed: number = 340;
+	newRegionMessageTime: number = 1000;
 
 	map: Phaser.Tilemaps.Tilemap;
 	landLayer: Phaser.Tilemaps.TilemapLayer;
@@ -728,6 +731,19 @@ export class Game extends Scene {
 		this.physics.world.setBounds(room.x, room.y, room.width, room.height);
 
 		camera.startFollow(this.player);
+
+		if (this.enemyManager.activeRoom) {
+			const previousRegion = getRegionFromRoomName(
+				this.enemyManager.activeRoom.name
+			);
+			const newRegion = getRegionFromRoomName(room.name);
+			if (previousRegion !== newRegion) {
+				this.scene.launch("Dialog", {
+					heading: getRegionName(newRegion),
+					hideAfter: this.newRegionMessageTime,
+				});
+			}
+		}
 
 		this.enemyManager.activeRoom = room;
 		this.enteredRoomAt = this.time.now;
@@ -1453,7 +1469,7 @@ export class Game extends Scene {
 
 		// if the player enters a door, move the camera to that room
 		const room = getRoomForPoint(this.map, this.player.x, this.player.y);
-		if (room !== this.enemyManager.activeRoom) {
+		if (room.name !== this.enemyManager.activeRoom?.name) {
 			console.log("moving camera to room", room);
 			this.moveCameraToRoom(room);
 		}
