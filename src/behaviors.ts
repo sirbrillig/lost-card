@@ -1553,7 +1553,7 @@ class Seeker extends Phaser.Physics.Arcade.Sprite {
 		});
 
 		this.scene.physics.add.overlap(this.#enemyManager.sword, this, () => {
-			if (!this.#enemyManager.sword.data.get(DataKeys.SwordAttackAcive)) {
+			if (!this.#enemyManager.sword.data.get(DataKeys.SwordAttackActive)) {
 				return;
 			}
 			this.body.stop();

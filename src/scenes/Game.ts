@@ -320,7 +320,7 @@ export class Game extends Scene {
 				this.playerHitEnemy(enemy);
 			},
 			() => {
-				return this.sword.data.get(DataKeys.SwordAttackAcive);
+				return this.sword.data.get(DataKeys.SwordAttackActive);
 			}
 		);
 		this.physics.add.overlap(
@@ -525,7 +525,7 @@ export class Game extends Scene {
 	activateAttack() {
 		console.log("attack beginning");
 		this.player.body.setVelocity(0);
-		this.sword.data.set(DataKeys.SwordAttackAcive, true);
+		this.sword.data.set(DataKeys.SwordAttackActive, true);
 		this.updateSwordHitbox();
 
 		this.sword.setRotation(Phaser.Math.DegToRad(0));
@@ -555,7 +555,7 @@ export class Game extends Scene {
 
 		this.attackSprite.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
 			console.log("attack complete");
-			this.sword.data.set(DataKeys.SwordAttackAcive, false);
+			this.sword.data.set(DataKeys.SwordAttackActive, false);
 			this.attackSprite.setVisible(false);
 			this.player.setVisible(true);
 			this.lastAttackedAt = this.time.now;

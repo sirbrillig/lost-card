@@ -34,7 +34,7 @@ export const DataKeys = {
 	ActivePower: "activePower",
 	PotionCount: "potionCount",
 	KeyCount: "keyCount",
-	SwordAttackAcive: "attackActive",
+	SwordAttackActive: "attackActive",
 	DefeatedBosses: "DefeatedBosses",
 };
 
