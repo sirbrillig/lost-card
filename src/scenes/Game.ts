@@ -59,7 +59,6 @@ export class Game extends Scene {
 	enemyCollider: Phaser.Physics.Arcade.Collider;
 	isGameOver: boolean = false;
 
-	framesSincePlayerHit: number = 0;
 	lastAttackedAt: number = 0;
 	lastPowerAt: number = 0;
 	playerDirection: SpriteDirection = SpriteDown;
@@ -83,7 +82,7 @@ export class Game extends Scene {
 	postPowerCooldown: number = 600;
 	postHitPlayerKnockback: number = 120;
 	postHitEnemyKnockback: number = 50;
-	postHitInvincibilityTime: number = 600;
+	postHitInvincibilityTime: number = 800;
 	attackFrameRate: number = 35;
 	attackDelay: number = 0;
 	gotItemFreeze: number = 1000;
@@ -2263,7 +2262,7 @@ export class Game extends Scene {
 	}
 
 	enemyHitPlayer(): void {
-		if (this.framesSincePlayerHit > 0 || this.isPlayerInvincible()) {
+		if (this.isPlayerBeingHit() || this.isPlayerInvincible()) {
 			return;
 		}
 		console.log("player got hit!");
@@ -2292,7 +2291,7 @@ export class Game extends Scene {
 			delay: this.postHitInvincibilityTime,
 			callback: () => {
 				if (this.getPlayerHitPoints() > 0) {
-					this.framesSincePlayerHit = 0;
+					this.setPlayerBeingHit(false);
 					this.enemyCollider.active = true;
 				}
 			},
@@ -2309,7 +2308,7 @@ export class Game extends Scene {
 			}
 		);
 
-		this.framesSincePlayerHit = 200;
+		this.setPlayerBeingHit(true);
 	}
 
 	knockBack(
@@ -2437,13 +2436,11 @@ export class Game extends Scene {
 	}
 
 	isPlayerBeingHit(): boolean {
-		return this.framesSincePlayerHit > 0;
+		return this.player.data?.get("playerGotHit");
 	}
 
-	updatePlayerBeingHit(): void {
-		this.framesSincePlayerHit -= 1;
-		// FIXME this needs to end on visible
-		// this.player.setVisible(this.framesSincePlayerHit % 2 === 0 ? true : false);
+	setPlayerBeingHit(setting: boolean): void {
+		this.player.data?.set("playerGotHit", setting);
 	}
 
 	isPlayerUsingPower(): boolean {
@@ -2730,10 +2727,6 @@ export class Game extends Scene {
 		);
 		this.registry.set("playerX", this.player.x);
 		this.registry.set("playerY", this.player.y);
-
-		if (this.isPlayerBeingHit()) {
-			this.updatePlayerBeingHit();
-		}
 
 		this.updateSwordHitbox();
 		this.updatePowerHitboxPosition();
