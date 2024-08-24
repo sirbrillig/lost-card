@@ -143,8 +143,8 @@ export class Game extends Scene {
 		this.attackSprite = this.add.sprite(
 			this.player.x,
 			this.player.y,
-			"character-attack-up",
-			0
+			"character",
+			"sword-up-0.png"
 		);
 		this.attackSprite.setDepth(4);
 		this.attackSprite.setVisible(false);
@@ -536,16 +536,16 @@ export class Game extends Scene {
 		this.player.setVisible(false);
 		switch (this.playerDirection) {
 			case SpriteUp:
-				this.attackSprite.play("character-up-attack", true);
+				this.attackSprite.play("up-attack", true);
 				break;
 			case SpriteRight:
-				this.attackSprite.play("character-right-attack", true);
+				this.attackSprite.play("right-attack", true);
 				break;
 			case SpriteDown:
-				this.attackSprite.play("character-down-attack", true);
+				this.attackSprite.play("down-attack", true);
 				break;
 			case SpriteLeft:
-				this.attackSprite.play("character-left-attack", true);
+				this.attackSprite.play("left-attack", true);
 				break;
 		}
 
@@ -1348,7 +1348,7 @@ export class Game extends Scene {
 				this.power.anims.play("plant-power-right", true);
 				break;
 			case "WindCard":
-				this.power.anims.play("character-right-power", true);
+				this.power.anims.play("wind-power-right", true);
 				break;
 		}
 	}
@@ -1414,7 +1414,7 @@ export class Game extends Scene {
 
 	pickUpSword() {
 		this.equipSword();
-		this.player.anims.play("character-down-attack", true);
+		this.player.anims.play("down-attack", true);
 		this.setPlayerInvincible(true);
 		this.setPlayerStunned(true);
 		this.time.addEvent({
@@ -1659,70 +1659,110 @@ export class Game extends Scene {
 		});
 
 		anims.create({
-			key: "character-idle-down",
-			frames: anims.generateFrameNumbers("character-idle-down"),
+			key: "idle-down",
+			frames: anims.generateFrameNames("character", {
+				prefix: "idle-down-",
+				suffix: ".png",
+				end: 4,
+			}),
 			frameRate: 7,
 			repeat: -1,
 		});
 		anims.create({
-			key: "character-idle-up",
-			frames: anims.generateFrameNumbers("character-idle-up"),
+			key: "idle-up",
+			frames: anims.generateFrameNames("character", {
+				prefix: "idle-up-",
+				suffix: ".png",
+				end: 4,
+			}),
 			frameRate: 7,
 			repeat: -1,
 		});
 		anims.create({
-			key: "character-idle-left",
-			frames: anims.generateFrameNumbers("character-idle-left"),
+			key: "idle-left",
+			frames: anims.generateFrameNames("character", {
+				prefix: "idle-left-",
+				suffix: ".png",
+				end: 4,
+			}),
 			frameRate: 7,
 			repeat: -1,
 		});
 
 		anims.create({
-			key: "character-down-walk",
-			frames: anims.generateFrameNumbers("character-run-down"),
+			key: "down-walk",
+			frames: anims.generateFrameNames("character", {
+				prefix: "run-down-",
+				suffix: ".png",
+				end: 7,
+			}),
 			frameRate: 14,
 			repeat: -1,
 		});
 		anims.create({
-			key: "character-up-walk",
-			frames: anims.generateFrameNumbers("character-run-up"),
+			key: "up-walk",
+			frames: anims.generateFrameNames("character", {
+				prefix: "run-up-",
+				suffix: ".png",
+				end: 7,
+			}),
 			frameRate: 14,
 			repeat: -1,
 		});
 		anims.create({
-			key: "character-left-walk",
-			frames: anims.generateFrameNumbers("character-run-left"),
+			key: "left-walk",
+			frames: anims.generateFrameNames("character", {
+				prefix: "run-left-",
+				suffix: ".png",
+				end: 7,
+			}),
 			frameRate: 14,
 			repeat: -1,
 		});
 
 		anims.create({
-			key: "character-down-attack",
-			frames: anims.generateFrameNumbers("character-attack-down"),
+			key: "down-attack",
+			frames: anims.generateFrameNames("character", {
+				prefix: "sword-down-",
+				suffix: ".png",
+				end: 9,
+			}),
 			frameRate: this.attackFrameRate,
 			repeat: 0,
 			delay: this.attackDelay,
 			showBeforeDelay: true,
 		});
 		anims.create({
-			key: "character-right-attack",
-			frames: anims.generateFrameNumbers("character-attack-right"),
+			key: "right-attack",
+			frames: anims.generateFrameNames("character", {
+				prefix: "sword-right-",
+				suffix: ".png",
+				end: 9,
+			}),
 			frameRate: this.attackFrameRate,
 			repeat: 0,
 			delay: this.attackDelay,
 			showBeforeDelay: true,
 		});
 		anims.create({
-			key: "character-up-attack",
-			frames: anims.generateFrameNumbers("character-attack-up"),
+			key: "up-attack",
+			frames: anims.generateFrameNames("character", {
+				prefix: "sword-up-",
+				suffix: ".png",
+				end: 9,
+			}),
 			frameRate: this.attackFrameRate,
 			repeat: 0,
 			delay: this.attackDelay,
 			showBeforeDelay: true,
 		});
 		anims.create({
-			key: "character-left-attack",
-			frames: anims.generateFrameNumbers("character-attack-left"),
+			key: "left-attack",
+			frames: anims.generateFrameNames("character", {
+				prefix: "sword-left-",
+				suffix: ".png",
+				end: 9,
+			}),
 			frameRate: this.attackFrameRate,
 			repeat: 0,
 			delay: this.attackDelay,
@@ -1767,17 +1807,8 @@ export class Game extends Scene {
 			repeat: 2,
 		});
 		anims.create({
-			key: "character-right-power",
-			frames: anims.generateFrameNumbers("character-power-right"),
-			frameRate: 24,
-			showOnStart: true,
-			hideOnComplete: true,
-		});
-		anims.create({
-			key: "character-left-power",
-			frames: anims.generateFrameNumbers("character-power-left", {
-				frames: [5, 4, 3, 2, 1, 0, 11, 10, 9, 8, 7, 6],
-			}),
+			key: "wind-power-right",
+			frames: anims.generateFrameNumbers("wind-power"),
 			frameRate: 24,
 			showOnStart: true,
 			hideOnComplete: true,
@@ -1800,10 +1831,9 @@ export class Game extends Scene {
 	}
 
 	createPlayer(x: number, y: number): void {
-		this.player = this.physics.add.sprite(x, y, "character-idle-down", 0);
+		this.player = this.physics.add.sprite(x, y, "character", "idle-down-0.png");
 		this.player.setDataEnabled();
 		this.player.setDebugBodyColor(0x00ff00);
-		this.player.setDisplaySize(13, 24);
 		this.player.setSize(8, 12);
 		this.player.setOffset(
 			this.player.body.offset.x,
@@ -1813,7 +1843,7 @@ export class Game extends Scene {
 		this.sword = this.physics.add.sprite(
 			this.player.x,
 			this.player.y,
-			"character-power-right",
+			"wind-power",
 			4
 		);
 		this.sword.setDataEnabled();
@@ -1824,7 +1854,7 @@ export class Game extends Scene {
 		this.power = this.physics.add.sprite(
 			this.player.x,
 			this.player.y,
-			"character-power-right",
+			"wind-power",
 			4
 		);
 		this.power.setDebugBodyColor(0x00fff0);
@@ -2466,7 +2496,7 @@ export class Game extends Scene {
 					case "CloudCard":
 						this.power.anims.play("cloud-power", true);
 						this.player.setVelocity(0, -this.cloudCardSpeed);
-						this.player.anims.play("character-up-walk");
+						this.player.anims.play("up-walk");
 						break;
 					case "SpiritCard":
 						this.power.anims.play("spirit-power", true);
@@ -2490,8 +2520,8 @@ export class Game extends Scene {
 						this.power.setFlipX(true);
 						break;
 					case "WindCard":
-						this.power.setRotation(Phaser.Math.DegToRad(90));
-						this.power.anims.play("character-left-power", true);
+						this.power.setRotation(Phaser.Math.DegToRad(-90));
+						this.power.anims.play("wind-power-right", true);
 						break;
 				}
 				break;
@@ -2505,7 +2535,7 @@ export class Game extends Scene {
 					case "CloudCard":
 						this.power.anims.play("cloud-power", true);
 						this.player.setVelocity(this.cloudCardSpeed, 0);
-						this.player.anims.play("character-left-walk");
+						this.player.anims.play("left-walk");
 						this.player.setFlipX(true);
 						break;
 					case "SpiritCard":
@@ -2526,7 +2556,7 @@ export class Game extends Scene {
 						this.power.anims.play("ice-power-right", true);
 						break;
 					case "WindCard":
-						this.power.anims.play("character-right-power", true);
+						this.power.anims.play("wind-power-right", true);
 						break;
 				}
 				break;
@@ -2540,7 +2570,7 @@ export class Game extends Scene {
 					case "CloudCard":
 						this.power.anims.play("cloud-power", true);
 						this.player.setVelocity(0, this.cloudCardSpeed);
-						this.player.anims.play("character-down-walk");
+						this.player.anims.play("down-walk");
 						break;
 					case "SpiritCard":
 						this.power.anims.play("spirit-power", true);
@@ -2563,7 +2593,7 @@ export class Game extends Scene {
 						break;
 					case "WindCard":
 						this.power.setRotation(Phaser.Math.DegToRad(90));
-						this.power.anims.play("character-right-power", true);
+						this.power.anims.play("wind-power-right", true);
 						break;
 				}
 				break;
@@ -2578,7 +2608,7 @@ export class Game extends Scene {
 					case "CloudCard":
 						this.power.anims.play("cloud-power", true);
 						this.player.setVelocity(-this.cloudCardSpeed, 0);
-						this.player.anims.play("character-left-walk");
+						this.player.anims.play("left-walk");
 						break;
 					case "SpiritCard":
 						this.power.anims.play("spirit-power", true);
@@ -2600,7 +2630,8 @@ export class Game extends Scene {
 						this.power.setFlipX(true);
 						break;
 					case "WindCard":
-						this.power.anims.play("character-left-power", true);
+						this.power.setRotation(Phaser.Math.DegToRad(-180));
+						this.power.anims.play("wind-power-right", true);
 						break;
 				}
 				break;
@@ -2673,14 +2704,14 @@ export class Game extends Scene {
 		// Set animation based on direction (if multiple, just pick one)
 		if (this.isPressingLeft()) {
 			this.player.setFlipX(false);
-			this.player.anims.play("character-left-walk", true);
+			this.player.anims.play("left-walk", true);
 		} else if (this.isPressingRight()) {
 			this.player.setFlipX(true);
-			this.player.anims.play("character-left-walk", true);
+			this.player.anims.play("left-walk", true);
 		} else if (this.isPressingUp()) {
-			this.player.anims.play("character-up-walk", true);
+			this.player.anims.play("up-walk", true);
 		} else if (this.isPressingDown()) {
-			this.player.anims.play("character-down-walk", true);
+			this.player.anims.play("down-walk", true);
 		} else {
 			this.setPlayerIdleFrame();
 		}
@@ -2734,17 +2765,17 @@ export class Game extends Scene {
 		this.player.setFlipX(false);
 		switch (this.playerDirection) {
 			case SpriteLeft:
-				this.player.anims.play("character-idle-left", true);
+				this.player.anims.play("idle-left", true);
 				return;
 			case SpriteRight:
 				this.player.setFlipX(true);
-				this.player.anims.play("character-idle-left", true);
+				this.player.anims.play("idle-left", true);
 				return;
 			case SpriteUp:
-				this.player.anims.play("character-idle-up", true);
+				this.player.anims.play("idle-up", true);
 				return;
 			case SpriteDown:
-				this.player.anims.play("character-idle-down", true);
+				this.player.anims.play("idle-down", true);
 				return;
 		}
 	}

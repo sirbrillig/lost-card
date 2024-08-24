@@ -26,8 +26,6 @@ export class Preloader extends Scene {
 		//  Load the assets for the game - Replace with your own assets
 		this.load.setPath("assets");
 
-		this.load.image("logo", "logo.png");
-
 		this.load.image("Mountain-Dusk", "Mountain-Dusk.png");
 		this.load.image("game-map", "lost-card-map.png");
 		this.load.image("side_portrait", "Side_Portrait_Small.png");
@@ -80,54 +78,7 @@ export class Preloader extends Scene {
 			}
 		);
 
-		this.load.spritesheet("character-idle-down", "character_idle_down.png", {
-			frameWidth: 15,
-			frameHeight: 26,
-		});
-		this.load.spritesheet("character-idle-up", "character_idle_up.png", {
-			frameWidth: 15,
-			frameHeight: 26,
-		});
-		this.load.spritesheet("character-idle-left", "character_idle_left.png", {
-			frameWidth: 15,
-			frameHeight: 24,
-		});
-		this.load.spritesheet("character-run-down", "character_run_down.png", {
-			frameWidth: 15,
-			frameHeight: 26,
-			spacing: 2,
-			margin: 1,
-		});
-		this.load.spritesheet("character-run-up", "character_run_up.png", {
-			frameWidth: 15,
-			frameHeight: 26,
-			spacing: 2,
-			margin: 1,
-		});
-		this.load.spritesheet("character-run-left", "character_run_left.png", {
-			frameWidth: 17,
-			frameHeight: 24,
-		});
-		this.load.spritesheet("character-attack-down", "character_sword_down.png", {
-			frameWidth: 38,
-			frameHeight: 45,
-		});
-		this.load.spritesheet("character-attack-up", "character_sword_up.png", {
-			frameWidth: 39,
-			frameHeight: 45,
-		});
-		this.load.spritesheet(
-			"character-attack-right",
-			"character_sword_right.png",
-			{
-				frameWidth: 48,
-				frameHeight: 38,
-			}
-		);
-		this.load.spritesheet("character-attack-left", "character_sword_left.png", {
-			frameWidth: 48,
-			frameHeight: 38,
-		});
+		this.load.atlas("character", "character.png", "character.json");
 
 		this.load.spritesheet("ice_beam", "ice_beam.png", {
 			frameWidth: 32,
@@ -161,15 +112,7 @@ export class Preloader extends Scene {
 			frameWidth: 32,
 			frameHeight: 32,
 		});
-		this.load.spritesheet(
-			"character-power-right",
-			"wind_card_effect_right.png",
-			{
-				frameWidth: 32,
-				frameHeight: 32,
-			}
-		);
-		this.load.spritesheet("character-power-left", "wind_card_effect_left.png", {
+		this.load.spritesheet("wind-power", "wind_power.png", {
 			frameWidth: 32,
 			frameHeight: 32,
 		});
@@ -178,10 +121,6 @@ export class Preloader extends Scene {
 			frameHeight: 32,
 		});
 
-		this.load.spritesheet("character", "character_sprite_sheet.png", {
-			frameWidth: 32,
-			frameHeight: 32,
-		});
 		this.load.spritesheet("monster_explode1", "monster_explode1.png", {
 			frameWidth: 32,
 			frameHeight: 32,
