@@ -1556,7 +1556,7 @@ export class Game extends Scene {
 				this.playerDirection === SpriteLeft ||
 				this.playerDirection === SpriteRight
 			) {
-				return 20;
+				return 24;
 			}
 			return 10;
 		})();
@@ -1571,7 +1571,7 @@ export class Game extends Scene {
 				this.playerDirection === SpriteUp ||
 				this.playerDirection === SpriteDown
 			) {
-				return 20;
+				return 24;
 			}
 			return 10;
 		})();
@@ -1883,11 +1883,12 @@ export class Game extends Scene {
 		this.setPlayerStunned(true);
 		this.player.setVisible(false);
 		const effect = this.add.sprite(
-			this.player.body.center.x + 3,
-			this.player.body.center.y + 5,
-			"character_appear",
+			this.player.body.center.x - 4,
+			this.player.body.center.y + this.player.body.height / 2,
+			"white_fire_circle",
 			0
 		);
+		effect.setOrigin(0, 0.5);
 		effect.setDepth(5);
 		effect.anims.play("white_fire_circle", true);
 		effect.anims.chain("appear");
@@ -2229,7 +2230,7 @@ export class Game extends Scene {
 				this.enemyKnockBackSpeed,
 				this.playerDirection,
 				() => {
-					enemy.data.set(DataKeys.Stunned, false);
+					enemy?.data?.set(DataKeys.Stunned, false);
 				}
 			);
 		}
