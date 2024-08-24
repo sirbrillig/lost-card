@@ -30,7 +30,6 @@ export const DataKeys = {
 	Pushable: "pushable",
 	Freezable: "freezable",
 	MonsterPosition: "monsterPosition",
-	PlayerPosition: "playerPosition",
 	ActivePower: "activePower",
 	PotionCount: "potionCount",
 	KeyCount: "keyCount",

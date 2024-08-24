@@ -1054,8 +1054,9 @@ export class Game extends Scene {
 			}
 
 			const tilePosition = new Phaser.Math.Vector2(tile.body.x, tile.body.y);
-			const playerPosition: Phaser.Math.Vector2 = this.data.get(
-				DataKeys.PlayerPosition
+			const playerPosition = new Phaser.Math.Vector2(
+				this.player.x,
+				this.player.y
 			);
 			const distanceToActivate: number =
 				this.data.get("distanceToActivate") ?? this.distanceToActivateTransient;
@@ -1494,19 +1495,19 @@ export class Game extends Scene {
 		}
 		const xOffset = (() => {
 			if (this.playerDirection === SpriteLeft) {
-				return -18;
+				return -20;
 			}
 			if (this.playerDirection === SpriteRight) {
-				return 18;
+				return 20;
 			}
 			return 0;
 		})();
 		const yOffset = (() => {
 			if (this.playerDirection === SpriteUp) {
-				return -18;
+				return -20;
 			}
 			if (this.playerDirection === SpriteDown) {
-				return 18;
+				return 20;
 			}
 			return 0;
 		})();
@@ -1578,8 +1579,8 @@ export class Game extends Scene {
 		this.power.body.setSize(width, height);
 
 		const [xOffset, yOffset] = this.getPowerOffset();
-		this.power.x = this.player.x + xOffset;
-		this.power.y = this.player.y + yOffset;
+		this.power.x = this.player.body.center.x + xOffset;
+		this.power.y = this.player.body.center.y + yOffset;
 	}
 
 	// This will be true once the player starts their attack flow. However, there
@@ -1844,7 +1845,8 @@ export class Game extends Scene {
 		this.player = this.physics.add.sprite(x, y, "character", "idle-down-0.png");
 		this.player.setDataEnabled();
 		this.player.setDebugBodyColor(0x00ff00);
-		this.player.setSize(8, 12);
+		this.player.setSize(7, 12);
+		this.player.setOrigin(0, 0.5);
 		this.player.setOffset(
 			this.player.body.offset.x,
 			this.player.body.offset.y + 3
@@ -2751,10 +2753,6 @@ export class Game extends Scene {
 
 	updatePlayer(): void {
 		this.updatePlayerTint();
-		this.data.set(
-			DataKeys.PlayerPosition,
-			new Phaser.Math.Vector2(this.player.x, this.player.y)
-		);
 		this.registry.set("playerX", this.player.x);
 		this.registry.set("playerY", this.player.y);
 
