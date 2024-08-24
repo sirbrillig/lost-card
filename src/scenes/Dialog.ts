@@ -22,8 +22,16 @@ export class Dialog extends Scene {
 			this.cameras.main.y + 40
 		);
 
-		const panelWidth = this.cameras.main.width - 20;
-		const panelHeight = data.text ? this.cameras.main.height / 2 : 30;
+		const panelWidth = this.cameras.main.width - 10;
+		const panelHeight = (() => {
+			if (!data.text) {
+				return 30;
+			}
+			if (data.text.length > 60) {
+				return this.cameras.main.height - 70;
+			}
+			return 85;
+		})();
 		this.bg = this.add
 			.nineslice(
 				panelTopLeft.x,
@@ -47,6 +55,7 @@ export class Dialog extends Scene {
 				data.heading,
 				12
 			)
+			.setMaxWidth(panelWidth - 15)
 			.setOrigin(0);
 
 		if (data.text) {
@@ -58,6 +67,7 @@ export class Dialog extends Scene {
 					data.text,
 					12
 				)
+				.setMaxWidth(panelWidth - 15)
 				.setOrigin(0);
 		}
 

@@ -1124,7 +1124,7 @@ export class Game extends Scene {
 					if (tile.name === "TutorialSign") {
 						this.scene.launch("Dialog", {
 							heading: "The door is shut",
-							text: "The cards have been lost\r\nPress SPACE to continue",
+							text: "Once, cards of power protected the kingdoms, but the cards have been lost. Monsters have sealed the people behind this door.\r\nPress SPACE to continue",
 						});
 						this.input.keyboard?.once("keydown-SPACE", () => {
 							this.scene.get("Dialog")?.scene.stop();
