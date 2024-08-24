@@ -368,9 +368,9 @@ export class Game extends Scene {
 		if (this.getKeyCount() < 6) {
 			this.scene.launch("Dialog", {
 				heading: "Gold door",
-				text: "Get six keys to open\r\nPress SPACE to continue",
+				text: "Get six keys to open it",
 			});
-			this.input.keyboard?.once("keydown-SPACE", () => {
+			this.input.keyboard?.once("keydown", () => {
 				this.scene.get("Dialog")?.scene.stop();
 			});
 			return;
@@ -1124,9 +1124,9 @@ export class Game extends Scene {
 					if (tile.name === "TutorialSign") {
 						this.scene.launch("Dialog", {
 							heading: "The door is shut",
-							text: "Once, cards of power protected the kingdoms, but the cards have been lost. Monsters have sealed the people behind this door.\r\nPress SPACE to continue",
+							text: "Once, cards of power protected the kingdoms, but the cards have been lost. Monsters have sealed the people behind this door.",
 						});
-						this.input.keyboard?.once("keydown-SPACE", () => {
+						this.input.keyboard?.once("keydown", () => {
 							this.scene.get("Dialog")?.scene.stop();
 						});
 					}
@@ -1331,9 +1331,9 @@ export class Game extends Scene {
 		this.setKeyCount(this.getKeyCount() + 1);
 		this.scene.launch("Dialog", {
 			heading: "A Key",
-			text: "Get six for the gold door\r\nPress SPACE to continue",
+			text: "Get six for the gold door",
 		});
-		this.input.keyboard?.once("keydown-SPACE", () => {
+		this.input.keyboard?.once("keydown", () => {
 			this.scene.get("Dialog")?.scene.stop();
 		});
 	}
