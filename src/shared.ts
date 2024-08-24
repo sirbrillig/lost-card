@@ -393,16 +393,16 @@ export function getDoorDestinationCoordinates(
 	// in a loop.
 	const destinationX = (() => {
 		if (destinationDirection === SpriteLeft) {
-			return destinationTile.x - 6;
+			return destinationTile.x - 24;
 		}
 		if (destinationDirection === SpriteRight) {
 			return destinationTile.x + 24;
 		}
-		return destinationTile.x + 8;
+		return destinationTile.x;
 	})();
 	const destinationY = (() => {
 		if (destinationDirection === SpriteUp) {
-			return destinationTile.y - 24;
+			return destinationTile.y - 34;
 		}
 		if (destinationDirection === SpriteDown) {
 			return destinationTile.y + 10;
