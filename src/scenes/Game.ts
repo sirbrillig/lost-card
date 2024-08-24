@@ -633,9 +633,10 @@ export class Game extends Scene {
 
 	createAppearingTiles() {
 		this.createdTiles = createSpritesFromObjectLayer(this.map, "Transients", {
-			filterCallback: this.shouldCreateLayerObject.bind(this),
-			callback: this.recordObjectIdOnSprite.bind(this),
 			getTilesetKeyByName: this.getTilesetKeyByName.bind(this),
+		}).map((sprite) => {
+			sprite.body.setSize(sprite.body.width * 0.75, sprite.body.height * 0.75);
+			return sprite;
 		});
 	}
 
