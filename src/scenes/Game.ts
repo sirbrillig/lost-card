@@ -142,8 +142,8 @@ export class Game extends Scene {
 			saveData?.playerY ?? spawnPoint.y
 		);
 		this.attackSprite = this.add.sprite(
-			this.player.x,
-			this.player.y,
+			this.player.body.center.x,
+			this.player.body.center.y,
 			"character",
 			"sword-up-0.png"
 		);
@@ -541,7 +541,10 @@ export class Game extends Scene {
 		// sprite for the attack animation and leave the player and its hitbox
 		// alone.
 		this.attackSprite.setVisible(true);
-		this.attackSprite.setPosition(this.player.x, this.player.y);
+		this.attackSprite.setPosition(
+			this.player.body.center.x,
+			this.player.body.center.y
+		);
 		this.player.setVisible(false);
 		switch (this.playerDirection) {
 			case SpriteUp:
