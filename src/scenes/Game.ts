@@ -425,11 +425,7 @@ export class Game extends Scene {
 			this.equipPower("FireCard");
 			this.equipPower("SpiritCard");
 			this.equipPower("CloudCard");
-			this.registry.set("seenPotionDialog", true);
-			this.pickUpPotion();
-			this.pickUpPotion();
-			this.pickUpPotion();
-			this.pickUpPotion();
+			this.setPotionCount(10);
 		});
 		this.input.keyboard.on("keydown-SPACE", () => {
 			// Attack
@@ -444,7 +440,7 @@ export class Game extends Scene {
 				this.activatePower();
 			}
 		});
-		this.input.keyboard.on("keydown-X", () => {
+		this.input.keyboard.on("keydown-P", () => {
 			if (this.getPlayerHitPoints() <= 0) {
 				return;
 			}
@@ -1408,7 +1404,7 @@ export class Game extends Scene {
 
 		this.scene.launch("Dialog", {
 			heading: "A potion!",
-			text: "Press X to restore health\r\nPress SPACE to continue",
+			text: "Press P to restore health\r\nPress SPACE to continue",
 		});
 		this.registry.set("seenPotionDialog", true);
 		this.input.keyboard?.once("keydown-SPACE", () => {
