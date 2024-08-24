@@ -51,6 +51,7 @@ import {
 
 export class Game extends Scene {
 	debugGraphic: Phaser.GameObjects.Graphics | undefined;
+	layerDebugGraphic: Phaser.GameObjects.Graphics | undefined;
 	player: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
 	sword: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
 	power: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
@@ -403,8 +404,16 @@ export class Game extends Scene {
 			if (this.debugGraphic) {
 				this.debugGraphic.destroy();
 				this.debugGraphic = undefined;
+				this.layerDebugGraphic?.destroy();
+				this.layerDebugGraphic = undefined;
 			} else {
 				this.debugGraphic = this.physics.world.createDebugGraphic();
+				this.layerDebugGraphic = this.add.graphics();
+				this.landLayer.renderDebug(this.layerDebugGraphic, {
+					tileColor: null,
+					collidingTileColor: new Phaser.Display.Color(243, 134, 48, 200),
+					faceColor: new Phaser.Display.Color(40, 39, 37, 255),
+				});
 			}
 		});
 		this.input.keyboard.on("keydown-TWO", () => {
