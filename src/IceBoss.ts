@@ -31,6 +31,7 @@ export class IceBoss extends BaseMonster<AllStates> {
 		this.setOffset(this.body.offset.x, this.body.offset.y + 10);
 		this.setOrigin(0.5, 0.75);
 		this.data.set(DataKeys.Freezable, false);
+		this.data.set(DataKeys.Pushable, false);
 	}
 
 	getInitialState(): AllStates {

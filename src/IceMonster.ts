@@ -15,7 +15,6 @@ export class IceMonster extends BaseMonster<AllStates> {
 		y: number
 	) {
 		super(scene, enemyManager, x, y, "monsters1", 51);
-		this.data.set(DataKeys.Pushable, false);
 	}
 
 	initSprites() {
