@@ -1848,11 +1848,11 @@ export class Game extends Scene {
 		this.player = this.physics.add.sprite(x, y, "character", "idle-down-0.png");
 		this.player.setDataEnabled();
 		this.player.setDebugBodyColor(0x00ff00);
-		this.player.setSize(7, 12);
+		this.player.setSize(7, 10);
 		this.player.setOrigin(0, 0.5);
 		this.player.setOffset(
 			this.player.body.offset.x,
-			this.player.body.offset.y + 3
+			this.player.body.offset.y + 5
 		);
 		this.player.setDepth(1);
 		this.sword = this.physics.add.sprite(
