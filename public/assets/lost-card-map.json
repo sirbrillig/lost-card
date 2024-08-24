@@ -2854,7 +2854,7 @@
                 {
                  "height":288,
                  "id":206,
-                 "name":"CK1",
+                 "name":"MKPlateau",
                  "rotation":0,
                  "type":"",
                  "visible":true,
@@ -2865,7 +2865,7 @@
                 {
                  "height":144,
                  "id":220,
-                 "name":"PK1",
+                 "name":"MKLake",
                  "rotation":0,
                  "type":"",
                  "visible":true,
