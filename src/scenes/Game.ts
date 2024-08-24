@@ -376,6 +376,7 @@ export class Game extends Scene {
 			heading: "You win!",
 			text: "Congratulations",
 		});
+		this.setPlayerStunned(true);
 	}
 
 	createInputs() {
