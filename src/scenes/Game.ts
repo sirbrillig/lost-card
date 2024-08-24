@@ -103,7 +103,7 @@ export class Game extends Scene {
 	iceMeltTime: number = 4000;
 	plantCardVelocity: number = 140;
 	firePowerVelocity: number = 120;
-	gateCloseSpeed: number = 200;
+	gateCloseSpeed: number = 340;
 
 	map: Phaser.Tilemaps.Tilemap;
 	landLayer: Phaser.Tilemaps.TilemapLayer;
@@ -554,7 +554,6 @@ export class Game extends Scene {
 		}
 
 		this.attackSprite.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
-			console.log("attack complete");
 			this.sword.data.set(DataKeys.SwordAttackActive, false);
 			this.attackSprite.setVisible(false);
 			this.player.setVisible(true);
@@ -573,7 +572,6 @@ export class Game extends Scene {
 	loadLastSave() {
 		const saveData = loadSavedData();
 		if (!saveData) {
-			console.log("No saved data");
 			return;
 		}
 		this.scene.stop();
@@ -585,7 +583,6 @@ export class Game extends Scene {
 	saveGame() {
 		localStorage.setItem("lost-card-save", JSON.stringify(this.getSaveData()));
 		console.log(this.getSaveData());
-		console.log("game saved");
 		MainEvents.emit(Events.GameSaved);
 	}
 
@@ -753,7 +750,6 @@ export class Game extends Scene {
 		if (!gatePillar) {
 			return;
 		}
-		console.log("opening gate pillars");
 		const gatePosition = new Phaser.Math.Vector2(gatePillar.x, gatePillar.y);
 		gatePillar.data.set("openGate", true);
 		this.createdTiles
@@ -805,7 +801,6 @@ export class Game extends Scene {
 			.forEach((tile) => {
 				const tilePosition = tile.data.get("originalPosition");
 				if (tilePosition) {
-					console.log("closing gate pillars");
 					this.tweens.killTweensOf(tile);
 					this.tweens.add({
 						targets: tile,
