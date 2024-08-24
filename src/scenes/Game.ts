@@ -425,6 +425,11 @@ export class Game extends Scene {
 			this.equipPower("FireCard");
 			this.equipPower("SpiritCard");
 			this.equipPower("CloudCard");
+			this.registry.set("seenPotionDialog", true);
+			this.pickUpPotion();
+			this.pickUpPotion();
+			this.pickUpPotion();
+			this.pickUpPotion();
 		});
 		this.input.keyboard.on("keydown-SPACE", () => {
 			// Attack
