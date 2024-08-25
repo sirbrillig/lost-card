@@ -4976,8 +4976,8 @@
                  "type":"",
                  "visible":true,
                  "width":16,
-                 "x":2621.86154182136,
-                 "y":1646.54407803742
+                 "x":2621.86,
+                 "y":1646.54
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -5107,8 +5107,8 @@
                  "type":"",
                  "visible":true,
                  "width":16,
-                 "x":2609.56610759263,
-                 "y":1615.86874135546
+                 "x":2609.57,
+                 "y":1615.87
                 }, 
                 {
                  "gid":2717,
@@ -9233,8 +9233,20 @@
                  "type":"",
                  "visible":true,
                  "width":16,
-                 "x":1488.84947527659,
-                 "y":1101.55860574395
+                 "x":1488.85,
+                 "y":1101.56
+                }, 
+                {
+                 "gid":2503,
+                 "height":16,
+                 "id":691,
+                 "name":"SwordSign",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":16,
+                 "x":1504.30233957285,
+                 "y":974.533561606355
                 }, 
                 {
                  "gid":2093,
@@ -9777,7 +9789,7 @@
          "y":0
         }],
  "nextlayerid":17,
- "nextobjectid":691,
+ "nextobjectid":692,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.0",

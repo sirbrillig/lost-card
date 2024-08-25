@@ -1158,6 +1158,12 @@ export class Game extends Scene {
 							text: "Press TAB or M to pause and view the map.",
 						});
 					}
+					if (tile.name === "SwordSign") {
+						this.showDialog({
+							heading: "Get a weapon",
+							text: "It would be unwise to face the monsters unarmed. Visit the armory south of the throne room.",
+						});
+					}
 				});
 				this.physics.add.collider(
 					this.enemyManager.enemies,

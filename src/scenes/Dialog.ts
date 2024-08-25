@@ -30,7 +30,7 @@ export class Dialog extends Scene {
 			if (data.text.length > 60) {
 				return this.cameras.main.height - 70;
 			}
-			return 85;
+			return 90;
 		})();
 		this.bg = this.add
 			.nineslice(
@@ -87,6 +87,17 @@ export class Dialog extends Scene {
 				},
 			});
 			return;
+		} else {
+			this.add
+				.bitmapText(
+					panelTopLeft.x + panelWidth / 2,
+					panelTopLeft.y + panelHeight - 20,
+					"RetroGamingWhiteSmall",
+					"Press SPACE",
+					12
+				)
+				.setMaxWidth(panelWidth - 15)
+				.setOrigin(0);
 		}
 
 		this.scene.pause("Game");
@@ -94,7 +105,7 @@ export class Dialog extends Scene {
 		if (!this.input.keyboard) {
 			throw new Error("No keyboard controls could be found");
 		}
-		this.input.keyboard.on("keydown", () => {
+		this.input.keyboard.on("keydown-SPACE", () => {
 			this.scene.resume("Game");
 			this.scene.stop();
 		});
