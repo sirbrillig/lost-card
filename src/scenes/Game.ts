@@ -69,9 +69,12 @@ export class Game extends Scene {
 
 	attackSound: Sound;
 	hitSound: Sound;
+	walkSound: Sound;
 	healSound: Sound;
 	windSound: Sound;
 	iceSound: Sound;
+	rockDestroySound: Sound;
+	freezeSound: Sound;
 	plantSound: Sound;
 
 	lastAttackedAt: number = 0;
@@ -534,6 +537,7 @@ export class Game extends Scene {
 		if (!isTileWithPropertiesObject(tile) || !tile.properties.isWater) {
 			return;
 		}
+		this.freezeSound.play();
 		const iceTileFrame = 284;
 		this.enemyManager.map.removeTile(tile, iceTileFrame);
 		this.time.addEvent({
@@ -1006,6 +1010,7 @@ export class Game extends Scene {
 		console.log("destroying tile", tile);
 		this.cameras.main.shake(200, 0.004);
 
+		this.rockDestroySound.play();
 		tile.setOrigin(0.6, 0.5);
 		tile.anims.play("explode", true);
 		tile.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
@@ -1726,7 +1731,10 @@ export class Game extends Scene {
 	preload() {
 		this.attackSound = this.sound.add("attack", { loop: false });
 		this.windSound = this.sound.add("wind", { loop: false });
+		this.walkSound = this.sound.add("walk", { loop: false, rate: 1.5 });
 		this.iceSound = this.sound.add("ice", { loop: false });
+		this.rockDestroySound = this.sound.add("rock-destroy", { loop: false });
+		this.freezeSound = this.sound.add("freeze", { loop: false });
 		this.plantSound = this.sound.add("plant", { loop: false });
 		this.healSound = this.sound.add("heal", { loop: false });
 		this.hitSound = this.sound.add("hit", { loop: false });
@@ -2313,6 +2321,7 @@ export class Game extends Scene {
 			enemy.data.get(DataKeys.Hittable) &&
 			enemy.data.get(DataKeys.Freezable)
 		) {
+			this.freezeSound.play();
 			enemy.emit(Events.MonsterStun, true);
 			enemy.setTint(0x0000ff);
 			this.time.addEvent({
@@ -2359,28 +2368,26 @@ export class Game extends Scene {
 	}
 
 	sendHitToEnemy(enemy: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody) {
-		if (enemy.data.get(DataKeys.Hittable) === true) {
-			this.cameras.main.shake(200, 0.004);
-			enemy.emit(Events.MonsterHit);
-
-			// Knock the player back a bit when they hit an enemy.
-			this.knockBack(
-				this.player.body,
-				this.postHitEnemyKnockback,
-				this.playerKnockBackSpeed,
-				invertSpriteDirection(this.playerDirection),
-				() => {}
-			);
-
-			// Knock back monster when they are hit.
-			this.pushEnemy(enemy);
-		} else {
-			console.log(
-				"enemy not hittable",
-				enemy,
-				enemy.data.get(DataKeys.Hittable)
-			);
+		if (enemy.data.get(DataKeys.Hittable) !== true) {
+			return;
 		}
+		if (!this.hitSound.isPlaying) {
+			this.hitSound.play();
+		}
+		this.cameras.main.shake(200, 0.004);
+		enemy.emit(Events.MonsterHit);
+
+		// Knock the player back a bit when they hit an enemy.
+		this.knockBack(
+			this.player.body,
+			this.postHitEnemyKnockback,
+			this.playerKnockBackSpeed,
+			invertSpriteDirection(this.playerDirection),
+			() => {}
+		);
+
+		// Knock back monster when they are hit.
+		this.pushEnemy(enemy);
 	}
 
 	gameOver() {
@@ -2547,8 +2554,11 @@ export class Game extends Scene {
 
 	setPlayerFrozen(setting: boolean) {
 		this.player.data?.set("freezePlayer", setting);
-		this.player.body.stop();
-		this.player.stop();
+		if (setting === true) {
+			this.freezeSound.play();
+			this.player.body.stop();
+			this.player.stop();
+		}
 	}
 
 	setPlayerStunned(setting: boolean) {
@@ -2837,16 +2847,27 @@ export class Game extends Scene {
 		if (this.isPressingLeft()) {
 			this.player.setFlipX(false);
 			this.player.anims.play("left-walk", true);
+			this.playWalkSound();
 		} else if (this.isPressingRight()) {
 			this.player.setFlipX(true);
 			this.player.anims.play("left-walk", true);
+			this.playWalkSound();
 		} else if (this.isPressingUp()) {
 			this.player.anims.play("up-walk", true);
+			this.playWalkSound();
 		} else if (this.isPressingDown()) {
 			this.player.anims.play("down-walk", true);
+			this.playWalkSound();
 		} else {
 			this.setPlayerIdleFrame();
 		}
+	}
+
+	playWalkSound() {
+		if (this.walkSound.isPlaying) {
+			return;
+		}
+		this.walkSound.play();
 	}
 
 	getPlayerTint(): number {

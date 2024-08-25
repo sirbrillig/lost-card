@@ -175,12 +175,15 @@ export class Preloader extends Scene {
 			frameHeight: 64,
 		});
 
-		this.load.audio("attack", ["attack.wav"]);
+		this.load.audio("attack", ["attack.ogg"]);
 		this.load.audio("wind", ["wind.wav"]);
 		this.load.audio("ice", ["ice.wav"]);
+		this.load.audio("freeze", ["freeze.wav"]);
 		this.load.audio("plant", ["plant.wav"]);
 		this.load.audio("heal", ["heal.wav"]);
-		this.load.audio("hit", ["hit.wav"]);
+		this.load.audio("hit", ["hit.ogg"]);
+		this.load.audio("walk", ["walk.ogg"]);
+		this.load.audio("rock-destroy", ["rock-destroy.wav"]);
 	}
 
 	create() {
