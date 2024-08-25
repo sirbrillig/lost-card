@@ -126,6 +126,14 @@ export class Preloader extends Scene {
 			frameWidth: 32,
 			frameHeight: 32,
 		});
+		this.load.spritesheet("healing-1", "healing-1.png", {
+			frameWidth: 32,
+			frameHeight: 32,
+		});
+		this.load.spritesheet("healing-2", "healing-2.png", {
+			frameWidth: 32,
+			frameHeight: 32,
+		});
 		this.load.spritesheet("ice_powerup", "ice_powerup.png", {
 			frameWidth: 32,
 			frameHeight: 32,

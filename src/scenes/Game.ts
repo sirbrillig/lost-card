@@ -79,6 +79,9 @@ export class Game extends Scene {
 	keyD: Phaser.Input.Keyboard.Key;
 	keyW: Phaser.Input.Keyboard.Key;
 
+	keyR: Phaser.Input.Keyboard.Key;
+	keyP: Phaser.Input.Keyboard.Key;
+
 	// Config
 	characterSpeed: number = 90;
 	cloudCardSpeed: number = 450;
@@ -413,6 +416,9 @@ export class Game extends Scene {
 		this.keyD = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
 		this.keyW = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W);
 
+		this.keyR = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.R);
+		this.keyP = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.P);
+
 		this.input.keyboard.on("keydown-ONE", () => {
 			// Cheat: show hitboxes
 			if (this.debugGraphic) {
@@ -459,14 +465,13 @@ export class Game extends Scene {
 		this.input.keyboard.on("keydown-SHIFT", () => {
 			// Power
 			if (this.canPlayerUsePower()) {
-				console.log("using power");
 				this.activatePower();
 			}
 		});
-		this.input.keyboard.on("keydown-P", () => {
+		this.keyP.on("down", () => {
 			this.usePotion();
 		});
-		this.input.keyboard.on("keydown-R", () => {
+		this.keyR.on("down", () => {
 			this.usePotion();
 		});
 	}
@@ -479,10 +484,40 @@ export class Game extends Scene {
 		const totalHitPoints =
 			this.registry.get("playerTotalHitPoints") ?? this.playerInitialHitPoints;
 		if (this.getPlayerHitPoints() === totalHitPoints) {
+			const effect = this.add.sprite(
+				this.player.body.center.x + 1,
+				this.player.body.center.y - 1,
+				"white_fire_circle",
+				0
+			);
+			effect.setDepth(5);
+			effect.setAlpha(0.8);
+			effect.anims.play("use-potion-charge");
+			effect.on(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
+				effect.destroy();
+			});
 			return;
 		}
 		const potionCount = this.getPotionCount();
 		if (potionCount > 0) {
+			const effect = this.add.sprite(
+				this.player.body.center.x + 1,
+				this.player.body.center.y - 1,
+				"white_fire_circle",
+				0
+			);
+			effect.setDepth(5);
+			effect.setAlpha(0.8);
+			effect.anims.play("use-potion-charge");
+			effect.anims.chain("use-potion");
+			effect.on(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
+				const name = effect.anims.getName();
+				const progress = effect.anims.getProgress();
+				if (name === "use-potion" && progress === 1) {
+					effect.destroy();
+				}
+			});
+
 			this.setPotionCount(potionCount - 1);
 			this.setPlayerHitPoints(totalHitPoints);
 		}
@@ -1685,6 +1720,22 @@ export class Game extends Scene {
 			key: "appear",
 			frames: anims.generateFrameNumbers("character_appear"),
 			frameRate: 20,
+			showOnStart: true,
+			hideOnComplete: true,
+		});
+		anims.create({
+			key: "use-potion-charge",
+			frames: anims.generateFrameNumbers("healing-1", {
+				frames: [10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0, 1, 2, 3, 4, 5],
+			}),
+			frameRate: 24,
+			showOnStart: true,
+			hideOnComplete: true,
+		});
+		anims.create({
+			key: "use-potion",
+			frames: anims.generateFrameNumbers("healing-2", { start: 11, end: 0 }),
+			frameRate: 24,
 			showOnStart: true,
 			hideOnComplete: true,
 		});
