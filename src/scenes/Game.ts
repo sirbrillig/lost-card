@@ -392,6 +392,7 @@ export class Game extends Scene {
 			return;
 		}
 		this.lastDialogData = obj;
+		this.walkSound.stop();
 		this.scene.launch("Dialog", {
 			heading: obj.heading,
 			text: obj.text,
@@ -1732,18 +1733,28 @@ export class Game extends Scene {
 	}
 
 	preload() {
-		this.attackSound = this.sound.add("attack", { loop: false });
-		this.windSound = this.sound.add("wind", { loop: false });
-		this.walkSound = this.sound.add("walk", { loop: true, rate: 1.5 });
-		this.iceSound = this.sound.add("ice", { loop: false });
-		this.holyLoopSound = this.sound.add("holy-loop", { loop: true });
-		this.appearSound = this.sound.add("holy", { loop: false });
-		this.rockDestroySound = this.sound.add("rock-destroy", { loop: false });
-		this.freezeSound = this.sound.add("freeze", { loop: false });
-		this.plantSound = this.sound.add("plant", { loop: false });
-		this.healSound = this.sound.add("heal", { loop: false });
-		this.hitSound = this.sound.add("hit", { loop: false });
-		this.destroySound = this.sound.add("destroy", { loop: false });
+		this.attackSound = this.sound.add("attack", { loop: false, volume: 0.5 });
+		this.windSound = this.sound.add("wind", { loop: false, volume: 0.8 });
+		this.walkSound = this.sound.add("walk", {
+			loop: false,
+			rate: 1.5,
+			volume: 0.9,
+		});
+		this.iceSound = this.sound.add("ice", { loop: false, volume: 0.5 });
+		this.holyLoopSound = this.sound.add("holy-loop", {
+			loop: true,
+			volume: 0.9,
+		});
+		this.appearSound = this.sound.add("holy", { loop: false, volume: 0.9 });
+		this.rockDestroySound = this.sound.add("rock-destroy", {
+			loop: false,
+			volume: 0.5,
+		});
+		this.freezeSound = this.sound.add("freeze", { loop: false, volume: 0.5 });
+		this.plantSound = this.sound.add("plant", { loop: false, volume: 0.5 });
+		this.healSound = this.sound.add("heal", { loop: false, volume: 0.9 });
+		this.hitSound = this.sound.add("hit", { loop: false, volume: 0.5 });
+		this.destroySound = this.sound.add("destroy", { loop: false, volume: 0.5 });
 
 		const anims = this.anims;
 		anims.create({
@@ -2016,8 +2027,6 @@ export class Game extends Scene {
 			const name = effect.anims.getName();
 			const progress = effect.anims.getProgress();
 			if (name === "appear" && progress > 0.8) {
-				this.holyLoopSound.stop();
-				this.appearSound.play();
 				this.setPlayerStunned(false);
 				this.player.setVisible(true);
 				this.time.addEvent({
@@ -2026,6 +2035,16 @@ export class Game extends Scene {
 						this.setPlayerInvincible(false);
 					},
 				});
+			}
+		});
+		effect.on(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
+			const name = effect.anims.getName();
+			if (name === "white_fire_circle") {
+				this.holyLoopSound.stop();
+				this.appearSound.play();
+			}
+			if (name === "appear") {
+				effect.destroy();
 			}
 		});
 	}
@@ -2411,6 +2430,7 @@ export class Game extends Scene {
 		this.isGameOver = true;
 		this.cameras.main.fadeOut(1000, 0, 0, 0, (_: unknown, progress: number) => {
 			if (progress === 1) {
+				this.walkSound.stop();
 				this.scene.stop();
 				this.scene.get("Overlay")?.scene.stop();
 				this.scene.start("GameOver");
@@ -2833,6 +2853,7 @@ export class Game extends Scene {
 
 	updatePlayerMovement(): void {
 		if (!this.canPlayerMove()) {
+			this.walkSound.stop();
 			return;
 		}
 
