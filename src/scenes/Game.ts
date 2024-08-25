@@ -51,6 +51,11 @@ import {
 	getRegionName,
 } from "../shared";
 
+type Sound =
+	| Phaser.Sound.NoAudioSound
+	| Phaser.Sound.HTML5AudioSound
+	| Phaser.Sound.WebAudioSound;
+
 export class Game extends Scene {
 	debugGraphic: Phaser.GameObjects.Graphics | undefined;
 	layerDebugGraphic: Phaser.GameObjects.Graphics | undefined;
@@ -61,6 +66,13 @@ export class Game extends Scene {
 	enemyManager: EnemyManager;
 	enemyCollider: Phaser.Physics.Arcade.Collider;
 	isGameOver: boolean = false;
+
+	attackSound: Sound;
+	hitSound: Sound;
+	healSound: Sound;
+	windSound: Sound;
+	iceSound: Sound;
+	plantSound: Sound;
 
 	lastAttackedAt: number = 0;
 	lastPowerAt: number = 0;
@@ -480,47 +492,42 @@ export class Game extends Scene {
 		if (this.getPlayerHitPoints() <= 0) {
 			return;
 		}
+		const potionCount = this.getPotionCount();
+		if (potionCount === 0) {
+			return;
+		}
 		// Use Potion
 		const totalHitPoints =
 			this.registry.get("playerTotalHitPoints") ?? this.playerInitialHitPoints;
+		this.healSound.play();
+		const effect = this.add.sprite(
+			this.player.body.center.x + 1,
+			this.player.body.center.y - 1,
+			"white_fire_circle",
+			0
+		);
+		effect.setDepth(5);
+		effect.setAlpha(0.8);
+		effect.anims.play("use-potion-charge");
+
 		if (this.getPlayerHitPoints() === totalHitPoints) {
-			const effect = this.add.sprite(
-				this.player.body.center.x + 1,
-				this.player.body.center.y - 1,
-				"white_fire_circle",
-				0
-			);
-			effect.setDepth(5);
-			effect.setAlpha(0.8);
-			effect.anims.play("use-potion-charge");
 			effect.on(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
 				effect.destroy();
 			});
 			return;
 		}
-		const potionCount = this.getPotionCount();
-		if (potionCount > 0) {
-			const effect = this.add.sprite(
-				this.player.body.center.x + 1,
-				this.player.body.center.y - 1,
-				"white_fire_circle",
-				0
-			);
-			effect.setDepth(5);
-			effect.setAlpha(0.8);
-			effect.anims.play("use-potion-charge");
-			effect.anims.chain("use-potion");
-			effect.on(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
-				const name = effect.anims.getName();
-				const progress = effect.anims.getProgress();
-				if (name === "use-potion" && progress === 1) {
-					effect.destroy();
-				}
-			});
 
-			this.setPotionCount(potionCount - 1);
-			this.setPlayerHitPoints(totalHitPoints);
-		}
+		effect.anims.chain("use-potion");
+		effect.on(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
+			const name = effect.anims.getName();
+			const progress = effect.anims.getProgress();
+			if (name === "use-potion" && progress === 1) {
+				effect.destroy();
+			}
+		});
+
+		this.setPotionCount(potionCount - 1);
+		this.setPlayerHitPoints(totalHitPoints);
 	}
 
 	freezeWaterTile(tile: Phaser.Tilemaps.Tile) {
@@ -583,7 +590,6 @@ export class Game extends Scene {
 	}
 
 	activateAttack() {
-		console.log("attack beginning");
 		this.player.body.setVelocity(0);
 		this.sword.data.set(DataKeys.SwordAttackActive, true);
 		this.updateSwordHitbox();
@@ -616,6 +622,8 @@ export class Game extends Scene {
 				break;
 		}
 
+		this.attackSound.play();
+
 		this.attackSprite.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
 			this.sword.data.set(DataKeys.SwordAttackActive, false);
 			this.attackSprite.setVisible(false);
@@ -630,6 +638,7 @@ export class Game extends Scene {
 		this.setPlayerIdleFrame();
 		this.updateSwordHitbox();
 		this.playPowerAnimation();
+		this.playPowerSound();
 	}
 
 	loadLastSave() {
@@ -1715,6 +1724,13 @@ export class Game extends Scene {
 	}
 
 	preload() {
+		this.attackSound = this.sound.add("attack", { loop: false });
+		this.windSound = this.sound.add("wind", { loop: false });
+		this.iceSound = this.sound.add("ice", { loop: false });
+		this.plantSound = this.sound.add("plant", { loop: false });
+		this.healSound = this.sound.add("heal", { loop: false });
+		this.hitSound = this.sound.add("hit", { loop: false });
+
 		const anims = this.anims;
 		anims.create({
 			key: "appear",
@@ -2386,7 +2402,7 @@ export class Game extends Scene {
 		if (this.isPlayerBeingHit() || this.isPlayerInvincible()) {
 			return;
 		}
-		console.log("player got hit!");
+		this.hitSound.play();
 
 		this.enemyCollider.active = false;
 		this.cameras.main.shake(300, 0.009);
@@ -2578,6 +2594,20 @@ export class Game extends Scene {
 
 	setActivePower(power: Powers): void {
 		this.registry.set(DataKeys.ActivePower, power);
+	}
+
+	playPowerSound() {
+		switch (this.getActivePower()) {
+			case "WindCard":
+				this.windSound.play();
+				break;
+			case "IceCard":
+				this.iceSound.play();
+				break;
+			case "PlantCard":
+				this.plantSound.play();
+				break;
+		}
 	}
 
 	playPowerAnimation(): void {
