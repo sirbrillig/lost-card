@@ -380,8 +380,8 @@ export class Game extends Scene {
 	checkEndGame() {
 		if (this.getKeyCount() < 6) {
 			this.showDialog({
-				heading: "Gold door",
-				text: "Get six keys to open it",
+				heading: "Golden door",
+				text: "The survivors of the kingdoms are trapped behind this door but it requires six keys to open.",
 			});
 			return;
 		}
@@ -464,22 +464,28 @@ export class Game extends Scene {
 			}
 		});
 		this.input.keyboard.on("keydown-P", () => {
-			if (this.getPlayerHitPoints() <= 0) {
-				return;
-			}
-			// Use Potion
-			const totalHitPoints =
-				this.registry.get("playerTotalHitPoints") ??
-				this.playerInitialHitPoints;
-			if (this.getPlayerHitPoints() === totalHitPoints) {
-				return;
-			}
-			const potionCount = this.getPotionCount();
-			if (potionCount > 0) {
-				this.setPotionCount(potionCount - 1);
-				this.setPlayerHitPoints(totalHitPoints);
-			}
+			this.usePotion();
 		});
+		this.input.keyboard.on("keydown-R", () => {
+			this.usePotion();
+		});
+	}
+
+	usePotion() {
+		if (this.getPlayerHitPoints() <= 0) {
+			return;
+		}
+		// Use Potion
+		const totalHitPoints =
+			this.registry.get("playerTotalHitPoints") ?? this.playerInitialHitPoints;
+		if (this.getPlayerHitPoints() === totalHitPoints) {
+			return;
+		}
+		const potionCount = this.getPotionCount();
+		if (potionCount > 0) {
+			this.setPotionCount(potionCount - 1);
+			this.setPlayerHitPoints(totalHitPoints);
+		}
 	}
 
 	freezeWaterTile(tile: Phaser.Tilemaps.Tile) {
@@ -1146,6 +1152,12 @@ export class Game extends Scene {
 							text: "Once, cards of power protected the kingdoms, but the cards have been lost. Monsters have sealed the people behind this door.",
 						});
 					}
+					if (tile.name === "MapSign") {
+						this.showDialog({
+							heading: "View the map",
+							text: "Press TAB or M to pause and view the map.",
+						});
+					}
 				});
 				this.physics.add.collider(
 					this.enemyManager.enemies,
@@ -1347,7 +1359,7 @@ export class Game extends Scene {
 		this.setKeyCount(this.getKeyCount() + 1);
 		this.showDialog({
 			heading: "A Key",
-			text: "Get six for the gold door",
+			text: "Collect six of these to open the Golden door.",
 		});
 	}
 
@@ -1424,7 +1436,7 @@ export class Game extends Scene {
 			callback: () => {
 				this.showDialog({
 					heading: this.getCardNameForPower(card),
-					text: "Press SHIFT to use\r\nPress [ or ] to change",
+					text: "Press SHIFT to use the power.\r\nPress [ or ] to change the active power.",
 				});
 				this.setPlayerInvincible(false);
 				this.setPlayerStunned(false);
@@ -1445,7 +1457,7 @@ export class Game extends Scene {
 
 		this.showDialog({
 			heading: "A potion!",
-			text: "Press P to restore health\r\nPress SPACE to continue",
+			text: "Press P or R to use a potion and restore your health.",
 		});
 		this.registry.set("seenPotionDialog", true);
 	}

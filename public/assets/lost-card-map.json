@@ -9225,6 +9225,18 @@
                  "y":1104
                 }, 
                 {
+                 "gid":2503,
+                 "height":16,
+                 "id":690,
+                 "name":"MapSign",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":16,
+                 "x":1488.84947527659,
+                 "y":1101.55860574395
+                }, 
+                {
                  "gid":2093,
                  "height":16,
                  "id":615,
@@ -9764,8 +9776,8 @@
          "x":0,
          "y":0
         }],
- "nextlayerid":14,
- "nextobjectid":690,
+ "nextlayerid":17,
+ "nextobjectid":691,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.0",
