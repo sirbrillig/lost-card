@@ -115,11 +115,20 @@ export class BaseMonster<AllStates extends string> extends Phaser.Physics.Arcade
 		);
 	}
 
+	playHitSound() {
+		this.scene.sound.play("hit", { volume: 0.7 });
+	}
+
+	playDestroySound() {
+		this.scene.sound.play("destroy");
+	}
+
 	hit() {
 		if (!this.baseIsHittable()) {
 			return;
 		}
 
+		this.playHitSound();
 		this.#isBeingHit = true;
 		this.tint = 0xff0000;
 		this.scene.time.addEvent({
@@ -142,14 +151,27 @@ export class BaseMonster<AllStates extends string> extends Phaser.Physics.Arcade
 	}
 
 	kill() {
-		this.body?.stop();
+		if (!this.body || !isDynamicSprite(this)) {
+			throw new Error("Could not update monster");
+		}
+		this.body.stop();
+		this.setVisible(false);
 		this.stateMachine.empty();
 		this.data.set(DataKeys.Stunned, true);
 		this.emit(Events.MonsterDying);
-		this.setOrigin(0.5, 0.3);
-		this.anims.play("explode", true);
-		MainEvents.emit(Events.MonsterDefeated);
-		this.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
+
+		const effect = this.scene.add.sprite(
+			this.body.center.x + 1,
+			this.body.center.y - 1,
+			"explode",
+			0
+		);
+		effect.setDepth(5);
+		effect.anims.play("explode");
+		MainEvents.emit(Events.MonsterDying);
+		this.playDestroySound();
+		effect.on(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
+			effect.destroy();
 			this.emit(Events.MonsterDefeated);
 			this.destroy();
 		});

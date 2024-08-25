@@ -128,7 +128,7 @@ export class IceBoss extends BaseMonster<AllStates> {
 	isHittable(): boolean {
 		return (
 			this.stateMachine.getCurrentState() !== "initial" &&
-			!this.stateMachine.getCurrentState().includes("roar")
+			!this.stateMachine.getCurrentState()?.includes("roar")
 		);
 	}
 }

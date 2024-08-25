@@ -18,7 +18,7 @@ type AllStates =
 	| "leftrightmarch";
 
 export class MountainBoss extends BaseMonster<AllStates> {
-	hitPoints: number = 6;
+	hitPoints: number = 8;
 
 	constructor(
 		scene: Phaser.Scene,
@@ -113,6 +113,16 @@ export class MountainBoss extends BaseMonster<AllStates> {
 		}
 	}
 
+	playHitSound() {
+		this.scene.sound.play("rock-destroy", {
+			volume: 0.7,
+		});
+	}
+
+	playDestroySound() {
+		this.scene.sound.play("destroy");
+	}
+
 	kill() {
 		this.emit(Events.MonsterDying);
 		this.setVelocity(0);
@@ -129,7 +139,7 @@ export class MountainBoss extends BaseMonster<AllStates> {
 	isHittable(): boolean {
 		return (
 			this.stateMachine.getCurrentState() !== "initial" &&
-			!this.stateMachine.getCurrentState().includes("roar")
+			!this.stateMachine.getCurrentState()?.includes("roar")
 		);
 	}
 }

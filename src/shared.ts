@@ -11,6 +11,11 @@ export type SpriteDirection =
 	| typeof SpriteDown
 	| typeof SpriteLeft;
 
+export type Sound =
+	| Phaser.Sound.NoAudioSound
+	| Phaser.Sound.HTML5AudioSound
+	| Phaser.Sound.WebAudioSound;
+
 export const Events = {
 	MonsterDefeated: "defeated",
 	MonsterDying: "dying",

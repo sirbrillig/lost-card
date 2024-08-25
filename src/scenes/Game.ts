@@ -49,12 +49,8 @@ import {
 	getPowerEquippedKey,
 	getRegionFromRoomName,
 	getRegionName,
+	Sound,
 } from "../shared";
-
-type Sound =
-	| Phaser.Sound.NoAudioSound
-	| Phaser.Sound.HTML5AudioSound
-	| Phaser.Sound.WebAudioSound;
 
 export class Game extends Scene {
 	debugGraphic: Phaser.GameObjects.Graphics | undefined;
@@ -69,8 +65,10 @@ export class Game extends Scene {
 
 	attackSound: Sound;
 	destroySound: Sound;
+	gameOverSound: Sound;
 	hitSound: Sound;
 	walkSound: Sound;
+	saveSound: Sound;
 	healSound: Sound;
 	windSound: Sound;
 	iceSound: Sound;
@@ -333,7 +331,13 @@ export class Game extends Scene {
 				if (this.isPlayerInvincible()) {
 					return false;
 				}
-				return enemy.visible && !enemy.data?.get("stunned");
+				if (!enemy.visible || !enemy.active) {
+					return false;
+				}
+				if (enemy.data?.get(DataKeys.Stunned)) {
+					return false;
+				}
+				return true;
 			}
 		);
 
@@ -392,7 +396,7 @@ export class Game extends Scene {
 			return;
 		}
 		this.lastDialogData = obj;
-		this.walkSound.stop();
+		this.sound.stopAll();
 		this.scene.launch("Dialog", {
 			heading: obj.heading,
 			text: obj.text,
@@ -661,6 +665,7 @@ export class Game extends Scene {
 	}
 
 	saveGame() {
+		this.saveSound.play();
 		localStorage.setItem("lost-card-save", JSON.stringify(this.getSaveData()));
 		console.log(this.getSaveData());
 		MainEvents.emit(Events.GameSaved);
@@ -1153,8 +1158,8 @@ export class Game extends Scene {
 
 			const tilePosition = new Phaser.Math.Vector2(tile.body.x, tile.body.y);
 			const playerPosition = new Phaser.Math.Vector2(
-				this.player.x,
-				this.player.y
+				this.player.body.center.x,
+				this.player.body.center.y
 			);
 			const distanceToActivate: number =
 				this.data.get("distanceToActivate") ?? this.distanceToActivateTransient;
@@ -1215,6 +1220,12 @@ export class Game extends Scene {
 						this.showDialog({
 							heading: "Get a weapon",
 							text: "It would be unwise to face the monsters unarmed. Visit the armory south of the throne room.",
+						});
+					}
+					if (tile.name === "ArmorySign") {
+						this.showDialog({
+							heading: "The Armory",
+							text: "It would be unwise to face the monsters unarmed. Find a weapon in here.",
 						});
 					}
 				});
@@ -1309,6 +1320,7 @@ export class Game extends Scene {
 		effect.setDepth(5);
 		effect.anims.play("white_fire_circle", true);
 		effect.anims.chain("appear");
+		this.holyLoopSound.play();
 		effect.on(Phaser.Animations.Events.ANIMATION_UPDATE, () => {
 			const name = effect.anims.getName();
 			const progress = effect.anims.getProgress();
@@ -1316,6 +1328,16 @@ export class Game extends Scene {
 				item.data.set("hidden", false);
 				item.setVisible(true);
 				item.setActive(true);
+			}
+		});
+		effect.on(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
+			const name = effect.anims.getName();
+			if (name === "white_fire_circle") {
+				this.holyLoopSound.stop();
+				this.appearSound.play();
+			}
+			if (name === "appear") {
+				effect.destroy();
 			}
 		});
 	}
@@ -1415,14 +1437,21 @@ export class Game extends Scene {
 	}
 
 	pickUpKey() {
+		this.sound.play("key");
 		this.setKeyCount(this.getKeyCount() + 1);
-		this.showDialog({
-			heading: "A Key",
-			text: "Collect six of these to open the Golden door.",
+		this.time.addEvent({
+			delay: this.gotItemFreeze,
+			callback: () => {
+				this.showDialog({
+					heading: "A Key",
+					text: "Collect six of these to open the Golden door.",
+				});
+			},
 		});
 	}
 
 	pickUpHeart() {
+		this.sound.play("heart");
 		let playerTotalHitPoints =
 			this.registry.get("playerTotalHitPoints") ?? this.playerInitialHitPoints;
 		playerTotalHitPoints += 1;
@@ -1488,6 +1517,7 @@ export class Game extends Scene {
 	pickUpCard(card: Powers) {
 		this.equipPower(card);
 		this.playCardAnimation(card);
+		this.sound.play("bonus");
 		this.setPlayerInvincible(true);
 		this.setPlayerStunned(true);
 		this.time.addEvent({
@@ -1508,6 +1538,7 @@ export class Game extends Scene {
 			this.registry.get("playerTotalHitPoints") ?? this.playerInitialHitPoints;
 		this.setPlayerHitPoints(playerTotalHitPoints);
 
+		this.appearSound.play();
 		this.setPotionCount(this.getPotionCount() + 1);
 
 		if (this.registry.get("seenPotionDialog")) {
@@ -1524,6 +1555,7 @@ export class Game extends Scene {
 	pickUpSword() {
 		this.equipSword();
 		this.player.anims.play("down-attack", true);
+		this.attackSound.play();
 		this.setPlayerInvincible(true);
 		this.setPlayerStunned(true);
 		this.time.addEvent({
@@ -1735,10 +1767,18 @@ export class Game extends Scene {
 	preload() {
 		this.attackSound = this.sound.add("attack", { loop: false, volume: 0.5 });
 		this.windSound = this.sound.add("wind", { loop: false, volume: 0.8 });
+		this.saveSound = this.sound.add("fire", {
+			loop: false,
+			volume: 0.8,
+		});
+		this.gameOverSound = this.sound.add("game-over", {
+			loop: false,
+			volume: 0.8,
+		});
 		this.walkSound = this.sound.add("walk", {
 			loop: false,
-			rate: 1.5,
-			volume: 0.9,
+			rate: 1.6,
+			volume: 0.8,
 		});
 		this.iceSound = this.sound.add("ice", { loop: false, volume: 0.5 });
 		this.holyLoopSound = this.sound.add("holy-loop", {
@@ -2152,7 +2192,7 @@ export class Game extends Scene {
 						point.x,
 						point.y
 					);
-					monster.once("defeated", () => {
+					monster.once(Events.MonsterDefeated, () => {
 						this.showHiddenItem("IceCard");
 					});
 					this.enemyManager.enemies.add(monster);
@@ -2296,10 +2336,6 @@ export class Game extends Scene {
 
 		// It seems that we may need to do this again when enemies changes?
 		this.physics.add.collider(this.createdDoors, this.enemyManager.enemies);
-
-		MainEvents.on(Events.MonsterDefeated, () => {
-			this.destroySound.play();
-		});
 	}
 
 	wasBossDefeated(name: string) {
@@ -2403,9 +2439,6 @@ export class Game extends Scene {
 		if (enemy.data.get(DataKeys.Hittable) !== true) {
 			return;
 		}
-		if (!this.hitSound.isPlaying) {
-			this.hitSound.play();
-		}
 		this.cameras.main.shake(200, 0.004);
 		enemy.emit(Events.MonsterHit);
 
@@ -2426,11 +2459,12 @@ export class Game extends Scene {
 		if (!this.scene.isActive()) {
 			return;
 		}
-		console.log("game over!");
+		this.sound.stopAll();
+		this.gameOverSound.play();
 		this.isGameOver = true;
 		this.cameras.main.fadeOut(1000, 0, 0, 0, (_: unknown, progress: number) => {
 			if (progress === 1) {
-				this.walkSound.stop();
+				this.sound.stopAll();
 				this.scene.stop();
 				this.scene.get("Overlay")?.scene.stop();
 				this.scene.start("GameOver");

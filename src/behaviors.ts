@@ -1,4 +1,5 @@
 import {
+	Sound,
 	moveHitboxInFrontOfSprite,
 	DataKeys,
 	getDirectionOfSpriteMovement,
@@ -106,16 +107,17 @@ export class Roar<AllStates extends string>
 			throw new Error("Could not update monster");
 		}
 		sprite.body.stop();
-		sprite.anims.play(
-			{
-				key: "roar",
-			},
-			true
-		);
+		sprite.anims.play("roar", true);
+		const roar = sprite.scene.sound.add("roar", {
+			loop: false,
+			volume: 0.9,
+		});
+		roar.play();
 		MainEvents.emit(Events.StunPlayer, true);
 		sprite.scene.cameras.main.shake(2000, 0.009);
 		sprite.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
 			MainEvents.emit(Events.StunPlayer, false);
+			roar.stop();
 			stateMachine.popState();
 			stateMachine.pushState(this.#nextState);
 		});
@@ -272,6 +274,7 @@ export class RandomlyWalk<AllStates extends string>
 	#maxWalkTime = 4000;
 	#nextState: AllStates;
 	name: AllStates;
+	walkSound: Sound;
 
 	constructor(
 		name: AllStates,
@@ -302,14 +305,25 @@ export class RandomlyWalk<AllStates extends string>
 		if (!isDynamicSprite(sprite)) {
 			throw new Error("invalid sprite");
 		}
+		this.walkSound = sprite.scene.sound.add("enemy-walk", {
+			loop: true,
+			rate: 1.5,
+			volume: 0.5,
+		});
+		this.walkSound.play();
 
 		const direction = getWalkingDirection(sprite);
 		this.#walkInDirection(sprite, direction);
+
+		sprite.on(Events.MonsterDying, () => {
+			this.walkSound.stop();
+		});
 
 		sprite.scene.time.addEvent({
 			delay: this.#getWalkingTime(),
 			callback: () => {
 				sprite?.body?.setVelocity(0);
+				this.walkSound.stop();
 				stateMachine.popState();
 				stateMachine.pushState(this.#nextState);
 			},
@@ -573,10 +587,13 @@ export class PowerUp<AllStates extends string>
 		effect.setDepth(5);
 		effect.setAlpha(0.7);
 		effect.anims.play("powerup", true);
+		sprite.scene.sound.play("ice-charge");
 		sprite.once(Events.MonsterDying, () => {
+			sprite.scene.sound.stopByKey("ice-charge");
 			effect?.destroy();
 		});
 		effect.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
+			sprite.scene.sound.stopByKey("ice-charge");
 			effect.destroy();
 			stateMachine.popState();
 			stateMachine.pushState(this.#nextState);
@@ -772,6 +789,7 @@ export class IceAttack<AllStates extends string>
 		effect.setDisplaySize(sprite.body.width * 5, sprite.body.height * 5);
 		effect.setDepth(5);
 		effect.anims.play("ice_attack", true);
+		sprite.scene.sound.play("ice");
 
 		sprite.scene.physics.add.overlap(enemyManager.player, effect, () => {
 			MainEvents.emit(Events.FreezePlayer, true);
@@ -982,6 +1000,7 @@ export class RangedIceBall<AllStates extends string>
 		effect.setDisplaySize(effect.body.width * 0.8, effect.body.height * 0.8);
 		effect.body.setSize(effect.body.width * 0.5, effect.body.height * 0.5);
 		sprite.scene.physics.moveToObject(effect, enemyManager.player, 120);
+		sprite.scene.sound.play("wave");
 
 		sprite.scene.physics.add.overlap(enemyManager.player, effect, () => {
 			MainEvents.emit(Events.EnemyHitPlayer, true);
@@ -1150,6 +1169,7 @@ export class IceBeam<AllStates extends string>
 			},
 			true
 		);
+		sprite.scene.sound.play("ice");
 		if (!isDynamicSprite(effect)) {
 			throw new Error("Could not update ice beam");
 		}
@@ -1177,6 +1197,7 @@ export class IceBeam<AllStates extends string>
 		);
 
 		sprite.scene.physics.add.overlap(enemyManager.player, effect, () => {
+			sprite.scene.sound.stopByKey("freeze");
 			MainEvents.emit(Events.EnemyHitPlayer, true);
 			effect.destroy();
 			stateMachine.popState();
@@ -1184,9 +1205,11 @@ export class IceBeam<AllStates extends string>
 		});
 
 		sprite.once(Events.MonsterDying, () => {
+			sprite.scene.sound.stopByKey("freeze");
 			effect?.destroy();
 		});
 		effect.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
+			sprite.scene.sound.stopByKey("freeze");
 			effect.destroy();
 			stateMachine.popState();
 			stateMachine.pushState(this.#nextState);
@@ -1201,6 +1224,7 @@ export class IceBeam<AllStates extends string>
 		if (!isTileWithPropertiesObject(tile) || !tile.properties.isWater) {
 			return;
 		}
+		sprite.scene.sound.play("freeze");
 		const iceTileFrame = 284;
 		enemyManager.map.removeTile(tile, iceTileFrame);
 		sprite.scene.time.addEvent({

@@ -1,5 +1,4 @@
 import { RandomlyWalk, PowerUp, IceAttack } from "./behaviors";
-import { DataKeys } from "./shared";
 import { EnemyManager } from "./EnemyManager";
 import { BaseMonster } from "./BaseMonster";
 
