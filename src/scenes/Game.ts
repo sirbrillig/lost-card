@@ -58,6 +58,7 @@ export class Game extends Scene {
 	player: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
 	sword: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
 	power: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
+	healEffect: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody | undefined;
 	attackSprite: Phaser.GameObjects.Sprite;
 	enemyManager: EnemyManager;
 	enemyCollider: Phaser.Physics.Arcade.Collider;
@@ -511,29 +512,34 @@ export class Game extends Scene {
 		const totalHitPoints =
 			this.registry.get("playerTotalHitPoints") ?? this.playerInitialHitPoints;
 		this.healSound.play();
-		const effect = this.add.sprite(
+		if (this.healEffect) {
+			this.healEffect.destroy();
+		}
+		const healEffect = this.add.sprite(
 			this.player.body.center.x + 1,
 			this.player.body.center.y - 1,
-			"white_fire_circle",
+			"use-potion-charge",
 			0
 		);
-		effect.setDepth(5);
-		effect.setAlpha(0.8);
-		effect.anims.play("use-potion-charge");
-
+		this.physics.add.existing(healEffect);
+		if (!isDynamicSprite(healEffect)) {
+			throw new Error("Heal effect is not a sprite");
+		}
+		this.healEffect = healEffect;
+		this.healEffect.setDepth(5);
+		this.healEffect.setAlpha(0.8);
+		this.healEffect.anims.play("use-potion-charge");
 		if (this.getPlayerHitPoints() === totalHitPoints) {
-			effect.on(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
-				effect.destroy();
+			this.healEffect.on(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
+				this.healEffect?.setVisible(false);
 			});
 			return;
 		}
-
-		effect.anims.chain("use-potion");
-		effect.on(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
-			const name = effect.anims.getName();
-			const progress = effect.anims.getProgress();
-			if (name === "use-potion" && progress === 1) {
-				effect.destroy();
+		this.healEffect.anims.chain("use-potion");
+		this.healEffect.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
+			const name = this.healEffect?.anims.getName();
+			if (name === "use-potion") {
+				this.healEffect?.destroy();
 			}
 		});
 
@@ -2974,6 +2980,15 @@ export class Game extends Scene {
 		}
 	}
 
+	updateHealEffectPosition() {
+		if (this.healEffect) {
+			this.healEffect.setPosition(
+				this.player.body.center.x + 1,
+				this.player.body.center.y - 1
+			);
+		}
+	}
+
 	updatePlayer(): void {
 		this.updatePlayerTint();
 		this.registry.set("playerX", this.player.x);
@@ -2982,6 +2997,7 @@ export class Game extends Scene {
 		this.updateSwordHitbox();
 		this.updatePowerHitboxPosition();
 		this.updatePlayerMovement();
+		this.updateHealEffectPosition();
 
 		const isMoving =
 			this.player.body.velocity.x !== 0 || this.player.body.velocity.y !== 0;
