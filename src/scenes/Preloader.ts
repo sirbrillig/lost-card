@@ -52,6 +52,7 @@ export class Preloader extends Scene {
 			frameWidth: 13,
 			frameHeight: 12,
 		});
+		this.load.atlas("icons-atlas", "menu-icons.png", "menu-icons.json");
 		this.load.spritesheet("icons3", "white_sprite_sheet.png", {
 			frameWidth: 18,
 			frameHeight: 18,

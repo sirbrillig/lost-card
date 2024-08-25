@@ -10,17 +10,78 @@ import {
 } from "../shared";
 
 const heartSize: number = 18;
-const itemSize: number = 20;
+const itemSize: number = 17;
 const portraitPadding = 22;
 const inactiveFrame = 13;
 const activeFrame = 29;
 
 class Item {
 	image: Phaser.GameObjects.Image;
+	selectedItemMarker: Phaser.GameObjects.NineSlice;
+	scene: Phaser.Scene;
+	name: string;
+	isSelected: boolean = false;
+
+	constructor(
+		scene: Phaser.Scene,
+		count: number,
+		texture: string,
+		frame: number,
+		name: string
+	) {
+		const image = scene.add
+			.image(
+				portraitPadding + itemSize * count,
+				scene.cameras.main.y + 35,
+				texture,
+				frame
+			)
+			.setDepth(6)
+			.setOrigin(1);
+		this.image = image;
+		this.name = name;
+		this.scene = scene;
+	}
+
+	update() {
+		if (!this.selectedItemMarker) {
+			this.selectedItemMarker = this.scene.add
+				.nineslice(
+					this.image.x - this.image.width / 2,
+					this.image.y - this.image.height / 2,
+					"icons-atlas",
+					"menu-icons-white-16.png",
+					itemSize,
+					itemSize,
+					5,
+					5,
+					5,
+					5
+				)
+				.setDepth(5)
+				.setOrigin(0.5);
+		}
+		if (!this.isSelected) {
+			this.selectedItemMarker?.setVisible(false);
+			return;
+		}
+		this.selectedItemMarker?.setVisible(true);
+	}
+
+	destroy() {
+		this.image.destroy();
+		this.selectedItemMarker?.destroy();
+	}
+}
+
+class PotionItem {
+	image: Phaser.GameObjects.Image;
 	selectedItemMarker: Phaser.GameObjects.Image;
 	scene: Phaser.Scene;
 	name: string;
 	isSelected: boolean = false;
+	totalPotions: number = 0;
+	countLabel: Phaser.GameObjects.BitmapText;
 
 	constructor(
 		scene: Phaser.Scene,
@@ -40,46 +101,6 @@ class Item {
 		this.image = image;
 		this.name = name;
 		this.scene = scene;
-	}
-
-	update() {
-		if (!this.isSelected) {
-			this.selectedItemMarker?.setVisible(false);
-			return;
-		}
-
-		if (!this.selectedItemMarker) {
-			this.selectedItemMarker = this.scene.add
-				.image(
-					this.image.x - this.image.width / 2,
-					this.image.y + 4,
-					"icons2",
-					10
-				)
-				.setOrigin(0.5)
-				.setDepth(8);
-		}
-		this.selectedItemMarker.setVisible(true);
-	}
-
-	destroy() {
-		this.image.destroy();
-		this.selectedItemMarker?.destroy();
-	}
-}
-
-class PotionItem extends Item {
-	totalPotions: number = 0;
-	countLabel: Phaser.GameObjects.BitmapText;
-
-	constructor(
-		scene: Phaser.Scene,
-		count: number,
-		texture: string,
-		frame: number,
-		name: string
-	) {
-		super(scene, count, texture, frame, name);
 		this.countLabel = scene.add
 			.bitmapText(
 				this.image.x - this.image.width + 2,
@@ -138,7 +159,7 @@ class Heart {
 }
 
 export class Overlay extends Scene {
-	items: Item[] = [];
+	items: (Item | PotionItem)[] = [];
 	hearts: Heart[] = [];
 	totalHearts: number = 0;
 	activeHearts: number = 0;
@@ -166,7 +187,7 @@ export class Overlay extends Scene {
 				"panel4",
 				0,
 				this.getBackgroundWidth(),
-				20,
+				this.getBackgroundHeight(),
 				8,
 				8,
 				8,
@@ -222,7 +243,7 @@ export class Overlay extends Scene {
 		this.input.keyboard.on("keydown-M", () => {
 			this.togglePause();
 		});
-		this.input.keyboard.on("keydown-OPEN_BRACKET", () => {
+		this.input.keyboard.on("keydown-CLOSED_BRACKET", () => {
 			// Rotate Active Power
 			const available = powerOrder.filter((power) =>
 				this.isPowerEquipped(power)
@@ -235,7 +256,7 @@ export class Overlay extends Scene {
 			const nextPower = available[current + 1] ?? available[0];
 			this.setActivePower(nextPower);
 		});
-		this.input.keyboard.on("keydown-CLOSED_BRACKET", () => {
+		this.input.keyboard.on("keydown-OPEN_BRACKET", () => {
 			// Rotate Active Power
 			const available = powerOrder.filter((power) =>
 				this.isPowerEquipped(power)
@@ -345,6 +366,10 @@ export class Overlay extends Scene {
 		);
 	}
 
+	getBackgroundHeight() {
+		return 20;
+	}
+
 	update() {
 		const totalHearts = this.registry.get("playerTotalHitPoints") ?? 0;
 		const activeHearts = this.registry.get("playerHitPoints") ?? 0;
@@ -371,7 +396,7 @@ export class Overlay extends Scene {
 			heart.update();
 		});
 
-		this.bg.setSize(this.getBackgroundWidth(), 20);
+		this.bg.setSize(this.getBackgroundWidth(), this.getBackgroundHeight());
 
 		this.updateItems();
 		this.updateKeys();

@@ -7,7 +7,7 @@ export class GameMap extends Scene {
 
 	create() {
 		this.add
-			.nineslice(128, 112, "panel4", 0, 248, 180, 8, 8, 8, 8)
+			.nineslice(128, 112, "panel4", 0, 248, 150, 8, 8, 8, 8)
 			.setOrigin(0.5)
 			.setAlpha(0.9);
 
