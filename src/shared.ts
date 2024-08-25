@@ -448,7 +448,7 @@ export function getDoorDestinationCoordinates(
 		if (destinationDirection === SpriteDown) {
 			return destinationTile.y + 10;
 		}
-		return destinationTile.y - 10;
+		return destinationTile.y - 12;
 	})();
 	return [destinationX, destinationY];
 }
