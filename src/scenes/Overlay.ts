@@ -259,10 +259,6 @@ export class Overlay extends Scene {
 		} else {
 			this.scene.pause("Game");
 			this.scene.launch("GameMap");
-			// this.scene.launch("Dialog", {
-			// 	heading: "Paused",
-			// 	text: "Press ESC to resume",
-			// });
 		}
 	}
 

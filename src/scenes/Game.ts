@@ -64,6 +64,7 @@ export class Game extends Scene {
 
 	lastAttackedAt: number = 0;
 	lastPowerAt: number = 0;
+	lastDialogData: { heading: string; text?: string } | undefined;
 	playerDirection: SpriteDirection = SpriteDown;
 	enteredRoomAt: number = 0;
 	isPlayerBeingKnockedBack: boolean = false;
@@ -99,6 +100,7 @@ export class Game extends Scene {
 	saveCooldown: number = 30000;
 	preGameOverTime: number = 2500;
 	roomTransitionFadeTime: number = 300;
+	regionTransitionFadeTime: number = 1000;
 	sceneStartFadeTime: number = 1000;
 	postAppearInvincibilityTime: number = 1000;
 	icePowerVelocity: number = 80;
@@ -364,18 +366,26 @@ export class Game extends Scene {
 		});
 	}
 
+	showDialog(obj: { heading: string; text?: string }) {
+		if (this.lastDialogData?.heading === obj.heading) {
+			return;
+		}
+		this.lastDialogData = obj;
+		this.scene.launch("Dialog", {
+			heading: obj.heading,
+			text: obj.text,
+		});
+	}
+
 	checkEndGame() {
 		if (this.getKeyCount() < 6) {
-			this.scene.launch("Dialog", {
+			this.showDialog({
 				heading: "Gold door",
 				text: "Get six keys to open it",
 			});
-			this.input.keyboard?.once("keydown", () => {
-				this.scene.get("Dialog")?.scene.stop();
-			});
 			return;
 		}
-		this.scene.launch("Dialog", {
+		this.showDialog({
 			heading: "You win!",
 			text: "Congratulations",
 		});
@@ -717,7 +727,7 @@ export class Game extends Scene {
 	}
 
 	moveCameraToRoom(room: Phaser.Types.Tilemaps.TiledObject) {
-		this.scene.get("Dialog")?.scene.stop();
+		this.lastDialogData = undefined;
 		const camera = this.cameras.main;
 
 		if (
@@ -731,19 +741,6 @@ export class Game extends Scene {
 		this.physics.world.setBounds(room.x, room.y, room.width, room.height);
 
 		camera.startFollow(this.player);
-
-		if (this.enemyManager.activeRoom) {
-			const previousRegion = getRegionFromRoomName(
-				this.enemyManager.activeRoom.name
-			);
-			const newRegion = getRegionFromRoomName(room.name);
-			if (previousRegion !== newRegion) {
-				this.scene.launch("Dialog", {
-					heading: getRegionName(newRegion),
-					hideAfter: this.newRegionMessageTime,
-				});
-			}
-		}
 
 		this.enemyManager.activeRoom = room;
 		this.enteredRoomAt = this.time.now;
@@ -869,18 +866,40 @@ export class Game extends Scene {
 			destinationTile,
 			destinationDirection
 		);
+
+		const room = getRoomForPoint(this.map, destinationX, destinationY);
+		if (room.name === this.enemyManager.activeRoom?.name) {
+			return;
+		}
+
+		const previousRegion = this.enemyManager.activeRoom
+			? getRegionFromRoomName(this.enemyManager.activeRoom.name)
+			: undefined;
+		const newRegion = getRegionFromRoomName(room.name);
+		const isRegionTransition = previousRegion !== newRegion;
+		const fadeTime = isRegionTransition
+			? this.regionTransitionFadeTime
+			: this.roomTransitionFadeTime;
+
 		console.log("moving player to point", destinationX, destinationY);
 		this.setPlayerStunned(true);
 		this.cameras.main.fadeOut(
-			this.roomTransitionFadeTime,
+			fadeTime,
 			0,
 			0,
 			0,
 			(_: unknown, progress: number) => {
 				if (progress === 1) {
+					if (isRegionTransition) {
+						this.scene.launch("Dialog", {
+							heading: getRegionName(newRegion),
+							hideAfter: this.newRegionMessageTime,
+						});
+					}
+
 					this.movePlayerToPoint(destinationX, destinationY);
 					this.setPlayerStunned(false);
-					this.cameras.main.fadeIn(this.roomTransitionFadeTime);
+					this.cameras.main.fadeIn(fadeTime);
 				}
 			}
 		);
@@ -1122,12 +1141,9 @@ export class Game extends Scene {
 						this.power.visible = false;
 					}
 					if (tile.name === "TutorialSign") {
-						this.scene.launch("Dialog", {
+						this.showDialog({
 							heading: "The door is shut",
 							text: "Once, cards of power protected the kingdoms, but the cards have been lost. Monsters have sealed the people behind this door.",
-						});
-						this.input.keyboard?.once("keydown", () => {
-							this.scene.get("Dialog")?.scene.stop();
 						});
 					}
 				});
@@ -1329,12 +1345,9 @@ export class Game extends Scene {
 
 	pickUpKey() {
 		this.setKeyCount(this.getKeyCount() + 1);
-		this.scene.launch("Dialog", {
+		this.showDialog({
 			heading: "A Key",
 			text: "Get six for the gold door",
-		});
-		this.input.keyboard?.once("keydown", () => {
-			this.scene.get("Dialog")?.scene.stop();
 		});
 	}
 
@@ -1409,15 +1422,12 @@ export class Game extends Scene {
 		this.time.addEvent({
 			delay: this.gotItemFreeze,
 			callback: () => {
-				this.scene.launch("Dialog", {
+				this.showDialog({
 					heading: this.getCardNameForPower(card),
 					text: "Press SHIFT to use\r\nPress [ or ] to change",
 				});
 				this.setPlayerInvincible(false);
 				this.setPlayerStunned(false);
-				this.input.keyboard?.once("keydown-SHIFT", () => {
-					this.scene.get("Dialog")?.scene.stop();
-				});
 			},
 		});
 	}
@@ -1433,14 +1443,11 @@ export class Game extends Scene {
 			return;
 		}
 
-		this.scene.launch("Dialog", {
+		this.showDialog({
 			heading: "A potion!",
 			text: "Press P to restore health\r\nPress SPACE to continue",
 		});
 		this.registry.set("seenPotionDialog", true);
-		this.input.keyboard?.once("keydown-SPACE", () => {
-			this.scene.get("Dialog")?.scene.stop();
-		});
 	}
 
 	pickUpSword() {
@@ -1451,28 +1458,21 @@ export class Game extends Scene {
 		this.time.addEvent({
 			delay: this.gotItemFreeze,
 			callback: () => {
-				this.scene.launch("Dialog", {
+				this.showDialog({
 					heading: "You found a sword!",
 					text: "Press SPACE to swing.",
 				});
 				this.setPlayerInvincible(false);
 				this.setPlayerStunned(false);
-				this.input.keyboard?.once("keydown-SPACE", () => {
-					this.scene.get("Dialog")?.scene.stop();
-				});
 			},
 		});
 	}
 
 	movePlayerToPoint(x: number, y: number) {
 		this.player.setPosition(x, y);
-
-		// if the player enters a door, move the camera to that room
 		const room = getRoomForPoint(this.map, this.player.x, this.player.y);
-		if (room.name !== this.enemyManager.activeRoom?.name) {
-			console.log("moving camera to room", room);
-			this.moveCameraToRoom(room);
-		}
+		console.log("moving camera to room", room);
+		this.moveCameraToRoom(room);
 	}
 
 	getPlayerSpeed(): number {

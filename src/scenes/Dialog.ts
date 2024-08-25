@@ -86,7 +86,18 @@ export class Dialog extends Scene {
 					});
 				},
 			});
+			return;
 		}
+
+		this.scene.pause("Game");
+
+		if (!this.input.keyboard) {
+			throw new Error("No keyboard controls could be found");
+		}
+		this.input.keyboard.on("keydown", () => {
+			this.scene.resume("Game");
+			this.scene.stop();
+		});
 	}
 
 	update() {}
