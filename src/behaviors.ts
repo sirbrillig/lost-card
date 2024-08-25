@@ -380,6 +380,12 @@ export class LeftRightMarch<AllStates extends string>
 
 		const direction = getWalkingDirectionLeftRight(sprite);
 		sprite.data.set("direction", direction);
+		const walkSound = sprite.scene.sound.add("enemy-walk", {
+			loop: true,
+			rate: 1.5,
+			volume: 0.5,
+		});
+		walkSound.play();
 		switch (direction) {
 			case SpriteRight:
 				sprite.anims.play("right", true);
@@ -394,6 +400,7 @@ export class LeftRightMarch<AllStates extends string>
 		sprite.scene.time.addEvent({
 			delay: this.#getWalkingTime(),
 			callback: () => {
+				walkSound.stop();
 				// sprite may have been destroyed before this happens
 				sprite?.body?.setVelocity(0);
 				stateMachine.popState();
@@ -450,6 +457,7 @@ export class RandomTeleport<AllStates extends string>
 		);
 		effect1.setDepth(5);
 		effect1.anims.play("teleport", true);
+		sprite.scene.sound.play("holy");
 		sprite.once(Events.MonsterDying, () => {
 			effect1?.destroy();
 		});
@@ -538,6 +546,7 @@ export class TeleportToWater<AllStates extends string>
 		const x = targetTile.pixelX + targetTile.width / 2;
 		// Move to tile
 		sprite.setPosition(x, targetTile.pixelY);
+		sprite.scene.sound.play("holy");
 
 		// Move to next state
 		sprite.scene.time.addEvent({
@@ -667,6 +676,7 @@ export class SlashTowardPlayer<AllStates extends string>
 		this.#effect.setDepth(5);
 		moveHitboxInFrontOfSprite(sprite, direction, this.#effect);
 		this.#effect.anims.play("slash-effect", true);
+		sprite.scene.sound.play("attack");
 
 		sprite.scene.physics.add.overlap(enemyManager.player, this.#effect, () => {
 			MainEvents.emit(Events.EnemyHitPlayer, true);
@@ -733,6 +743,7 @@ export class BigSwing<AllStates extends string>
 		effect.setDisplaySize(sprite.body.width * 4, sprite.body.height * 4);
 		effect.setDepth(5);
 		effect.anims.play("slash-effect", true);
+		sprite.scene.sound.play("attack");
 
 		sprite.scene.physics.add.overlap(enemyManager.player, effect, () => {
 			MainEvents.emit(Events.EnemyHitPlayer, true);
@@ -920,6 +931,7 @@ export class RangedFireBall<AllStates extends string>
 			},
 			true
 		);
+		sprite.scene.sound.play("fire-loop");
 		if (!isDynamicSprite(effect)) {
 			throw new Error("Could not update fire ball");
 		}
@@ -928,11 +940,13 @@ export class RangedFireBall<AllStates extends string>
 		sprite.scene.physics.moveToObject(effect, enemyManager.player, this.#speed);
 
 		sprite.scene.physics.add.overlap(enemyManager.player, effect, () => {
+			sprite?.scene?.sound.stopByKey("fire-loop");
 			MainEvents.emit(Events.EnemyHitPlayer, true);
 			effect.destroy();
 		});
 
 		sprite.once(Events.MonsterDying, () => {
+			sprite.scene.sound.stopByKey("fire-loop");
 			effect?.destroy();
 		});
 
@@ -945,6 +959,7 @@ export class RangedFireBall<AllStates extends string>
 		});
 
 		effect.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
+			sprite?.scene?.sound?.stopByKey("fire-loop");
 			effect.destroy();
 		});
 	}
@@ -1045,6 +1060,12 @@ export class WalkWithFire<AllStates extends string>
 		}
 		const direction = getWalkingDirection(sprite);
 		this.#walkInDirection(sprite, direction);
+		const walkSound = sprite.scene.sound.add("enemy-walk", {
+			loop: true,
+			rate: 1.5,
+			volume: 0.5,
+		});
+		walkSound.play();
 
 		sprite.scene.anims.create({
 			key: "fire-power",
@@ -1081,6 +1102,7 @@ export class WalkWithFire<AllStates extends string>
 			this.#effect.body.height * 0.5
 		);
 		sprite.scene.physics.add.overlap(enemyManager.player, this.#effect, () => {
+			walkSound.stop();
 			MainEvents.emit(Events.EnemyHitPlayer, true);
 			this.#effect.destroy();
 			stateMachine.popState();
@@ -1088,9 +1110,11 @@ export class WalkWithFire<AllStates extends string>
 		});
 
 		sprite.once(Events.MonsterDying, () => {
+			walkSound.stop();
 			this.#effect?.destroy();
 		});
 		this.#effect.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
+			walkSound.stop();
 			this.#effect.destroy();
 			stateMachine.popState();
 			stateMachine.pushState(this.#nextState);
@@ -1289,6 +1313,7 @@ export class SwoopAttack<AllStates extends string>
 	#speed: number = 10;
 	#maxSpeed: number = 30;
 	#lastDistance = 0;
+	walkSound: Sound;
 
 	constructor(
 		name: AllStates,
@@ -1323,6 +1348,12 @@ export class SwoopAttack<AllStates extends string>
 		if (!isDynamicSprite(sprite)) {
 			throw new Error("invalid sprite");
 		}
+
+		this.walkSound = sprite.scene.sound.add("wind", {
+			loop: true,
+			rate: 1.5,
+			volume: 0.5,
+		});
 
 		if (this.#followTime) {
 			sprite.scene.time.addEvent({
@@ -1375,6 +1406,9 @@ export class SwoopAttack<AllStates extends string>
 		}
 		this.#lastDistance = distance;
 
+		if (!this.walkSound.isPlaying) {
+			this.walkSound.play();
+		}
 		sprite.scene.physics.accelerateTo(
 			sprite,
 			enemyManager.player.body.center.x,
@@ -1470,6 +1504,7 @@ export class FollowPlayer<AllStates extends string>
 		);
 		if (this.#awareDistance) {
 			if (distance > this.#awareDistance) {
+				sprite.scene.sound.stopByKey("water-walk");
 				sprite.body.stop();
 				stateMachine.popState();
 				stateMachine.pushState(this.#nextState);
@@ -1488,6 +1523,13 @@ export class FollowPlayer<AllStates extends string>
 			enemyManager.player.body.center.y,
 			this.#speed
 		);
+		if (
+			!sprite.scene.sound
+				.getAllPlaying()
+				.some((sound) => sound.key === "water-walk")
+		) {
+			sprite.scene.sound.play("water-walk");
+		}
 		const direction = getDirectionOfSpriteMovement(sprite.body);
 		if (!direction) {
 			return;
@@ -1568,10 +1610,12 @@ class Seeker extends Phaser.Physics.Arcade.Sprite {
 		if (!isDynamicSprite(this)) {
 			throw new Error("Could not update plant ball");
 		}
+		this.scene.sound.play("fire-loop");
 		this.setDisplaySize(this.body.width * 0.8, this.body.height * 0.8);
 		this.body.setSize(this.body.width * 0.5, this.body.height * 0.5);
 
 		this.scene.physics.add.overlap(this.#enemyManager.player, this, () => {
+			this.scene?.sound?.stopByKey("fire-loop");
 			MainEvents.emit(Events.EnemyHitPlayer, true);
 			this.destroy();
 		});
@@ -1600,6 +1644,7 @@ class Seeker extends Phaser.Physics.Arcade.Sprite {
 			effect.setDepth(5);
 			effect.anims.play("fire-power", true);
 			effect.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
+				this.scene?.sound?.stopByKey("fire-loop");
 				effect.destroy();
 				this.destroy();
 			});

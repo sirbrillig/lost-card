@@ -180,6 +180,7 @@ export class Preloader extends Scene {
 		this.load.audio("ice", ["ice.wav"]);
 		this.load.audio("ice-charge", ["ice-charge.wav"]);
 		this.load.audio("wave", ["wave.wav"]);
+		this.load.audio("fire-loop", ["fire-loop.wav"]);
 		this.load.audio("freeze", ["freeze.wav"]);
 		this.load.audio("plant", ["plant.wav"]);
 		this.load.audio("heal", ["heal.wav"]);
@@ -188,9 +189,11 @@ export class Preloader extends Scene {
 		this.load.audio("rock-destroy", ["rock-destroy.wav"]);
 		this.load.audio("destroy", ["fire-hit.wav"]);
 		this.load.audio("fire", ["fire-boom.wav"]);
+		this.load.audio("spirit", ["spirit.wav"]);
 		this.load.audio("holy", ["holy.wav"]);
 		this.load.audio("holy-loop", ["holy-loop.wav"]);
 		this.load.audio("enemy-walk", ["enemy-walk.ogg"]);
+		this.load.audio("water-walk", ["water-walk.wav"]);
 		this.load.audio("game-over", ["game-over.wav"]);
 		this.load.audio("roar", ["roar.wav"]);
 		this.load.audio("bonus", ["bonus.wav"]);

@@ -2684,6 +2684,15 @@ export class Game extends Scene {
 			case "PlantCard":
 				this.plantSound.play();
 				break;
+			case "CloudCard":
+				this.windSound.play();
+				break;
+			case "FireCard":
+				this.sound.play("fire");
+				break;
+			case "SpiritCard":
+				this.sound.play("spirit");
+				break;
 		}
 	}
 
@@ -2712,6 +2721,7 @@ export class Game extends Scene {
 						this.power.setAlpha(0.5);
 						this.player.setAlpha(0.5);
 						this.power.on(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
+							this.sound.stopByKey("spirit");
 							this.power.setAlpha(1);
 							this.player.setAlpha(1);
 						});
@@ -2752,6 +2762,7 @@ export class Game extends Scene {
 						this.power.setAlpha(0.5);
 						this.player.setAlpha(0.5);
 						this.power.on(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
+							this.sound.stopByKey("spirit");
 							this.power.setAlpha(1);
 							this.player.setAlpha(1);
 						});
@@ -2786,6 +2797,7 @@ export class Game extends Scene {
 						this.power.setAlpha(0.5);
 						this.player.setAlpha(0.5);
 						this.power.on(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
+							this.sound.stopByKey("spirit");
 							this.power.setAlpha(1);
 							this.player.setAlpha(1);
 						});
@@ -2824,6 +2836,7 @@ export class Game extends Scene {
 						this.power.setAlpha(0.5);
 						this.player.setAlpha(0.5);
 						this.power.on(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
+							this.sound.stopByKey("spirit");
 							this.power.setAlpha(1);
 							this.player.setAlpha(1);
 						});
