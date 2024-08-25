@@ -74,6 +74,8 @@ export class Game extends Scene {
 	healSound: Sound;
 	windSound: Sound;
 	iceSound: Sound;
+	holyLoopSound: Sound;
+	appearSound: Sound;
 	rockDestroySound: Sound;
 	freezeSound: Sound;
 	plantSound: Sound;
@@ -1732,8 +1734,10 @@ export class Game extends Scene {
 	preload() {
 		this.attackSound = this.sound.add("attack", { loop: false });
 		this.windSound = this.sound.add("wind", { loop: false });
-		this.walkSound = this.sound.add("walk", { loop: false, rate: 1.5 });
+		this.walkSound = this.sound.add("walk", { loop: true, rate: 1.5 });
 		this.iceSound = this.sound.add("ice", { loop: false });
+		this.holyLoopSound = this.sound.add("holy-loop", { loop: true });
+		this.appearSound = this.sound.add("holy", { loop: false });
 		this.rockDestroySound = this.sound.add("rock-destroy", { loop: false });
 		this.freezeSound = this.sound.add("freeze", { loop: false });
 		this.plantSound = this.sound.add("plant", { loop: false });
@@ -2007,10 +2011,13 @@ export class Game extends Scene {
 		effect.setDepth(5);
 		effect.anims.play("white_fire_circle", true);
 		effect.anims.chain("appear");
+		this.holyLoopSound.play();
 		effect.on(Phaser.Animations.Events.ANIMATION_UPDATE, () => {
 			const name = effect.anims.getName();
 			const progress = effect.anims.getProgress();
 			if (name === "appear" && progress > 0.8) {
+				this.holyLoopSound.stop();
+				this.appearSound.play();
 				this.setPlayerStunned(false);
 				this.player.setVisible(true);
 				this.time.addEvent({

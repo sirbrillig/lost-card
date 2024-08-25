@@ -185,6 +185,8 @@ export class Preloader extends Scene {
 		this.load.audio("walk", ["walk.ogg"]);
 		this.load.audio("rock-destroy", ["rock-destroy.wav"]);
 		this.load.audio("destroy", ["fire-hit.wav"]);
+		this.load.audio("holy", ["holy.wav"]);
+		this.load.audio("holy-loop", ["holy-loop.wav"]);
 	}
 
 	create() {
