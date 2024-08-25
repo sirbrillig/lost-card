@@ -1,6 +1,7 @@
 import { isDynamicSprite, Events, DataKeys } from "./shared";
 import { BehaviorMachineInterface, Behavior, StateMachine } from "./behavior";
 import { EnemyManager } from "./EnemyManager";
+import { MainEvents } from "./MainEvents";
 
 export class BaseMonster<AllStates extends string> extends Phaser.Physics.Arcade
 	.Sprite {
@@ -147,6 +148,7 @@ export class BaseMonster<AllStates extends string> extends Phaser.Physics.Arcade
 		this.emit(Events.MonsterDying);
 		this.setOrigin(0.5, 0.3);
 		this.anims.play("explode", true);
+		MainEvents.emit(Events.MonsterDefeated);
 		this.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
 			this.emit(Events.MonsterDefeated);
 			this.destroy();

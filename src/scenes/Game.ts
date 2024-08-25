@@ -68,6 +68,7 @@ export class Game extends Scene {
 	isGameOver: boolean = false;
 
 	attackSound: Sound;
+	destroySound: Sound;
 	hitSound: Sound;
 	walkSound: Sound;
 	healSound: Sound;
@@ -1738,6 +1739,7 @@ export class Game extends Scene {
 		this.plantSound = this.sound.add("plant", { loop: false });
 		this.healSound = this.sound.add("heal", { loop: false });
 		this.hitSound = this.sound.add("hit", { loop: false });
+		this.destroySound = this.sound.add("destroy", { loop: false });
 
 		const anims = this.anims;
 		anims.create({
@@ -2268,6 +2270,10 @@ export class Game extends Scene {
 
 		// It seems that we may need to do this again when enemies changes?
 		this.physics.add.collider(this.createdDoors, this.enemyManager.enemies);
+
+		MainEvents.on(Events.MonsterDefeated, () => {
+			this.destroySound.play();
+		});
 	}
 
 	wasBossDefeated(name: string) {
@@ -2859,6 +2865,7 @@ export class Game extends Scene {
 			this.player.anims.play("down-walk", true);
 			this.playWalkSound();
 		} else {
+			this.walkSound.stop();
 			this.setPlayerIdleFrame();
 		}
 	}
