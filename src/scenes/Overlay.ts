@@ -340,7 +340,9 @@ export class Overlay extends Scene {
 	}
 
 	getBackgroundWidth() {
-		return this.totalHearts * 25;
+		return (
+			5 + portraitPadding + this.cameras.main.x + heartSize * this.totalHearts
+		);
 	}
 
 	update() {
