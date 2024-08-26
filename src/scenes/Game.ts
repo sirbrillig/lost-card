@@ -2390,7 +2390,7 @@ export class Game extends Scene {
 					boss.once(Events.MonsterDefeated, () => {
 						this.markBossDefeated("MountainBoss");
 						this.showHiddenItem("WindCard");
-						this.showHiddenItem("Potion");
+						this.showHiddenItem("PotionBottle");
 						this.showHiddenItem("Key");
 						this.saveGame();
 					});
@@ -2404,7 +2404,7 @@ export class Game extends Scene {
 					const boss = new IceBoss(this, this.enemyManager, point.x, point.y);
 					boss.once(Events.MonsterDefeated, () => {
 						this.markBossDefeated("IceBoss");
-						this.showHiddenItem("Potion");
+						this.showHiddenItem("PotionBottle");
 						this.showHiddenItem("Key");
 						this.saveGame();
 					});
@@ -2418,7 +2418,7 @@ export class Game extends Scene {
 					const boss = new CloudBoss(this, this.enemyManager, point.x, point.y);
 					boss.once(Events.MonsterDefeated, () => {
 						this.markBossDefeated("CloudBoss");
-						this.showHiddenItem("Potion");
+						this.showHiddenItem("PotionBottle");
 						this.showHiddenItem("Key");
 						this.saveGame();
 					});
@@ -2437,7 +2437,7 @@ export class Game extends Scene {
 					);
 					boss.once(Events.MonsterDefeated, () => {
 						this.markBossDefeated("SpiritBoss");
-						this.showHiddenItem("Potion");
+						this.showHiddenItem("PotionBottle");
 						this.showHiddenItem("Key");
 						this.saveGame();
 					});
@@ -2451,7 +2451,7 @@ export class Game extends Scene {
 					const boss = new PlantBoss(this, this.enemyManager, point.x, point.y);
 					boss.once(Events.MonsterDefeated, () => {
 						this.markBossDefeated("PlantBoss");
-						this.showHiddenItem("Potion");
+						this.showHiddenItem("PotionBottle");
 						this.showHiddenItem("Key");
 						this.saveGame();
 					});
@@ -2465,7 +2465,7 @@ export class Game extends Scene {
 					const boss = new FireBoss(this, this.enemyManager, point.x, point.y);
 					boss.once(Events.MonsterDefeated, () => {
 						this.markBossDefeated("FireBoss");
-						this.showHiddenItem("Potion");
+						this.showHiddenItem("PotionBottle");
 						this.showHiddenItem("Key");
 						this.saveGame();
 					});
