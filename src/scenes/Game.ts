@@ -116,7 +116,7 @@ export class Game extends Scene {
 	enemyKnockBackSpeed: number = 200;
 	playerKnockBackSpeed: number = 150;
 	distanceToActivateTransient: number = 30;
-	playerInitialHitPoints: number = 3;
+	playerInitialHitPoints: number = 4;
 	saveCooldown: number = 30000;
 	preGameOverTime: number = 2500;
 	roomTransitionFadeTime: number = 300;
@@ -2392,7 +2392,7 @@ export class Game extends Scene {
 					boss.once(Events.MonsterDefeated, () => {
 						this.markBossDefeated("MountainBoss");
 						this.showHiddenItem("WindCard");
-						this.showHiddenItem("Heart");
+						this.showHiddenItem("Potion");
 						this.showHiddenItem("Key");
 						this.saveGame();
 					});
@@ -2406,7 +2406,7 @@ export class Game extends Scene {
 					const boss = new IceBoss(this, this.enemyManager, point.x, point.y);
 					boss.once(Events.MonsterDefeated, () => {
 						this.markBossDefeated("IceBoss");
-						this.showHiddenItem("Heart");
+						this.showHiddenItem("Potion");
 						this.showHiddenItem("Key");
 						this.saveGame();
 					});
@@ -2420,7 +2420,7 @@ export class Game extends Scene {
 					const boss = new CloudBoss(this, this.enemyManager, point.x, point.y);
 					boss.once(Events.MonsterDefeated, () => {
 						this.markBossDefeated("CloudBoss");
-						this.showHiddenItem("Heart");
+						this.showHiddenItem("Potion");
 						this.showHiddenItem("Key");
 						this.saveGame();
 					});
@@ -2439,7 +2439,7 @@ export class Game extends Scene {
 					);
 					boss.once(Events.MonsterDefeated, () => {
 						this.markBossDefeated("SpiritBoss");
-						this.showHiddenItem("Heart");
+						this.showHiddenItem("Potion");
 						this.showHiddenItem("Key");
 						this.saveGame();
 					});
@@ -2453,7 +2453,7 @@ export class Game extends Scene {
 					const boss = new PlantBoss(this, this.enemyManager, point.x, point.y);
 					boss.once(Events.MonsterDefeated, () => {
 						this.markBossDefeated("PlantBoss");
-						this.showHiddenItem("Heart");
+						this.showHiddenItem("Potion");
 						this.showHiddenItem("Key");
 						this.saveGame();
 					});
@@ -2467,7 +2467,7 @@ export class Game extends Scene {
 					const boss = new FireBoss(this, this.enemyManager, point.x, point.y);
 					boss.once(Events.MonsterDefeated, () => {
 						this.markBossDefeated("FireBoss");
-						this.showHiddenItem("Heart");
+						this.showHiddenItem("Potion");
 						this.showHiddenItem("Key");
 						this.saveGame();
 					});

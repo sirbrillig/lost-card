@@ -4614,10 +4614,10 @@
                  "y":975.803
                 }, 
                 {
-                 "gid":2818,
+                 "gid":2791,
                  "height":16,
                  "id":375,
-                 "name":"Heart",
+                 "name":"Potion",
                  "properties":[
                         {
                          "name":"hidden",
@@ -4668,10 +4668,10 @@
                  "y":1882.21
                 }, 
                 {
-                 "gid":2818,
+                 "gid":2791,
                  "height":16,
                  "id":405,
-                 "name":"Heart",
+                 "name":"Potion",
                  "properties":[
                         {
                          "name":"hidden",
@@ -4686,10 +4686,10 @@
                  "y":2578.61
                 }, 
                 {
-                 "gid":2818,
+                 "gid":2791,
                  "height":16,
                  "id":406,
-                 "name":"Heart",
+                 "name":"Potion",
                  "properties":[
                         {
                          "name":"hidden",
@@ -4758,10 +4758,10 @@
                  "y":1655.2
                 }, 
                 {
-                 "gid":2818,
+                 "gid":2791,
                  "height":16,
                  "id":538,
-                 "name":"Heart",
+                 "name":"Potion",
                  "properties":[
                         {
                          "name":"hidden",
@@ -4776,10 +4776,10 @@
                  "y":1522.74
                 }, 
                 {
-                 "gid":2818,
+                 "gid":2791,
                  "height":16,
                  "id":539,
-                 "name":"Heart",
+                 "name":"Potion",
                  "properties":[
                         {
                          "name":"hidden",
@@ -4902,10 +4902,10 @@
                  "y":2530.85
                 }, 
                 {
-                 "gid":2818,
+                 "gid":2791,
                  "height":16,
                  "id":560,
-                 "name":"Heart",
+                 "name":"Potion",
                  "properties":[
                         {
                          "name":"hidden",
@@ -5038,6 +5038,42 @@
                  "width":16,
                  "x":2621.86,
                  "y":1646.54
+                }, 
+                {
+                 "gid":2818,
+                 "height":16,
+                 "id":720,
+                 "name":"Heart",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":16,
+                 "x":1377.5292732527,
+                 "y":1598.76313817832
+                }, 
+                {
+                 "gid":2818,
+                 "height":16,
+                 "id":721,
+                 "name":"Heart",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":16,
+                 "x":1568.27624639268,
+                 "y":1840.02308687432
+                }, 
+                {
+                 "gid":2818,
+                 "height":16,
+                 "id":722,
+                 "name":"Heart",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":16,
+                 "x":1761.50904392765,
+                 "y":2400.2480620155
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -10138,7 +10174,7 @@
          "y":0
         }],
  "nextlayerid":17,
- "nextobjectid":720,
+ "nextobjectid":723,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.0",
