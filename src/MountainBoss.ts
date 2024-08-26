@@ -1,24 +1,13 @@
-import { Events } from "./shared";
 import { EnemyManager } from "./EnemyManager";
-import {
-	WaitForActive,
-	Roar,
-	SpawnEnemies,
-	Idle,
-	LeftRightMarch,
-} from "./behaviors";
+import { WaitForActive, Roar, SpawnEnemies, LeftRightMarch } from "./behaviors";
 import { BaseMonster } from "./BaseMonster";
+import { MountainMonster } from "./MountainMonster";
 
-type AllStates =
-	| "initial"
-	| "roar1"
-	| "spawn1"
-	| "spawn2"
-	| "idle1"
-	| "leftrightmarch";
+type AllStates = "initial" | "roar1" | "spawn1" | "spawn2" | "leftrightmarch";
 
 export class MountainBoss extends BaseMonster<AllStates> {
-	hitPoints: number = 8;
+	hitPoints: number = 10;
+	enemyManager: EnemyManager;
 
 	constructor(
 		scene: Phaser.Scene,
@@ -68,13 +57,6 @@ export class MountainBoss extends BaseMonster<AllStates> {
 			frameRate: 10,
 			repeat: 6,
 		});
-		this.anims.create({
-			key: "explode-boss",
-			frames: this.anims.generateFrameNumbers("monster_explode1"),
-			frameRate: 24,
-			repeat: 4,
-			repeatDelay: 2,
-		});
 
 		this.anims.create({
 			key: "left",
@@ -97,19 +79,36 @@ export class MountainBoss extends BaseMonster<AllStates> {
 	}
 
 	constructNewBehaviorFor(state: AllStates) {
+		const createMonster = () => {
+			if (!this.body) {
+				throw new Error("monster is invalid");
+			}
+			return new MountainMonster(
+				this.scene,
+				this.enemyManager,
+				this.body.center.x,
+				this.body.center.y
+			);
+		};
 		switch (state) {
 			case "initial":
 				return new WaitForActive(state, "roar1");
 			case "roar1":
 				return new Roar(state, "spawn1");
 			case "spawn1":
-				return new SpawnEnemies(state, "spawn2");
+				return new SpawnEnemies(state, "spawn2", {
+					enemiesToSpawn: 6,
+					maxSpawnedEnemies: 18,
+					createMonster,
+				});
 			case "spawn2":
-				return new SpawnEnemies(state, "idle1");
-			case "idle1":
-				return new Idle(state, "leftrightmarch", "idle");
+				return new SpawnEnemies(state, "leftrightmarch", {
+					enemiesToSpawn: 6,
+					maxSpawnedEnemies: 18,
+					createMonster,
+				});
 			case "leftrightmarch":
-				return new LeftRightMarch(state, "roar1");
+				return new LeftRightMarch(state, "roar1", { speed: 80 });
 		}
 	}
 
@@ -121,19 +120,6 @@ export class MountainBoss extends BaseMonster<AllStates> {
 
 	playDestroySound() {
 		this.scene.sound.play("destroy");
-	}
-
-	kill() {
-		this.emit(Events.MonsterDying);
-		this.setVelocity(0);
-		this.data.set("stunned", true);
-		this.setOrigin(0.5, 0.3);
-		this.setDisplaySize(this.width * 2, this.height * 2);
-		this.anims.play("explode-boss", true);
-		this.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
-			this.emit(Events.MonsterDefeated);
-			this.destroy();
-		});
 	}
 
 	isHittable(): boolean {

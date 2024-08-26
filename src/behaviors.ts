@@ -365,9 +365,22 @@ export class LeftRightMarch<AllStates extends string>
 	#nextState: AllStates;
 	name: AllStates;
 
-	constructor(name: AllStates, nextState: AllStates) {
+	constructor(
+		name: AllStates,
+		nextState: AllStates,
+		config?: { speed?: number; minWalkTime?: number; maxWalkTime?: number }
+	) {
 		this.name = name;
 		this.#nextState = nextState;
+		if (config?.speed) {
+			this.#enemySpeed = config.speed;
+		}
+		if (config?.minWalkTime) {
+			this.#minWalkTime = config.minWalkTime;
+		}
+		if (config?.maxWalkTime) {
+			this.#maxWalkTime = config.maxWalkTime;
+		}
 	}
 
 	init(
