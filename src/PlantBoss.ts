@@ -1,13 +1,19 @@
-import { Events, DataKeys } from "./shared";
-import { isTileWithPropertiesObject } from "./shared";
+import { DataKeys } from "./shared";
 import { EnemyManager } from "./EnemyManager";
 import { WaitForActive, Roar, RandomlyWalk, SeekingVine } from "./behaviors";
 import { BaseMonster } from "./BaseMonster";
 
-type AllStates = "initial" | "roar1" | "walk" | "attack1" | "attack2";
+type AllStates =
+	| "initial"
+	| "roar1"
+	| "walk"
+	| "attack1"
+	| "attack2"
+	| "attack3"
+	| "attack4";
 
 export class PlantBoss extends BaseMonster<AllStates> {
-	hitPoints: number = 8;
+	hitPoints: number = 12;
 
 	constructor(
 		scene: Phaser.Scene,
@@ -40,13 +46,6 @@ export class PlantBoss extends BaseMonster<AllStates> {
 			}),
 			frameRate: 10,
 			repeat: 8,
-		});
-		this.anims.create({
-			key: "explode-boss",
-			frames: this.anims.generateFrameNumbers("monster_explode1"),
-			frameRate: 24,
-			repeat: 4,
-			repeatDelay: 2,
 		});
 
 		this.anims.create({
@@ -87,18 +86,6 @@ export class PlantBoss extends BaseMonster<AllStates> {
 		});
 	}
 
-	doesCollideWithTile(
-		tile: Phaser.Tilemaps.Tile | Phaser.Types.Physics.Arcade.GameObjectWithBody
-	): boolean {
-		if (!isTileWithPropertiesObject(tile)) {
-			return true;
-		}
-		if (tile.properties.isWater) {
-			return false;
-		}
-		return true;
-	}
-
 	constructNewBehaviorFor(state: AllStates) {
 		const vineSpeed = 50;
 		switch (state) {
@@ -108,28 +95,19 @@ export class PlantBoss extends BaseMonster<AllStates> {
 				return new Roar(state, "attack1");
 			case "walk":
 				return new RandomlyWalk(state, "attack1", {
-					speed: 60,
+					speed: 75,
 					minWalkTime: 400,
-					maxWalkTime: 3000,
+					maxWalkTime: 2500,
 				});
 			case "attack1":
 				return new SeekingVine(state, "attack2", vineSpeed, 550);
 			case "attack2":
-				return new SeekingVine(state, "walk", vineSpeed, 550);
+				return new SeekingVine(state, "attack3", vineSpeed, 900);
+			case "attack3":
+				return new SeekingVine(state, "attack4", vineSpeed * 3, 900);
+			case "attack4":
+				return new SeekingVine(state, "walk", vineSpeed * 3, 550);
 		}
-	}
-
-	kill() {
-		this.emit(Events.MonsterDying);
-		this.setVelocity(0);
-		this.data.set("stunned", true);
-		this.setOrigin(0.5, 0.3);
-		this.setDisplaySize(this.width * 2, this.height * 2);
-		this.anims.play("explode-boss", true);
-		this.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
-			this.emit(Events.MonsterDefeated);
-			this.destroy();
-		});
 	}
 
 	isHittable(): boolean {
