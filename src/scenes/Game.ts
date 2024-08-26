@@ -392,6 +392,13 @@ export class Game extends Scene {
 		});
 	}
 
+	showNotice(text: string, hideAfter: number) {
+		this.scene.launch("Dialog", {
+			heading: text,
+			hideAfter,
+		});
+	}
+
 	showDialog(obj: { heading: string; text?: string }) {
 		if (this.lastDialogData?.heading === obj.heading) {
 			return;
@@ -443,7 +450,26 @@ export class Game extends Scene {
 		this.keyR = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.R);
 		this.keyP = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.P);
 
+		const cheatCode = "lostcard";
+		let successfulCheatCode = "";
+		let isCheatMode = false;
+		this.input.keyboard.on("keydown", (data: { key: string }) => {
+			if (cheatCode.startsWith(successfulCheatCode + data.key)) {
+				successfulCheatCode = successfulCheatCode + data.key;
+				if (cheatCode === successfulCheatCode) {
+					this.appearSound.play();
+					this.showNotice("Debug mode", 1500);
+					isCheatMode = true;
+				}
+			} else {
+				successfulCheatCode = "";
+			}
+		});
+
 		this.input.keyboard.on("keydown-ONE", () => {
+			if (!isCheatMode) {
+				return;
+			}
 			// Cheat: show hitboxes
 			if (this.debugGraphic) {
 				this.debugGraphic.destroy();
@@ -461,6 +487,9 @@ export class Game extends Scene {
 			}
 		});
 		this.input.keyboard.on("keydown-TWO", () => {
+			if (!isCheatMode) {
+				return;
+			}
 			if (this.getPlayerHitPoints() <= 0) {
 				return;
 			}
@@ -470,6 +499,9 @@ export class Game extends Scene {
 			);
 		});
 		this.input.keyboard.on("keydown-THREE", () => {
+			if (!isCheatMode) {
+				return;
+			}
 			// Cheat: gain all items
 			this.equipSword();
 			this.equipPower("WindCard");
@@ -961,12 +993,11 @@ export class Game extends Scene {
 			(_: unknown, progress: number) => {
 				if (progress === 1) {
 					if (isRegionTransition) {
-						this.scene.launch("Dialog", {
-							heading: getRegionName(newRegion),
-							hideAfter: this.newRegionMessageTime,
-						});
+						this.showNotice(
+							getRegionName(newRegion),
+							this.newRegionMessageTime
+						);
 					}
-
 					this.movePlayerToPoint(destinationX, destinationY);
 					this.setPlayerStunned(false);
 					this.cameras.main.fadeIn(fadeTime);
