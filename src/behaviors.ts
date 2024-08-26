@@ -515,6 +515,82 @@ export class RandomTeleport<AllStates extends string>
 	update() {}
 }
 
+export class TeleportToPlatform<AllStates extends string>
+	implements Behavior<AllStates, Phaser.GameObjects.Sprite>
+{
+	#postTeleportDelay = 1500;
+	#nextState: AllStates;
+	name: AllStates;
+
+	constructor(
+		name: AllStates,
+		nextState: AllStates,
+		postTeleportDelay: number
+	) {
+		this.name = name;
+		this.#nextState = nextState;
+		this.#postTeleportDelay = postTeleportDelay;
+	}
+
+	init(
+		sprite: Phaser.GameObjects.Sprite,
+		stateMachine: BehaviorMachineInterface<AllStates>,
+		enemyManager: EnemyManager
+	): void {
+		if (!isDynamicSprite(sprite)) {
+			throw new Error("invalid sprite");
+		}
+		if (!enemyManager.activeRoom) {
+			throw new Error("Cannot create monster outside of room");
+		}
+		sprite.body.setVelocity(0);
+		// Get all platform tiles in room
+		const tiles = getTilesInRoom(
+			enemyManager.map,
+			enemyManager.activeRoom
+		).filter((tile) => {
+			if (isTileWithPropertiesObject(tile) && tile.properties.isPlatform) {
+				return true;
+			}
+			return false;
+		});
+		if (tiles.length < 1) {
+			console.log("Too few platform tiles in room to teleport to");
+			stateMachine.popState();
+			stateMachine.pushState(this.#nextState);
+		}
+		// Choose furthest tile
+		let targetTile = tiles[0];
+		let lastDistance = 0;
+		tiles.forEach((tile) => {
+			const distance = Phaser.Math.Distance.BetweenPoints(sprite.body.center, {
+				x: tile.pixelX,
+				y: tile.pixelY,
+			});
+			if (distance > lastDistance) {
+				lastDistance = distance;
+				targetTile = tile;
+			}
+		});
+
+		const x = targetTile.pixelX + targetTile.width / 2;
+		// Move to tile
+		sprite.setPosition(x, targetTile.pixelY);
+		sprite.scene.sound.play("holy");
+
+		// Move to next state
+		sprite.scene.time.addEvent({
+			delay: this.#postTeleportDelay,
+			callback: () => {
+				stateMachine.popState();
+				stateMachine.pushState(this.#nextState);
+			},
+		});
+	}
+
+	update() {}
+}
+
 export class TeleportToWater<AllStates extends string>
 	implements Behavior<AllStates, Phaser.GameObjects.Sprite>
 {

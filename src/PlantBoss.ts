@@ -1,6 +1,12 @@
 import { DataKeys } from "./shared";
 import { EnemyManager } from "./EnemyManager";
-import { WaitForActive, Roar, RandomlyWalk, SeekingVine } from "./behaviors";
+import {
+	WaitForActive,
+	Roar,
+	RandomlyWalk,
+	SeekingVine,
+	TeleportToPlatform,
+} from "./behaviors";
 import { BaseMonster } from "./BaseMonster";
 
 type AllStates =
@@ -10,7 +16,7 @@ type AllStates =
 	| "attack1"
 	| "attack2"
 	| "attack3"
-	| "attack4";
+	| "teleport";
 
 export class PlantBoss extends BaseMonster<AllStates> {
 	hitPoints: number = 12;
@@ -96,17 +102,17 @@ export class PlantBoss extends BaseMonster<AllStates> {
 			case "walk":
 				return new RandomlyWalk(state, "attack1", {
 					speed: 75,
-					minWalkTime: 400,
-					maxWalkTime: 2500,
+					minWalkTime: 500,
+					maxWalkTime: 3000,
 				});
 			case "attack1":
 				return new SeekingVine(state, "attack2", vineSpeed, 550);
 			case "attack2":
 				return new SeekingVine(state, "attack3", vineSpeed, 900);
 			case "attack3":
-				return new SeekingVine(state, "attack4", vineSpeed * 3, 900);
-			case "attack4":
-				return new SeekingVine(state, "walk", vineSpeed * 3, 550);
+				return new SeekingVine(state, "teleport", vineSpeed * 3, 2000);
+			case "teleport":
+				return new TeleportToPlatform(state, "walk", 2500);
 		}
 	}
 
