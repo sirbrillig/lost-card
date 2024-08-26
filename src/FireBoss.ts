@@ -1,5 +1,4 @@
-import { Events, DataKeys } from "./shared";
-import { isTileWithPropertiesObject } from "./shared";
+import { DataKeys } from "./shared";
 import { EnemyManager } from "./EnemyManager";
 import { WaitForActive, Roar, RandomlyWalk, RangedFireBall } from "./behaviors";
 import { BaseMonster } from "./BaseMonster";
@@ -10,10 +9,11 @@ type AllStates =
 	| "walk"
 	| "attack1"
 	| "attack2"
-	| "attack3";
+	| "attack3"
+	| "attack4";
 
 export class FireBoss extends BaseMonster<AllStates> {
-	hitPoints: number = 8;
+	hitPoints: number = 10;
 
 	constructor(
 		scene: Phaser.Scene,
@@ -46,13 +46,6 @@ export class FireBoss extends BaseMonster<AllStates> {
 			}),
 			frameRate: 10,
 			repeat: 8,
-		});
-		this.anims.create({
-			key: "explode-boss",
-			frames: this.anims.generateFrameNumbers("monster_explode1"),
-			frameRate: 24,
-			repeat: 4,
-			repeatDelay: 2,
 		});
 
 		this.anims.create({
@@ -93,18 +86,6 @@ export class FireBoss extends BaseMonster<AllStates> {
 		});
 	}
 
-	doesCollideWithTile(
-		tile: Phaser.Tilemaps.Tile | Phaser.Types.Physics.Arcade.GameObjectWithBody
-	): boolean {
-		if (!isTileWithPropertiesObject(tile)) {
-			return true;
-		}
-		if (tile.properties.isWater) {
-			return false;
-		}
-		return true;
-	}
-
 	constructNewBehaviorFor(state: AllStates) {
 		switch (state) {
 			case "initial":
@@ -118,31 +99,20 @@ export class FireBoss extends BaseMonster<AllStates> {
 					maxWalkTime: 5000,
 				});
 			case "attack1":
-				return new RangedFireBall(state, "attack2", 130, 350);
+				return new RangedFireBall(state, "attack2", 140, 350);
 			case "attack2":
-				return new RangedFireBall(state, "attack3", 130, 350);
+				return new RangedFireBall(state, "attack3", 140, 350);
 			case "attack3":
-				return new RangedFireBall(state, "walk", 130, 350);
+				return new RangedFireBall(state, "attack4", 140, 350);
+			case "attack4":
+				return new RangedFireBall(state, "walk", 140, 350);
 		}
-	}
-
-	kill() {
-		this.emit(Events.MonsterDying);
-		this.setVelocity(0);
-		this.data.set("stunned", true);
-		this.setOrigin(0.5, 0.3);
-		this.setDisplaySize(this.width * 2, this.height * 2);
-		this.anims.play("explode-boss", true);
-		this.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
-			this.emit(Events.MonsterDefeated);
-			this.destroy();
-		});
 	}
 
 	isHittable(): boolean {
 		return (
 			this.stateMachine.getCurrentState() !== "initial" &&
-			!this.stateMachine.getCurrentState().includes("roar")
+			!this.stateMachine.getCurrentState()?.includes("roar")
 		);
 	}
 }
