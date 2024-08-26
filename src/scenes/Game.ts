@@ -130,7 +130,7 @@ export class Game extends Scene {
 	firePowerVelocity: number = 120;
 	gateCloseSpeed: number = 340;
 	newRegionMessageTime: number = 1000;
-	initialPotionCount: number = 2;
+	initialPotionCount: number = 1;
 	chanceToDropPotion: number = 20;
 	droppedItemLifetime: number = 10000;
 
