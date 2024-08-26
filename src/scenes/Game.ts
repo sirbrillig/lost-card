@@ -131,6 +131,7 @@ export class Game extends Scene {
 	gateCloseSpeed: number = 340;
 	newRegionMessageTime: number = 1000;
 	initialPotionCount: number = 3;
+	chanceToDropPotion: number = 20;
 
 	map: Phaser.Tilemaps.Tilemap;
 	landLayer: Phaser.Tilemaps.TilemapLayer;
@@ -2226,8 +2227,8 @@ export class Game extends Scene {
 				) {
 					return;
 				}
-				const randomNumber = Phaser.Math.Between(1, 10);
-				if (randomNumber > 7) {
+				const randomNumber = Phaser.Math.Between(1, 100);
+				if (randomNumber <= this.chanceToDropPotion) {
 					this.addPotionVialAt(monster.body.center.x, monster.body.center.y);
 				}
 			}
