@@ -2540,6 +2540,9 @@ export class Game extends Scene {
 		if (this.isPlayerBeingHit() || this.isPlayerInvincible()) {
 			return;
 		}
+		if (this.isPlayerUsingPower() && this.getActivePower() === "SpiritCard") {
+			return;
+		}
 		this.hitSound.play();
 
 		this.enemyCollider.active = false;
