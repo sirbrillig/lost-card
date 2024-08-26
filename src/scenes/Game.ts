@@ -132,6 +132,7 @@ export class Game extends Scene {
 	newRegionMessageTime: number = 1000;
 	initialPotionCount: number = 2;
 	chanceToDropPotion: number = 20;
+	droppedItemLifetime: number = 10000;
 
 	map: Phaser.Tilemaps.Tilemap;
 	landLayer: Phaser.Tilemaps.TilemapLayer;
@@ -2503,6 +2504,18 @@ export class Game extends Scene {
 		this.physics.add.overlap(this.player, potionVial, () => {
 			this.pickUpPotionVial();
 			potionVial.destroy();
+		});
+		this.time.addEvent({
+			delay: this.droppedItemLifetime / 2,
+			callback: () => {
+				potionVial?.setAlpha(0.4);
+			},
+		});
+		this.time.addEvent({
+			delay: this.droppedItemLifetime,
+			callback: () => {
+				potionVial?.destroy();
+			},
 		});
 	}
 
