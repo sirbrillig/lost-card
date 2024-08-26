@@ -2280,6 +2280,7 @@ export class Game extends Scene {
 						this.showHiddenItem("WindCard");
 						this.showHiddenItem("Heart");
 						this.showHiddenItem("Key");
+						this.saveGame();
 					});
 					this.enemyManager.enemies.add(boss);
 					break;
@@ -2293,6 +2294,7 @@ export class Game extends Scene {
 						this.markBossDefeated("IceBoss");
 						this.showHiddenItem("Heart");
 						this.showHiddenItem("Key");
+						this.saveGame();
 					});
 					this.enemyManager.enemies.add(boss);
 					break;
@@ -2306,6 +2308,7 @@ export class Game extends Scene {
 						this.markBossDefeated("CloudBoss");
 						this.showHiddenItem("Heart");
 						this.showHiddenItem("Key");
+						this.saveGame();
 					});
 					this.enemyManager.enemies.add(boss);
 					break;
@@ -2324,6 +2327,7 @@ export class Game extends Scene {
 						this.markBossDefeated("SpiritBoss");
 						this.showHiddenItem("Heart");
 						this.showHiddenItem("Key");
+						this.saveGame();
 					});
 					this.enemyManager.enemies.add(boss);
 					break;
@@ -2337,6 +2341,7 @@ export class Game extends Scene {
 						this.markBossDefeated("PlantBoss");
 						this.showHiddenItem("Heart");
 						this.showHiddenItem("Key");
+						this.saveGame();
 					});
 					this.enemyManager.enemies.add(boss);
 					break;
@@ -2350,6 +2355,7 @@ export class Game extends Scene {
 						this.markBossDefeated("FireBoss");
 						this.showHiddenItem("Heart");
 						this.showHiddenItem("Key");
+						this.saveGame();
 					});
 					this.enemyManager.enemies.add(boss);
 					break;
