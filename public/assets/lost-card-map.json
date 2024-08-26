@@ -4862,8 +4862,8 @@
                  "type":"",
                  "visible":true,
                  "width":16,
-                 "x":978.470106116547,
-                 "y":2579.74720404844
+                 "x":960.820541269612,
+                 "y":2593.74513478911
                 }, 
                 {
                  "gid":2817,
@@ -9897,8 +9897,8 @@
                  "type":"",
                  "visible":true,
                  "width":16,
-                 "x":1004.4467770191,
-                 "y":2513.29970273812
+                 "x":1006.88119975661,
+                 "y":2498.69316631307
                 }, 
                 {
                  "gid":2301,
@@ -9932,6 +9932,39 @@
                  "width":16,
                  "x":1003.89422167046,
                  "y":2687.51
+                }, 
+                {
+                 "gid":2301,
+                 "height":16,
+                 "id":719,
+                 "name":"",
+                 "properties":[
+                        {
+                         "name":"affectedByPlantCard",
+                         "type":"bool",
+                         "value":true
+                        }, 
+                        {
+                         "name":"affectedByWindCard",
+                         "type":"bool",
+                         "value":false
+                        }, 
+                        {
+                         "name":"msAfterApproach",
+                         "type":"int",
+                         "value":1
+                        }, 
+                        {
+                         "name":"previewBeforeAppear",
+                         "type":"int",
+                         "value":0
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":16,
+                 "x":1005.72003872359,
+                 "y":2629.69245998418
                 }, 
                 {
                  "gid":2301,
@@ -10062,8 +10095,8 @@
                  "type":"",
                  "visible":true,
                  "width":16,
-                 "x":1073.35513690599,
-                 "y":2496.74573142975
+                 "x":1074.57234827475,
+                 "y":2477.27034952969
                 }, 
                 {
                  "gid":2301,
@@ -10095,8 +10128,8 @@
                  "type":"",
                  "visible":true,
                  "width":16,
-                 "x":1040.15,
-                 "y":2721.22
+                 "x":1075.44912969387,
+                 "y":2672.53154524983
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -10105,7 +10138,7 @@
          "y":0
         }],
  "nextlayerid":17,
- "nextobjectid":719,
+ "nextobjectid":720,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.0",

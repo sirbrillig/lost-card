@@ -228,6 +228,9 @@ export class Game extends Scene {
 			if (this.isPlayerUsingPower() && this.getActivePower() === "SpiritCard") {
 				return false;
 			}
+			if (this.player.data.get("isPlantCardGrappleActive")) {
+				return false;
+			}
 			return true;
 		});
 		this.physics.add.collider(
@@ -511,6 +514,13 @@ export class Game extends Scene {
 			this.equipPower("SpiritCard");
 			this.equipPower("CloudCard");
 			this.setPotionCount(10);
+		});
+		this.input.keyboard.on("keydown-FOUR", () => {
+			if (!isCheatMode) {
+				return;
+			}
+			// Cheat: be invincible
+			this.setPlayerInvincible(true);
 		});
 		this.input.keyboard.on("keydown-SPACE", () => {
 			// Attack
