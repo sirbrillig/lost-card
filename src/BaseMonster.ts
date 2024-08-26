@@ -10,6 +10,7 @@ export class BaseMonster<AllStates extends string> extends Phaser.Physics.Arcade
 	#enemyManager: EnemyManager;
 	#isBeingHit: boolean = false;
 	#freeTimeAfterHit: number = 600;
+	#isDying = false;
 
 	hitPoints: number = 1;
 
@@ -154,6 +155,11 @@ export class BaseMonster<AllStates extends string> extends Phaser.Physics.Arcade
 		if (!this.body || !isDynamicSprite(this)) {
 			throw new Error("Could not update monster");
 		}
+		if (this.#isDying) {
+			return;
+		}
+		this.#isDying = true;
+
 		this.body.stop();
 		this.setVisible(false);
 		this.stateMachine.empty();
@@ -168,7 +174,7 @@ export class BaseMonster<AllStates extends string> extends Phaser.Physics.Arcade
 		);
 		effect.setDepth(5);
 		effect.anims.play("explode");
-		MainEvents.emit(Events.MonsterDying);
+		MainEvents.emit(Events.MonsterDying, this);
 		this.playDestroySound();
 		effect.on(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
 			effect.destroy();

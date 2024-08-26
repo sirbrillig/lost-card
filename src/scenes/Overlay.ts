@@ -15,7 +15,7 @@ const portraitPadding = 22;
 const inactiveFrame = 13;
 const activeFrame = 29;
 
-class Item {
+class Card {
 	image: Phaser.GameObjects.Image;
 	selectedItemMarker: Phaser.GameObjects.NineSlice;
 	scene: Phaser.Scene;
@@ -159,7 +159,7 @@ class Heart {
 }
 
 export class Overlay extends Scene {
-	items: (Item | PotionItem)[] = [];
+	items: (Card | PotionItem)[] = [];
 	hearts: Heart[] = [];
 	totalHearts: number = 0;
 	activeHearts: number = 0;
@@ -353,7 +353,7 @@ export class Overlay extends Scene {
 			}
 			const icon = getIconForPower(power);
 			this.items.push(
-				new Item(this, this.items.length, icon.texture, icon.frame, power)
+				new Card(this, this.items.length, icon.texture, icon.frame, power)
 			);
 		});
 

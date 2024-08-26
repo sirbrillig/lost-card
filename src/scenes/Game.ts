@@ -130,6 +130,7 @@ export class Game extends Scene {
 	firePowerVelocity: number = 120;
 	gateCloseSpeed: number = 340;
 	newRegionMessageTime: number = 1000;
+	initialPotionCount: number = 3;
 
 	map: Phaser.Tilemaps.Tilemap;
 	landLayer: Phaser.Tilemaps.TilemapLayer;
@@ -497,9 +498,7 @@ export class Game extends Scene {
 				return;
 			}
 			// Cheat: restore all HP
-			this.setPlayerHitPoints(
-				this.registry.get("playerTotalHitPoints") ?? this.playerInitialHitPoints
-			);
+			this.restorePlayerHitPoints();
 		});
 		this.input.keyboard.on("keydown-THREE", () => {
 			if (!isCheatMode) {
@@ -513,6 +512,7 @@ export class Game extends Scene {
 			this.equipPower("FireCard");
 			this.equipPower("SpiritCard");
 			this.equipPower("CloudCard");
+			this.setPotionTotalCount(10);
 			this.setPotionCount(10);
 		});
 		this.input.keyboard.on("keydown-FOUR", () => {
@@ -586,7 +586,7 @@ export class Game extends Scene {
 		});
 
 		this.setPotionCount(potionCount - 1);
-		this.setPlayerHitPoints(totalHitPoints);
+		this.restorePlayerHitPoints();
 	}
 
 	freezeWaterTile(tile: Phaser.Tilemaps.Tile) {
@@ -1467,6 +1467,9 @@ export class Game extends Scene {
 				case "Potion":
 					this.pickUpPotion();
 					break;
+				case "PotionVial":
+					this.pickUpPotionVial();
+					break;
 				case "PlantCard":
 					this.pickUpCard(touchingItem.name);
 					break;
@@ -1562,7 +1565,7 @@ export class Game extends Scene {
 			this.registry.get("playerTotalHitPoints") ?? this.playerInitialHitPoints;
 		playerTotalHitPoints += 1;
 		this.registry.set("playerTotalHitPoints", playerTotalHitPoints);
-		this.setPlayerHitPoints(playerTotalHitPoints);
+		this.restorePlayerHitPoints();
 	}
 
 	playCardAnimation(card: Powers) {
@@ -1639,23 +1642,39 @@ export class Game extends Scene {
 		});
 	}
 
-	pickUpPotion() {
+	restorePlayerHitPoints() {
 		const playerTotalHitPoints =
 			this.registry.get("playerTotalHitPoints") ?? this.playerInitialHitPoints;
 		this.setPlayerHitPoints(playerTotalHitPoints);
+	}
 
+	restorePlayerPotions() {
+		this.setPotionCount(this.getPotionTotalCount());
+	}
+
+	pickUpPotionVial() {
+		this.restorePlayerPotions();
 		this.appearSound.play();
-		this.setPotionCount(this.getPotionCount() + 1);
+	}
 
-		if (this.registry.get("seenPotionDialog")) {
-			return;
+	pickUpPotion() {
+		this.appearSound.play();
+		this.restorePlayerHitPoints();
+		if (this.getPotionTotalCount() === 0) {
+			this.setPotionTotalCount(this.initialPotionCount);
+			this.restorePlayerPotions();
+			this.showDialog({
+				heading: "A magic potion bottle!",
+				text: "Press P or R to restore your health. You can refill the bottle using potion vials found around the kingdoms.",
+			});
+		} else {
+			this.setPotionTotalCount(this.getPotionTotalCount() + 1);
+			this.restorePlayerPotions();
+			this.showDialog({
+				heading: "A magic potion bottle!",
+				text: "The amount of potion you can carry has increased!",
+			});
 		}
-
-		this.showDialog({
-			heading: "A potion!",
-			text: "Press P or R to use a potion and restore your health.",
-		});
-		this.registry.set("seenPotionDialog", true);
 	}
 
 	pickUpSword() {
@@ -2200,6 +2219,22 @@ export class Game extends Scene {
 			this.map.filterObjects("Creatures", () => {
 				return true;
 			}) ?? [];
+
+		MainEvents.on(
+			Events.MonsterDying,
+			(monster: { body: { center: { x: number; y: number } } }) => {
+				if (
+					this.getPotionTotalCount() === 0 ||
+					this.getPotionCount() === this.getPotionTotalCount()
+				) {
+					return;
+				}
+				const randomNumber = Phaser.Math.Between(1, 10);
+				if (randomNumber > 5) {
+					this.addPotionVialAt(monster.body.center.x, monster.body.center.y);
+				}
+			}
+		);
 	}
 
 	createEnemiesInRoom() {
@@ -2450,6 +2485,14 @@ export class Game extends Scene {
 		this.physics.add.collider(this.createdDoors, this.enemyManager.enemies);
 	}
 
+	addPotionVialAt(x: number, y: number) {
+		const potionVial = this.physics.add.sprite(x, y, "icons4", 34);
+		this.physics.add.overlap(this.player, potionVial, () => {
+			this.pickUpPotionVial();
+			potionVial.destroy();
+		});
+	}
+
 	wasBossDefeated(name: string) {
 		const defeated = this.registry.get(DataKeys.DefeatedBosses) ?? [];
 		return defeated.includes(name);
@@ -2687,6 +2730,14 @@ export class Game extends Scene {
 			this.getTimeSinceLastAttack() > this.postAttackCooldown &&
 			!this.isPlayerUsingPower()
 		);
+	}
+
+	getPotionTotalCount(): number {
+		return this.registry.get(DataKeys.PotionTotalCount) ?? 0;
+	}
+
+	setPotionTotalCount(count: number) {
+		this.registry.set(DataKeys.PotionTotalCount, count);
 	}
 
 	getPotionCount(): number {

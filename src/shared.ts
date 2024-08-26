@@ -37,6 +37,7 @@ export const DataKeys = {
 	MonsterPosition: "monsterPosition",
 	ActivePower: "activePower",
 	PotionCount: "potionCount",
+	PotionTotalCount: "potionTotalCount",
 	KeyCount: "keyCount",
 	SwordAttackActive: "attackActive",
 	DefeatedBosses: "DefeatedBosses",

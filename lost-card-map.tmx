@@ -8530,7 +8530,7 @@
     <property name="hidden" type="bool" value="true"/>
    </properties>
   </object>
-  <object id="374" name="Potion" gid="2791" x="1470.52" y="381.114" width="16" height="16"/>
+  <object id="374" name="PotionVial" gid="2823" x="1470.52" y="381.114" width="16" height="16"/>
   <object id="578" name="Potion" gid="2791" x="1297.71" y="975.803" width="16" height="16"/>
   <object id="375" name="Heart" gid="2818" x="1474.44" y="130.818" width="16" height="16">
    <properties>
@@ -8538,7 +8538,7 @@
    </properties>
   </object>
   <object id="376" name="Potion" gid="2791" x="1796.15" y="2401.62" width="16" height="16"/>
-  <object id="378" name="Potion" gid="2791" x="2000.84" y="1870.13" width="16" height="16"/>
+  <object id="378" name="PotionVial" gid="2823" x="2000.84" y="1870.13" width="16" height="16"/>
   <object id="403" name="PlantCard" gid="2878" x="1048.6" y="1882.21" width="16" height="16"/>
   <object id="405" name="Heart" gid="2818" x="959.42" y="2578.61" width="16" height="16">
    <properties>
@@ -8603,16 +8603,16 @@
     <property name="hidden" type="bool" value="true"/>
    </properties>
   </object>
-  <object id="576" name="Potion" gid="2791" x="2928.74" y="2301.73" width="16" height="16"/>
+  <object id="576" name="PotionVial" gid="2823" x="2928.74" y="2301.73" width="16" height="16"/>
   <object id="577" name="Potion" gid="2791" x="2879.41" y="1806.09" width="16" height="16"/>
   <object id="641" name="Potion" gid="2791" x="845.678" y="2030.97" width="16" height="16"/>
-  <object id="657" name="Potion" gid="2791" x="464" y="1504" width="16" height="16"/>
+  <object id="657" name="PotionVial" gid="2823" x="464" y="1504" width="16" height="16"/>
   <object id="658" name="Potion" gid="2791" x="704" y="1488" width="16" height="16"/>
   <object id="659" name="Potion" gid="2791" x="1050.1" y="1858.35" width="16" height="16"/>
-  <object id="660" name="Potion" gid="2791" x="816" y="2336" width="16" height="16"/>
-  <object id="661" name="Potion" gid="2791" x="1616" y="1664" width="16" height="16"/>
-  <object id="662" name="Potion" gid="2791" x="1984" y="2432" width="16" height="16"/>
-  <object id="663" name="Potion" gid="2791" x="2621.86" y="1646.54" width="16" height="16"/>
+  <object id="660" name="PotionVial" gid="2823" x="816" y="2336" width="16" height="16"/>
+  <object id="661" name="PotionVial" gid="2823" x="1616" y="1664" width="16" height="16"/>
+  <object id="662" name="PotionVial" gid="2823" x="1984" y="2432" width="16" height="16"/>
+  <object id="663" name="PotionVial" gid="2823" x="2621.86" y="1646.54" width="16" height="16"/>
  </objectgroup>
  <objectgroup id="11" name="SavePoints">
   <object id="244" gid="2717" x="1600" y="1664" width="16" height="16"/>
