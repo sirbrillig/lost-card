@@ -49,15 +49,6 @@ export class IceBoss extends BaseMonster<AllStates> {
 			repeat: 8,
 		});
 		this.anims.create({
-			key: "idle",
-			frames: this.anims.generateFrameNumbers("bosses1", {
-				start: 6,
-				end: 8,
-			}),
-			frameRate: 10,
-			repeat: 8,
-		});
-		this.anims.create({
 			key: "explode-boss",
 			frames: this.anims.generateFrameNumbers("monster_explode1"),
 			frameRate: 24,

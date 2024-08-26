@@ -5,6 +5,8 @@ import { BaseMonster } from "./BaseMonster";
 type AllStates = "randomwalk1" | "randomwalk2";
 
 export class Skeleton extends BaseMonster<AllStates> {
+	hitPoints = 3;
+
 	constructor(
 		scene: Phaser.Scene,
 		enemyManager: EnemyManager,

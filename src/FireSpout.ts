@@ -6,7 +6,7 @@ import { BaseMonster } from "./BaseMonster";
 type AllStates = "idle1" | "spitfire" | "idle2" | "idle3";
 
 export class FireSpout extends BaseMonster<AllStates> {
-	hitPoints: number = 1;
+	hitPoints: number = 2;
 
 	constructor(
 		scene: Phaser.Scene,
@@ -54,14 +54,20 @@ export class FireSpout extends BaseMonster<AllStates> {
 
 	constructNewBehaviorFor(state: string) {
 		switch (state) {
-			case "idle1":
-				return new Idle(state, "spitfire", "appear");
-			case "spitfire":
-				return new RangedFireBall(state, "idle2", 50, 1000);
-			case "idle2":
-				return new Idle(state, "idle3", "disappear");
+			case "idle1": {
+				const randomNumber = Phaser.Math.Between(300, 900);
+				return new Idle(state, "spitfire", "appear", randomNumber);
+			}
+			case "spitfire": {
+				const randomNumber = Phaser.Math.Between(500, 1000);
+				return new RangedFireBall(state, "idle2", 70, randomNumber);
+			}
+			case "idle2": {
+				const randomNumber = Phaser.Math.Between(300, 900);
+				return new Idle(state, "idle3", "disappear", randomNumber);
+			}
 			case "idle3":
-				return new Idle(state, "idle1", "idle");
+				return new Idle(state, "idle1", "idle", 300);
 		}
 	}
 }

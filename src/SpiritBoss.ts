@@ -6,6 +6,7 @@ import {
 	RandomlyWalk,
 	SlashTowardPlayer,
 	RandomTeleport,
+	Idle,
 } from "./behaviors";
 import { BaseMonster } from "./BaseMonster";
 
@@ -13,13 +14,14 @@ type AllStates =
 	| "initial"
 	| "roar1"
 	| "walk"
+	| "idle"
 	| "teleport"
 	| "attack1"
 	| "attack2"
 	| "attack3";
 
 export class SpiritBoss extends BaseMonster<AllStates> {
-	hitPoints: number = 8;
+	hitPoints: number = 10;
 
 	constructor(
 		scene: Phaser.Scene,
@@ -52,13 +54,6 @@ export class SpiritBoss extends BaseMonster<AllStates> {
 			}),
 			frameRate: 10,
 			repeat: 8,
-		});
-		this.anims.create({
-			key: "explode-boss",
-			frames: this.anims.generateFrameNumbers("monster_explode1"),
-			frameRate: 24,
-			repeat: 4,
-			repeatDelay: 2,
 		});
 
 		this.anims.create({
@@ -108,31 +103,20 @@ export class SpiritBoss extends BaseMonster<AllStates> {
 			case "walk":
 				return new RandomlyWalk(state, "teleport", {
 					speed: 60,
-					minWalkTime: 2000,
-					maxWalkTime: 5000,
+					minWalkTime: 1000,
+					maxWalkTime: 4000,
 				});
 			case "teleport":
 				return new RandomTeleport(state, "attack1");
 			case "attack1":
-				return new SlashTowardPlayer(state, "attack2");
+				return new SlashTowardPlayer(state, "attack2", 180);
 			case "attack2":
-				return new SlashTowardPlayer(state, "attack3");
+				return new SlashTowardPlayer(state, "idle", 180);
+			case "idle":
+				return new Idle(state, "attack3", "right", 500);
 			case "attack3":
-				return new SlashTowardPlayer(state, "walk");
+				return new SlashTowardPlayer(state, "walk", 180);
 		}
-	}
-
-	kill() {
-		this.emit(Events.MonsterDying);
-		this.setVelocity(0);
-		this.data.set("stunned", true);
-		this.setOrigin(0.5, 0.3);
-		this.setDisplaySize(this.width * 2, this.height * 2);
-		this.anims.play("explode-boss", true);
-		this.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
-			this.emit(Events.MonsterDefeated);
-			this.destroy();
-		});
 	}
 
 	isHittable(): boolean {

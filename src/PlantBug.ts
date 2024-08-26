@@ -7,6 +7,7 @@ type AllStates = "wait" | "follow";
 export class PlantBug extends BaseMonster<AllStates> {
 	awareDistance: number = 90;
 	speed: number = 50;
+	hitPoints = 2;
 
 	constructor(
 		scene: Phaser.Scene,

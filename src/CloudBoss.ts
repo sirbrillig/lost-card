@@ -1,10 +1,16 @@
-import { Events, DataKeys } from "./shared";
+import { DataKeys } from "./shared";
 import { isTileWithPropertiesObject } from "./shared";
 import { EnemyManager } from "./EnemyManager";
 import { WaitForActive, Roar, RandomlyWalk, SwoopAttack } from "./behaviors";
 import { BaseMonster } from "./BaseMonster";
 
-type AllStates = "initial" | "roar1" | "walk" | "attack1" | "attack2";
+type AllStates =
+	| "initial"
+	| "roar1"
+	| "walk"
+	| "attack1"
+	| "attack2"
+	| "attack3";
 
 export class CloudBoss extends BaseMonster<AllStates> {
 	hitPoints: number = 8;
@@ -25,6 +31,7 @@ export class CloudBoss extends BaseMonster<AllStates> {
 		this.setOffset(this.body.offset.x, this.body.offset.y + 10);
 		this.setOrigin(0.5, 0.75);
 		this.data.set(DataKeys.Freezable, false);
+		this.data.set(DataKeys.Pushable, false);
 	}
 
 	getInitialState(): AllStates {
@@ -40,13 +47,6 @@ export class CloudBoss extends BaseMonster<AllStates> {
 			}),
 			frameRate: 8,
 			repeat: 8,
-		});
-		this.anims.create({
-			key: "explode-boss",
-			frames: this.anims.generateFrameNumbers("monster_explode1"),
-			frameRate: 24,
-			repeat: 4,
-			repeatDelay: 2,
 		});
 
 		this.anims.create({
@@ -106,10 +106,11 @@ export class CloudBoss extends BaseMonster<AllStates> {
 			case "roar1":
 				return new Roar(state, "attack1");
 			case "walk":
+				this.body?.stop();
 				return new RandomlyWalk(state, "attack1", {
 					speed: 30,
-					minWalkTime: 1000,
-					maxWalkTime: 2500,
+					minWalkTime: 2200,
+					maxWalkTime: 3000,
 				});
 			case "attack1":
 				return new SwoopAttack(state, "attack2", {
@@ -119,6 +120,13 @@ export class CloudBoss extends BaseMonster<AllStates> {
 					followTime: 2000,
 				});
 			case "attack2":
+				return new SwoopAttack(state, "attack3", {
+					awareDistance: 600,
+					speed: 250,
+					maxSpeed: 850,
+					followTime: 2000,
+				});
+			case "attack3":
 				return new SwoopAttack(state, "walk", {
 					awareDistance: 600,
 					speed: 250,
@@ -126,20 +134,6 @@ export class CloudBoss extends BaseMonster<AllStates> {
 					followTime: 2000,
 				});
 		}
-	}
-
-	kill() {
-		this.body?.stop();
-		this.stateMachine.empty();
-		this.data.set(DataKeys.Stunned, true);
-		this.emit(Events.MonsterDying);
-		this.setOrigin(0.5, 0.3);
-		this.setDisplaySize(this.width * 2, this.height * 2);
-		this.anims.play("explode-boss", true);
-		this.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
-			this.emit(Events.MonsterDefeated);
-			this.destroy();
-		});
 	}
 
 	isHittable(): boolean {

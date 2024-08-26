@@ -7,7 +7,7 @@ type AllStates = "wait" | "follow";
 export class Ghost extends BaseMonster<AllStates> {
 	awareDistance: number = 90;
 	speed: number = 18;
-	hitPoints = 2;
+	hitPoints = 4;
 
 	constructor(
 		scene: Phaser.Scene,

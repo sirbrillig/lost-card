@@ -58,7 +58,7 @@ export class PlantSpitter extends BaseMonster<AllStates> {
 	constructNewBehaviorFor(state: string) {
 		switch (state) {
 			case "idle":
-				return new Idle(state, "spawn", "appear");
+				return new Idle(state, "spawn", "appear", 300);
 			case "spawn":
 				return new SpawnEnemies(state, "idle2", {
 					enemiesToSpawn: 1,
@@ -75,7 +75,7 @@ export class PlantSpitter extends BaseMonster<AllStates> {
 					},
 				});
 			case "idle2":
-				return new Idle(state, "idle", "disappear");
+				return new Idle(state, "idle", "disappear", 300);
 		}
 	}
 }

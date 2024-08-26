@@ -240,12 +240,19 @@ export class Idle<AllStates extends string>
 {
 	#nextState: AllStates;
 	#animationKey: string;
+	#idleTime: number;
 	name: AllStates;
 
-	constructor(name: AllStates, nextState: AllStates, animationKey: string) {
+	constructor(
+		name: AllStates,
+		nextState: AllStates,
+		animationKey: string,
+		idleTime: number
+	) {
 		this.name = name;
 		this.#nextState = nextState;
 		this.#animationKey = animationKey;
+		this.#idleTime = idleTime;
 	}
 
 	init(
@@ -257,9 +264,12 @@ export class Idle<AllStates extends string>
 		}
 		sprite.body.stop();
 		sprite.anims.play(this.#animationKey, true);
-		sprite.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
-			stateMachine.popState();
-			stateMachine.pushState(this.#nextState);
+		sprite.scene.time.addEvent({
+			delay: this.#idleTime,
+			callback: () => {
+				stateMachine.popState();
+				stateMachine.pushState(this.#nextState);
+			},
 		});
 	}
 
@@ -710,9 +720,10 @@ export class SlashTowardPlayer<AllStates extends string>
 	#hitboxSize = 30;
 	#effect: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
 
-	constructor(name: AllStates, nextState: AllStates) {
+	constructor(name: AllStates, nextState: AllStates, speed: number) {
 		this.name = name;
 		this.#nextState = nextState;
+		this.#speed = speed;
 	}
 
 	init(
@@ -1016,11 +1027,12 @@ export class RangedFireBall<AllStates extends string>
 		effect.anims.play(
 			{
 				key: "fire-power",
-				repeat: 6,
+				repeat: 8,
 			},
 			true
 		);
-		sprite.scene.sound.play("fire-loop");
+		const fireSound = sprite.scene.sound.add("fire", { volume: 0.4 });
+		fireSound.play();
 		if (!isDynamicSprite(effect)) {
 			throw new Error("Could not update fire ball");
 		}
@@ -1029,13 +1041,13 @@ export class RangedFireBall<AllStates extends string>
 		sprite.scene.physics.moveToObject(effect, enemyManager.player, this.#speed);
 
 		sprite.scene.physics.add.overlap(enemyManager.player, effect, () => {
-			sprite?.scene?.sound.stopByKey("fire-loop");
+			fireSound?.stop();
 			MainEvents.emit(Events.EnemyHitPlayer, true);
 			effect.destroy();
 		});
 
 		sprite.once(Events.MonsterDying, () => {
-			sprite.scene.sound.stopByKey("fire-loop");
+			fireSound?.stop();
 			effect?.destroy();
 		});
 
@@ -1048,7 +1060,7 @@ export class RangedFireBall<AllStates extends string>
 		});
 
 		effect.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
-			sprite?.scene?.sound?.stopByKey("fire-loop");
+			fireSound?.stop();
 			effect.destroy();
 		});
 	}
@@ -1060,11 +1072,20 @@ export class RangedIceBall<AllStates extends string>
 	implements Behavior<AllStates, Phaser.GameObjects.Sprite>
 {
 	#nextState: AllStates;
+	#speed = 50;
+	#postAttackTime = 1000;
 	name: AllStates;
 
-	constructor(name: AllStates, nextState: AllStates) {
+	constructor(
+		name: AllStates,
+		nextState: AllStates,
+		speed: number,
+		postAttackTime: number
+	) {
 		this.name = name;
 		this.#nextState = nextState;
+		this.#speed = speed;
+		this.#postAttackTime = postAttackTime;
 	}
 
 	init(
@@ -1094,32 +1115,40 @@ export class RangedIceBall<AllStates extends string>
 		effect.anims.play(
 			{
 				key: "ice_ball",
-				repeat: 3,
+				repeat: 8,
 			},
 			true
 		);
+		sprite.scene.sound.play("ice");
 		if (!isDynamicSprite(effect)) {
 			throw new Error("Could not update ice ball");
 		}
 		effect.setDisplaySize(effect.body.width * 0.8, effect.body.height * 0.8);
 		effect.body.setSize(effect.body.width * 0.5, effect.body.height * 0.5);
-		sprite.scene.physics.moveToObject(effect, enemyManager.player, 120);
-		sprite.scene.sound.play("wave");
+		sprite.scene.physics.moveToObject(effect, enemyManager.player, this.#speed);
 
 		sprite.scene.physics.add.overlap(enemyManager.player, effect, () => {
+			sprite?.scene?.sound.stopByKey("ice");
 			MainEvents.emit(Events.EnemyHitPlayer, true);
 			effect.destroy();
-			stateMachine.popState();
-			stateMachine.pushState(this.#nextState);
 		});
 
 		sprite.once(Events.MonsterDying, () => {
+			sprite.scene.sound.stopByKey("ice");
 			effect?.destroy();
 		});
+
+		sprite.scene.time.addEvent({
+			delay: this.#postAttackTime,
+			callback: () => {
+				stateMachine.popState();
+				stateMachine.pushState(this.#nextState);
+			},
+		});
+
 		effect.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
+			sprite?.scene?.sound?.stopByKey("ice");
 			effect.destroy();
-			stateMachine.popState();
-			stateMachine.pushState(this.#nextState);
 		});
 	}
 

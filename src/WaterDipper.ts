@@ -7,7 +7,7 @@ import { BaseMonster } from "./BaseMonster";
 type AllStates = "waterteleport" | "powerup" | "iceball";
 
 export class WaterDipper extends BaseMonster<AllStates> {
-	hitPoints: number = 6;
+	hitPoints: number = 8;
 
 	constructor(
 		scene: Phaser.Scene,
@@ -17,23 +17,6 @@ export class WaterDipper extends BaseMonster<AllStates> {
 	) {
 		super(scene, enemyManager, x, y, "monsters3", 6);
 		this.data.set(DataKeys.Pushable, false);
-	}
-
-	initSprites() {
-		this.anims.create({
-			key: "idle",
-			frames: this.anims.generateFrameNumbers("monsters3", {
-				start: 6,
-				end: 8,
-			}),
-			frameRate: 10,
-			repeat: -1,
-		});
-		this.anims.create({
-			key: "explode",
-			frames: this.anims.generateFrameNumbers("monster_explode1"),
-			frameRate: 20,
-		});
 	}
 
 	doesCollideWithTile(
@@ -59,7 +42,7 @@ export class WaterDipper extends BaseMonster<AllStates> {
 			case "powerup":
 				return new PowerUp(state, "iceball");
 			case "iceball":
-				return new RangedIceBall(state, "waterteleport");
+				return new RangedIceBall(state, "waterteleport", 50, 1000);
 		}
 	}
 }
