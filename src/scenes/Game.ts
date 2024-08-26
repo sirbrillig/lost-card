@@ -50,7 +50,10 @@ import {
 	getPowerEquippedKey,
 	getRegionFromRoomName,
 	getRegionName,
+	Region,
 	Sound,
+	isPointInRegion,
+	hasXandY,
 } from "../shared";
 
 export class Game extends Scene {
@@ -150,7 +153,22 @@ export class Game extends Scene {
 			this.sword,
 			this.map
 		);
-		this.createEnemies();
+
+		MainEvents.on(
+			Events.MonsterDying,
+			(monster: { body: { center: { x: number; y: number } } }) => {
+				if (
+					this.getPotionTotalCount() === 0 ||
+					this.getPotionCount() === this.getPotionTotalCount()
+				) {
+					return;
+				}
+				const randomNumber = Phaser.Math.Between(1, 100);
+				if (randomNumber <= config.chanceToDropPotion) {
+					this.addPotionVialAt(monster.body.center.x, monster.body.center.y);
+				}
+			}
+		);
 
 		this.landLayer = this.createTileLayer("Background", tilesetTile, 0);
 		this.physics.add.collider(
@@ -804,6 +822,7 @@ export class Game extends Scene {
 			this.player.x + tileWidth,
 			this.player.y + tileHeight
 		);
+		this.respawnRegion(getRegionFromRoomName(room.name));
 		this.moveCameraToRoom(room);
 	}
 
@@ -967,11 +986,12 @@ export class Game extends Scene {
 			0,
 			(_: unknown, progress: number) => {
 				if (progress === 1) {
-					if (isRegionTransition) {
+					if (isRegionTransition && previousRegion) {
 						this.showNotice(
 							getRegionName(newRegion),
 							config.newRegionMessageTime
 						);
+						this.respawnRegion(newRegion);
 					}
 					this.movePlayerToPoint(destinationX, destinationY);
 					this.setPlayerStunned(false);
@@ -979,6 +999,17 @@ export class Game extends Scene {
 				}
 			}
 		);
+	}
+
+	respawnRegion(region: Region) {
+		this.enemyManager.enemies.clear(true, true);
+		this.spawnPoints =
+			this.map.filterObjects("Creatures", (point) => {
+				if (!hasXandY(point)) {
+					return false;
+				}
+				return isPointInRegion(this.map, point.x, point.y, region);
+			}) ?? [];
 	}
 
 	checkForGameOver() {
@@ -2188,29 +2219,6 @@ export class Game extends Scene {
 				effect.destroy();
 			}
 		});
-	}
-
-	createEnemies(): void {
-		this.spawnPoints =
-			this.map.filterObjects("Creatures", () => {
-				return true;
-			}) ?? [];
-
-		MainEvents.on(
-			Events.MonsterDying,
-			(monster: { body: { center: { x: number; y: number } } }) => {
-				if (
-					this.getPotionTotalCount() === 0 ||
-					this.getPotionCount() === this.getPotionTotalCount()
-				) {
-					return;
-				}
-				const randomNumber = Phaser.Math.Between(1, 100);
-				if (randomNumber <= config.chanceToDropPotion) {
-					this.addPotionVialAt(monster.body.center.x, monster.body.center.y);
-				}
-			}
-		);
 	}
 
 	createEnemiesInRoom() {

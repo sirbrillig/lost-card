@@ -256,6 +256,38 @@ export function getRooms(
 	return map.getObjectLayer("Rooms")?.objects ?? [];
 }
 
+export function getRoomsInRegion(
+	map: Phaser.Tilemaps.Tilemap,
+	region: Region
+): Phaser.Types.Tilemaps.TiledObject[] {
+	return getRooms(map).filter((room) => {
+		return room.name.startsWith(region);
+	});
+}
+
+export function isPointInRegion(
+	map: Phaser.Tilemaps.Tilemap,
+	x: number,
+	y: number,
+	region: Region
+): boolean {
+	return getRoomsInRegion(map, region).some((room) => {
+		if (
+			room.x !== undefined &&
+			room.y !== undefined &&
+			room.width &&
+			room.height &&
+			x >= room.x &&
+			x <= room.x + room.width &&
+			y >= room.y &&
+			y <= room.y + room.height
+		) {
+			return true;
+		}
+		return false;
+	});
+}
+
 export function isPointInRoom(
 	x: number,
 	y: number,
