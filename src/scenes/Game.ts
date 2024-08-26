@@ -1,4 +1,5 @@
 import { Scene } from "phaser";
+import { config } from "../config";
 import { MainEvents } from "../MainEvents";
 import { EnemyManager } from "../EnemyManager";
 import { MountainMonster } from "../MountainMonster";
@@ -99,41 +100,6 @@ export class Game extends Scene {
 	keyR: Phaser.Input.Keyboard.Key;
 	keyP: Phaser.Input.Keyboard.Key;
 
-	// Config
-	characterSpeed: number = 90;
-	cloudCardSpeed: number = 450;
-	postAttackCooldown: number = 150;
-	postPowerCooldown: number = 600;
-	postHitPlayerKnockback: number = 120;
-	postHitEnemyKnockback: number = 50;
-	postHitInvincibilityTime: number = 800;
-	attackFrameRate: number = 35;
-	attackDelay: number = 0;
-	gotItemFreeze: number = 1000;
-	windCardPushSpeed: number = 100;
-	windCardPushTime: number = 100;
-	enemyKnockbackTime: number = 200;
-	enemyKnockBackSpeed: number = 200;
-	playerKnockBackSpeed: number = 150;
-	distanceToActivateTransient: number = 30;
-	playerInitialHitPoints: number = 4;
-	saveCooldown: number = 30000;
-	preGameOverTime: number = 2500;
-	roomTransitionFadeTime: number = 300;
-	regionTransitionFadeTime: number = 1000;
-	sceneStartFadeTime: number = 1000;
-	postAppearInvincibilityTime: number = 1000;
-	icePowerVelocity: number = 80;
-	iceCardFrozenTime: number = 3000;
-	iceMeltTime: number = 4000;
-	plantCardVelocity: number = 140;
-	firePowerVelocity: number = 120;
-	gateCloseSpeed: number = 340;
-	newRegionMessageTime: number = 1000;
-	initialPotionCount: number = 1;
-	chanceToDropPotion: number = 20;
-	droppedItemLifetime: number = 10000;
-
 	map: Phaser.Tilemaps.Tilemap;
 	landLayer: Phaser.Tilemaps.TilemapLayer;
 	stuffLayer: Phaser.Tilemaps.TilemapLayer;
@@ -150,7 +116,7 @@ export class Game extends Scene {
 
 	create(saveData: SaveData | undefined) {
 		this.isGameOver = false;
-		this.cameras.main.fadeIn(this.sceneStartFadeTime);
+		this.cameras.main.fadeIn(config.sceneStartFadeTime);
 		this.map = this.make.tilemap({ key: "map" });
 		const tilesetTile = this.map.addTilesetImage(
 			"Dungeon_Tiles",
@@ -283,7 +249,7 @@ export class Game extends Scene {
 					return;
 				}
 				const lastSaved = savePoint.data.get("savedAt");
-				if (lastSaved && this.time.now - lastSaved < this.saveCooldown) {
+				if (lastSaved && this.time.now - lastSaved < config.saveCooldown) {
 					return;
 				}
 
@@ -555,7 +521,8 @@ export class Game extends Scene {
 		}
 		// Use Potion
 		const totalHitPoints =
-			this.registry.get("playerTotalHitPoints") ?? this.playerInitialHitPoints;
+			this.registry.get("playerTotalHitPoints") ??
+			config.playerInitialHitPoints;
 		this.healSound.play();
 		if (this.healEffect) {
 			this.healEffect.destroy();
@@ -600,7 +567,7 @@ export class Game extends Scene {
 		const iceTileFrame = 284;
 		this.enemyManager.map.removeTile(tile, iceTileFrame);
 		this.time.addEvent({
-			delay: this.iceMeltTime,
+			delay: config.iceMeltTime,
 			callback: () => this.meltFrozenTile(tile),
 		});
 	}
@@ -612,7 +579,7 @@ export class Game extends Scene {
 		if (this.physics.overlapTiles(this.player, [tile])) {
 			// Do not melt the tile we stand on.
 			this.time.addEvent({
-				delay: this.iceMeltTime,
+				delay: config.iceMeltTime,
 				callback: () => this.meltFrozenTile(tile),
 			});
 			return;
@@ -902,7 +869,7 @@ export class Game extends Scene {
 					targets: tile,
 					x: gatePosition.x,
 					y: gatePosition.y,
-					duration: this.gateCloseSpeed * 2,
+					duration: config.gateCloseSpeed * 2,
 				});
 			});
 	}
@@ -944,7 +911,7 @@ export class Game extends Scene {
 						targets: tile,
 						x: tilePosition.x,
 						y: tilePosition.y,
-						duration: this.gateCloseSpeed,
+						duration: config.gateCloseSpeed,
 					});
 				}
 			});
@@ -993,8 +960,8 @@ export class Game extends Scene {
 		const newRegion = getRegionFromRoomName(room.name);
 		const isRegionTransition = previousRegion !== newRegion;
 		const fadeTime = isRegionTransition
-			? this.regionTransitionFadeTime
-			: this.roomTransitionFadeTime;
+			? config.regionTransitionFadeTime
+			: config.roomTransitionFadeTime;
 
 		console.log("moving player to point", destinationX, destinationY);
 		this.setPlayerStunned(true);
@@ -1008,7 +975,7 @@ export class Game extends Scene {
 					if (isRegionTransition) {
 						this.showNotice(
 							getRegionName(newRegion),
-							this.newRegionMessageTime
+							config.newRegionMessageTime
 						);
 					}
 					this.movePlayerToPoint(destinationX, destinationY);
@@ -1026,7 +993,7 @@ export class Game extends Scene {
 			this.player.body.setVelocity(0);
 			this.enemyCollider.active = false;
 			this.time.addEvent({
-				delay: this.preGameOverTime,
+				delay: config.preGameOverTime,
 				callback: () => {
 					this.gameOver();
 				},
@@ -1125,7 +1092,7 @@ export class Game extends Scene {
 
 		// The plant card moves you next to the target, over any land obstacle
 		this.player.data.set("isPlantCardGrappleActive", true);
-		this.physics.moveToObject(this.player, tile, this.plantCardVelocity);
+		this.physics.moveToObject(this.player, tile, config.plantCardVelocity);
 		this.power.anims.pause();
 		this.power.body.stop();
 	}
@@ -1145,12 +1112,12 @@ export class Game extends Scene {
 
 		// The wind card pushes tiles.
 		const velocity = createVelocityForDirection(
-			this.windCardPushSpeed,
+			config.windCardPushSpeed,
 			this.playerDirection
 		);
 		tile.body.setVelocity(velocity.x, velocity.y);
 		this.time.addEvent({
-			delay: this.windCardPushTime,
+			delay: config.windCardPushTime,
 			callback: () => {
 				// Tile might have been destroyed before this happens
 				if (tile.body?.setVelocity) {
@@ -1213,7 +1180,8 @@ export class Game extends Scene {
 				this.player.body.center.y
 			);
 			const distanceToActivate: number =
-				this.data.get("distanceToActivate") ?? this.distanceToActivateTransient;
+				this.data.get("distanceToActivate") ??
+				config.distanceToActivateTransient;
 
 			// If you haven't gotten close to the tile, do nothing.
 			if (tilePosition.distance(playerPosition) > distanceToActivate) {
@@ -1545,7 +1513,9 @@ export class Game extends Scene {
 	}
 
 	getPlayerHitPoints(): number {
-		return this.registry.get("playerHitPoints") ?? this.playerInitialHitPoints;
+		return (
+			this.registry.get("playerHitPoints") ?? config.playerInitialHitPoints
+		);
 	}
 
 	setPlayerHitPoints(hitPoints: number) {
@@ -1575,7 +1545,8 @@ export class Game extends Scene {
 	pickUpHeart() {
 		this.sound.play("heart");
 		let playerTotalHitPoints =
-			this.registry.get("playerTotalHitPoints") ?? this.playerInitialHitPoints;
+			this.registry.get("playerTotalHitPoints") ??
+			config.playerInitialHitPoints;
 		playerTotalHitPoints += 1;
 		this.registry.set("playerTotalHitPoints", playerTotalHitPoints);
 		this.restorePlayerHitPoints();
@@ -1591,7 +1562,7 @@ export class Game extends Scene {
 		// Play power animation
 		switch (card) {
 			case "IceCard":
-				this.power.setVelocity(this.icePowerVelocity, 0);
+				this.power.setVelocity(config.icePowerVelocity, 0);
 				this.power.anims.play("ice-power-right", true);
 				break;
 			case "SpiritCard":
@@ -1607,7 +1578,7 @@ export class Game extends Scene {
 				this.power.anims.play("cloud-power", true);
 				break;
 			case "FireCard":
-				this.power.setVelocity(this.firePowerVelocity, 0);
+				this.power.setVelocity(config.firePowerVelocity, 0);
 				this.power.anims.play("fire-power-right", true);
 				break;
 			case "PlantCard":
@@ -1643,7 +1614,7 @@ export class Game extends Scene {
 		this.setPlayerInvincible(true);
 		this.setPlayerStunned(true);
 		this.time.addEvent({
-			delay: this.gotItemFreeze,
+			delay: config.gotItemFreeze,
 			callback: () => {
 				this.sound.stopAll();
 				this.showDialog({
@@ -1658,7 +1629,8 @@ export class Game extends Scene {
 
 	restorePlayerHitPoints() {
 		const playerTotalHitPoints =
-			this.registry.get("playerTotalHitPoints") ?? this.playerInitialHitPoints;
+			this.registry.get("playerTotalHitPoints") ??
+			config.playerInitialHitPoints;
 		this.setPlayerHitPoints(playerTotalHitPoints);
 	}
 
@@ -1679,7 +1651,7 @@ export class Game extends Scene {
 
 		this.restorePlayerHitPoints();
 		if (this.getPotionTotalCount() === 0) {
-			this.setPotionTotalCount(this.initialPotionCount);
+			this.setPotionTotalCount(config.initialPotionCount);
 			this.restorePlayerPotions();
 			this.showDialog({
 				heading: "A magic potion bottle!",
@@ -1705,7 +1677,7 @@ export class Game extends Scene {
 		this.setPlayerInvincible(true);
 		this.setPlayerStunned(true);
 		this.time.addEvent({
-			delay: this.gotItemFreeze,
+			delay: config.gotItemFreeze,
 			callback: () => {
 				this.showDialog({
 					heading: "You found a sword!",
@@ -1725,7 +1697,7 @@ export class Game extends Scene {
 	}
 
 	getPlayerSpeed(): number {
-		return this.characterSpeed;
+		return config.characterSpeed;
 	}
 
 	updateSwordHitboxForAttack() {
@@ -1902,10 +1874,10 @@ export class Game extends Scene {
 
 	createOverlay() {
 		if (!this.registry.has("playerTotalHitPoints")) {
-			this.registry.set("playerTotalHitPoints", this.playerInitialHitPoints);
+			this.registry.set("playerTotalHitPoints", config.playerInitialHitPoints);
 		}
 		if (!this.registry.has("playerHitPoints")) {
-			this.setPlayerHitPoints(this.playerInitialHitPoints);
+			this.setPlayerHitPoints(config.playerInitialHitPoints);
 		}
 		this.scene.launch("Overlay");
 	}
@@ -2054,9 +2026,9 @@ export class Game extends Scene {
 				suffix: ".png",
 				end: 9,
 			}),
-			frameRate: this.attackFrameRate,
+			frameRate: config.attackFrameRate,
 			repeat: 0,
-			delay: this.attackDelay,
+			delay: config.attackDelay,
 			showBeforeDelay: true,
 		});
 		anims.create({
@@ -2066,9 +2038,9 @@ export class Game extends Scene {
 				suffix: ".png",
 				end: 9,
 			}),
-			frameRate: this.attackFrameRate,
+			frameRate: config.attackFrameRate,
 			repeat: 0,
-			delay: this.attackDelay,
+			delay: config.attackDelay,
 			showBeforeDelay: true,
 		});
 		anims.create({
@@ -2078,9 +2050,9 @@ export class Game extends Scene {
 				suffix: ".png",
 				end: 9,
 			}),
-			frameRate: this.attackFrameRate,
+			frameRate: config.attackFrameRate,
 			repeat: 0,
-			delay: this.attackDelay,
+			delay: config.attackDelay,
 			showBeforeDelay: true,
 		});
 		anims.create({
@@ -2090,9 +2062,9 @@ export class Game extends Scene {
 				suffix: ".png",
 				end: 9,
 			}),
-			frameRate: this.attackFrameRate,
+			frameRate: config.attackFrameRate,
 			repeat: 0,
-			delay: this.attackDelay,
+			delay: config.attackDelay,
 			showBeforeDelay: true,
 		});
 
@@ -2216,7 +2188,7 @@ export class Game extends Scene {
 				this.setPlayerStunned(false);
 				this.player.setVisible(true);
 				this.time.addEvent({
-					delay: this.postAppearInvincibilityTime,
+					delay: config.postAppearInvincibilityTime,
 					callback: () => {
 						this.setPlayerInvincible(false);
 					},
@@ -2251,7 +2223,7 @@ export class Game extends Scene {
 					return;
 				}
 				const randomNumber = Phaser.Math.Between(1, 100);
-				if (randomNumber <= this.chanceToDropPotion) {
+				if (randomNumber <= config.chanceToDropPotion) {
 					this.addPotionVialAt(monster.body.center.x, monster.body.center.y);
 				}
 			}
@@ -2506,13 +2478,13 @@ export class Game extends Scene {
 			potionVial.destroy();
 		});
 		this.time.addEvent({
-			delay: this.droppedItemLifetime / 2,
+			delay: config.droppedItemLifetime / 2,
 			callback: () => {
 				potionVial?.setAlpha(0.4);
 			},
 		});
 		this.time.addEvent({
-			delay: this.droppedItemLifetime,
+			delay: config.droppedItemLifetime,
 			callback: () => {
 				potionVial?.destroy();
 			},
@@ -2574,7 +2546,7 @@ export class Game extends Scene {
 			enemy.emit(Events.MonsterStun, true);
 			enemy.setTint(0x0000ff);
 			this.time.addEvent({
-				delay: this.iceCardFrozenTime,
+				delay: config.iceCardFrozenTime,
 				callback: () => {
 					enemy?.emit(Events.MonsterStun, false);
 					enemy?.clearTint();
@@ -2589,8 +2561,8 @@ export class Game extends Scene {
 			enemy.data.set(DataKeys.Stunned, true);
 			this.knockBack(
 				enemy.body,
-				this.enemyKnockbackTime,
-				this.enemyKnockBackSpeed,
+				config.enemyKnockbackTime,
+				config.enemyKnockBackSpeed,
 				this.playerDirection,
 				() => {
 					enemy?.data?.set(DataKeys.Stunned, false);
@@ -2612,7 +2584,7 @@ export class Game extends Scene {
 		enemy.body.stop();
 		enemy.data.set("isPlantCardGrappleActive", true);
 
-		this.physics.moveToObject(enemy, this.player, this.plantCardVelocity);
+		this.physics.moveToObject(enemy, this.player, config.plantCardVelocity);
 		this.power.body.stop();
 	}
 
@@ -2626,8 +2598,8 @@ export class Game extends Scene {
 		// Knock the player back a bit when they hit an enemy.
 		this.knockBack(
 			this.player.body,
-			this.postHitEnemyKnockback,
-			this.playerKnockBackSpeed,
+			config.postHitEnemyKnockback,
+			config.playerKnockBackSpeed,
 			invertSpriteDirection(this.playerDirection),
 			() => {}
 		);
@@ -2685,7 +2657,7 @@ export class Game extends Scene {
 		}
 
 		this.time.addEvent({
-			delay: this.postHitInvincibilityTime,
+			delay: config.postHitInvincibilityTime,
 			callback: () => {
 				if (this.getPlayerHitPoints() > 0) {
 					this.setPlayerBeingHit(false);
@@ -2697,8 +2669,8 @@ export class Game extends Scene {
 		this.isPlayerBeingKnockedBack = true;
 		this.knockBack(
 			this.player.body,
-			this.postHitPlayerKnockback,
-			this.playerKnockBackSpeed,
+			config.postHitPlayerKnockback,
+			config.playerKnockBackSpeed,
 			invertSpriteDirection(this.playerDirection),
 			() => {
 				this.isPlayerBeingKnockedBack = false;
@@ -2755,7 +2727,7 @@ export class Game extends Scene {
 			!this.isPlayerFrozen() &&
 			!this.isPlayerStunned() &&
 			!this.isPlayerAttacking() &&
-			this.getTimeSinceLastAttack() > this.postAttackCooldown &&
+			this.getTimeSinceLastAttack() > config.postAttackCooldown &&
 			!this.isPlayerUsingPower()
 		);
 	}
@@ -2793,7 +2765,7 @@ export class Game extends Scene {
 			!this.isPlayerFrozen() &&
 			!this.isPlayerStunned() &&
 			!this.isPlayerAttacking() &&
-			this.getTimeSinceLastPower() > this.postPowerCooldown &&
+			this.getTimeSinceLastPower() > config.postPowerCooldown &&
 			!this.isPlayerUsingPower()
 		);
 	}
@@ -2901,13 +2873,13 @@ export class Game extends Scene {
 				switch (this.getActivePower()) {
 					case "PlantCard":
 						this.power.setRotation(Phaser.Math.DegToRad(90));
-						this.power.setVelocity(0, -this.plantCardVelocity);
+						this.power.setVelocity(0, -config.plantCardVelocity);
 						this.power.anims.play("plant-power-right", true);
 						this.power.setFlipX(true);
 						break;
 					case "CloudCard":
 						this.power.anims.play("cloud-power", true);
-						this.player.setVelocity(0, -this.cloudCardSpeed);
+						this.player.setVelocity(0, -config.cloudCardSpeed);
 						this.player.anims.play("up-walk");
 						break;
 					case "SpiritCard":
@@ -2922,13 +2894,13 @@ export class Game extends Scene {
 						break;
 					case "FireCard":
 						this.power.setRotation(Phaser.Math.DegToRad(90));
-						this.power.setVelocity(0, -this.firePowerVelocity);
+						this.power.setVelocity(0, -config.firePowerVelocity);
 						this.power.anims.play("fire-power-right", true);
 						this.power.setFlipX(true);
 						break;
 					case "IceCard":
 						this.power.setRotation(Phaser.Math.DegToRad(90));
-						this.power.setVelocity(0, -this.icePowerVelocity);
+						this.power.setVelocity(0, -config.icePowerVelocity);
 						this.power.anims.play("ice-power-right", true);
 						this.power.setFlipX(true);
 						break;
@@ -2942,12 +2914,12 @@ export class Game extends Scene {
 				this.power.setRotation(Phaser.Math.DegToRad(0));
 				switch (this.getActivePower()) {
 					case "PlantCard":
-						this.power.setVelocity(this.plantCardVelocity, 0);
+						this.power.setVelocity(config.plantCardVelocity, 0);
 						this.power.anims.play("plant-power-right", true);
 						break;
 					case "CloudCard":
 						this.power.anims.play("cloud-power", true);
-						this.player.setVelocity(this.cloudCardSpeed, 0);
+						this.player.setVelocity(config.cloudCardSpeed, 0);
 						this.player.anims.play("left-walk");
 						this.player.setFlipX(true);
 						break;
@@ -2962,11 +2934,11 @@ export class Game extends Scene {
 						});
 						break;
 					case "FireCard":
-						this.power.setVelocity(this.firePowerVelocity, 0);
+						this.power.setVelocity(config.firePowerVelocity, 0);
 						this.power.anims.play("fire-power-right", true);
 						break;
 					case "IceCard":
-						this.power.setVelocity(this.icePowerVelocity, 0);
+						this.power.setVelocity(config.icePowerVelocity, 0);
 						this.power.anims.play("ice-power-right", true);
 						break;
 					case "WindCard":
@@ -2978,12 +2950,12 @@ export class Game extends Scene {
 				switch (this.getActivePower()) {
 					case "PlantCard":
 						this.power.setRotation(Phaser.Math.DegToRad(90));
-						this.power.setVelocity(0, this.plantCardVelocity);
+						this.power.setVelocity(0, config.plantCardVelocity);
 						this.power.anims.play("plant-power-right", true);
 						break;
 					case "CloudCard":
 						this.power.anims.play("cloud-power", true);
-						this.player.setVelocity(0, this.cloudCardSpeed);
+						this.player.setVelocity(0, config.cloudCardSpeed);
 						this.player.anims.play("down-walk");
 						break;
 					case "SpiritCard":
@@ -2998,12 +2970,12 @@ export class Game extends Scene {
 						break;
 					case "FireCard":
 						this.power.setRotation(Phaser.Math.DegToRad(90));
-						this.power.setVelocity(0, this.firePowerVelocity);
+						this.power.setVelocity(0, config.firePowerVelocity);
 						this.power.anims.play("fire-power-right", true);
 						break;
 					case "IceCard":
 						this.power.setRotation(Phaser.Math.DegToRad(90));
-						this.power.setVelocity(0, this.icePowerVelocity);
+						this.power.setVelocity(0, config.icePowerVelocity);
 						this.power.anims.play("ice-power-right", true);
 						break;
 					case "WindCard":
@@ -3016,13 +2988,13 @@ export class Game extends Scene {
 				this.power.setRotation(Phaser.Math.DegToRad(0));
 				switch (this.getActivePower()) {
 					case "PlantCard":
-						this.power.setVelocity(-this.plantCardVelocity, 0);
+						this.power.setVelocity(-config.plantCardVelocity, 0);
 						this.power.anims.play("plant-power-right", true);
 						this.power.setFlipX(true);
 						break;
 					case "CloudCard":
 						this.power.anims.play("cloud-power", true);
-						this.player.setVelocity(-this.cloudCardSpeed, 0);
+						this.player.setVelocity(-config.cloudCardSpeed, 0);
 						this.player.anims.play("left-walk");
 						break;
 					case "SpiritCard":
@@ -3036,12 +3008,12 @@ export class Game extends Scene {
 						});
 						break;
 					case "FireCard":
-						this.power.setVelocity(-this.firePowerVelocity, 0);
+						this.power.setVelocity(-config.firePowerVelocity, 0);
 						this.power.anims.play("fire-power-right", true);
 						this.power.setFlipX(true);
 						break;
 					case "IceCard":
-						this.power.setVelocity(-this.icePowerVelocity, 0);
+						this.power.setVelocity(-config.icePowerVelocity, 0);
 						this.power.anims.play("ice-power-right", true);
 						this.power.setFlipX(true);
 						break;
