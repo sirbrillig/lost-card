@@ -409,7 +409,6 @@ export class Game extends Scene {
 			return;
 		}
 		this.lastDialogData = obj;
-		this.sound.stopAll();
 		this.scene.launch("Dialog", {
 			heading: obj.heading,
 			text: obj.text,
@@ -418,12 +417,14 @@ export class Game extends Scene {
 
 	checkEndGame() {
 		if (this.getKeyCount() < 6) {
+			this.sound.stopAll();
 			this.showDialog({
 				heading: "Golden door",
 				text: "The survivors of the kingdoms are trapped behind this door but it requires six keys to open.",
 			});
 			return;
 		}
+		this.sound.stopAll();
 		this.showDialog({
 			heading: "You win!",
 			text: "Congratulations",
@@ -1264,6 +1265,34 @@ export class Game extends Scene {
 		});
 	}
 
+	showSign(title: string) {
+		this.sound.stopAll();
+		if (title === "TutorialSign") {
+			this.showDialog({
+				heading: "The door is shut",
+				text: "Once, cards of power protected the kingdoms, but the cards have been lost. Monsters have sealed the people behind this door.",
+			});
+		}
+		if (title === "MapSign") {
+			this.showDialog({
+				heading: "View the map",
+				text: "Press TAB or M to pause and view the map.",
+			});
+		}
+		if (title === "SwordSign") {
+			this.showDialog({
+				heading: "Get a weapon",
+				text: "It would be unwise to face the monsters unarmed. Visit the armory south of the throne room.",
+			});
+		}
+		if (title === "ArmorySign") {
+			this.showDialog({
+				heading: "The Armory",
+				text: "It would be unwise to face the monsters unarmed. Find a weapon in here.",
+			});
+		}
+	}
+
 	showTransientTile(tile: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody) {
 		tile.setVisible(true);
 		tile.setAlpha(1);
@@ -1277,29 +1306,8 @@ export class Game extends Scene {
 				this.power.anims.stop();
 				this.power.visible = false;
 			}
-			if (tile.name === "TutorialSign") {
-				this.showDialog({
-					heading: "The door is shut",
-					text: "Once, cards of power protected the kingdoms, but the cards have been lost. Monsters have sealed the people behind this door.",
-				});
-			}
-			if (tile.name === "MapSign") {
-				this.showDialog({
-					heading: "View the map",
-					text: "Press TAB or M to pause and view the map.",
-				});
-			}
-			if (tile.name === "SwordSign") {
-				this.showDialog({
-					heading: "Get a weapon",
-					text: "It would be unwise to face the monsters unarmed. Visit the armory south of the throne room.",
-				});
-			}
-			if (tile.name === "ArmorySign") {
-				this.showDialog({
-					heading: "The Armory",
-					text: "It would be unwise to face the monsters unarmed. Find a weapon in here.",
-				});
+			if (tile.name.endsWith("Sign")) {
+				this.showSign(tile.name);
 			}
 		});
 		this.physics.add.collider(
@@ -1555,10 +1563,11 @@ export class Game extends Scene {
 		this.sound.play("key");
 		this.setKeyCount(this.getKeyCount() + 1);
 		this.sound.get("key").on(Phaser.Sound.Events.COMPLETE, () => {
-			this.showDialog({
-				heading: "A Key",
-				text: "Collect six of these to open the Golden door.",
-			});
+			this.sound.stopAll();
+		});
+		this.showDialog({
+			heading: "A Key",
+			text: "Collect six of these to open the Golden door.",
 		});
 	}
 
@@ -1635,6 +1644,7 @@ export class Game extends Scene {
 		this.time.addEvent({
 			delay: this.gotItemFreeze,
 			callback: () => {
+				this.sound.stopAll();
 				this.showDialog({
 					heading: this.getCardNameForPower(card),
 					text: "Press SHIFT to use the power.\r\nPress [ or ] to change the active power.",
@@ -1662,6 +1672,10 @@ export class Game extends Scene {
 
 	pickUpPotion() {
 		this.appearSound.play();
+		this.appearSound.on(Phaser.Sound.Events.COMPLETE, () => {
+			this.sound.stopAll();
+		});
+
 		this.restorePlayerHitPoints();
 		if (this.getPotionTotalCount() === 0) {
 			this.setPotionTotalCount(this.initialPotionCount);
@@ -1684,6 +1698,9 @@ export class Game extends Scene {
 		this.equipSword();
 		this.player.anims.play("down-attack", true);
 		this.attackSound.play();
+		this.attackSound.on(Phaser.Sound.Events.COMPLETE, () => {
+			this.sound.stopAll();
+		});
 		this.setPlayerInvincible(true);
 		this.setPlayerStunned(true);
 		this.time.addEvent({
