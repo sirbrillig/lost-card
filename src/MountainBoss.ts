@@ -95,12 +95,14 @@ export class MountainBoss extends BaseMonster<AllStates> {
 			if (!this.body) {
 				throw new Error("monster is invalid");
 			}
-			return new MountainMonster(
+			const enemy = new MountainMonster(
 				this.scene,
 				this.enemyManager,
 				this.body.center.x,
 				this.body.center.y
 			);
+			enemy.hitPoints = 1;
+			return enemy;
 		};
 		switch (state) {
 			case "initial":
@@ -109,13 +111,13 @@ export class MountainBoss extends BaseMonster<AllStates> {
 				return new Roar(state, "spawn1");
 			case "spawn1":
 				return new SpawnEnemies(state, "spawn2", {
-					enemiesToSpawn: 6,
+					enemiesToSpawn: 4,
 					maxSpawnedEnemies: 18,
 					createMonster,
 				});
 			case "spawn2":
 				return new SpawnEnemies(state, "leftrightmarch", {
-					enemiesToSpawn: 6,
+					enemiesToSpawn: 4,
 					maxSpawnedEnemies: 18,
 					createMonster,
 				});
