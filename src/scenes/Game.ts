@@ -1548,14 +1548,11 @@ export class Game extends Scene {
 	pickUpKey() {
 		this.sound.play("key");
 		this.setKeyCount(this.getKeyCount() + 1);
-		this.time.addEvent({
-			delay: this.gotItemFreeze,
-			callback: () => {
-				this.showDialog({
-					heading: "A Key",
-					text: "Collect six of these to open the Golden door.",
-				});
-			},
+		this.sound.get("key").on(Phaser.Sound.Events.COMPLETE, () => {
+			this.showDialog({
+				heading: "A Key",
+				text: "Collect six of these to open the Golden door.",
+			});
 		});
 	}
 
@@ -2230,7 +2227,7 @@ export class Game extends Scene {
 					return;
 				}
 				const randomNumber = Phaser.Math.Between(1, 10);
-				if (randomNumber > 5) {
+				if (randomNumber > 7) {
 					this.addPotionVialAt(monster.body.center.x, monster.body.center.y);
 				}
 			}
@@ -2619,7 +2616,9 @@ export class Game extends Scene {
 		this.isGameOver = true;
 		this.cameras.main.fadeOut(1000, 0, 0, 0, (_: unknown, progress: number) => {
 			if (progress === 1) {
-				this.sound.stopAll();
+				this.gameOverSound.on(Phaser.Sound.Events.COMPLETE, () => {
+					this.sound.stopAll();
+				});
 				this.scene.stop();
 				this.scene.get("Overlay")?.scene.stop();
 				this.scene.start("GameOver");

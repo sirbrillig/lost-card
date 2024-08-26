@@ -56,7 +56,7 @@ export class WaitForActive<AllStates extends string>
 		sprite.body.stop();
 
 		if (this.#maxWaitTime) {
-			sprite.scene.time.addEvent({
+			sprite.scene?.time.addEvent({
 				delay: this.#maxWaitTime,
 				callback: () => {
 					stateMachine.popState();
@@ -1836,13 +1836,13 @@ export class ThrowRocks<AllStates extends string>
 			duration: this.#speed,
 			onComplete: () => {
 				this.showRock(tile);
-				this.#sprite.scene.sound.play("rock-destroy", {
+				this.#sprite.scene?.sound.play("rock-destroy", {
 					loop: false,
 					volume: 0.5,
 				});
 				this.#rockCount -= 1;
 				if (this.#rockCount > 0) {
-					this.#sprite.scene.time.addEvent({
+					this.#sprite.scene?.time.addEvent({
 						delay: this.#delayBetweenRocks,
 						callback: () => {
 							this.dropRock(this.createRock());
@@ -1857,11 +1857,11 @@ export class ThrowRocks<AllStates extends string>
 		tile.setAlpha(1);
 		tile.body.pushable = false;
 
-		if (this.#sprite.scene.physics.overlap(this.#enemyManager.player, tile)) {
+		if (this.#sprite.scene?.physics.overlap(this.#enemyManager.player, tile)) {
 			MainEvents.emit(Events.EnemyHitPlayer, true);
 		}
-		this.#sprite.scene.physics.add.collider(this.#enemyManager.player, tile);
-		this.#sprite.scene.physics.add.collider(this.#enemyManager.enemies, tile);
+		this.#sprite.scene?.physics.add.collider(this.#enemyManager.player, tile);
+		this.#sprite.scene?.physics.add.collider(this.#enemyManager.enemies, tile);
 	}
 
 	waitAndEnd(stateMachine: BehaviorMachineInterface<AllStates>) {
@@ -1870,11 +1870,11 @@ export class ThrowRocks<AllStates extends string>
 		}
 		this.#isEnding = true;
 
-		this.#sprite.scene.time.addEvent({
+		this.#sprite.scene?.time.addEvent({
 			delay: this.#delayBeforeEnd,
 			callback: () => {
 				this.#rocksCreated.forEach((rock) => {
-					this.#sprite.scene.sound.play("rock-destroy", {
+					this.#sprite.scene?.sound.play("rock-destroy", {
 						loop: false,
 						volume: 0.5,
 					});
