@@ -685,7 +685,6 @@ export class Game extends Scene {
 	saveGame() {
 		this.saveSound.play();
 		localStorage.setItem("lost-card-save", JSON.stringify(this.getSaveData()));
-		console.log(this.getSaveData());
 		MainEvents.emit(Events.GameSaved);
 	}
 
@@ -927,10 +926,8 @@ export class Game extends Scene {
 		if (destinationDirection === undefined) {
 			throw new Error("Door has no destination direction");
 		}
-		console.log("moving through door in direction", destinationDirection);
 
 		if (this.playerDirection !== destinationDirection) {
-			console.log("hit door in wrong direction");
 			return;
 		}
 
@@ -941,7 +938,6 @@ export class Game extends Scene {
 		if (!destinationTile) {
 			throw new Error("Hit door without destination tile");
 		}
-		console.log("moving to tile", destinationTile, "through door", door);
 
 		// if the player enters a door, teleport them just past the corresponding door
 		const [destinationX, destinationY] = getDoorDestinationCoordinates(
@@ -963,7 +959,6 @@ export class Game extends Scene {
 			? config.regionTransitionFadeTime
 			: config.roomTransitionFadeTime;
 
-		console.log("moving player to point", destinationX, destinationY);
 		this.setPlayerStunned(true);
 		this.cameras.main.fadeOut(
 			fadeTime,
@@ -1034,7 +1029,6 @@ export class Game extends Scene {
 	}
 
 	destroyCreatedTile(tile: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody) {
-		console.log("destroying tile", tile);
 		this.cameras.main.shake(200, 0.004);
 
 		this.rockDestroySound.play();
@@ -1088,7 +1082,6 @@ export class Game extends Scene {
 		) {
 			return;
 		}
-		console.log("hit item with plant card", tile);
 
 		// The plant card moves you next to the target, over any land obstacle
 		this.player.data.set("isPlantCardGrappleActive", true);
@@ -1108,7 +1101,6 @@ export class Game extends Scene {
 			return;
 		}
 		tile.data.set("beingPushed", true);
-		console.log("hit item with wind card", tile);
 
 		// The wind card pushes tiles.
 		const velocity = createVelocityForDirection(
@@ -1121,7 +1113,6 @@ export class Game extends Scene {
 			callback: () => {
 				// Tile might have been destroyed before this happens
 				if (tile.body?.setVelocity) {
-					console.log("hit item complete");
 					tile.body.setVelocity(0, 0);
 					tile.data.set("beingPushed", false);
 				}
@@ -1136,7 +1127,6 @@ export class Game extends Scene {
 		if (!isAffectedByPower) {
 			return;
 		}
-		console.log("hit item with fire card", tile);
 
 		// The fire card destroys tiles.
 		this.createdTiles = this.createdTiles.filter((x) => x !== tile);
@@ -1269,7 +1259,6 @@ export class Game extends Scene {
 		tile.body.pushable = false;
 		this.physics.add.collider(this.player, tile, () => {
 			if (this.player.data.get("isPlantCardGrappleActive")) {
-				console.log("end plant card");
 				// In case we were being pulled by the PlantCard
 				this.player.data.set("isPlantCardGrappleActive", false);
 				this.power.anims.stop();
@@ -1289,7 +1278,6 @@ export class Game extends Scene {
 				if (tile.body.velocity.x === 0 && tile.body.velocity.y === 0) {
 					return;
 				}
-				console.log("hit enemy with rock");
 				this.sendHitToEnemy(enemy);
 			},
 			(tile, enemy) => {
@@ -1312,7 +1300,6 @@ export class Game extends Scene {
 				return;
 			}
 			if (collideTile.data.get("beingPushed")) {
-				console.log("hit wall with rock");
 				this.destroyCreatedTile(tile);
 			}
 		});
@@ -1321,13 +1308,11 @@ export class Game extends Scene {
 				return;
 			}
 			if (collideTile.data.get("beingPushed")) {
-				console.log("hit door with rock");
 				this.destroyCreatedTile(tile);
 			}
 		});
 
 		if (this.physics.overlap(this.player, tile)) {
-			console.log("hit player with tile");
 			this.enemyHitPlayer();
 		}
 
@@ -1442,7 +1427,6 @@ export class Game extends Scene {
 	maybePickUpItem() {
 		const touchingItem = getItemTouchingPlayer(this.createdItems, this.player);
 		if (touchingItem && touchingItem.active) {
-			console.log("touched item", touchingItem);
 			switch (touchingItem.name) {
 				case "Sword":
 					this.pickUpSword();
@@ -1692,7 +1676,6 @@ export class Game extends Scene {
 	movePlayerToPoint(x: number, y: number) {
 		this.player.setPosition(x, y);
 		const room = getRoomForPoint(this.map, this.player.x, this.player.y);
-		console.log("moving camera to room", room);
 		this.moveCameraToRoom(room);
 	}
 
@@ -2248,7 +2231,6 @@ export class Game extends Scene {
 				return;
 			}
 
-			console.log("creating monster at", point.x, point.y);
 			const enemyType = point.name;
 			switch (enemyType) {
 				case "MountainMonster": {
@@ -2578,7 +2560,6 @@ export class Game extends Scene {
 		if (enemy.data.get("isPlantCardGrappleActive")) {
 			return;
 		}
-		console.log("pulling monster");
 		// We can't use MonsterStun event here because it is too slow.
 		enemy.data.set(DataKeys.Stunned, true);
 		enemy.body.stop();
