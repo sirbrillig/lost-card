@@ -1676,3 +1676,150 @@ class Seeker extends Phaser.Physics.Arcade.Sprite {
 		);
 	}
 }
+
+export class ThrowRocks<AllStates extends string>
+	implements Behavior<AllStates, Phaser.GameObjects.Sprite>
+{
+	#nextState: AllStates;
+	#speed = 500;
+	#delayBeforeEnd = 1000;
+	#delayBetweenRocks = 600;
+	#isEnding = false;
+	#rockCount = 3;
+	#sprite: Phaser.GameObjects.Sprite;
+	#rocksCreated: Phaser.GameObjects.Sprite[] = [];
+	#enemyManager: EnemyManager;
+	name: AllStates;
+
+	constructor(
+		name: AllStates,
+		nextState: AllStates,
+		config: {
+			speed: number;
+			rockCount: number;
+			delayBeforeEnd: number;
+			delayBetweenRocks: number;
+		}
+	) {
+		this.name = name;
+		this.#nextState = nextState;
+		this.#speed = config.speed;
+		this.#rockCount = config.rockCount;
+		this.#delayBeforeEnd = config.delayBeforeEnd;
+		this.#delayBetweenRocks = config.delayBetweenRocks;
+	}
+
+	init(
+		sprite: Phaser.GameObjects.Sprite,
+		_: BehaviorMachineInterface<AllStates>,
+		enemyManager: EnemyManager
+	): void {
+		if (!sprite.body || !isDynamicSprite(sprite)) {
+			throw new Error("Could not update monster");
+		}
+
+		this.#sprite = sprite;
+		this.#enemyManager = enemyManager;
+
+		this.dropRock(this.createRock());
+	}
+
+	createRock() {
+		if (!this.#enemyManager.player.body) {
+			throw new Error("No player exists");
+		}
+
+		this.#sprite.anims.play("throwrock");
+		const rock = this.#sprite.scene.add.sprite(
+			this.#enemyManager.player.body.center.x,
+			this.#enemyManager.player.body.center.y,
+			"dungeon_tiles_sprites",
+			865
+		);
+		this.#sprite.scene.physics.add.existing(rock);
+		if (!isDynamicSprite(rock)) {
+			throw new Error("Could not create rock");
+		}
+		this.#rocksCreated.push(rock);
+		return rock;
+	}
+
+	dropRock(tile: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody) {
+		tile.setVisible(true);
+		const tileFinalHeight = tile.y;
+		const tileInitialHeight = 70;
+		const tileInitialAlpha = 0.4;
+		let height = tile.y - tileInitialHeight;
+		let alpha = tileInitialAlpha;
+		tile.setAlpha(alpha);
+		tile.setPosition(tile.x, height);
+		this.#sprite.scene.tweens.add({
+			targets: tile,
+			x: tile.x,
+			y: tileFinalHeight,
+			duration: this.#speed,
+			onComplete: () => {
+				this.showRock(tile);
+				this.#sprite.scene.sound.play("rock-destroy", {
+					loop: false,
+					volume: 0.5,
+				});
+				this.#rockCount -= 1;
+				if (this.#rockCount > 0) {
+					this.#sprite.scene.time.addEvent({
+						delay: this.#delayBetweenRocks,
+						callback: () => {
+							this.dropRock(this.createRock());
+						},
+					});
+				}
+			},
+		});
+	}
+
+	showRock(tile: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody) {
+		tile.setAlpha(1);
+		tile.body.pushable = false;
+
+		if (this.#sprite.scene.physics.overlap(this.#enemyManager.player, tile)) {
+			MainEvents.emit(Events.EnemyHitPlayer, true);
+		}
+		this.#sprite.scene.physics.add.collider(this.#enemyManager.player, tile);
+		this.#sprite.scene.physics.add.collider(this.#enemyManager.enemies, tile);
+	}
+
+	waitAndEnd(stateMachine: BehaviorMachineInterface<AllStates>) {
+		if (this.#isEnding) {
+			return;
+		}
+		this.#isEnding = true;
+
+		this.#sprite.scene.time.addEvent({
+			delay: this.#delayBeforeEnd,
+			callback: () => {
+				this.#rocksCreated.forEach((rock) => {
+					this.#sprite.scene.sound.play("rock-destroy", {
+						loop: false,
+						volume: 0.5,
+					});
+					rock.setOrigin(0.6, 0.5);
+					rock.anims.play("explode", true);
+					rock.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
+						rock.destroy();
+					});
+				});
+				stateMachine.popState();
+				stateMachine.pushState(this.#nextState);
+			},
+		});
+	}
+
+	update(
+		_: Phaser.GameObjects.Sprite,
+		stateMachine: BehaviorMachineInterface<AllStates>
+	): void {
+		if (this.#rockCount === 0) {
+			this.waitAndEnd(stateMachine);
+		}
+	}
+}

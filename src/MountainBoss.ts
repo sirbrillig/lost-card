@@ -1,9 +1,21 @@
 import { EnemyManager } from "./EnemyManager";
-import { WaitForActive, Roar, SpawnEnemies, LeftRightMarch } from "./behaviors";
+import {
+	WaitForActive,
+	Roar,
+	SpawnEnemies,
+	LeftRightMarch,
+	ThrowRocks,
+} from "./behaviors";
 import { BaseMonster } from "./BaseMonster";
 import { MountainMonster } from "./MountainMonster";
 
-type AllStates = "initial" | "roar1" | "spawn1" | "spawn2" | "leftrightmarch";
+type AllStates =
+	| "initial"
+	| "roar1"
+	| "spawn1"
+	| "spawn2"
+	| "leftrightmarch"
+	| "throwrocks";
 
 export class MountainBoss extends BaseMonster<AllStates> {
 	hitPoints: number = 10;
@@ -49,13 +61,12 @@ export class MountainBoss extends BaseMonster<AllStates> {
 			repeat: 2,
 		});
 		this.anims.create({
-			key: "idle",
+			key: "throwrock",
 			frames: this.anims.generateFrameNumbers("bosses1", {
-				start: 48,
-				end: 50,
+				frames: [60, 61, 62],
 			}),
-			frameRate: 10,
-			repeat: 6,
+			frameRate: 5,
+			yoyo: true,
 		});
 
 		this.anims.create({
@@ -108,7 +119,14 @@ export class MountainBoss extends BaseMonster<AllStates> {
 					createMonster,
 				});
 			case "leftrightmarch":
-				return new LeftRightMarch(state, "roar1", { speed: 80 });
+				return new LeftRightMarch(state, "throwrocks", { speed: 80 });
+			case "throwrocks":
+				return new ThrowRocks(state, "roar1", {
+					speed: 500,
+					rockCount: 3,
+					delayBeforeEnd: 1200,
+					delayBetweenRocks: 600,
+				});
 		}
 	}
 

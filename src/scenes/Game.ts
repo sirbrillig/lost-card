@@ -1249,7 +1249,6 @@ export class Game extends Scene {
 			duration: speed,
 			onComplete: () => {
 				this.showTransientTile(tile);
-				this.rockDestroySound.play();
 			},
 		});
 	}
