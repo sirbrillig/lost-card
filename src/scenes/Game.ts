@@ -749,7 +749,8 @@ export class Game extends Scene {
 		if (!layerObject.id) {
 			return true;
 		}
-		const itemsRemoved: Array<number> = this.registry.get("itemsRemoved") ?? [];
+		const itemsRemoved: Array<number> =
+			this.registry.get(DataKeys.CollectedItems) ?? [];
 		return !itemsRemoved.includes(layerObject.id);
 	}
 
@@ -757,7 +758,7 @@ export class Game extends Scene {
 		layerObject: Phaser.Types.Tilemaps.TiledObject,
 		sprite: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody
 	): void {
-		sprite.data.set("objectId", layerObject.id);
+		sprite.data.set(DataKeys.ItemObjectId, layerObject.id);
 	}
 
 	createTileLayer(
@@ -1295,8 +1296,14 @@ export class Game extends Scene {
 	hideHiddenItems() {
 		this.createdItems.forEach((item) => {
 			if (item.data.get("hidden")) {
-				item.setVisible(false);
-				item.setActive(false);
+				// If the item has been previous revealed, do not hide it.
+				const itemId: number | undefined = item.data.get(DataKeys.ItemObjectId);
+				const shownItems: number[] =
+					this.registry.get(DataKeys.RevealedItems) ?? [];
+				if (itemId && !shownItems.includes(itemId)) {
+					item.setVisible(false);
+					item.setActive(false);
+				}
 			}
 		});
 	}
@@ -1317,6 +1324,14 @@ export class Game extends Scene {
 		if (!item.data.get("hidden")) {
 			return;
 		}
+
+		const itemId = item.data.get(DataKeys.ItemObjectId);
+		if (itemId) {
+			const shownItems = this.registry.get(DataKeys.RevealedItems) ?? [];
+			shownItems.push(itemId);
+			this.registry.set(DataKeys.RevealedItems, shownItems);
+		}
+
 		const effect = this.add.sprite(
 			item.body.center.x,
 			item.body.center.y,
@@ -1404,25 +1419,31 @@ export class Game extends Scene {
 		}
 	}
 
-	removeItem(itemToRemove: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody) {
-		this.createdItems = this.createdItems.filter(
-			(item) => item !== itemToRemove
-		);
-		const itemsRemoved = this.registry.get("itemsRemoved") ?? [];
-		const itemObject = this.map.findObject("Items", (obj) => {
+	findItemObjectMatchingCreatedItem(
+		item: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody
+	) {
+		return this.map.findObject("Items", (obj) => {
 			if (!hasId(obj)) {
 				return false;
 			}
-			if (obj.id === itemToRemove.data.get("objectId")) {
+			if (obj.id === item.data.get(DataKeys.ItemObjectId)) {
 				return true;
 			}
 			return false;
 		});
+	}
+
+	removeItem(itemToRemove: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody) {
+		this.createdItems = this.createdItems.filter(
+			(item) => item !== itemToRemove
+		);
+		const itemsRemoved = this.registry.get(DataKeys.CollectedItems) ?? [];
+		const itemObject = this.findItemObjectMatchingCreatedItem(itemToRemove);
 		if (!itemObject) {
 			return;
 		}
 		itemsRemoved.push(itemObject.id);
-		this.registry.set("itemsRemoved", itemsRemoved);
+		this.registry.set(DataKeys.CollectedItems, itemsRemoved);
 		itemToRemove.destroy();
 	}
 

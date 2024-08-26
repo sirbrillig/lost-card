@@ -40,6 +40,9 @@ export const DataKeys = {
 	KeyCount: "keyCount",
 	SwordAttackActive: "attackActive",
 	DefeatedBosses: "DefeatedBosses",
+	CollectedItems: "itemsRemoved",
+	RevealedItems: "itemsRevealed",
+	ItemObjectId: "objectId",
 };
 
 export type Region = "MK" | "IK" | "CK" | "FK" | "PK" | "SK";
