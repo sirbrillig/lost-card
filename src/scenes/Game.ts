@@ -1388,23 +1388,28 @@ export class Game extends Scene {
 		});
 	}
 
-	showHiddenItem(name: string) {
-		const item = this.createdItems.find((item) => {
+	getAllHiddenItemsInRoom(): Phaser.Types.Physics.Arcade.SpriteWithDynamicBody[] {
+		return this.createdItems.filter((item) => {
 			if (!this.enemyManager.activeRoom) {
 				return false;
 			}
-			return (
-				item.name === name &&
-				isPointInRoom(item.x, item.y, this.enemyManager.activeRoom)
-			);
+			if (!isPointInRoom(item.x, item.y, this.enemyManager.activeRoom)) {
+				return false;
+			}
+			if (!item.data.get("hidden")) {
+				return false;
+			}
+			return true;
 		});
-		if (!item) {
-			return;
-		}
-		if (!item.data.get("hidden")) {
-			return;
-		}
+	}
 
+	showAllHiddenItemsInRoom() {
+		this.getAllHiddenItemsInRoom().map((item) => {
+			this.showHiddenItem(item);
+		});
+	}
+
+	showHiddenItem(item: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody) {
 		const itemId = item.data.get(DataKeys.ItemObjectId);
 		if (itemId) {
 			const shownItems = this.registry.get(DataKeys.RevealedItems) ?? [];
@@ -2290,7 +2295,7 @@ export class Game extends Scene {
 					);
 					this.enemyManager.enemies.add(monster);
 					monster.once("defeated", () => {
-						this.showHiddenItem("SpiritCard");
+						this.showAllHiddenItemsInRoom();
 					});
 					break;
 				}
@@ -2332,7 +2337,7 @@ export class Game extends Scene {
 						point.y
 					);
 					monster.once(Events.MonsterDefeated, () => {
-						this.showHiddenItem("IceCard");
+						this.showAllHiddenItemsInRoom();
 					});
 					this.enemyManager.enemies.add(monster);
 					break;
@@ -2389,9 +2394,7 @@ export class Game extends Scene {
 					);
 					boss.once(Events.MonsterDefeated, () => {
 						this.markBossDefeated("MountainBoss");
-						this.showHiddenItem("WindCard");
-						this.showHiddenItem("PotionBottle");
-						this.showHiddenItem("Key");
+						this.showAllHiddenItemsInRoom();
 						this.saveGame();
 					});
 					this.enemyManager.enemies.add(boss);
@@ -2404,8 +2407,7 @@ export class Game extends Scene {
 					const boss = new IceBoss(this, this.enemyManager, point.x, point.y);
 					boss.once(Events.MonsterDefeated, () => {
 						this.markBossDefeated("IceBoss");
-						this.showHiddenItem("PotionBottle");
-						this.showHiddenItem("Key");
+						this.showAllHiddenItemsInRoom();
 						this.saveGame();
 					});
 					this.enemyManager.enemies.add(boss);
@@ -2418,8 +2420,7 @@ export class Game extends Scene {
 					const boss = new CloudBoss(this, this.enemyManager, point.x, point.y);
 					boss.once(Events.MonsterDefeated, () => {
 						this.markBossDefeated("CloudBoss");
-						this.showHiddenItem("PotionBottle");
-						this.showHiddenItem("Key");
+						this.showAllHiddenItemsInRoom();
 						this.saveGame();
 					});
 					this.enemyManager.enemies.add(boss);
@@ -2437,8 +2438,7 @@ export class Game extends Scene {
 					);
 					boss.once(Events.MonsterDefeated, () => {
 						this.markBossDefeated("SpiritBoss");
-						this.showHiddenItem("PotionBottle");
-						this.showHiddenItem("Key");
+						this.showAllHiddenItemsInRoom();
 						this.saveGame();
 					});
 					this.enemyManager.enemies.add(boss);
@@ -2451,8 +2451,7 @@ export class Game extends Scene {
 					const boss = new PlantBoss(this, this.enemyManager, point.x, point.y);
 					boss.once(Events.MonsterDefeated, () => {
 						this.markBossDefeated("PlantBoss");
-						this.showHiddenItem("PotionBottle");
-						this.showHiddenItem("Key");
+						this.showAllHiddenItemsInRoom();
 						this.saveGame();
 					});
 					this.enemyManager.enemies.add(boss);
@@ -2465,8 +2464,7 @@ export class Game extends Scene {
 					const boss = new FireBoss(this, this.enemyManager, point.x, point.y);
 					boss.once(Events.MonsterDefeated, () => {
 						this.markBossDefeated("FireBoss");
-						this.showHiddenItem("PotionBottle");
-						this.showHiddenItem("Key");
+						this.showAllHiddenItemsInRoom();
 						this.saveGame();
 					});
 					this.enemyManager.enemies.add(boss);
