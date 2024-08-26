@@ -1219,109 +1219,148 @@ export class Game extends Scene {
 			if (timeSinceApproach < msAfterApproach) {
 				return;
 			}
+
+			const previewBeforeAppear: number =
+				tile.data.get("previewBeforeAppear") ?? 0;
+			if (previewBeforeAppear > 0) {
+				return this.dropTransientTile(tile, previewBeforeAppear);
+			}
+
 			this.showTransientTile(tile);
 		});
 	}
 
-	showTransientTile(tile: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody) {
-		const previewBeforeAppear: number =
-			tile.data.get("previewBeforeAppear") ?? 0;
+	dropTransientTile(
+		tile: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody,
+		speed: number
+	) {
 		tile.setVisible(true);
-		tile.alpha = 0.4;
-		this.time.addEvent({
-			delay: previewBeforeAppear,
-			callback: () => {
-				tile.alpha = 1;
-				tile.data.set("hidden", false);
-				tile.body.pushable = false;
-				this.physics.add.collider(this.player, tile, () => {
-					if (this.player.data.get("isPlantCardGrappleActive")) {
-						console.log("end plant card");
-						// In case we were being pulled by the PlantCard
-						this.player.data.set("isPlantCardGrappleActive", false);
-						this.power.anims.stop();
-						this.power.visible = false;
-					}
-					if (tile.name === "TutorialSign") {
-						this.showDialog({
-							heading: "The door is shut",
-							text: "Once, cards of power protected the kingdoms, but the cards have been lost. Monsters have sealed the people behind this door.",
-						});
-					}
-					if (tile.name === "MapSign") {
-						this.showDialog({
-							heading: "View the map",
-							text: "Press TAB or M to pause and view the map.",
-						});
-					}
-					if (tile.name === "SwordSign") {
-						this.showDialog({
-							heading: "Get a weapon",
-							text: "It would be unwise to face the monsters unarmed. Visit the armory south of the throne room.",
-						});
-					}
-					if (tile.name === "ArmorySign") {
-						this.showDialog({
-							heading: "The Armory",
-							text: "It would be unwise to face the monsters unarmed. Find a weapon in here.",
-						});
-					}
-				});
-				this.physics.add.collider(
-					this.enemyManager.enemies,
-					tile,
-					(_, enemy) => {
-						if (!isDynamicSprite(enemy)) {
-							return;
-						}
-						if (tile.body.velocity.x === 0 && tile.body.velocity.y === 0) {
-							return;
-						}
-						console.log("hit enemy with rock");
-						this.sendHitToEnemy(enemy);
-					},
-					(tile, enemy) => {
-						if (!isDynamicSprite(enemy)) {
-							console.error(enemy);
-							throw new Error("Non-sprite ran into something");
-						}
-						if (!isEnemy(enemy)) {
-							console.error(enemy);
-							throw new Error("Non-enemy ran into something");
-						}
-						return enemy.doesCollideWithTile(tile);
-					}
-				);
-				this.physics.add.collider(this.stuffLayer, tile);
-				// Allow destroying rocks by pushing into walls so you can't block
-				// yourself in a room.
-				this.physics.add.collider(this.landLayer, tile, (collideTile) => {
-					if (!isDynamicSprite(collideTile)) {
-						return;
-					}
-					if (collideTile.data.get("beingPushed")) {
-						console.log("hit wall with rock");
-						this.destroyCreatedTile(tile);
-					}
-				});
-				this.physics.add.collider(this.createdDoors, tile, (_, collideTile) => {
-					if (!isDynamicSprite(collideTile)) {
-						return;
-					}
-					if (collideTile.data.get("beingPushed")) {
-						console.log("hit door with rock");
-						this.destroyCreatedTile(tile);
-					}
-				});
-
-				if (this.physics.overlap(this.player, tile)) {
-					console.log("hit player with tile");
-					this.enemyHitPlayer();
-				}
-
-				this.createdTiles.push(tile);
+		const tileFinalHeight = tile.y;
+		const tileInitialHeight = 70;
+		const tileInitialAlpha = 0.4;
+		let height = tile.y - tileInitialHeight;
+		let alpha = tileInitialAlpha;
+		tile.setAlpha(alpha);
+		tile.setPosition(tile.x, height);
+		this.tweens.add({
+			targets: tile,
+			x: tile.x,
+			y: tileFinalHeight,
+			duration: speed,
+			onComplete: () => {
+				this.showTransientTile(tile);
+				this.rockDestroySound.play();
 			},
 		});
+	}
+
+	showTransientTile(tile: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody) {
+		tile.setVisible(true);
+		tile.setAlpha(1);
+		tile.data.set("hidden", false);
+		tile.body.pushable = false;
+		this.physics.add.collider(this.player, tile, () => {
+			if (this.player.data.get("isPlantCardGrappleActive")) {
+				console.log("end plant card");
+				// In case we were being pulled by the PlantCard
+				this.player.data.set("isPlantCardGrappleActive", false);
+				this.power.anims.stop();
+				this.power.visible = false;
+			}
+			if (tile.name === "TutorialSign") {
+				this.showDialog({
+					heading: "The door is shut",
+					text: "Once, cards of power protected the kingdoms, but the cards have been lost. Monsters have sealed the people behind this door.",
+				});
+			}
+			if (tile.name === "MapSign") {
+				this.showDialog({
+					heading: "View the map",
+					text: "Press TAB or M to pause and view the map.",
+				});
+			}
+			if (tile.name === "SwordSign") {
+				this.showDialog({
+					heading: "Get a weapon",
+					text: "It would be unwise to face the monsters unarmed. Visit the armory south of the throne room.",
+				});
+			}
+			if (tile.name === "ArmorySign") {
+				this.showDialog({
+					heading: "The Armory",
+					text: "It would be unwise to face the monsters unarmed. Find a weapon in here.",
+				});
+			}
+		});
+		this.physics.add.collider(
+			this.enemyManager.enemies,
+			tile,
+			(_, enemy) => {
+				if (!isDynamicSprite(enemy)) {
+					return;
+				}
+				if (tile.body.velocity.x === 0 && tile.body.velocity.y === 0) {
+					return;
+				}
+				console.log("hit enemy with rock");
+				this.sendHitToEnemy(enemy);
+			},
+			(tile, enemy) => {
+				if (!isDynamicSprite(enemy)) {
+					console.error(enemy);
+					throw new Error("Non-sprite ran into something");
+				}
+				if (!isEnemy(enemy)) {
+					console.error(enemy);
+					throw new Error("Non-enemy ran into something");
+				}
+				return enemy.doesCollideWithTile(tile);
+			}
+		);
+		this.physics.add.collider(this.stuffLayer, tile);
+		// Allow destroying rocks by pushing into walls so you can't block
+		// yourself in a room.
+		this.physics.add.collider(this.landLayer, tile, (collideTile) => {
+			if (!isDynamicSprite(collideTile)) {
+				return;
+			}
+			if (collideTile.data.get("beingPushed")) {
+				console.log("hit wall with rock");
+				this.destroyCreatedTile(tile);
+			}
+		});
+		this.physics.add.collider(this.createdDoors, tile, (_, collideTile) => {
+			if (!isDynamicSprite(collideTile)) {
+				return;
+			}
+			if (collideTile.data.get("beingPushed")) {
+				console.log("hit door with rock");
+				this.destroyCreatedTile(tile);
+			}
+		});
+
+		if (this.physics.overlap(this.player, tile)) {
+			console.log("hit player with tile");
+			this.enemyHitPlayer();
+		}
+
+		this.createdTiles.push(tile);
+
+		if (this.enemyManager.activeRoom) {
+			// Just in case the tile was created outside the current room.
+			hideAllRoomsExcept(
+				this.map,
+				this.enemyManager.enemies,
+				[
+					...this.createdItems,
+					...this.createdTiles,
+					...this.createdDoors,
+					...this.createdFinalDoors,
+					...this.createdSavePoints,
+				],
+				this.enemyManager.activeRoom
+			);
+		}
 	}
 
 	hideHiddenItems() {
