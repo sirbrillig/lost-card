@@ -130,7 +130,7 @@ export class Game extends Scene {
 	firePowerVelocity: number = 120;
 	gateCloseSpeed: number = 340;
 	newRegionMessageTime: number = 1000;
-	initialPotionCount: number = 3;
+	initialPotionCount: number = 2;
 	chanceToDropPotion: number = 20;
 
 	map: Phaser.Tilemaps.Tilemap;
@@ -1465,7 +1465,7 @@ export class Game extends Scene {
 				case "Sword":
 					this.pickUpSword();
 					break;
-				case "Potion":
+				case "PotionBottle":
 					this.pickUpPotion();
 					break;
 				case "PotionVial":

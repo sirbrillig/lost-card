@@ -4602,7 +4602,7 @@
                  "gid":2791,
                  "height":16,
                  "id":174,
-                 "name":"Potion",
+                 "name":"PotionBottle",
                  "rotation":0,
                  "type":"",
                  "visible":true,
@@ -4662,7 +4662,7 @@
                  "gid":2791,
                  "height":16,
                  "id":578,
-                 "name":"Potion",
+                 "name":"PotionBottle",
                  "rotation":0,
                  "type":"",
                  "visible":true,
@@ -4674,7 +4674,7 @@
                  "gid":2791,
                  "height":16,
                  "id":375,
-                 "name":"Potion",
+                 "name":"PotionBottle",
                  "properties":[
                         {
                          "name":"hidden",
@@ -4692,7 +4692,7 @@
                  "gid":2791,
                  "height":16,
                  "id":376,
-                 "name":"Potion",
+                 "name":"PotionBottle",
                  "rotation":0,
                  "type":"",
                  "visible":true,
@@ -4728,7 +4728,7 @@
                  "gid":2791,
                  "height":16,
                  "id":405,
-                 "name":"Potion",
+                 "name":"PotionBottle",
                  "properties":[
                         {
                          "name":"hidden",
@@ -4746,7 +4746,7 @@
                  "gid":2791,
                  "height":16,
                  "id":406,
-                 "name":"Potion",
+                 "name":"PotionBottle",
                  "properties":[
                         {
                          "name":"hidden",
@@ -4764,7 +4764,7 @@
                  "gid":2791,
                  "height":16,
                  "id":407,
-                 "name":"Potion",
+                 "name":"PotionBottle",
                  "rotation":0,
                  "type":"",
                  "visible":true,
@@ -4818,7 +4818,7 @@
                  "gid":2791,
                  "height":16,
                  "id":538,
-                 "name":"Potion",
+                 "name":"PotionBottle",
                  "properties":[
                         {
                          "name":"hidden",
@@ -4836,7 +4836,7 @@
                  "gid":2791,
                  "height":16,
                  "id":539,
-                 "name":"Potion",
+                 "name":"PotionBottle",
                  "properties":[
                         {
                          "name":"hidden",
@@ -4962,7 +4962,7 @@
                  "gid":2791,
                  "height":16,
                  "id":560,
-                 "name":"Potion",
+                 "name":"PotionBottle",
                  "properties":[
                         {
                          "name":"hidden",
@@ -4989,10 +4989,10 @@
                  "y":2301.73
                 }, 
                 {
-                 "gid":2791,
+                 "gid":2799,
                  "height":16,
                  "id":577,
-                 "name":"Potion",
+                 "name":"PotionVial",
                  "rotation":0,
                  "type":"",
                  "visible":true,
@@ -5004,7 +5004,7 @@
                  "gid":2791,
                  "height":16,
                  "id":641,
-                 "name":"Potion",
+                 "name":"PotionBottle",
                  "rotation":0,
                  "type":"",
                  "visible":true,
@@ -5025,10 +5025,10 @@
                  "y":1504
                 }, 
                 {
-                 "gid":2791,
+                 "gid":2799,
                  "height":16,
                  "id":658,
-                 "name":"Potion",
+                 "name":"PotionVial",
                  "rotation":0,
                  "type":"",
                  "visible":true,
@@ -5037,10 +5037,10 @@
                  "y":1488
                 }, 
                 {
-                 "gid":2791,
+                 "gid":2799,
                  "height":16,
                  "id":659,
-                 "name":"Potion",
+                 "name":"PotionVial",
                  "rotation":0,
                  "type":"",
                  "visible":true,

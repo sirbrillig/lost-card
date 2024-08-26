@@ -8530,7 +8530,7 @@
  </objectgroup>
  <objectgroup id="8" name="Items">
   <object id="173" name="Sword" gid="2710" x="1504" y="1376" width="11.3856" height="11.3856"/>
-  <object id="174" name="Potion" gid="2791" x="1344.49" y="1598.73" width="16" height="16"/>
+  <object id="174" name="PotionBottle" gid="2791" x="1344.49" y="1598.73" width="16" height="16"/>
   <object id="176" name="WindCard" gid="2897" x="1455.52" y="130.901" width="16" height="16">
    <properties>
     <property name="hidden" type="bool" value="true"/>
@@ -8542,26 +8542,26 @@
    </properties>
   </object>
   <object id="374" name="PotionVial" gid="2823" x="1470.52" y="381.114" width="16" height="16"/>
-  <object id="578" name="Potion" gid="2791" x="1297.71" y="975.803" width="16" height="16"/>
-  <object id="375" name="Potion" gid="2791" x="1474.44" y="130.818" width="16" height="16">
+  <object id="578" name="PotionBottle" gid="2791" x="1297.71" y="975.803" width="16" height="16"/>
+  <object id="375" name="PotionBottle" gid="2791" x="1474.44" y="130.818" width="16" height="16">
    <properties>
     <property name="hidden" type="bool" value="true"/>
    </properties>
   </object>
-  <object id="376" name="Potion" gid="2791" x="1796.15" y="2401.62" width="16" height="16"/>
+  <object id="376" name="PotionBottle" gid="2791" x="1796.15" y="2401.62" width="16" height="16"/>
   <object id="378" name="PotionVial" gid="2823" x="2000.84" y="1870.13" width="16" height="16"/>
   <object id="403" name="PlantCard" gid="2878" x="1048.6" y="1882.21" width="16" height="16"/>
-  <object id="405" name="Potion" gid="2791" x="959.42" y="2578.61" width="16" height="16">
+  <object id="405" name="PotionBottle" gid="2791" x="959.42" y="2578.61" width="16" height="16">
    <properties>
     <property name="hidden" type="bool" value="true"/>
    </properties>
   </object>
-  <object id="406" name="Potion" gid="2791" x="1887.92" y="2656.04" width="16" height="16">
+  <object id="406" name="PotionBottle" gid="2791" x="1887.92" y="2656.04" width="16" height="16">
    <properties>
     <property name="hidden" type="bool" value="true"/>
    </properties>
   </object>
-  <object id="407" name="Potion" gid="2791" x="1584.1" y="1839.14" width="16" height="16"/>
+  <object id="407" name="PotionBottle" gid="2791" x="1584.1" y="1839.14" width="16" height="16"/>
   <object id="472" name="FireCard" gid="2871" x="3136" y="2160" width="16" height="16"/>
   <object id="506" name="CloudCard" gid="2873" x="691.769" y="1474.13" width="16" height="16"/>
   <object id="537" name="SpiritCard" gid="2890" x="2846.72" y="1655.2" width="16" height="16">
@@ -8569,12 +8569,12 @@
     <property name="hidden" type="bool" value="true"/>
    </properties>
   </object>
-  <object id="538" name="Potion" gid="2791" x="2560.23" y="1522.74" width="16" height="16">
+  <object id="538" name="PotionBottle" gid="2791" x="2560.23" y="1522.74" width="16" height="16">
    <properties>
     <property name="hidden" type="bool" value="true"/>
    </properties>
   </object>
-  <object id="539" name="Potion" gid="2791" x="530.082" y="1376.27" width="16" height="16">
+  <object id="539" name="PotionBottle" gid="2791" x="530.082" y="1376.27" width="16" height="16">
    <properties>
     <property name="hidden" type="bool" value="true"/>
    </properties>
@@ -8609,17 +8609,17 @@
     <property name="hidden" type="bool" value="true"/>
    </properties>
   </object>
-  <object id="560" name="Potion" gid="2791" x="2864.49" y="2529.33" width="16" height="16">
+  <object id="560" name="PotionBottle" gid="2791" x="2864.49" y="2529.33" width="16" height="16">
    <properties>
     <property name="hidden" type="bool" value="true"/>
    </properties>
   </object>
   <object id="576" name="PotionVial" gid="2823" x="2928.74" y="2301.73" width="16" height="16"/>
-  <object id="577" name="Potion" gid="2791" x="2879.41" y="1806.09" width="16" height="16"/>
-  <object id="641" name="Potion" gid="2791" x="845.678" y="2030.97" width="16" height="16"/>
+  <object id="577" name="PotionVial" gid="2799" x="2879.41" y="1806.09" width="16" height="16"/>
+  <object id="641" name="PotionBottle" gid="2791" x="845.678" y="2030.97" width="16" height="16"/>
   <object id="657" name="PotionVial" gid="2823" x="464" y="1504" width="16" height="16"/>
-  <object id="658" name="Potion" gid="2791" x="704" y="1488" width="16" height="16"/>
-  <object id="659" name="Potion" gid="2791" x="1050.1" y="1858.35" width="16" height="16"/>
+  <object id="658" name="PotionVial" gid="2799" x="704" y="1488" width="16" height="16"/>
+  <object id="659" name="PotionVial" gid="2799" x="1050.1" y="1858.35" width="16" height="16"/>
   <object id="660" name="PotionVial" gid="2823" x="816" y="2336" width="16" height="16"/>
   <object id="661" name="PotionVial" gid="2823" x="1616" y="1664" width="16" height="16"/>
   <object id="662" name="PotionVial" gid="2823" x="1984" y="2432" width="16" height="16"/>
