@@ -18,7 +18,7 @@ type AllStates =
 	| "throwrocks";
 
 export class MountainBoss extends BaseMonster<AllStates> {
-	hitPoints: number = 10;
+	hitPoints: number = 14;
 	enemyManager: EnemyManager;
 
 	constructor(
@@ -90,6 +90,7 @@ export class MountainBoss extends BaseMonster<AllStates> {
 	}
 
 	constructNewBehaviorFor(state: AllStates) {
+		const isBloodied = this.hitPoints < 5;
 		const createMonster = () => {
 			if (!this.body) {
 				throw new Error("monster is invalid");
@@ -119,13 +120,15 @@ export class MountainBoss extends BaseMonster<AllStates> {
 					createMonster,
 				});
 			case "leftrightmarch":
-				return new LeftRightMarch(state, "throwrocks", { speed: 80 });
+				return new LeftRightMarch(state, "throwrocks", {
+					speed: isBloodied ? 100 : 80,
+				});
 			case "throwrocks":
 				return new ThrowRocks(state, "roar1", {
 					speed: 500,
-					rockCount: 3,
+					rockCount: isBloodied ? 5 : 3,
 					delayBeforeEnd: 1200,
-					delayBetweenRocks: 600,
+					delayBetweenRocks: isBloodied ? 450 : 600,
 				});
 		}
 	}

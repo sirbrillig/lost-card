@@ -1275,9 +1275,10 @@ export class IceBeam<AllStates extends string>
 	attackSpeed = 150;
 	name: AllStates;
 
-	constructor(name: AllStates, nextState: AllStates) {
+	constructor(name: AllStates, nextState: AllStates, attackSpeed: number) {
 		this.name = name;
 		this.#nextState = nextState;
+		this.attackSpeed = attackSpeed;
 	}
 
 	init(

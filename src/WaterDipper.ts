@@ -31,6 +31,8 @@ export class WaterDipper extends BaseMonster<AllStates> {
 		return true;
 	}
 
+	initSprites() {}
+
 	getInitialState(): AllStates {
 		return "waterteleport";
 	}

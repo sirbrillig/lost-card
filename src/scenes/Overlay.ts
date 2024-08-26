@@ -114,8 +114,11 @@ class PotionItem {
 	}
 
 	update() {
-		this.totalPotions = this.scene.registry.get(DataKeys.PotionCount) ?? 0;
-		this.countLabel.setText(`${this.totalPotions}`);
+		const totalPotions = this.scene.registry.get(DataKeys.PotionCount) ?? 0;
+		if (this.totalPotions !== totalPotions) {
+			this.totalPotions = totalPotions;
+			this.countLabel.setText(`${this.totalPotions}`);
+		}
 	}
 
 	destroy() {
@@ -161,6 +164,7 @@ class Heart {
 export class Overlay extends Scene {
 	items: (Card | PotionItem)[] = [];
 	hearts: Heart[] = [];
+	keyCount: number = 0;
 	totalHearts: number = 0;
 	activeHearts: number = 0;
 	bg: Phaser.GameObjects.NineSlice;
@@ -174,6 +178,7 @@ export class Overlay extends Scene {
 
 	create() {
 		console.log("creating overlay");
+		this.keyCount = this.getKeyCount();
 		this.items.forEach((item) => item.destroy());
 		this.items = [];
 		this.hearts.forEach((item) => item.destroy());
@@ -332,7 +337,7 @@ export class Overlay extends Scene {
 				.setDepth(9)
 				.setOrigin(0.5);
 		}
-		this.keyCountLabel.setText(`${this.getKeyCount()}`);
+		this.keyCountLabel.setText(`${this.keyCount}`);
 	}
 
 	getKeyCount(): number {
@@ -373,6 +378,7 @@ export class Overlay extends Scene {
 	update() {
 		const totalHearts = this.registry.get("playerTotalHitPoints") ?? 0;
 		const activeHearts = this.registry.get("playerHitPoints") ?? 0;
+		const keyCount = this.getKeyCount();
 
 		if (this.totalHearts !== totalHearts) {
 			console.log("resetting hearts");
@@ -399,7 +405,10 @@ export class Overlay extends Scene {
 		this.bg.setSize(this.getBackgroundWidth(), this.getBackgroundHeight());
 
 		this.updateItems();
-		this.updateKeys();
+		if (keyCount !== this.keyCount) {
+			this.keyCount = keyCount;
+			this.updateKeys();
+		}
 		this.updateSelectedItem();
 	}
 

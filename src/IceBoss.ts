@@ -1,4 +1,4 @@
-import { Events, DataKeys } from "./shared";
+import { DataKeys } from "./shared";
 import { isTileWithPropertiesObject } from "./shared";
 import { EnemyManager } from "./EnemyManager";
 import {
@@ -13,7 +13,7 @@ import { BaseMonster } from "./BaseMonster";
 type AllStates = "initial" | "roar1" | "leftrightmarch" | "powerup" | "icebeam";
 
 export class IceBoss extends BaseMonster<AllStates> {
-	hitPoints: number = 8;
+	hitPoints: number = 10;
 
 	constructor(
 		scene: Phaser.Scene,
@@ -47,13 +47,6 @@ export class IceBoss extends BaseMonster<AllStates> {
 			}),
 			frameRate: 10,
 			repeat: 8,
-		});
-		this.anims.create({
-			key: "explode-boss",
-			frames: this.anims.generateFrameNumbers("monster_explode1"),
-			frameRate: 24,
-			repeat: 4,
-			repeatDelay: 2,
 		});
 
 		this.anims.create({
@@ -89,31 +82,21 @@ export class IceBoss extends BaseMonster<AllStates> {
 	}
 
 	constructNewBehaviorFor(state: AllStates) {
+		const isBloodied = this.hitPoints < 5;
 		switch (state) {
 			case "initial":
 				return new WaitForActive(state, "roar1");
 			case "roar1":
 				return new Roar(state, "leftrightmarch");
 			case "leftrightmarch":
-				return new LeftRightMarch(state, "powerup");
+				return new LeftRightMarch(state, "powerup", {
+					speed: isBloodied ? 90 : 70,
+				});
 			case "powerup":
 				return new PowerUp(state, "icebeam");
 			case "icebeam":
-				return new IceBeam(state, "leftrightmarch");
+				return new IceBeam(state, "leftrightmarch", isBloodied ? 200 : 150);
 		}
-	}
-
-	kill() {
-		this.emit(Events.MonsterDying);
-		this.setVelocity(0);
-		this.data.set("stunned", true);
-		this.setOrigin(0.5, 0.3);
-		this.setDisplaySize(this.width * 2, this.height * 2);
-		this.anims.play("explode-boss", true);
-		this.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
-			this.emit(Events.MonsterDefeated);
-			this.destroy();
-		});
 	}
 
 	isHittable(): boolean {
