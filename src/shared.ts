@@ -676,7 +676,6 @@ export function loadSavedRegistry(
 	saveData: SaveData
 ): void {
 	Object.keys(saveData).forEach((key) => {
-		console.log("key", key, saveData[key]);
 		registry.set(key, saveData[key]);
 	});
 }
@@ -684,12 +683,10 @@ export function loadSavedRegistry(
 export function loadSavedData(): SaveData | undefined {
 	const rawSaveData = localStorage.getItem("lost-card-save");
 	if (!rawSaveData) {
-		console.log("no save data");
 		return undefined;
 	}
 	const saveData = JSON.parse(rawSaveData);
 	if (saveData?.playerX === undefined || saveData.playerY === undefined) {
-		console.log("no save point found for save data");
 		return undefined;
 	}
 	return saveData;

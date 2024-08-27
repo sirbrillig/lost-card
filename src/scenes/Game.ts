@@ -721,6 +721,9 @@ export class Game extends Scene {
 	}
 
 	saveGame() {
+		if (this.getPlayerHitPoints() === 0) {
+			return;
+		}
 		this.saveSound.play();
 		localStorage.setItem("lost-card-save", JSON.stringify(this.getSaveData()));
 		MainEvents.emit(Events.GameSaved);
