@@ -8934,10 +8934,10 @@
     <property name="affectedByWindCard" type="bool" value="false"/>
    </properties>
   </object>
-  <object id="355" gid="2301" x="1712.85" y="2255.75" width="16" height="16"/>
-  <object id="356" gid="2301" x="1841.94" y="2287.36" width="16" height="16"/>
-  <object id="357" gid="2301" x="1724.44" y="2354.28" width="16" height="16"/>
-  <object id="358" gid="2301" x="1808.22" y="2318.98" width="16" height="16"/>
+  <object id="355" gid="2301" x="1712.85" y="2238.99" width="16" height="16"/>
+  <object id="356" gid="2301" x="1843.34" y="2299" width="16" height="16"/>
+  <object id="357" gid="2301" x="1744.92" y="2367.78" width="16" height="16"/>
+  <object id="358" gid="2301" x="1789.6" y="2306.41" width="16" height="16"/>
   <object id="411" gid="2301" x="1424" y="2240" width="16" height="16"/>
   <object id="412" gid="2301" x="1488" y="2288" width="16" height="16"/>
   <object id="413" gid="2301" x="1343.59" y="2240.83" width="16" height="16"/>
