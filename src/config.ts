@@ -1,5 +1,5 @@
 export const config = {
-	characterSpeed: 90,
+	characterSpeed: 100,
 	cloudCardSpeed: 450,
 	postAttackCooldown: 150,
 	postPowerCooldown: 600,
