@@ -697,11 +697,11 @@ export class PowerUp<AllStates extends string>
 		effect.anims.play("powerup", true);
 		sprite.scene.sound.play("ice-charge");
 		sprite.once(Events.MonsterDying, () => {
-			sprite.scene.sound.stopByKey("ice-charge");
+			sprite.scene?.sound.stopByKey("ice-charge");
 			effect?.destroy();
 		});
 		effect.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
-			sprite.scene.sound.stopByKey("ice-charge");
+			sprite.scene?.sound.stopByKey("ice-charge");
 			effect.destroy();
 			stateMachine.popState();
 			stateMachine.pushState(this.#nextState);
@@ -1134,7 +1134,7 @@ export class RangedIceBall<AllStates extends string>
 		});
 
 		sprite.once(Events.MonsterDying, () => {
-			sprite.scene.sound.stopByKey("ice");
+			sprite.scene?.sound.stopByKey("ice");
 			effect?.destroy();
 		});
 
@@ -1340,7 +1340,7 @@ export class IceBeam<AllStates extends string>
 		);
 
 		sprite.scene.physics.add.overlap(enemyManager.player, effect, () => {
-			sprite.scene.sound.stopByKey("freeze");
+			sprite.scene?.sound.stopByKey("freeze");
 			MainEvents.emit(Events.EnemyHitPlayer, true);
 			effect.destroy();
 			stateMachine.popState();
@@ -1348,11 +1348,11 @@ export class IceBeam<AllStates extends string>
 		});
 
 		sprite.once(Events.MonsterDying, () => {
-			sprite.scene.sound.stopByKey("freeze");
+			sprite.scene?.sound.stopByKey("freeze");
 			effect?.destroy();
 		});
 		effect.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
-			sprite.scene.sound.stopByKey("freeze");
+			sprite.scene?.sound.stopByKey("freeze");
 			effect.destroy();
 			stateMachine.popState();
 			stateMachine.pushState(this.#nextState);
@@ -1623,7 +1623,7 @@ export class FollowPlayer<AllStates extends string>
 		);
 		if (this.#awareDistance) {
 			if (distance > this.#awareDistance) {
-				sprite.scene.sound.stopByKey("water-walk");
+				sprite.scene?.sound.stopByKey("water-walk");
 				sprite.body.stop();
 				stateMachine.popState();
 				stateMachine.pushState(this.#nextState);
@@ -1643,11 +1643,11 @@ export class FollowPlayer<AllStates extends string>
 			this.#speed
 		);
 		if (
-			!sprite.scene.sound
-				.getAllPlaying()
-				.some((sound) => sound.key === "water-walk")
+			!(sprite.scene.sound?.getAllPlaying() ?? []).some(
+				(sound) => sound.key === "water-walk"
+			)
 		) {
-			sprite.scene.sound.play("water-walk");
+			sprite.scene?.sound.play("water-walk");
 		}
 		const direction = getDirectionOfSpriteMovement(sprite.body);
 		if (!direction) {
