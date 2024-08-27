@@ -249,32 +249,47 @@ export class Overlay extends Scene {
 			this.togglePause();
 		});
 		this.input.keyboard.on("keydown-CLOSED_BRACKET", () => {
-			// Rotate Active Power
-			const available = powerOrder.filter((power) =>
-				this.isPowerEquipped(power)
-			);
-			const active = this.getActivePower();
-			if (!active) {
-				return;
-			}
-			const current = available.indexOf(active);
-			const nextPower = available[current + 1] ?? available[0];
-			this.setActivePower(nextPower);
+			this.rotatePowerRight();
 		});
 		this.input.keyboard.on("keydown-OPEN_BRACKET", () => {
-			// Rotate Active Power
-			const available = powerOrder.filter((power) =>
-				this.isPowerEquipped(power)
-			);
-			const active = this.getActivePower();
-			if (!active) {
-				return;
-			}
-			const current = available.indexOf(active);
-			const nextPower =
-				available[current - 1] ?? available[available.length - 1];
-			this.setActivePower(nextPower);
+			this.rotatePowerLeft();
 		});
+
+		this.input.gamepad?.on("down", (_: any, button: { index: number }) => {
+			if (this.input.gamepad?.pad1?.L1) {
+				this.rotatePowerLeft();
+			}
+			if (this.input.gamepad?.pad1?.R1) {
+				this.rotatePowerLeft();
+			}
+			if (button.index === 9) {
+				// Start button
+				this.togglePause();
+			}
+		});
+	}
+
+	rotatePowerRight() {
+		// Rotate Active Power
+		const available = powerOrder.filter((power) => this.isPowerEquipped(power));
+		const active = this.getActivePower();
+		if (!active) {
+			return;
+		}
+		const current = available.indexOf(active);
+		const nextPower = available[current + 1] ?? available[0];
+		this.setActivePower(nextPower);
+	}
+
+	rotatePowerLeft() {
+		const available = powerOrder.filter((power) => this.isPowerEquipped(power));
+		const active = this.getActivePower();
+		if (!active) {
+			return;
+		}
+		const current = available.indexOf(active);
+		const nextPower = available[current - 1] ?? available[available.length - 1];
+		this.setActivePower(nextPower);
 	}
 
 	togglePause() {

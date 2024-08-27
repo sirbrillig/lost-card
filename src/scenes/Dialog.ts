@@ -109,6 +109,13 @@ export class Dialog extends Scene {
 			this.scene.resume("Game");
 			this.scene.stop();
 		});
+
+		this.input.gamepad?.on("down", () => {
+			if (this.input.gamepad?.pad1?.A) {
+				this.scene.resume("Game");
+				this.scene.stop();
+			}
+		});
 	}
 
 	update() {}

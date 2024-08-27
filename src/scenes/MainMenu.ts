@@ -53,6 +53,18 @@ export class MainMenu extends Scene {
 		}
 		this.cursors = cursors;
 
+		this.input.gamepad?.on("down", () => {
+			if (this.input.gamepad?.pad1?.A) {
+				this.confirmSelection();
+			}
+			if (this.input.gamepad?.pad1?.up) {
+				this.selectNextButton(-1);
+			}
+			if (this.input.gamepad?.pad1?.down) {
+				this.selectNextButton(1);
+			}
+		});
+
 		if (loadSavedData()) {
 			this.selectNextButton(1);
 		}

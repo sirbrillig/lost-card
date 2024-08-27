@@ -531,6 +531,22 @@ export class Game extends Scene {
 		this.keyR.on("down", () => {
 			this.usePotion();
 		});
+
+		this.input.gamepad?.on("down", () => {
+			if (this.input.gamepad?.pad1?.A) {
+				if (this.canPlayerAttack()) {
+					this.activateAttack();
+				}
+			}
+			if (this.input.gamepad?.pad1?.X) {
+				if (this.canPlayerUsePower()) {
+					this.activatePower();
+				}
+			}
+			if (this.input.gamepad?.pad1?.Y) {
+				this.usePotion();
+			}
+		});
 	}
 
 	usePotion() {
@@ -3052,18 +3068,44 @@ export class Game extends Scene {
 	}
 
 	isPressingLeft(): boolean {
-		return this.keyLeft.isDown || this.keyA.isDown;
+		if (
+			this.keyLeft.isDown ||
+			this.keyA.isDown ||
+			this.input.gamepad?.pad1?.left ||
+			(this.input.gamepad?.pad1?.leftStick.x ?? 0) < 0
+		) {
+			return true;
+		}
+		return false;
 	}
 
 	isPressingRight(): boolean {
+		if (
+			this.input.gamepad?.pad1?.right ||
+			(this.input.gamepad?.pad1?.leftStick.x ?? 0) > 0
+		) {
+			return true;
+		}
 		return this.keyRight.isDown || this.keyD.isDown;
 	}
 
 	isPressingUp(): boolean {
+		if (
+			this.input.gamepad?.pad1?.up ||
+			(this.input.gamepad?.pad1?.leftStick.y ?? 0) < 0
+		) {
+			return true;
+		}
 		return this.keyUp.isDown || this.keyW.isDown;
 	}
 
 	isPressingDown(): boolean {
+		if (
+			this.input.gamepad?.pad1?.down ||
+			(this.input.gamepad?.pad1?.leftStick.y ?? 0) > 0
+		) {
+			return true;
+		}
 		return this.keyDown.isDown || this.keyS.isDown;
 	}
 
