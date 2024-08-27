@@ -260,7 +260,7 @@ export class Overlay extends Scene {
 				this.rotatePowerLeft();
 			}
 			if (this.input.gamepad?.pad1?.R1) {
-				this.rotatePowerLeft();
+				this.rotatePowerRight();
 			}
 			if (button.index === 9) {
 				// Start button
