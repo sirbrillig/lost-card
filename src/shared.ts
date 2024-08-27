@@ -727,3 +727,51 @@ export function moveHitboxInFrontOfSprite(
 	hitbox.x = sprite.body.center.x + xOffset;
 	hitbox.y = sprite.body.center.y + yOffset;
 }
+
+export function getControllerType(
+	scene: Phaser.Scene
+): "dualshock" | "xbox" | undefined {
+	if (scene.input.gamepad?.pad1?.id.toLowerCase().includes("dual")) {
+		return "dualshock";
+	}
+	if (scene.input.gamepad?.pad1?.id.toLowerCase().includes("xbox")) {
+		return "xbox";
+	}
+}
+
+export interface ButtonNames {
+	ok: string;
+	power: string;
+	heal: string;
+	map: string;
+	rotatePower: string;
+}
+
+export function getButtonNames(scene: Phaser.Scene): ButtonNames {
+	switch (getControllerType(scene)) {
+		case "dualshock":
+			return {
+				ok: "X (or A)",
+				power: "SQUARE (or X)",
+				heal: "TRIANGLE (or Y)",
+				map: "START",
+				rotatePower: "L1 and R1",
+			};
+		case "xbox":
+			return {
+				ok: "A",
+				power: "X",
+				heal: "Y",
+				map: "START",
+				rotatePower: "L1 and R1",
+			};
+		default:
+			return {
+				ok: "SPACE",
+				power: "SHIFT",
+				heal: "R or P",
+				map: "TAB or M",
+				rotatePower: "[ and ]",
+			};
+	}
+}

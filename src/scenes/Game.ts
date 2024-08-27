@@ -55,6 +55,7 @@ import {
 	Sound,
 	isPointInRegion,
 	hasXandY,
+	getButtonNames,
 } from "../shared";
 
 export class Game extends Scene {
@@ -1295,7 +1296,7 @@ export class Game extends Scene {
 		if (title === "MapSign") {
 			this.showDialog({
 				heading: "View the map",
-				text: "Press TAB or M to pause and view the map.",
+				text: `Press ${getButtonNames(this).map} to pause and view the map.`,
 			});
 		}
 		if (title === "SwordSign") {
@@ -1663,7 +1664,11 @@ export class Game extends Scene {
 				this.stopSoundEffects();
 				this.showDialog({
 					heading: this.getCardNameForPower(card),
-					text: "Press SHIFT to use the power.\r\nPress [ or ] to change the active power.",
+					text: `Press ${
+						getButtonNames(this).power
+					} to use the power.\r\nPress ${
+						getButtonNames(this).rotatePower
+					} to change the active power.`,
 				});
 				this.setPlayerInvincible(false);
 				this.setPlayerStunned(false);
@@ -1699,7 +1704,9 @@ export class Game extends Scene {
 			this.restorePlayerPotions();
 			this.showDialog({
 				heading: "A magic potion bottle!",
-				text: "Press P or R to restore your health. You can refill the bottle using potion vials found around the kingdoms.",
+				text: `Press ${
+					getButtonNames(this).heal
+				} to restore your health. You can refill the bottle using potion vials found around the kingdoms.`,
 			});
 		} else {
 			this.setPotionTotalCount(this.getPotionTotalCount() + 1);
@@ -1725,7 +1732,7 @@ export class Game extends Scene {
 			callback: () => {
 				this.showDialog({
 					heading: "You found a sword!",
-					text: "Press SPACE to swing.",
+					text: `Press ${getButtonNames(this).ok} to swing.`,
 				});
 				this.setPlayerInvincible(false);
 				this.setPlayerStunned(false);

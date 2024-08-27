@@ -1,4 +1,5 @@
 import { Scene } from "phaser";
+import { getButtonNames } from "../shared";
 
 export interface DialogData {
 	heading: string;
@@ -93,7 +94,7 @@ export class Dialog extends Scene {
 					panelTopLeft.x + panelWidth / 2,
 					panelTopLeft.y + panelHeight - 20,
 					"RetroGamingWhiteSmall",
-					"Press SPACE",
+					`Press ${getButtonNames(this).ok}`,
 					12
 				)
 				.setMaxWidth(panelWidth - 15)
