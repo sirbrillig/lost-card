@@ -71,6 +71,7 @@ export class PlantSpitter extends BaseMonster<AllStates> {
 							this.y
 						);
 						bug.awareDistance = 500;
+						bug.hitPoints = 1;
 						return bug;
 					},
 				});
