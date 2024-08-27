@@ -1,5 +1,5 @@
 import { Scene } from "phaser";
-import { soundKeys } from "../sound";
+import { soundKeys, musicKeys } from "../sound";
 import { config } from "../config";
 import { MainEvents } from "../MainEvents";
 import { EnemyManager } from "../EnemyManager";
@@ -71,7 +71,7 @@ export class Game extends Scene {
 	enemyCollider: Phaser.Physics.Arcade.Collider;
 	isGameOver: boolean = false;
 
-	backgroundMusic: Sound;
+	backgroundMusic: Sound | undefined;
 	attackSound: Sound;
 	destroySound: Sound;
 	gameOverSound: Sound;
@@ -384,8 +384,27 @@ export class Game extends Scene {
 		MainEvents.on(Events.FreezePlayer, (setting: boolean) => {
 			this.setPlayerFrozen(setting);
 		});
+	}
 
-		this.backgroundMusic.play();
+	playMusicForRegion(region: Region) {
+		this.backgroundMusic?.stop();
+		this.backgroundMusic = this.getMusicForRegion(region);
+		this.backgroundMusic?.play();
+	}
+
+	getMusicForRegion(region: Region) {
+		switch (region) {
+			case "MK":
+				return this.sound.add(musicKeys.mountainKingdom, {
+					loop: true,
+					volume: 0.5,
+				});
+			case "IK":
+				return this.sound.add(musicKeys.iceKingdom, {
+					loop: true,
+					volume: 0.9,
+				});
+		}
 	}
 
 	showNotice(text: string, hideAfter: number) {
@@ -847,6 +866,7 @@ export class Game extends Scene {
 			this.player.x + tileWidth,
 			this.player.y + tileHeight
 		);
+		this.playMusicForRegion(getRegionFromRoomName(room.name));
 		this.respawnRegion(getRegionFromRoomName(room.name));
 		this.moveCameraToRoom(room);
 	}
@@ -1016,6 +1036,7 @@ export class Game extends Scene {
 							getRegionName(newRegion),
 							config.newRegionMessageTime
 						);
+						this.playMusicForRegion(getRegionFromRoomName(room.name));
 						this.respawnRegion(newRegion);
 					}
 					this.movePlayerToPoint(destinationX, destinationY);
@@ -1944,10 +1965,6 @@ export class Game extends Scene {
 	}
 
 	preload() {
-		this.backgroundMusic = this.sound.add("mountain-kingdom", {
-			loop: true,
-			volume: 0.5,
-		});
 		this.attackSound = this.sound.add("attack", { loop: false, volume: 0.5 });
 		this.windSound = this.sound.add("wind", { loop: false, volume: 0.8 });
 		this.saveSound = this.sound.add("fire", {
