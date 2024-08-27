@@ -14,6 +14,7 @@ import {
 	Events,
 	getTilesInRoom,
 	createVelocityForDirection,
+	vibrate,
 } from "./shared";
 import { EnemyManager } from "./EnemyManager";
 import { Behavior, BehaviorMachineInterface } from "./behavior";
@@ -115,6 +116,7 @@ export class Roar<AllStates extends string>
 		roar.play();
 		MainEvents.emit(Events.StunPlayer, true);
 		sprite.scene.cameras.main.shake(2000, 0.009);
+		vibrate(sprite.scene, 2, 1800);
 		sprite.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
 			MainEvents.emit(Events.StunPlayer, false);
 			roar.stop();

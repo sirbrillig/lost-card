@@ -56,6 +56,7 @@ import {
 	isPointInRegion,
 	hasXandY,
 	getButtonNames,
+	vibrate,
 } from "../shared";
 
 export class Game extends Scene {
@@ -1085,6 +1086,7 @@ export class Game extends Scene {
 
 	destroyCreatedTile(tile: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody) {
 		this.cameras.main.shake(200, 0.004);
+		vibrate(this, 1, 200);
 
 		this.rockDestroySound.play();
 		tile.setOrigin(0.6, 0.5);
@@ -2631,6 +2633,7 @@ export class Game extends Scene {
 			return;
 		}
 		this.cameras.main.shake(200, 0.004);
+		vibrate(this, 1, 200);
 		enemy.emit(Events.MonsterHit);
 
 		// Knock the player back a bit when they hit an enemy.
@@ -2676,6 +2679,7 @@ export class Game extends Scene {
 
 		this.enemyCollider.active = false;
 		this.cameras.main.shake(300, 0.009);
+		vibrate(this, 2, 300);
 		this.cameras.main.zoomTo(1.5, 600, "Linear", false, (_, progress) => {
 			if (progress === 1) {
 				this.time.addEvent({

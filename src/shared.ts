@@ -775,3 +775,15 @@ export function getButtonNames(scene: Phaser.Scene): ButtonNames {
 			};
 	}
 }
+
+export function vibrate(
+	scene: Phaser.Scene,
+	intensity: 1 | 2,
+	duration: number
+) {
+	scene.input.gamepad?.pad1?.vibration?.playEffect("dual-rumble", {
+		duration,
+		strongMagnitude: intensity === 1 ? 0.1 : 0.3,
+		weakMagnitude: intensity === 1 ? 0.2 : 0.5,
+	});
+}
