@@ -199,6 +199,8 @@ export class Preloader extends Scene {
 		this.load.audio("bonus", ["bonus.wav"]);
 		this.load.audio("key", ["key.wav"]);
 		this.load.audio("heart", ["heart.wav"]);
+
+		this.load.audio("mountain-kingdom", ["mountain_kingdom.mp3"]);
 	}
 
 	create() {

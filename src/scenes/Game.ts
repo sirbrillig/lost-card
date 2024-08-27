@@ -1,4 +1,5 @@
 import { Scene } from "phaser";
+import { soundKeys } from "../sound";
 import { config } from "../config";
 import { MainEvents } from "../MainEvents";
 import { EnemyManager } from "../EnemyManager";
@@ -68,6 +69,7 @@ export class Game extends Scene {
 	enemyCollider: Phaser.Physics.Arcade.Collider;
 	isGameOver: boolean = false;
 
+	backgroundMusic: Sound;
 	attackSound: Sound;
 	destroySound: Sound;
 	gameOverSound: Sound;
@@ -380,6 +382,8 @@ export class Game extends Scene {
 		MainEvents.on(Events.FreezePlayer, (setting: boolean) => {
 			this.setPlayerFrozen(setting);
 		});
+
+		this.backgroundMusic.play();
 	}
 
 	showNotice(text: string, hideAfter: number) {
@@ -1255,8 +1259,14 @@ export class Game extends Scene {
 		});
 	}
 
+	stopSoundEffects() {
+		Object.keys(soundKeys).forEach((key) => {
+			this.sound.stopByKey(key);
+		});
+	}
+
 	showSign(title: string) {
-		this.sound.stopAll();
+		this.stopSoundEffects();
 		if (title === "TutorialSign") {
 			this.showDialog({
 				heading: "The door is shut",
@@ -1549,7 +1559,7 @@ export class Game extends Scene {
 		this.sound.play("key");
 		this.setKeyCount(this.getKeyCount() + 1);
 		this.sound.get("key").on(Phaser.Sound.Events.COMPLETE, () => {
-			this.sound.stopAll();
+			this.stopSoundEffects();
 		});
 		this.showDialog({
 			heading: "A Key",
@@ -1631,7 +1641,7 @@ export class Game extends Scene {
 		this.time.addEvent({
 			delay: config.gotItemFreeze,
 			callback: () => {
-				this.sound.stopAll();
+				this.stopSoundEffects();
 				this.showDialog({
 					heading: this.getCardNameForPower(card),
 					text: "Press SHIFT to use the power.\r\nPress [ or ] to change the active power.",
@@ -1661,7 +1671,7 @@ export class Game extends Scene {
 	pickUpPotion() {
 		this.appearSound.play();
 		this.appearSound.on(Phaser.Sound.Events.COMPLETE, () => {
-			this.sound.stopAll();
+			this.stopSoundEffects();
 		});
 
 		this.restorePlayerHitPoints();
@@ -1687,7 +1697,7 @@ export class Game extends Scene {
 		this.player.anims.play("down-attack", true);
 		this.attackSound.play();
 		this.attackSound.on(Phaser.Sound.Events.COMPLETE, () => {
-			this.sound.stopAll();
+			this.stopSoundEffects();
 		});
 		this.setPlayerInvincible(true);
 		this.setPlayerStunned(true);
@@ -1897,6 +1907,10 @@ export class Game extends Scene {
 	}
 
 	preload() {
+		this.backgroundMusic = this.sound.add("mountain-kingdom", {
+			loop: true,
+			volume: 0.5,
+		});
 		this.attackSound = this.sound.add("attack", { loop: false, volume: 0.5 });
 		this.windSound = this.sound.add("wind", { loop: false, volume: 0.8 });
 		this.saveSound = this.sound.add("fire", {
