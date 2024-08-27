@@ -1740,6 +1740,15 @@ export class Game extends Scene {
 	}
 
 	getPlayerSpeed(): number {
+		const leftRightAmount = Math.abs(
+			this.input.gamepad?.pad1?.leftStick.x ?? 0
+		);
+		const upDownAmount = Math.abs(this.input.gamepad?.pad1?.leftStick.y ?? 0);
+		const amount =
+			leftRightAmount > upDownAmount ? leftRightAmount : upDownAmount;
+		if (amount > 0 && amount < 1) {
+			return config.characterSpeed * amount;
+		}
 		return config.characterSpeed;
 	}
 
