@@ -404,6 +404,11 @@ export class Game extends Scene {
 					loop: true,
 					volume: 0.9,
 				});
+			case "FK":
+				return this.sound.add(musicKeys.fireKingdom, {
+					loop: true,
+					volume: 0.9,
+				});
 		}
 	}
 

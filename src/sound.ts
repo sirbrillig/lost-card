@@ -26,4 +26,5 @@ export const soundKeys = {
 export const musicKeys = {
 	mountainKingdom: "mountain-kingdom",
 	iceKingdom: "ice-kingdom",
+	fireKingdom: "fire-kingdom",
 };
