@@ -20,7 +20,7 @@ export class BaseMonster<AllStates extends string> extends Phaser.Physics.Arcade
 		x: number,
 		y: number,
 		texture: string,
-		initialFrame: number
+		initialFrame: number | string
 	) {
 		super(scene, x, y, texture, initialFrame);
 

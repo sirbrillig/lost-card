@@ -21,14 +21,14 @@ export class FinalBoss extends BaseMonster<AllStates> {
 		x: number,
 		y: number
 	) {
-		super(scene, enemyManager, x, y, "bosses1", 69);
+		super(scene, enemyManager, x, y, "final-boss-atlas", "idle2-0.png");
 
 		if (!this.body) {
 			throw new Error("Could not create monster");
 		}
 
-		this.setSize(this.width * 0.6, this.height * 0.65);
-		this.setOffset(this.body.offset.x, this.body.offset.y + 10);
+		this.setSize(this.width * 0.3, this.height * 0.65);
+		this.setOffset(this.body.offset.x - 12, this.body.offset.y + 10);
 		this.setOrigin(0.5, 0.75);
 		this.data.set(DataKeys.Freezable, false);
 	}
@@ -40,46 +40,51 @@ export class FinalBoss extends BaseMonster<AllStates> {
 	initSprites() {
 		this.anims.create({
 			key: "roar",
-			frames: this.anims.generateFrameNumbers("bosses1", {
-				start: 57,
-				end: 59,
+			frames: this.anims.generateFrameNames("final-boss-atlas", {
+				prefix: "idle2-",
+				suffix: ".png",
+				end: 7,
 			}),
 			frameRate: 10,
-			repeat: 8,
+			repeat: 4,
 		});
 
 		this.anims.create({
 			key: "left",
-			frames: this.anims.generateFrameNumbers("bosses1", {
-				start: 69,
-				end: 71,
+			frames: this.anims.generateFrameNames("final-boss-atlas", {
+				prefix: "idle2-",
+				suffix: ".png",
+				end: 7,
 			}),
 			frameRate: 10,
 			repeat: -1,
 		});
 		this.anims.create({
 			key: "right",
-			frames: this.anims.generateFrameNumbers("bosses1", {
-				start: 81,
-				end: 83,
+			frames: this.anims.generateFrameNames("final-boss-atlas", {
+				prefix: "idle2-",
+				suffix: ".png",
+				end: 7,
 			}),
 			frameRate: 10,
 			repeat: -1,
 		});
 		this.anims.create({
 			key: "up",
-			frames: this.anims.generateFrameNumbers("bosses1", {
-				start: 93,
-				end: 95,
+			frames: this.anims.generateFrameNames("final-boss-atlas", {
+				prefix: "idle2-",
+				suffix: ".png",
+				end: 7,
 			}),
 			frameRate: 10,
 			repeat: -1,
 		});
 		this.anims.create({
 			key: "down",
-			frames: this.anims.generateFrameNumbers("bosses1", {
-				start: 57,
-				end: 59,
+			frames: this.anims.generateFrameNames("final-boss-atlas", {
+				prefix: "idle2-",
+				suffix: ".png",
+				end: 7,
 			}),
 			frameRate: 10,
 			repeat: -1,

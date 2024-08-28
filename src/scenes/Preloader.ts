@@ -53,6 +53,7 @@ export class Preloader extends Scene {
 			frameHeight: 12,
 		});
 		this.load.atlas("icons-atlas", "menu-icons.png", "menu-icons.json");
+		this.load.atlas("final-boss-atlas", "final-boss.png", "final-boss.json");
 		this.load.spritesheet("npcs", "npcs.png", {
 			frameWidth: 17,
 			frameHeight: 21,
