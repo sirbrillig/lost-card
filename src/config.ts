@@ -32,4 +32,5 @@ export const config = {
 	initialPotionCount: 1,
 	chanceToDropPotion: 20,
 	droppedItemLifetime: 10000,
+	finalBossDoorInside: 738,
 };

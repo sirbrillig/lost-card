@@ -46,7 +46,7 @@ export const DataKeys = {
 	ItemObjectId: "objectId",
 };
 
-export type Region = "MK" | "IK" | "CK" | "FK" | "PK" | "SK";
+export type Region = "MK" | "IK" | "CK" | "FK" | "PK" | "SK" | "FB";
 
 export type Powers =
 	| "IceCard"
@@ -438,10 +438,15 @@ export function getRegionName(code: Region) {
 			return "Fire Kingdom";
 		case "SK":
 			return "Spirit Kingdom";
+		case "FB":
+			return "Final Boss";
 	}
 }
 
 export function getRegionFromRoomName(name: string): Region {
+	if (name.startsWith("FB")) {
+		return "FB";
+	}
 	if (name.startsWith("MK")) {
 		return "MK";
 	}
@@ -566,7 +571,7 @@ export function createSpritesFromObjectLayer(
 			tilesetKey,
 			frame
 		);
-		sprite.setDisplaySize(obj.height, obj.width);
+		sprite.setDisplaySize(obj.width, obj.height);
 		sprite.setDataEnabled();
 		setSpritePropertiesFromJSON(sprite, obj.properties);
 		sprite.setName(obj.name);

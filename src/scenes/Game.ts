@@ -5,6 +5,7 @@ import { MainEvents } from "../MainEvents";
 import { EnemyManager } from "../EnemyManager";
 import { MountainMonster } from "../MountainMonster";
 import { Ghost } from "../Ghost";
+import { FinalBoss } from "../FinalBoss";
 import { Skeleton } from "../Skeleton";
 import { CloudGoblin } from "../CloudGoblin";
 import { SkyBlob } from "../SkyBlob";
@@ -245,11 +246,9 @@ export class Game extends Scene {
 		this.createItems();
 		this.createSavePoints();
 
-		this.physics.add.collider(
-			this.createdFinalDoors,
-			this.player,
-			this.checkEndGame.bind(this)
-		);
+		this.physics.add.collider(this.createdFinalDoors, this.player, (tile) => {
+			this.checkFinalDoor(tile);
+		});
 
 		// Enemies collide with doors but players can pass through them.
 		this.physics.add.collider(this.createdDoors, this.enemyManager.enemies);
@@ -444,7 +443,12 @@ export class Game extends Scene {
 		});
 	}
 
-	checkEndGame() {
+	checkFinalDoor(
+		door: Phaser.Tilemaps.Tile | Phaser.Types.Physics.Arcade.GameObjectWithBody
+	) {
+		if (this.isPlayerStunned()) {
+			return;
+		}
 		if (this.getKeyCount() < 6) {
 			this.sound.stopAll();
 			this.showDialog({
@@ -453,12 +457,45 @@ export class Game extends Scene {
 			});
 			return;
 		}
+
+		if (!("name" in door)) {
+			throw new Error("Final door has no name");
+		}
+
+		if ("name" in door && door.name !== "FinalDoor") {
+			return;
+		}
+
 		this.sound.stopAll();
-		this.showDialog({
-			heading: "You win!",
-			text: "Congratulations",
-		});
+		const destinationTile = this.map.findObject(
+			"FinalDoor",
+			(obj: unknown) => getObjectId(obj) === config.finalBossDoorInside
+		);
+		if (!destinationTile) {
+			throw new Error("Hit door without destination tile");
+		}
+		const destinationDirection = SpriteUp;
+		const [destinationX, destinationY] = getDoorDestinationCoordinates(
+			destinationTile,
+			destinationDirection
+		);
+		const fadeTime = config.roomTransitionFadeTime;
 		this.setPlayerStunned(true);
+		this.cameras.main.fadeOut(
+			fadeTime,
+			0,
+			0,
+			0,
+			(_: unknown, progress: number) => {
+				if (progress === 1) {
+					this.respawnRegion(getRegionFromRoomName("FB"));
+					this.movePlayerToPoint(destinationX, destinationY);
+					this.playMusicForRegion(getRegionFromRoomName("FB"));
+					this.setPlayerStunned(false);
+					this.cameras.main.fadeIn(fadeTime);
+				}
+			}
+		);
 	}
 
 	createInputs() {
@@ -545,6 +582,7 @@ export class Game extends Scene {
 			this.equipPower("CloudCard");
 			this.setPotionTotalCount(10);
 			this.setPotionCount(10);
+			this.setKeyCount(6);
 		});
 		this.input.keyboard.on("keydown-FOUR", () => {
 			if (!isCheatMode) {
@@ -775,6 +813,8 @@ export class Game extends Scene {
 
 	getTilesetKeyByName(name: string): string | undefined {
 		switch (name) {
+			case "npcs":
+				return "npcs";
 			case "Icons":
 				return "icons4";
 			case "Cards":
@@ -2531,6 +2571,26 @@ export class Game extends Scene {
 						this.saveGame();
 					});
 					this.enemyManager.enemies.add(boss);
+					break;
+				}
+				case "FinalBoss": {
+					const boss = new FinalBoss(this, this.enemyManager, point.x, point.y);
+					this.enemyManager.enemies.add(boss);
+					boss.once(Events.MonsterDefeated, () => {
+						this.cameras.main.fadeOut(
+							1000,
+							0,
+							0,
+							0,
+							(_: unknown, progress: number) => {
+								if (progress === 1) {
+									this.scene.stop();
+									this.scene.get("Overlay")?.scene.stop();
+									this.scene.start("Victory");
+								}
+							}
+						);
+					});
 					break;
 				}
 				default:
