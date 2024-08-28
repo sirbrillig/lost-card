@@ -27,5 +27,7 @@ export const musicKeys = {
 	mountainKingdom: "mountain-kingdom",
 	iceKingdom: "ice-kingdom",
 	fireKingdom: "fire-kingdom",
-	spiritKingdom: "sprit-kingdom",
+	spiritKingdom: "spirit-kingdom",
+	plantKingdom: "plant-kingdom",
+	cloudKingdom: "cloud-kingdom",
 };

@@ -74,7 +74,6 @@ export class Game extends Scene {
 	backgroundMusic: Sound | undefined;
 	attackSound: Sound;
 	destroySound: Sound;
-	gameOverSound: Sound;
 	hitSound: Sound;
 	walkSound: Sound;
 	saveSound: Sound;
@@ -411,6 +410,16 @@ export class Game extends Scene {
 				});
 			case "SK":
 				return this.sound.add(musicKeys.spiritKingdom, {
+					loop: true,
+					volume: 0.7,
+				});
+			case "PK":
+				return this.sound.add(musicKeys.plantKingdom, {
+					loop: true,
+					volume: 0.6,
+				});
+			case "CK":
+				return this.sound.add(musicKeys.cloudKingdom, {
 					loop: true,
 					volume: 0.7,
 				});
@@ -1981,10 +1990,6 @@ export class Game extends Scene {
 			loop: false,
 			volume: 0.8,
 		});
-		this.gameOverSound = this.sound.add("game-over", {
-			loop: false,
-			volume: 0.8,
-		});
 		this.walkSound = this.sound.add("walk", {
 			loop: false,
 			rate: 1.6,
@@ -2681,13 +2686,9 @@ export class Game extends Scene {
 			return;
 		}
 		this.sound.stopAll();
-		this.gameOverSound.play();
 		this.isGameOver = true;
 		this.cameras.main.fadeOut(1000, 0, 0, 0, (_: unknown, progress: number) => {
 			if (progress === 1) {
-				this.gameOverSound.on(Phaser.Sound.Events.COMPLETE, () => {
-					this.sound.stopAll();
-				});
 				this.scene.stop();
 				this.scene.get("Overlay")?.scene.stop();
 				this.scene.start("GameOver");

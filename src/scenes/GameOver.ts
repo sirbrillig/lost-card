@@ -6,8 +6,14 @@ export class GameOver extends Scene {
 	}
 
 	create() {
+		this.sound.stopAll();
+		const gameOverSound = this.sound.add("game-over", {
+			loop: false,
+			volume: 0.8,
+		});
+		gameOverSound.play();
 		this.time.addEvent({
-			delay: 3000,
+			delay: 2500,
 			callback: () => {
 				this.scene.start("MainMenu");
 			},

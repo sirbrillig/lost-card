@@ -204,6 +204,7 @@ export class Preloader extends Scene {
 		this.load.audio("ice-kingdom", ["ice_kingdom.mp3"]);
 		this.load.audio("fire-kingdom", ["fire_kingdom.mp3"]);
 		this.load.audio("spirit-kingdom", ["spirit_kingdom.mp3"]);
+		this.load.audio("plant-kingdom", ["plant_kingdom.mp3"]);
 	}
 
 	create() {

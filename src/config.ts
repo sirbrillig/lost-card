@@ -17,7 +17,7 @@ export const config = {
 	distanceToActivateTransient: 30,
 	playerInitialHitPoints: 4,
 	saveCooldown: 30000,
-	preGameOverTime: 2500,
+	preGameOverTime: 1000,
 	roomTransitionFadeTime: 300,
 	regionTransitionFadeTime: 1000,
 	sceneStartFadeTime: 1000,
