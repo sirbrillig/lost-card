@@ -16,6 +16,8 @@ import {
 	RangedIceBall,
 	IceAttack,
 	SeekingVine,
+	SlashTowardPlayer,
+	ThrowRocks,
 } from "./behaviors";
 import { BaseMonster } from "./BaseMonster";
 
@@ -29,6 +31,8 @@ type AllStates =
 	| "iceball"
 	| "freeze"
 	| "vine"
+	| "slash"
+	| "rocks"
 	| "attack1"
 	| "attack2"
 	| "attack3"
@@ -129,13 +133,19 @@ export class FinalBoss extends BaseMonster<AllStates> {
 		return true;
 	}
 
-	chooseAttack(): "vine" | "iceball" | "fireball" {
-		const number = Phaser.Math.Between(0, 2);
+	chooseAttack(): "vine" | "iceball" | "fireball" | "slash" | "rocks" {
+		const number = Phaser.Math.Between(0, 3);
 		switch (number) {
 			case 0:
 				return "vine";
 			case 1:
 				return "iceball";
+			case 2:
+				return "fireball";
+			case 3:
+				return "rocks";
+			case 4:
+				return "slash";
 			default:
 				return "fireball";
 		}
@@ -191,6 +201,15 @@ export class FinalBoss extends BaseMonster<AllStates> {
 				return new RangedIceBall(state, "summoncircle", 60, 350);
 			case "fireball":
 				return new RangedFireBall(state, "summoncircle", 140, 350);
+			case "slash":
+				return new SlashTowardPlayer(state, "summoncircle", 180);
+			case "rocks":
+				return new ThrowRocks(state, "summoncircle", {
+					speed: 500,
+					rockCount: 3,
+					delayBeforeEnd: 1200,
+					delayBetweenRocks: 600,
+				});
 		}
 	}
 
