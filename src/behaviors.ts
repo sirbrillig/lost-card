@@ -1271,14 +1271,6 @@ export class RangedFireBall<AllStates extends string>
 		if (!sprite.body || !isDynamicSprite(sprite)) {
 			throw new Error("Could not update monster");
 		}
-		const circleData = sprite.data.get("SummonCircle");
-		if (Array.isArray(circleData?.effects)) {
-			if (circleData.effects.length === 0) {
-				stateMachine.popState();
-				stateMachine.pushState(this.#nextState);
-				return;
-			}
-		}
 
 		sprite.scene.anims.create({
 			key: "fire-power",
