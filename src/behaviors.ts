@@ -2123,6 +2123,8 @@ export class ThrowRocks<AllStates extends string>
 		let alpha = tileInitialAlpha;
 		tile.setAlpha(alpha);
 		tile.setPosition(tile.x, height);
+		this.#sprite.scene.cameras.main.shake(200, 0.004);
+		vibrate(this.#sprite.scene, 1, 200);
 		this.#sprite.scene.tweens.add({
 			targets: tile,
 			x: tile.x,
@@ -2174,6 +2176,8 @@ export class ThrowRocks<AllStates extends string>
 					});
 					rock.setOrigin(0.6, 0.5);
 					rock.anims.play("explode", true);
+					this.#sprite.scene.cameras.main.shake(200, 0.004);
+					vibrate(this.#sprite.scene, 1, 200);
 					rock.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
 						rock.destroy();
 					});
