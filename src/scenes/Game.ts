@@ -1830,6 +1830,7 @@ export class Game extends Scene {
 				});
 				this.setPlayerInvincible(false);
 				this.setPlayerStunned(false);
+				this.saveGame();
 			},
 		});
 	}
