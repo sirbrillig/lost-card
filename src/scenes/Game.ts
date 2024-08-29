@@ -2812,6 +2812,7 @@ export class Game extends Scene {
 			},
 		});
 
+		this.setPlayerStunned(true);
 		this.isPlayerBeingKnockedBack = true;
 		this.knockBack(
 			this.player.body,
@@ -2819,6 +2820,7 @@ export class Game extends Scene {
 			config.playerKnockBackSpeed,
 			invertSpriteDirection(this.playerDirection),
 			() => {
+				this.setPlayerStunned(false);
 				this.isPlayerBeingKnockedBack = false;
 			}
 		);
