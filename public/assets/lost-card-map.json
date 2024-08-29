@@ -5206,30 +5206,6 @@
                 {
                  "gid":2818,
                  "height":16,
-                 "id":721,
-                 "name":"Heart",
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":16,
-                 "x":1568.28,
-                 "y":1840.02
-                }, 
-                {
-                 "gid":2818,
-                 "height":16,
-                 "id":722,
-                 "name":"Heart",
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":16,
-                 "x":1761.51,
-                 "y":2400.25
-                }, 
-                {
-                 "gid":2818,
-                 "height":16,
                  "id":726,
                  "name":"Heart",
                  "rotation":0,

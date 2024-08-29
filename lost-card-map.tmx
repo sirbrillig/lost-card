@@ -8670,8 +8670,6 @@
   <object id="662" name="PotionVial" gid="2823" x="1984" y="2432" width="16" height="16"/>
   <object id="663" name="PotionVial" gid="2823" x="2621.86" y="1646.54" width="16" height="16"/>
   <object id="720" name="Heart" gid="2818" x="1377.53" y="1598.76" width="16" height="16"/>
-  <object id="721" name="Heart" gid="2818" x="1568.28" y="1840.02" width="16" height="16"/>
-  <object id="722" name="Heart" gid="2818" x="1761.51" y="2400.25" width="16" height="16"/>
   <object id="726" name="Heart" gid="2818" x="3120.01" y="1904.81" width="16" height="16"/>
   <object id="731" name="Heart" gid="2818" x="828.172" y="2030.08" width="16" height="16"/>
   <object id="789" name="PotionVial" gid="2823" x="1928.72" y="840.199" width="16" height="16"/>
