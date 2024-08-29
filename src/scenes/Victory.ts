@@ -19,9 +19,9 @@ export class Victory extends Scene {
 		this.add
 			.bitmapText(
 				this.cameras.main.width / 2,
-				50,
+				80,
 				"RetroGamingWhiteSmall",
-				"The monsters defeated and the cards restored, the people of the six kingdoms were free once again. Your spirit may return to its rest.\r\nThe End.",
+				"With the monsters defeated and the cards restored, the people of the six kingdoms were free once again. Your spirit may return to its rest.\r\nThe End.",
 				12
 			)
 			.setMaxWidth(this.cameras.main.width - 10)

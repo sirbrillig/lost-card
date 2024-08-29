@@ -2,6 +2,7 @@ import { Boot } from "./scenes/Boot";
 import { Game as MainGame } from "./scenes/Game";
 import { GameOver } from "./scenes/GameOver";
 import { Victory } from "./scenes/Victory";
+import { Opening } from "./scenes/Opening";
 import { Overlay } from "./scenes/Overlay";
 import { Dialog } from "./scenes/Dialog";
 import { GameMap } from "./scenes/Map";
@@ -35,6 +36,7 @@ const config: Types.Core.GameConfig = {
 	scene: [
 		Boot,
 		Preloader,
+		Opening,
 		MainMenu,
 		MainGame,
 		GameOver,
