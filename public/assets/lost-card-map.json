@@ -2640,6 +2640,18 @@
                  "width":0,
                  "x":1935.89,
                  "y":1107.99
+                }, 
+                {
+                 "height":0,
+                 "id":775,
+                 "name":"Temp Start",
+                 "point":true,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":1933.91924384379,
+                 "y":979.189121963353
                 }],
          "opacity":1,
          "properties":[
@@ -10794,7 +10806,7 @@
          "y":0
         }],
  "nextlayerid":17,
- "nextobjectid":775,
+ "nextobjectid":776,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.0",

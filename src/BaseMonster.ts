@@ -105,6 +105,8 @@ export class BaseMonster<AllStates extends string> extends Phaser.Physics.Arcade
 				this.stateMachine,
 				this.#enemyManager
 			);
+			this.updateAfterBehaviorInit(this.#currentPlayingState.name);
+			this.updateAfterBehavior(this.#currentPlayingState.name);
 			return;
 		}
 
@@ -114,7 +116,13 @@ export class BaseMonster<AllStates extends string> extends Phaser.Physics.Arcade
 			this.stateMachine,
 			this.#enemyManager
 		);
+
+		this.updateAfterBehavior(this.#currentPlayingState?.name);
 	}
+
+	updateAfterBehavior(_: string | undefined) {}
+
+	updateAfterBehaviorInit(_: string | undefined) {}
 
 	playHitSound() {
 		this.scene.sound.play("hit", { volume: 0.7 });

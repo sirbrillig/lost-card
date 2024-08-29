@@ -982,6 +982,119 @@ export class SeekingVine<AllStates extends string>
 	update(): void {}
 }
 
+export class SummonCircle<AllStates extends string>
+	implements Behavior<AllStates, Phaser.GameObjects.Sprite>
+{
+	#nextState: AllStates;
+	#speed = 1;
+	name: AllStates;
+	effects: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody[] = [];
+	#sprite: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
+
+	constructor(name: AllStates, nextState: AllStates) {
+		this.name = name;
+		this.#nextState = nextState;
+	}
+
+	init(
+		sprite: Phaser.GameObjects.Sprite,
+		stateMachine: BehaviorMachineInterface<AllStates>,
+		enemyManager: EnemyManager
+	): void {
+		if (!sprite.body || !isDynamicSprite(sprite)) {
+			throw new Error("Could not update monster");
+		}
+		this.#sprite = sprite;
+		sprite.scene.anims.create({
+			key: "fire-power",
+			frames: sprite.anims.generateFrameNumbers("fire-power"),
+			frameRate: 50,
+			showOnStart: true,
+			hideOnComplete: true,
+			yoyo: true,
+		});
+
+		const existingEffects =
+			this.#sprite.data.get("SummonCircle")?.effects ?? [];
+		existingEffects.forEach((effect) => {
+			effect.destroy();
+		});
+		this.#sprite.data.remove("SummonCircle");
+
+		const numberOfEffects = 6;
+		for (let x = 0; x < numberOfEffects; x += 1) {
+			sprite.scene.time.addEvent({
+				delay: 450 * x,
+				callback: () => {
+					this.effects.push(this.createEffect(sprite, enemyManager));
+					Phaser.Actions.PlaceOnCircle(
+						this.effects,
+						new Phaser.Geom.Circle(
+							sprite.body.center.x,
+							sprite.body.center.y,
+							40
+						)
+					);
+				},
+			});
+		}
+
+		sprite.scene.time.addEvent({
+			delay: 450 * (numberOfEffects + 1),
+			callback: () => {
+				this.#sprite.data.set("SummonCircle", { effects: this.effects });
+				stateMachine.popState();
+				stateMachine.pushState(this.#nextState);
+			},
+		});
+	}
+
+	createEffect(sprite: Phaser.GameObjects.Sprite, enemyManager: EnemyManager) {
+		if (!sprite.body || !isDynamicSprite(sprite)) {
+			throw new Error("Could not update monster");
+		}
+		const effect = sprite.scene.add.sprite(
+			sprite.body.center.x,
+			sprite.body.center.y,
+			"fire-power",
+			0
+		);
+		sprite.scene.physics.add.existing(effect);
+		effect.setDepth(5);
+		effect.anims.play(
+			{
+				key: "fire-power",
+				repeat: -1,
+			},
+			true
+		);
+		if (!isDynamicSprite(effect)) {
+			throw new Error("Could not update fire ball");
+		}
+		effect.setDisplaySize(effect.body.width * 0.8, effect.body.height * 0.8);
+		effect.body.setSize(effect.body.width * 0.5, effect.body.height * 0.5);
+
+		sprite.scene.physics.add.overlap(enemyManager.player, effect, () => {
+			MainEvents.emit(Events.EnemyHitPlayer, true);
+			effect.destroy();
+		});
+
+		sprite.once(Events.MonsterDying, () => {
+			effect?.destroy();
+		});
+		return effect;
+	}
+
+	update(): void {
+		Phaser.Actions.RotateAroundDistance(
+			this.effects,
+			this.#sprite.body.center,
+			Phaser.Math.DegToRad(this.#speed),
+			40
+		);
+	}
+}
+
 export class RangedFireBall<AllStates extends string>
 	implements Behavior<AllStates, Phaser.GameObjects.Sprite>
 {
@@ -1010,6 +1123,15 @@ export class RangedFireBall<AllStates extends string>
 		if (!sprite.body || !isDynamicSprite(sprite)) {
 			throw new Error("Could not update monster");
 		}
+		const circleData = sprite.data.get("SummonCircle");
+		if (Array.isArray(circleData?.effects)) {
+			if (circleData.effects.length === 0) {
+				stateMachine.popState();
+				stateMachine.pushState(this.#nextState);
+				return;
+			}
+		}
+
 		sprite.scene.anims.create({
 			key: "fire-power",
 			frames: sprite.anims.generateFrameNumbers("fire-power"),
