@@ -1389,7 +1389,7 @@ export class Game extends Scene {
 		}
 		if (title === "SwordSign") {
 			this.showDialog({
-				heading: "Get a weapon",
+				heading: "Do no go further unarmed",
 				text: "It would be unwise to face the monsters unarmed. Visit the armory south of the throne room.",
 			});
 		}
@@ -1397,6 +1397,12 @@ export class Game extends Scene {
 			this.showDialog({
 				heading: "The Armory",
 				text: "It would be unwise to face the monsters unarmed. Find a weapon in here.",
+			});
+		}
+		if (title === "SummoningSign") {
+			this.showDialog({
+				heading: "I summon you from the past",
+				text: "You have lived before. Now live again to save us from our doom.",
 			});
 		}
 	}
