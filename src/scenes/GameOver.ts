@@ -1,4 +1,5 @@
 import { Scene } from "phaser";
+import { loadSavedRegistry, loadSavedData } from "../shared";
 
 export class GameOver extends Scene {
 	constructor() {
@@ -13,8 +14,14 @@ export class GameOver extends Scene {
 		});
 		gameOverSound.play();
 		this.time.addEvent({
-			delay: 2500,
+			delay: 1800,
 			callback: () => {
+				const savedData = loadSavedData();
+				if (savedData) {
+					loadSavedRegistry(this.registry, savedData);
+					this.scene.start("Game", savedData);
+					return;
+				}
 				this.scene.start("MainMenu");
 			},
 		});
@@ -25,9 +32,9 @@ export class GameOver extends Scene {
 			.bitmapText(
 				this.cameras.main.width / 2,
 				50,
-				"RetroGamingWhite",
-				"Game Over",
-				24
+				"RetroGamingWhiteSmall",
+				"Time repeats itself...",
+				12
 			)
 			.setOrigin(0.5);
 	}
