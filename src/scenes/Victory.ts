@@ -20,9 +20,9 @@ export class Victory extends Scene {
 			.bitmapText(
 				this.cameras.main.width / 2,
 				50,
-				"RetroGamingWhite",
-				"Lost Card\r\n\r\nYou Win!\r\nCongratulations!",
-				24
+				"RetroGamingWhiteSmall",
+				"The monsters defeated and the cards restored, the people of the six kingdoms were free once again. Your spirit may return to its rest.\r\nThe End.",
+				12
 			)
 			.setOrigin(0.5);
 	}
