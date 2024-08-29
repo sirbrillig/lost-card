@@ -55,19 +55,19 @@ export class FireSpout extends BaseMonster<AllStates> {
 	constructNewBehaviorFor(state: string) {
 		switch (state) {
 			case "idle1": {
-				const randomNumber = Phaser.Math.Between(300, 900);
+				const randomNumber = Phaser.Math.Between(400, 900);
 				return new Idle(state, "spitfire", "appear", randomNumber);
 			}
 			case "spitfire": {
-				const randomNumber = Phaser.Math.Between(500, 1000);
-				return new RangedFireBall(state, "idle2", 70, randomNumber);
+				const randomNumber = Phaser.Math.Between(700, 1000);
+				return new RangedFireBall(state, "idle2", 60, randomNumber);
 			}
 			case "idle2": {
-				const randomNumber = Phaser.Math.Between(300, 900);
+				const randomNumber = Phaser.Math.Between(400, 900);
 				return new Idle(state, "idle3", "disappear", randomNumber);
 			}
 			case "idle3":
-				return new Idle(state, "idle1", "idle", 300);
+				return new Idle(state, "idle1", "idle", 600);
 		}
 	}
 }
