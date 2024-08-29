@@ -27,10 +27,16 @@ type AllStates =
 	| "summoncircle"
 	| "walk"
 	| "teleport"
-	| "fireball"
-	| "iceball"
+	| "fireball1"
+	| "fireball2"
+	| "fireball3"
+	| "iceball1"
+	| "iceball2"
+	| "iceball3"
 	| "freeze"
-	| "vine"
+	| "vine1"
+	| "vine2"
+	| "vine3"
 	| "slash"
 	| "rocks"
 	| "attack1"
@@ -133,21 +139,29 @@ export class FinalBoss extends BaseMonster<AllStates> {
 		return true;
 	}
 
-	chooseAttack(): "vine" | "iceball" | "fireball" | "slash" | "rocks" {
-		const number = Phaser.Math.Between(0, 3);
+	chooseAttack1(): "fireball1" | "slash" | "teleport" {
+		const number = Phaser.Math.Between(1, 4);
 		switch (number) {
-			case 0:
-				return "vine";
 			case 1:
-				return "iceball";
-			case 2:
-				return "fireball";
-			case 3:
-				return "rocks";
-			case 4:
 				return "slash";
+			case 2:
+				return "teleport";
+			case 3:
+				return "teleport";
 			default:
-				return "fireball";
+				return "fireball1";
+		}
+	}
+
+	chooseAttack2(): "vine1" | "iceball1" | "rocks" {
+		const number = Phaser.Math.Between(1, 3);
+		switch (number) {
+			case 1:
+				return "vine1";
+			case 2:
+				return "iceball1";
+			default:
+				return "rocks";
 		}
 	}
 
@@ -156,7 +170,7 @@ export class FinalBoss extends BaseMonster<AllStates> {
 		const postOrbTime = 700;
 		switch (state) {
 			case "initial":
-				return new WaitForActive(state, "roar1");
+				return new WaitForActive(state, "roar1", { distance: 80 });
 			case "roar1":
 				return new Roar(state, "summoncircle");
 			case "walk":
@@ -164,6 +178,11 @@ export class FinalBoss extends BaseMonster<AllStates> {
 					speed: 65,
 					minWalkTime: 2000,
 					maxWalkTime: 5000,
+					walkSound: this.scene.sound.add("wind", {
+						loop: true,
+						rate: 1.5,
+						volume: 0.5,
+					}),
 				});
 			case "summoncircle":
 				return new SummonCircle(state, "walk", {
@@ -192,23 +211,35 @@ export class FinalBoss extends BaseMonster<AllStates> {
 			case "attack6":
 				return new BlackOrbAttack(state, "freeze", orbSpeed, postOrbTime);
 			case "freeze":
-				return new IceAttack(state, "teleport");
+				return new IceAttack(state, this.chooseAttack1());
 			case "teleport":
-				return new TeleportToPlatform(state, this.chooseAttack(), 300);
-			case "vine":
+				return new TeleportToPlatform(state, this.chooseAttack2(), 300);
+			case "vine1":
+				return new SeekingVine(state, "vine2", 50, 350);
+			case "vine2":
+				return new SeekingVine(state, "vine3", 50, 350);
+			case "vine3":
 				return new SeekingVine(state, "summoncircle", 50, 350);
-			case "iceball":
+			case "iceball1":
+				return new RangedIceBall(state, "iceball2", 60, 350);
+			case "iceball2":
+				return new RangedIceBall(state, "iceball3", 60, 350);
+			case "iceball3":
 				return new RangedIceBall(state, "summoncircle", 60, 350);
-			case "fireball":
+			case "fireball1":
+				return new RangedFireBall(state, "fireball2", 140, 350);
+			case "fireball2":
+				return new RangedFireBall(state, "fireball3", 140, 350);
+			case "fireball3":
 				return new RangedFireBall(state, "summoncircle", 140, 350);
 			case "slash":
 				return new SlashTowardPlayer(state, "summoncircle", 180);
 			case "rocks":
 				return new ThrowRocks(state, "summoncircle", {
 					speed: 500,
-					rockCount: 3,
-					delayBeforeEnd: 1200,
-					delayBetweenRocks: 600,
+					rockCount: 4,
+					delayBeforeEnd: 1000,
+					delayBetweenRocks: 500,
 				});
 		}
 	}

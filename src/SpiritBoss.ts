@@ -1,4 +1,4 @@
-import { Events, DataKeys } from "./shared";
+import { DataKeys } from "./shared";
 import { EnemyManager } from "./EnemyManager";
 import {
 	WaitForActive,

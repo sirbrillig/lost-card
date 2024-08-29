@@ -326,7 +326,7 @@ export class RandomlyWalk<AllStates extends string>
 	#maxWalkTime = 4000;
 	#nextState: AllStates;
 	name: AllStates;
-	walkSound: Sound;
+	#walkSound: Sound;
 
 	constructor(
 		name: AllStates,
@@ -335,6 +335,7 @@ export class RandomlyWalk<AllStates extends string>
 			speed?: number;
 			minWalkTime?: number;
 			maxWalkTime?: number;
+			walkSound?: Sound;
 		}
 	) {
 		this.name = name;
@@ -348,6 +349,9 @@ export class RandomlyWalk<AllStates extends string>
 		if (config?.maxWalkTime) {
 			this.#maxWalkTime = config.maxWalkTime;
 		}
+		if (config?.walkSound) {
+			this.#walkSound = config.walkSound;
+		}
 	}
 
 	init(
@@ -357,25 +361,27 @@ export class RandomlyWalk<AllStates extends string>
 		if (!isDynamicSprite(sprite)) {
 			throw new Error("invalid sprite");
 		}
-		this.walkSound = sprite.scene.sound.add("enemy-walk", {
-			loop: true,
-			rate: 1.5,
-			volume: 0.5,
-		});
-		this.walkSound.play();
+		this.#walkSound =
+			this.#walkSound ??
+			sprite.scene.sound.add("enemy-walk", {
+				loop: true,
+				rate: 1.5,
+				volume: 0.5,
+			});
+		this.#walkSound.play();
 
 		const direction = getWalkingDirection(sprite);
 		this.#walkInDirection(sprite, direction);
 
 		sprite.on(Events.MonsterDying, () => {
-			this.walkSound.stop();
+			this.#walkSound.stop();
 		});
 
 		sprite.scene.time.addEvent({
 			delay: this.#getWalkingTime(),
 			callback: () => {
 				sprite?.body?.setVelocity(0);
-				this.walkSound.stop();
+				this.#walkSound.stop();
 				stateMachine.popState();
 				stateMachine.pushState(this.#nextState);
 			},
@@ -1293,7 +1299,7 @@ export class RangedFireBall<AllStates extends string>
 		effect.anims.play(
 			{
 				key: "fire-power",
-				repeat: 8,
+				repeat: 20,
 			},
 			true
 		);
@@ -1381,7 +1387,7 @@ export class RangedIceBall<AllStates extends string>
 		effect.anims.play(
 			{
 				key: "ice_ball",
-				repeat: 8,
+				repeat: 20,
 			},
 			true
 		);
