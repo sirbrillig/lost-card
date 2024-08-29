@@ -30,4 +30,5 @@ export const musicKeys = {
 	spiritKingdom: "spirit-kingdom",
 	plantKingdom: "plant-kingdom",
 	cloudKingdom: "cloud-kingdom",
+	finalBoss: "final-boss",
 };

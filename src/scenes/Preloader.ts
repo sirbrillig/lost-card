@@ -211,6 +211,7 @@ export class Preloader extends Scene {
 		this.load.audio("spirit-kingdom", ["spirit_kingdom.mp3"]);
 		this.load.audio("plant-kingdom", ["plant_kingdom.mp3"]);
 		this.load.audio("cloud-kingdom", ["cloud_kingdom.mp3"]);
+		this.load.audio("final-boss", ["final_boss.mp3"]);
 	}
 
 	create() {

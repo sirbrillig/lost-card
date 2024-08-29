@@ -423,6 +423,11 @@ export class Game extends Scene {
 					loop: true,
 					volume: 0.7,
 				});
+			case "FB":
+				return this.sound.add(musicKeys.finalBoss, {
+					loop: true,
+					volume: 0.7,
+				});
 		}
 	}
 
