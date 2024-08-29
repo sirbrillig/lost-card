@@ -3,13 +3,19 @@ import {
 	isDynamicSprite,
 	isTileWithPropertiesObject,
 } from "./shared";
+import { BlackOrb } from "./BlackOrb";
 import { EnemyManager } from "./EnemyManager";
 import {
 	WaitForActive,
 	Roar,
 	RandomlyWalk,
-	RangedFireBall,
+	BlackOrbAttack,
 	SummonCircle,
+	TeleportToPlatform,
+	RangedFireBall,
+	RangedIceBall,
+	IceAttack,
+	SeekingVine,
 } from "./behaviors";
 import { BaseMonster } from "./BaseMonster";
 
@@ -18,6 +24,11 @@ type AllStates =
 	| "roar1"
 	| "summoncircle"
 	| "walk"
+	| "teleport"
+	| "fireball"
+	| "iceball"
+	| "freeze"
+	| "vine"
 	| "attack1"
 	| "attack2"
 	| "attack3"
@@ -26,7 +37,8 @@ type AllStates =
 	| "attack6";
 
 export class FinalBoss extends BaseMonster<AllStates> {
-	hitPoints: number = 10;
+	hitPoints: number = 20;
+	enemyManager: EnemyManager;
 
 	constructor(
 		scene: Phaser.Scene,
@@ -44,6 +56,7 @@ export class FinalBoss extends BaseMonster<AllStates> {
 		this.setOffset(this.body.offset.x - 12, this.body.offset.y + 10);
 		this.setOrigin(0.5, 0.75);
 		this.data.set(DataKeys.Freezable, false);
+		this.enemyManager = enemyManager;
 	}
 
 	getInitialState(): AllStates {
@@ -116,7 +129,21 @@ export class FinalBoss extends BaseMonster<AllStates> {
 		return true;
 	}
 
+	chooseAttack(): "vine" | "iceball" | "fireball" {
+		const number = Phaser.Math.Between(0, 2);
+		switch (number) {
+			case 0:
+				return "vine";
+			case 1:
+				return "iceball";
+			default:
+				return "fireball";
+		}
+	}
+
 	constructNewBehaviorFor(state: AllStates) {
+		const orbSpeed = 210;
+		const postOrbTime = 700;
 		switch (state) {
 			case "initial":
 				return new WaitForActive(state, "roar1");
@@ -124,40 +151,46 @@ export class FinalBoss extends BaseMonster<AllStates> {
 				return new Roar(state, "summoncircle");
 			case "walk":
 				return new RandomlyWalk(state, "attack1", {
-					speed: 50,
+					speed: 65,
 					minWalkTime: 2000,
 					maxWalkTime: 5000,
 				});
 			case "summoncircle":
-				return new SummonCircle(state, "walk");
+				return new SummonCircle(state, "walk", {
+					createMonster: () => {
+						if (!this.body) {
+							throw new Error("monster is invalid");
+						}
+						return new BlackOrb(
+							this.scene,
+							this.enemyManager,
+							this.body.center.x,
+							this.body.center.y
+						);
+					},
+				});
 			case "attack1":
-				return new RangedFireBall(state, "attack2", 140, 350);
+				return new BlackOrbAttack(state, "attack2", orbSpeed, postOrbTime);
 			case "attack2":
-				return new RangedFireBall(state, "attack3", 140, 350);
+				return new BlackOrbAttack(state, "attack3", orbSpeed, postOrbTime);
 			case "attack3":
-				return new RangedFireBall(state, "attack4", 140, 350);
+				return new BlackOrbAttack(state, "attack4", orbSpeed, postOrbTime);
 			case "attack4":
-				return new RangedFireBall(state, "attack5", 140, 350);
+				return new BlackOrbAttack(state, "attack5", orbSpeed, postOrbTime);
 			case "attack5":
-				return new RangedFireBall(state, "attack6", 140, 350);
+				return new BlackOrbAttack(state, "attack6", orbSpeed, postOrbTime);
 			case "attack6":
+				return new BlackOrbAttack(state, "freeze", orbSpeed, postOrbTime);
+			case "freeze":
+				return new IceAttack(state, "teleport");
+			case "teleport":
+				return new TeleportToPlatform(state, this.chooseAttack(), 300);
+			case "vine":
+				return new SeekingVine(state, "summoncircle", 50, 350);
+			case "iceball":
+				return new RangedIceBall(state, "summoncircle", 60, 350);
+			case "fireball":
 				return new RangedFireBall(state, "summoncircle", 140, 350);
-		}
-	}
-
-	updateAfterBehaviorInit(name: string | undefined) {
-		const circleData = this.data.get("SummonCircle");
-		if (!Array.isArray(circleData?.effects)) {
-			return;
-		}
-		if (!this.body || !isDynamicSprite(this)) {
-			throw new Error("Could not update monster");
-		}
-
-		if (name?.startsWith("attack") && circleData.effects.length > 0) {
-			const effect = circleData.effects.pop();
-			effect.destroy();
-			this.data.set("SummonCircle", circleData);
 		}
 	}
 

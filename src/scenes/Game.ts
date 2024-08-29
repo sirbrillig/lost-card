@@ -5,6 +5,7 @@ import { MainEvents } from "../MainEvents";
 import { EnemyManager } from "../EnemyManager";
 import { MountainMonster } from "../MountainMonster";
 import { Ghost } from "../Ghost";
+import { BlackOrb } from "../BlackOrb";
 import { FinalBoss } from "../FinalBoss";
 import { Skeleton } from "../Skeleton";
 import { CloudGoblin } from "../CloudGoblin";
@@ -2386,6 +2387,16 @@ export class Game extends Scene {
 				}
 				case "Ghost": {
 					const monster = new Ghost(this, this.enemyManager, point.x, point.y);
+					this.enemyManager.enemies.add(monster);
+					break;
+				}
+				case "BlackOrb": {
+					const monster = new BlackOrb(
+						this,
+						this.enemyManager,
+						point.x,
+						point.y
+					);
 					this.enemyManager.enemies.add(monster);
 					break;
 				}

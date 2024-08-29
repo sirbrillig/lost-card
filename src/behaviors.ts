@@ -237,6 +237,46 @@ export class SpawnEnemies<AllStates extends string>
 	}
 }
 
+export class Nothing<AllStates extends string>
+	implements Behavior<AllStates, Phaser.GameObjects.Sprite>
+{
+	#nextState: AllStates;
+	#animationKey: string;
+	#idleTime: number;
+	name: AllStates;
+
+	constructor(
+		name: AllStates,
+		nextState: AllStates,
+		animationKey: string,
+		idleTime: number
+	) {
+		this.name = name;
+		this.#nextState = nextState;
+		this.#animationKey = animationKey;
+		this.#idleTime = idleTime;
+	}
+
+	init(
+		sprite: Phaser.GameObjects.Sprite,
+		stateMachine: BehaviorMachineInterface<AllStates>
+	): void {
+		if (!sprite.body || !isDynamicSprite(sprite)) {
+			throw new Error("Could not update monster");
+		}
+		sprite.anims.play(this.#animationKey, true);
+		sprite.scene.time.addEvent({
+			delay: this.#idleTime,
+			callback: () => {
+				stateMachine.popState();
+				stateMachine.pushState(this.#nextState);
+			},
+		});
+	}
+
+	update(): void {}
+}
+
 export class Idle<AllStates extends string>
 	implements Behavior<AllStates, Phaser.GameObjects.Sprite>
 {
@@ -488,7 +528,15 @@ export class RandomTeleport<AllStates extends string>
 		});
 
 		// Get all tiles in room
-		const tiles = getTilesInRoom(enemyManager.map, enemyManager.activeRoom);
+		const tiles = getTilesInRoom(
+			enemyManager.map,
+			enemyManager.activeRoom
+		).filter((tile) => {
+			if (isTileWithPropertiesObject(tile) && tile.properties.collides) {
+				return false;
+			}
+			return true;
+		});
 		if (tiles.length < 1) {
 			console.log("No tiles in room to teleport to");
 			stateMachine.popState();
@@ -898,8 +946,9 @@ export class IceAttack<AllStates extends string>
 			0
 		);
 		sprite.scene.physics.add.existing(effect);
-		effect.setSize(sprite.body.width * 5, sprite.body.height * 5);
-		effect.setDisplaySize(sprite.body.width * 5, sprite.body.height * 5);
+		// Both use width so this remains square
+		effect.setSize(sprite.body.width * 5, sprite.body.width * 5);
+		effect.setDisplaySize(sprite.body.width * 5, sprite.body.width * 5);
 		effect.setDepth(5);
 		effect.anims.play("ice_attack", true);
 		sprite.scene.sound.play("ice");
@@ -990,10 +1039,34 @@ export class SummonCircle<AllStates extends string>
 	name: AllStates;
 	effects: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody[] = [];
 	#sprite: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
+	#createMonster: (
+		scene: Phaser.Scene,
+		enemyManager: EnemyManager,
+		x: number,
+		y: number
+	) => Phaser.GameObjects.Sprite = (scene, enemyManager, x, y) => {
+		return new MountainMonster(scene, enemyManager, x, y);
+	};
 
-	constructor(name: AllStates, nextState: AllStates) {
+	constructor(
+		name: AllStates,
+		nextState: AllStates,
+		config?: {
+			enemiesToSpawn?: number;
+			maxSpawnedEnemies?: number;
+			createMonster: (
+				scene: Phaser.Scene,
+				enemyManager: EnemyManager,
+				x: number,
+				y: number
+			) => Phaser.GameObjects.Sprite;
+		}
+	) {
 		this.name = name;
 		this.#nextState = nextState;
+		if (config?.createMonster) {
+			this.#createMonster = config.createMonster;
+		}
 	}
 
 	init(
@@ -1014,9 +1087,12 @@ export class SummonCircle<AllStates extends string>
 			yoyo: true,
 		});
 
-		const existingEffects =
+		const existingEffects: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody[] =
 			this.#sprite.data.get("SummonCircle")?.effects ?? [];
 		existingEffects.forEach((effect) => {
+			if (!isDynamicSprite(effect)) {
+				return;
+			}
 			effect.destroy();
 		});
 		this.#sprite.data.remove("SummonCircle");
@@ -1053,36 +1129,23 @@ export class SummonCircle<AllStates extends string>
 		if (!sprite.body || !isDynamicSprite(sprite)) {
 			throw new Error("Could not update monster");
 		}
-		const effect = sprite.scene.add.sprite(
-			sprite.body.center.x,
-			sprite.body.center.y,
-			"fire-power",
-			0
-		);
-		sprite.scene.physics.add.existing(effect);
-		effect.setDepth(5);
-		effect.anims.play(
-			{
-				key: "fire-power",
-				repeat: -1,
-			},
-			true
-		);
-		if (!isDynamicSprite(effect)) {
-			throw new Error("Could not update fire ball");
-		}
-		effect.setDisplaySize(effect.body.width * 0.8, effect.body.height * 0.8);
-		effect.body.setSize(effect.body.width * 0.5, effect.body.height * 0.5);
 
-		sprite.scene.physics.add.overlap(enemyManager.player, effect, () => {
-			MainEvents.emit(Events.EnemyHitPlayer, true);
-			effect.destroy();
-		});
-
+		const monster = this.#createMonster(
+			sprite.scene,
+			enemyManager,
+			sprite.body.x + 5,
+			sprite.body.y + sprite.body.height
+		);
+		enemyManager.enemies.add(monster);
 		sprite.once(Events.MonsterDying, () => {
-			effect?.destroy();
+			console.log("spawner is dying so killing spawned creatures");
+			monster.emit(Events.MonsterKillRequest);
 		});
-		return effect;
+		if (!isDynamicSprite(monster)) {
+			throw new Error("Could not update monster");
+		}
+
+		return monster;
 	}
 
 	update(): void {
@@ -1093,6 +1156,85 @@ export class SummonCircle<AllStates extends string>
 			40
 		);
 	}
+}
+
+export class BlackOrbAttack<AllStates extends string>
+	implements Behavior<AllStates, Phaser.GameObjects.Sprite>
+{
+	#nextState: AllStates;
+	#speed = 50;
+	#postAttackTime = 1000;
+	#maxLifetime = 6000;
+	name: AllStates;
+
+	constructor(
+		name: AllStates,
+		nextState: AllStates,
+		speed: number,
+		postAttackTime: number
+	) {
+		this.name = name;
+		this.#nextState = nextState;
+		this.#speed = speed;
+		this.#postAttackTime = postAttackTime;
+	}
+
+	init(
+		sprite: Phaser.GameObjects.Sprite,
+		stateMachine: BehaviorMachineInterface<AllStates>,
+		enemyManager: EnemyManager
+	): void {
+		if (!sprite.body || !isDynamicSprite(sprite)) {
+			throw new Error("Could not update monster");
+		}
+		const circleData:
+			| { effects?: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody[] }
+			| undefined = sprite.data.get("SummonCircle");
+		if (!Array.isArray(circleData?.effects)) {
+			stateMachine.popState();
+			stateMachine.pushState(this.#nextState);
+			return;
+		}
+		if (circleData.effects.length === 0) {
+			stateMachine.popState();
+			stateMachine.pushState(this.#nextState);
+			return;
+		}
+		const enemy = circleData.effects.pop();
+		if (!enemy) {
+			throw new Error("Could not update monster");
+		}
+		sprite.data.set("SummonCircle", circleData);
+		if (!enemy.active) {
+			stateMachine.popState();
+			stateMachine.pushState(this.#nextState);
+			return;
+		}
+
+		sprite.scene.physics.moveToObject(enemy, enemyManager.player, this.#speed);
+
+		sprite.scene.physics.add.overlap(enemyManager.player, enemy, () => {
+			MainEvents.emit(Events.EnemyHitPlayer, true);
+			enemy.emit(Events.MonsterKillRequest);
+		});
+
+		sprite.scene.time.addEvent({
+			delay: this.#postAttackTime,
+			callback: () => {
+				stateMachine.popState();
+				stateMachine.pushState(this.#nextState);
+			},
+		});
+
+		sprite.scene.time.addEvent({
+			delay: this.#maxLifetime,
+			callback: () => {
+				enemy?.emit(Events.MonsterKillRequest);
+			},
+		});
+	}
+
+	update(): void {}
 }
 
 export class RangedFireBall<AllStates extends string>
