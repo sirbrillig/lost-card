@@ -5295,8 +5295,8 @@
                  "type":"",
                  "visible":true,
                  "width":16,
-                 "x":1990.24860522549,
-                 "y":1126.50696461146
+                 "x":1990.25,
+                 "y":1126.51
                 }, 
                 {
                  "gid":2717,
@@ -9449,8 +9449,8 @@
                  "type":"",
                  "visible":true,
                  "width":16,
-                 "x":1856.84550837707,
-                 "y":1104.28063873376
+                 "x":1856.85,
+                 "y":1104.28
                 }, 
                 {
                  "gid":2503,
@@ -10944,8 +10944,20 @@
                  "type":"",
                  "visible":true,
                  "width":16,
-                 "x":1902.58849942469,
-                 "y":1135.04515477226
+                 "x":1902.59,
+                 "y":1135.05
+                }, 
+                {
+                 "gid":2503,
+                 "height":16,
+                 "id":791,
+                 "name":"SaveSign",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":16,
+                 "x":1491.82773800865,
+                 "y":367.261953068177
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -10954,7 +10966,7 @@
          "y":0
         }],
  "nextlayerid":17,
- "nextobjectid":791,
+ "nextobjectid":792,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.0",

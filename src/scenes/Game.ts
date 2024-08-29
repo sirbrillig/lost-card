@@ -1381,6 +1381,12 @@ export class Game extends Scene {
 				text: "Once, cards of power protected the kingdoms, but the cards have been lost. Monsters have sealed the people behind this door.",
 			});
 		}
+		if (title === "SaveSign") {
+			this.showDialog({
+				heading: "Light the lanterns",
+				text: "Your soul is bound to the lantern light and can be rekindled there.",
+			});
+		}
 		if (title === "MapSign") {
 			this.showDialog({
 				heading: "View the map",
