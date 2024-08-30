@@ -289,6 +289,7 @@ export class Game extends Scene {
 					isSaving = false;
 					effect.destroy();
 				});
+				this.saveSound.play();
 				this.saveGame();
 			}
 		);
@@ -808,7 +809,6 @@ export class Game extends Scene {
 		if (this.getPlayerHitPoints() === 0) {
 			return;
 		}
-		this.saveSound.play();
 		localStorage.setItem("lost-card-save", JSON.stringify(this.getSaveData()));
 		MainEvents.emit(Events.GameSaved);
 	}
