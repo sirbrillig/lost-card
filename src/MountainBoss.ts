@@ -5,6 +5,7 @@ import {
 	SpawnEnemies,
 	LeftRightMarch,
 	ThrowRocks,
+	PowerUp,
 } from "./behaviors";
 import { BaseMonster } from "./BaseMonster";
 import { MountainMonster } from "./MountainMonster";
@@ -14,6 +15,7 @@ type AllStates =
 	| "roar1"
 	| "spawn1"
 	| "spawn2"
+	| "preparethrow"
 	| "leftrightmarch"
 	| "throwrocks";
 
@@ -122,9 +124,11 @@ export class MountainBoss extends BaseMonster<AllStates> {
 					createMonster,
 				});
 			case "leftrightmarch":
-				return new LeftRightMarch(state, "throwrocks", {
+				return new LeftRightMarch(state, "preparethrow", {
 					speed: isBloodied ? 100 : 80,
 				});
+			case "preparethrow":
+				return new PowerUp(state, "throwrocks");
 			case "throwrocks":
 				return new ThrowRocks(state, "roar1", {
 					speed: 500,
