@@ -51,8 +51,8 @@ export class MountainBoss extends BaseMonster<AllStates> {
 				start: 48,
 				end: 50,
 			}),
-			frameRate: 10,
-			repeat: 8,
+			frameRate: 24,
+			repeat: 16,
 		});
 		this.anims.create({
 			key: "spawn",

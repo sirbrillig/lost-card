@@ -117,9 +117,31 @@ export class Roar<AllStates extends string>
 		MainEvents.emit(Events.StunPlayer, true);
 		sprite.scene.cameras.main.shake(2000, 0.009);
 		vibrate(sprite.scene, 2, 1800);
+
+		sprite.scene.anims.create({
+			key: "orange_boom",
+			frames: sprite.anims.generateFrameNumbers("orange_boom"),
+			frameRate: 24,
+			repeat: -1,
+			showOnStart: true,
+			hideOnComplete: true,
+		});
+		const effect = sprite.scene.add.sprite(
+			sprite.body.center.x,
+			sprite.body.center.y,
+			"orange_boom",
+			0
+		);
+		effect.setDepth(5);
+		effect.anims.play("orange_boom", true);
+		sprite.once(Events.MonsterDying, () => {
+			effect?.destroy();
+		});
+
 		sprite.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
 			MainEvents.emit(Events.StunPlayer, false);
 			roar.stop();
+			effect?.destroy();
 			stateMachine.popState();
 			stateMachine.pushState(this.#nextState);
 		});

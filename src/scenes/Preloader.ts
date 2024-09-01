@@ -86,6 +86,10 @@ export class Preloader extends Scene {
 
 		this.load.atlas("character", "character.png", "character.json");
 
+		this.load.spritesheet("orange_boom", "orange_boom.png", {
+			frameWidth: 32,
+			frameHeight: 32,
+		});
 		this.load.spritesheet("ice_beam", "ice_beam.png", {
 			frameWidth: 32,
 			frameHeight: 32,
