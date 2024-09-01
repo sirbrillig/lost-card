@@ -117,7 +117,14 @@ class PotionItem {
 		const totalPotions = this.scene.registry.get(DataKeys.PotionCount) ?? 0;
 		if (this.totalPotions !== totalPotions) {
 			this.totalPotions = totalPotions;
-			this.countLabel.setText(`${this.totalPotions}`);
+			try {
+				this.countLabel.setText(`${this.totalPotions}`);
+			} catch (err) {
+				console.error(err);
+				console.error(
+					"Something went wrong updating the number of potions. Hopefully it works during the next frame."
+				);
+			}
 		}
 	}
 
@@ -352,7 +359,14 @@ export class Overlay extends Scene {
 				.setDepth(9)
 				.setOrigin(0.5);
 		}
-		this.keyCountLabel.setText(`${this.keyCount}`);
+		try {
+			this.keyCountLabel.setText(`${this.keyCount}`);
+		} catch (err) {
+			console.error(err);
+			console.error(
+				"Something went wrong updating the number of keys. Hopefully it works during the next frame."
+			);
+		}
 	}
 
 	getKeyCount(): number {
