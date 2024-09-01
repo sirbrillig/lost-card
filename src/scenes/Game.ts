@@ -1395,7 +1395,7 @@ export class Game extends Scene {
 		}
 		if (title === "SwordSign") {
 			this.showDialog({
-				heading: "Do no go further unarmed",
+				heading: "Do not go further unarmed",
 				text: "It would be unwise to face the monsters unarmed. Visit the armory south of the throne room.",
 			});
 		}
