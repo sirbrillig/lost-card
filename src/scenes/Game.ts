@@ -59,6 +59,7 @@ import {
 	hasXandY,
 	getButtonNames,
 	vibrate,
+	doRectanglesOverlap,
 } from "../shared";
 
 export class Game extends Scene {
@@ -1168,6 +1169,7 @@ export class Game extends Scene {
 	updateRoom() {
 		this.checkForPowerHitTiles();
 		this.updateAppearingTiles();
+		this.checkForMountainBossDoorGate();
 	}
 
 	destroyCreatedTile(tile: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody) {
@@ -1182,6 +1184,43 @@ export class Game extends Scene {
 			this.stuffLayer.removeTileAtWorldXY(tile.x, tile.y);
 			tile.destroy();
 		});
+	}
+
+	checkForMountainBossDoorGate() {
+		if (this.enemyManager.activeRoom?.name !== "MKBoss") {
+			return;
+		}
+		const mountainBossActivationArea = this.map.findObject(
+			"MetaObjects",
+			(obj) => obj.name === "MountainBossActivateRocks"
+		);
+		if (!mountainBossActivationArea) {
+			return;
+		}
+		if (
+			doRectanglesOverlap(this.player, {
+				x: mountainBossActivationArea.x ?? 0,
+				y: mountainBossActivationArea.y ?? 0,
+				width: mountainBossActivationArea.width ?? 0,
+				height: mountainBossActivationArea.height ?? 0,
+			})
+		) {
+			const transientTiles = this.enemyManager.activeRoom
+				? getItemsInRoom(this.createdTiles, this.enemyManager.activeRoom)
+				: [];
+
+			// Don't consider tiles which are already visible.
+			const appearingTiles = transientTiles.filter(
+				(tile) => tile.visible === false
+			);
+
+			appearingTiles.forEach((tile) => {
+				if (tile.data.get("manualActivation") !== true) {
+					return;
+				}
+				this.makeAppearingTileAppear(tile);
+			});
+		}
 	}
 
 	checkForPowerHitTiles() {
@@ -1286,6 +1325,53 @@ export class Game extends Scene {
 		});
 	}
 
+	makeAppearingTileAppear(
+		tile: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody
+	) {
+		const msAfterApproach: number = tile.data.get("msAfterApproach") ?? 0;
+		let firstApproachedTime: number = tile.data.get("firstApproachedTime") ?? 0;
+
+		// If the tile has no msAfterApproach, then it should appear immediately.
+		if (msAfterApproach < 100) {
+			this.showTransientTile(tile);
+			return;
+		}
+
+		const tilePosition = new Phaser.Math.Vector2(tile.body.x, tile.body.y);
+		const playerPosition = new Phaser.Math.Vector2(
+			this.player.body.center.x,
+			this.player.body.center.y
+		);
+		const distanceToActivate: number =
+			this.data.get("distanceToActivate") ?? config.distanceToActivateTransient;
+
+		// If you haven't gotten close to the tile, do nothing.
+		if (tilePosition.distance(playerPosition) > distanceToActivate) {
+			return;
+		}
+
+		// Record the time when you get close to it.
+		if (!firstApproachedTime) {
+			firstApproachedTime = this.time.now;
+			tile.data.set("firstApproachedTime", firstApproachedTime);
+		}
+
+		// If the time since you've gotten close is greater than the time it
+		// should appear, make it appear.
+		const timeSinceApproach = this.time.now - firstApproachedTime;
+		if (timeSinceApproach < msAfterApproach) {
+			return;
+		}
+
+		const previewBeforeAppear: number =
+			tile.data.get("previewBeforeAppear") ?? 0;
+		if (previewBeforeAppear > 0) {
+			return this.dropTransientTile(tile, previewBeforeAppear);
+		}
+
+		this.showTransientTile(tile);
+	}
+
 	updateAppearingTiles() {
 		const transientTiles = this.enemyManager.activeRoom
 			? getItemsInRoom(this.createdTiles, this.enemyManager.activeRoom)
@@ -1297,50 +1383,12 @@ export class Game extends Scene {
 		);
 
 		appearingTiles.forEach((tile) => {
-			const msAfterApproach: number = tile.data.get("msAfterApproach") ?? 0;
-			let firstApproachedTime: number =
-				tile.data.get("firstApproachedTime") ?? 0;
-
-			// If the tile has no msAfterApproach, then it should appear immediately.
-			if (msAfterApproach < 100) {
-				this.showTransientTile(tile);
+			// Tiles with `manualActivation` must be explicitly shown.
+			if (tile.data.get("manualActivation") === true) {
 				return;
 			}
 
-			const tilePosition = new Phaser.Math.Vector2(tile.body.x, tile.body.y);
-			const playerPosition = new Phaser.Math.Vector2(
-				this.player.body.center.x,
-				this.player.body.center.y
-			);
-			const distanceToActivate: number =
-				this.data.get("distanceToActivate") ??
-				config.distanceToActivateTransient;
-
-			// If you haven't gotten close to the tile, do nothing.
-			if (tilePosition.distance(playerPosition) > distanceToActivate) {
-				return;
-			}
-
-			// Record the time when you get close to it.
-			if (!firstApproachedTime) {
-				firstApproachedTime = this.time.now;
-				tile.data.set("firstApproachedTime", firstApproachedTime);
-			}
-
-			// If the time since you've gotten close is greater than the time it
-			// should appear, make it appear.
-			const timeSinceApproach = this.time.now - firstApproachedTime;
-			if (timeSinceApproach < msAfterApproach) {
-				return;
-			}
-
-			const previewBeforeAppear: number =
-				tile.data.get("previewBeforeAppear") ?? 0;
-			if (previewBeforeAppear > 0) {
-				return this.dropTransientTile(tile, previewBeforeAppear);
-			}
-
-			this.showTransientTile(tile);
+			this.makeAppearingTileAppear(tile);
 		});
 	}
 

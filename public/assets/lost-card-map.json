@@ -2640,6 +2640,17 @@
                  "width":0,
                  "x":1935.89,
                  "y":1107.99
+                }, 
+                {
+                 "height":22.2325457924077,
+                 "id":792,
+                 "name":"MountainBossActivateRocks",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":143.350146004778,
+                 "x":1392.02282983807,
+                 "y":256.172020175206
                 }],
          "opacity":1,
          "properties":[
@@ -2822,7 +2833,7 @@
                 {
                  "height":224,
                  "id":42,
-                 "name":"MK10",
+                 "name":"MKBoss",
                  "properties":[
                         {
                          "name":"room",
@@ -6336,17 +6347,22 @@
                         {
                          "name":"distanceToActivate",
                          "type":"int",
-                         "value":100
+                         "value":0
+                        }, 
+                        {
+                         "name":"manualActivation",
+                         "type":"bool",
+                         "value":true
                         }, 
                         {
                          "name":"msAfterApproach",
                          "type":"int",
-                         "value":1000
+                         "value":1200
                         }, 
                         {
                          "name":"previewBeforeAppear",
                          "type":"int",
-                         "value":300
+                         "value":500
                         }],
                  "rotation":0,
                  "type":"",
@@ -6374,7 +6390,12 @@
                         {
                          "name":"distanceToActivate",
                          "type":"int",
-                         "value":100
+                         "value":0
+                        }, 
+                        {
+                         "name":"manualActivation",
+                         "type":"bool",
+                         "value":true
                         }, 
                         {
                          "name":"msAfterApproach",
@@ -6384,7 +6405,7 @@
                         {
                          "name":"previewBeforeAppear",
                          "type":"int",
-                         "value":300
+                         "value":500
                         }],
                  "rotation":0,
                  "type":"",
@@ -10932,8 +10953,8 @@
                  "type":"",
                  "visible":true,
                  "width":16,
-                 "x":1491.82773800865,
-                 "y":367.261953068177
+                 "x":1491.83,
+                 "y":367.262
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -10942,7 +10963,7 @@
          "y":0
         }],
  "nextlayerid":17,
- "nextobjectid":792,
+ "nextobjectid":793,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.0",
