@@ -681,6 +681,10 @@ export function loadSavedRegistry(
 	saveData: SaveData
 ): void {
 	Object.keys(saveData).forEach((key) => {
+		if (key === "playerHitPoints") {
+			// Always give player full HP when they load
+			return;
+		}
 		registry.set(key, saveData[key]);
 	});
 }
