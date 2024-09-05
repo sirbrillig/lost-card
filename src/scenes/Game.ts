@@ -318,7 +318,7 @@ export class Game extends Scene {
 				if (enemy.data.get("isPlantCardGrappleActive")) {
 					return true;
 				}
-				if (this.isPlayerInvincible()) {
+				if (this.isPlayerInvincible() || this.isPlayerHiddenInvincible()) {
 					return false;
 				}
 				if (!enemy.visible || !enemy.active) {
@@ -1120,7 +1120,7 @@ export class Game extends Scene {
 
 	checkForGameOver() {
 		if (this.getPlayerHitPoints() <= 0 && !this.isGameOver) {
-			this.setPlayerInvincible(true);
+			this.setPlayerHiddenInvincible(true);
 			this.player.stop();
 			this.player.body.setVelocity(0);
 			this.enemyCollider.active = false;
@@ -1792,7 +1792,7 @@ export class Game extends Scene {
 		this.equipPower(card);
 		this.playCardAnimation(card);
 		this.sound.play("bonus");
-		this.setPlayerInvincible(true);
+		this.setPlayerHiddenInvincible(true);
 		this.setPlayerStunned(true);
 		this.time.addEvent({
 			delay: config.gotItemFreeze,
@@ -1806,7 +1806,7 @@ export class Game extends Scene {
 						getButtonNames(this).rotatePower
 					} to change the active power.`,
 				});
-				this.setPlayerInvincible(false);
+				this.setPlayerHiddenInvincible(false);
 				this.setPlayerStunned(false);
 			},
 		});
@@ -1861,7 +1861,7 @@ export class Game extends Scene {
 		this.attackSound.on(Phaser.Sound.Events.COMPLETE, () => {
 			this.stopSoundEffects();
 		});
-		this.setPlayerInvincible(true);
+		this.setPlayerHiddenInvincible(true);
 		this.setPlayerStunned(true);
 		this.time.addEvent({
 			delay: config.gotItemFreeze,
@@ -1870,7 +1870,7 @@ export class Game extends Scene {
 					heading: "You found a sword!",
 					text: `Press ${getButtonNames(this).ok} to swing.`,
 				});
-				this.setPlayerInvincible(false);
+				this.setPlayerHiddenInvincible(false);
 				this.setPlayerStunned(false);
 				this.saveGame();
 			},
@@ -2822,7 +2822,11 @@ export class Game extends Scene {
 	}
 
 	enemyHitPlayer(): void {
-		if (this.isPlayerBeingHit() || this.isPlayerInvincible()) {
+		if (
+			this.isPlayerBeingHit() ||
+			this.isPlayerInvincible() ||
+			this.isPlayerHiddenInvincible()
+		) {
 			return;
 		}
 		this.hitSound.play();
@@ -2993,12 +2997,23 @@ export class Game extends Scene {
 		this.player.body.setVelocity(0);
 	}
 
+	// Same as setPlayerInvincible but there will be no visual cue. Useful for
+	// times when the player should just not be able to take damage like a "got
+	// powerup" period.
+	setPlayerHiddenInvincible(setting: boolean) {
+		this.player.data?.set("invinciblePlayerHidden", setting);
+	}
+
 	setPlayerInvincible(setting: boolean) {
 		this.player.data?.set("invinciblePlayer", setting);
 	}
 
 	isPlayerInvincible(): boolean {
 		return this.player.data?.get("invinciblePlayer");
+	}
+
+	isPlayerHiddenInvincible(): boolean {
+		return this.player.data?.get("invinciblePlayerHidden");
 	}
 
 	isPlayerFrozen(): boolean {
@@ -3059,7 +3074,7 @@ export class Game extends Scene {
 	playSpiritPowerAnimation() {
 		this.power.anims.play("spirit-power", true);
 		this.power.setAlpha(0.5);
-		this.setPlayerInvincible(true);
+		this.setPlayerHiddenInvincible(true);
 		const endAnimation = this.tweens.add({
 			delay: config.spiritPowerTime - 1000,
 			targets: this.power,
@@ -3076,7 +3091,7 @@ export class Game extends Scene {
 				this.power.anims.complete();
 				this.sound.stopByKey("spirit");
 				this.power.setAlpha(1);
-				this.setPlayerInvincible(false);
+				this.setPlayerHiddenInvincible(false);
 			},
 		});
 	}
