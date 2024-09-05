@@ -318,12 +318,6 @@ export class Game extends Scene {
 				if (enemy.data.get("isPlantCardGrappleActive")) {
 					return true;
 				}
-				if (
-					this.isPlayerUsingPower() &&
-					this.getActivePower() === "SpiritCard"
-				) {
-					return false;
-				}
 				if (this.isPlayerInvincible()) {
 					return false;
 				}
@@ -1759,13 +1753,7 @@ export class Game extends Scene {
 				this.power.anims.play("ice-power-right", true);
 				break;
 			case "SpiritCard":
-				this.power.anims.play("spirit-power", true);
-				this.power.setAlpha(0.5);
-				this.player.setAlpha(0.5);
-				this.power.on(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
-					this.power.setAlpha(1);
-					this.player.setAlpha(1);
-				});
+				this.activateSpiritPowerAnimation();
 				break;
 			case "CloudCard":
 				this.power.anims.play("cloud-power", true);
@@ -2837,9 +2825,6 @@ export class Game extends Scene {
 		if (this.isPlayerBeingHit() || this.isPlayerInvincible()) {
 			return;
 		}
-		if (this.isPlayerUsingPower() && this.getActivePower() === "SpiritCard") {
-			return;
-		}
 		this.hitSound.play();
 
 		this.enemyCollider.active = false;
@@ -3071,12 +3056,22 @@ export class Game extends Scene {
 		}
 	}
 
+	activateSpiritPowerAnimation() {
+		this.power.anims.play("spirit-power", true);
+		this.power.setAlpha(0.5);
+		this.setPlayerInvincible(true);
+		this.power.on(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
+			this.sound.stopByKey("spirit");
+			this.power.setAlpha(1);
+			this.setPlayerInvincible(false);
+		});
+	}
+
 	playPowerAnimation(): void {
 		this.lastPowerAt = this.time.now;
 		this.power.setVelocity(0);
 		this.power.setFlipX(false);
 		this.power.setAlpha(1);
-		this.player.setAlpha(1);
 		switch (this.playerDirection) {
 			case SpriteUp:
 				switch (this.getActivePower()) {
@@ -3092,14 +3087,7 @@ export class Game extends Scene {
 						this.player.anims.play("up-walk");
 						break;
 					case "SpiritCard":
-						this.power.anims.play("spirit-power", true);
-						this.power.setAlpha(0.5);
-						this.player.setAlpha(0.5);
-						this.power.on(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
-							this.sound.stopByKey("spirit");
-							this.power.setAlpha(1);
-							this.player.setAlpha(1);
-						});
+						this.activateSpiritPowerAnimation();
 						break;
 					case "FireCard":
 						this.power.setRotation(Phaser.Math.DegToRad(90));
@@ -3133,14 +3121,7 @@ export class Game extends Scene {
 						this.player.setFlipX(true);
 						break;
 					case "SpiritCard":
-						this.power.anims.play("spirit-power", true);
-						this.power.setAlpha(0.5);
-						this.player.setAlpha(0.5);
-						this.power.on(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
-							this.sound.stopByKey("spirit");
-							this.power.setAlpha(1);
-							this.player.setAlpha(1);
-						});
+						this.activateSpiritPowerAnimation();
 						break;
 					case "FireCard":
 						this.power.setVelocity(config.firePowerVelocity, 0);
@@ -3168,14 +3149,7 @@ export class Game extends Scene {
 						this.player.anims.play("down-walk");
 						break;
 					case "SpiritCard":
-						this.power.anims.play("spirit-power", true);
-						this.power.setAlpha(0.5);
-						this.player.setAlpha(0.5);
-						this.power.on(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
-							this.sound.stopByKey("spirit");
-							this.power.setAlpha(1);
-							this.player.setAlpha(1);
-						});
+						this.activateSpiritPowerAnimation();
 						break;
 					case "FireCard":
 						this.power.setRotation(Phaser.Math.DegToRad(90));
@@ -3207,14 +3181,7 @@ export class Game extends Scene {
 						this.player.anims.play("left-walk");
 						break;
 					case "SpiritCard":
-						this.power.anims.play("spirit-power", true);
-						this.power.setAlpha(0.5);
-						this.player.setAlpha(0.5);
-						this.power.on(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
-							this.sound.stopByKey("spirit");
-							this.power.setAlpha(1);
-							this.player.setAlpha(1);
-						});
+						this.activateSpiritPowerAnimation();
 						break;
 					case "FireCard":
 						this.power.setVelocity(-config.firePowerVelocity, 0);
@@ -3375,6 +3342,14 @@ export class Game extends Scene {
 		}
 	}
 
+	updatePlayerAlpha() {
+		if (this.isPlayerInvincible()) {
+			this.player.setAlpha(0.5);
+		} else {
+			this.player.clearAlpha();
+		}
+	}
+
 	updateHealEffectPosition() {
 		if (this.healEffect) {
 			this.healEffect.setPosition(
@@ -3386,6 +3361,7 @@ export class Game extends Scene {
 
 	updatePlayer(): void {
 		this.updatePlayerTint();
+		this.updatePlayerAlpha();
 		this.registry.set("playerX", this.player.x);
 		this.registry.set("playerY", this.player.y);
 
