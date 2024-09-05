@@ -33,4 +33,5 @@ export const config = {
 	chanceToDropPotion: 20,
 	droppedItemLifetime: 10000,
 	finalBossDoorInside: 738,
+	spiritPowerTime: 4000,
 };

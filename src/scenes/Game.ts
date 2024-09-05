@@ -1753,7 +1753,7 @@ export class Game extends Scene {
 				this.power.anims.play("ice-power-right", true);
 				break;
 			case "SpiritCard":
-				this.activateSpiritPowerAnimation();
+				this.playSpiritPowerAnimation();
 				break;
 			case "CloudCard":
 				this.power.anims.play("cloud-power", true);
@@ -2295,7 +2295,7 @@ export class Game extends Scene {
 			frameRate: 24,
 			showOnStart: true,
 			hideOnComplete: true,
-			repeat: 2,
+			repeat: -1,
 		});
 		anims.create({
 			key: "wind-power-right",
@@ -3056,14 +3056,28 @@ export class Game extends Scene {
 		}
 	}
 
-	activateSpiritPowerAnimation() {
+	playSpiritPowerAnimation() {
 		this.power.anims.play("spirit-power", true);
 		this.power.setAlpha(0.5);
 		this.setPlayerInvincible(true);
-		this.power.on(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
-			this.sound.stopByKey("spirit");
-			this.power.setAlpha(1);
-			this.setPlayerInvincible(false);
+		const endAnimation = this.tweens.add({
+			delay: config.spiritPowerTime - 1000,
+			targets: this.power,
+			alpha: 0,
+			duration: 200,
+			repeat: -1,
+			yoyo: true,
+		});
+		this.time.addEvent({
+			delay: config.spiritPowerTime,
+			callback: () => {
+				endAnimation.stop();
+				this.power.anims.stop();
+				this.power.anims.complete();
+				this.sound.stopByKey("spirit");
+				this.power.setAlpha(1);
+				this.setPlayerInvincible(false);
+			},
 		});
 	}
 
@@ -3087,7 +3101,7 @@ export class Game extends Scene {
 						this.player.anims.play("up-walk");
 						break;
 					case "SpiritCard":
-						this.activateSpiritPowerAnimation();
+						this.playSpiritPowerAnimation();
 						break;
 					case "FireCard":
 						this.power.setRotation(Phaser.Math.DegToRad(90));
@@ -3121,7 +3135,7 @@ export class Game extends Scene {
 						this.player.setFlipX(true);
 						break;
 					case "SpiritCard":
-						this.activateSpiritPowerAnimation();
+						this.playSpiritPowerAnimation();
 						break;
 					case "FireCard":
 						this.power.setVelocity(config.firePowerVelocity, 0);
@@ -3149,7 +3163,7 @@ export class Game extends Scene {
 						this.player.anims.play("down-walk");
 						break;
 					case "SpiritCard":
-						this.activateSpiritPowerAnimation();
+						this.playSpiritPowerAnimation();
 						break;
 					case "FireCard":
 						this.power.setRotation(Phaser.Math.DegToRad(90));
@@ -3181,7 +3195,7 @@ export class Game extends Scene {
 						this.player.anims.play("left-walk");
 						break;
 					case "SpiritCard":
-						this.activateSpiritPowerAnimation();
+						this.playSpiritPowerAnimation();
 						break;
 					case "FireCard":
 						this.power.setVelocity(-config.firePowerVelocity, 0);
