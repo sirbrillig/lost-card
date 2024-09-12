@@ -57,13 +57,15 @@ export class PlantSpitter extends BaseMonster<AllStates> {
 
 	constructNewBehaviorFor(state: string) {
 		switch (state) {
-			case "idle":
-				return new Idle(state, "spawn", "appear", 300);
+			case "idle": {
+				const randomNumber = Phaser.Math.Between(300, 500);
+				return new Idle(state, "spawn", "appear", randomNumber);
+			}
 			case "spawn":
 				return new SpawnEnemies(state, "idle2", {
 					enemiesToSpawn: 1,
 					maxSpawnedEnemies: 5,
-					postSpawnTime: 1900,
+					postSpawnTime: 1500,
 					createMonster: () => {
 						const bug = new PlantBug(
 							this.scene,
@@ -76,8 +78,10 @@ export class PlantSpitter extends BaseMonster<AllStates> {
 						return bug;
 					},
 				});
-			case "idle2":
-				return new Idle(state, "idle", "disappear", 300);
+			case "idle2": {
+				const randomNumber = Phaser.Math.Between(300, 500);
+				return new Idle(state, "idle", "disappear", randomNumber);
+			}
 		}
 	}
 }

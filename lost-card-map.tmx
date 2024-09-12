@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.0" orientation="orthogonal" renderorder="right-down" width="200" height="200" tilewidth="16" tileheight="16" infinite="0" nextlayerid="17" nextobjectid="797">
+<map version="1.10" tiledversion="1.11.0" orientation="orthogonal" renderorder="right-down" width="200" height="200" tilewidth="16" tileheight="16" infinite="0" nextlayerid="17" nextobjectid="799">
  <editorsettings>
   <export target="public/assets/lost-card-map.json" format="json"/>
  </editorsettings>
@@ -8327,7 +8327,7 @@
   <object id="313" name="IceMonster" x="1924.17" y="1850.98">
    <point/>
   </object>
-  <object id="312" name="IceMonster" x="1902.38" y="1882.42">
+  <object id="312" name="IceMonster" x="1879.97" y="1850.33">
    <point/>
   </object>
   <object id="309" name="IceMonster" x="1965.53" y="2043.15">
@@ -8423,10 +8423,10 @@
   <object id="596" name="PlantSpitter" x="1120.18" y="1878.51">
    <point/>
   </object>
-  <object id="597" name="PlantSpitter" x="1001.31" y="1963.42">
+  <object id="597" name="PlantSpitter" x="1010.28" y="1951.19">
    <point/>
   </object>
-  <object id="598" name="PlantBug" x="1082.01" y="2073.85">
+  <object id="598" name="PlantBug" x="1093.73" y="2064.17">
    <point/>
   </object>
   <object id="599" name="PlantBug" x="1399.11" y="2096.9">
@@ -8438,7 +8438,7 @@
   <object id="600" name="PlantBug" x="1352.22" y="2061.11">
    <point/>
   </object>
-  <object id="601" name="PlantBug" x="1056.6" y="2137.28">
+  <object id="601" name="PlantBug" x="1095.82" y="2115.89">
    <point/>
   </object>
   <object id="602" name="PlantSpitter" x="1136.94" y="2241.61">
@@ -8504,13 +8504,13 @@
   <object id="649" name="SkyBlob" x="718.111" y="1527.87">
    <point/>
   </object>
-  <object id="707" name="SkyBlob" x="700.69" y="1622.06">
+  <object id="707" name="SkyBlob" x="729.726" y="1553.29">
    <point/>
   </object>
-  <object id="732" name="SkyBlob" x="707.793" y="1599.92">
+  <object id="732" name="SkyBlob" x="764.846" y="1571.9">
    <point/>
   </object>
-  <object id="733" name="SkyBlob" x="687.736" y="1600.34">
+  <object id="733" name="SkyBlob" x="694.868" y="1514.76">
    <point/>
   </object>
   <object id="734" name="SkyBlob" x="806.406" y="1546.43">
@@ -8664,8 +8664,8 @@
   <object id="577" name="PotionVial" gid="2799" x="2879.41" y="1806.09" width="16" height="16"/>
   <object id="641" name="PotionBottle" gid="2791" x="845.678" y="2030.97" width="16" height="16"/>
   <object id="657" name="PotionVial" gid="2823" x="464" y="1504" width="16" height="16"/>
-  <object id="658" name="PotionVial" gid="2799" x="704" y="1488" width="16" height="16"/>
-  <object id="659" name="PotionVial" gid="2799" x="1050.1" y="1858.35" width="16" height="16"/>
+  <object id="658" name="PotionVial" gid="2823" x="704" y="1488" width="16" height="16"/>
+  <object id="659" name="PotionVial" gid="2823" x="1050.1" y="1858.35" width="16" height="16"/>
   <object id="660" name="PotionVial" gid="2823" x="816" y="2336" width="16" height="16"/>
   <object id="661" name="PotionVial" gid="2823" x="1616" y="1664" width="16" height="16"/>
   <object id="662" name="PotionVial" gid="2823" x="1984" y="2432" width="16" height="16"/>
