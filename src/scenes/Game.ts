@@ -2327,7 +2327,6 @@ export class Game extends Scene {
 	}
 
 	createPlayer(x: number, y: number): void {
-		this.setPlayerHitPoints(config.playerInitialHitPoints);
 		this.player = this.physics.add.sprite(x, y, "character", "idle-down-0.png");
 		this.player.setDataEnabled();
 		this.player.setDebugBodyColor(0x00ff00);
@@ -2338,6 +2337,9 @@ export class Game extends Scene {
 			this.player.body.offset.y + 5
 		);
 		this.player.setDepth(1);
+
+		this.restorePlayerHitPoints();
+
 		this.sword = this.physics.add.sprite(
 			this.player.x,
 			this.player.y,
