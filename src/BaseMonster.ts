@@ -53,6 +53,9 @@ export class BaseMonster<AllStates extends string> extends Phaser.Physics.Arcade
 		this.on(Events.MonsterHit, this.hit);
 		this.on(Events.MonsterStun, this.setStunned);
 		this.on(Events.MonsterKillRequest, this.kill);
+		MainEvents.on(Events.RoomChanged, () => {
+			this.active = false;
+		});
 
 		this.initSprites();
 	}
@@ -83,6 +86,7 @@ export class BaseMonster<AllStates extends string> extends Phaser.Physics.Arcade
 		}
 		if (!this.active) {
 			this.body.stop();
+			this.anims.pause();
 			return;
 		}
 		if (this.data.get(DataKeys.Stunned)) {

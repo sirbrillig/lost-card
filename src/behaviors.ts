@@ -250,6 +250,9 @@ export class SpawnEnemies<AllStates extends string>
 			console.log("spawner is dying so killing spawned creatures");
 			monster.emit(Events.MonsterKillRequest);
 		});
+		MainEvents.once(Events.RoomChanged, () => {
+			monster.emit(Events.MonsterKillRequest);
+		});
 	}
 
 	update(sprite: Phaser.GameObjects.Sprite): void {
@@ -554,6 +557,9 @@ export class RandomTeleport<AllStates extends string>
 		sprite.once(Events.MonsterDying, () => {
 			effect1?.destroy();
 		});
+		MainEvents.once(Events.RoomChanged, () => {
+			effect1?.destroy();
+		});
 
 		// Get all tiles in room
 		const tiles = getTilesInRoom(
@@ -585,6 +591,9 @@ export class RandomTeleport<AllStates extends string>
 		effect2.setDepth(8);
 		effect2.anims.play("teleport", true);
 		sprite.once(Events.MonsterDying, () => {
+			effect2?.destroy();
+		});
+		MainEvents.once(Events.RoomChanged, () => {
 			effect2?.destroy();
 		});
 
@@ -778,9 +787,12 @@ export class PowerUp<AllStates extends string>
 			sprite.scene?.sound.stopByKey("ice-charge");
 			effect?.destroy();
 		});
+		MainEvents.once(Events.RoomChanged, () => {
+			effect?.destroy();
+		});
 		effect.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
-			sprite.scene?.sound.stopByKey("ice-charge");
-			effect.destroy();
+			sprite?.scene?.sound.stopByKey("ice-charge");
+			effect?.destroy();
 			stateMachine.popState();
 			stateMachine.pushState(this.#nextState);
 		});
@@ -863,8 +875,11 @@ export class SlashTowardPlayer<AllStates extends string>
 		sprite.once(Events.MonsterDying, () => {
 			this.#effect?.destroy();
 		});
+		MainEvents.once(Events.RoomChanged, () => {
+			this.#effect?.destroy();
+		});
 		this.#effect.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
-			this.#effect.destroy();
+			this.#effect?.destroy();
 			stateMachine.popState();
 			stateMachine.pushState(this.#nextState);
 		});
@@ -879,7 +894,9 @@ export class SlashTowardPlayer<AllStates extends string>
 		if (!direction) {
 			return;
 		}
-		moveHitboxInFrontOfSprite(sprite, direction, this.#effect);
+		if (isDynamicSprite(this.#effect)) {
+			moveHitboxInFrontOfSprite(sprite, direction, this.#effect);
+		}
 	}
 }
 
@@ -930,8 +947,11 @@ export class BigSwing<AllStates extends string>
 		sprite.once(Events.MonsterDying, () => {
 			effect?.destroy();
 		});
+		MainEvents.once(Events.RoomChanged, () => {
+			effect?.destroy();
+		});
 		effect.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
-			effect.destroy();
+			effect?.destroy();
 			stateMachine.popState();
 			stateMachine.pushState(this.#nextState);
 		});
@@ -994,8 +1014,11 @@ export class IceAttack<AllStates extends string>
 		sprite.once(Events.MonsterDying, () => {
 			effect?.destroy();
 		});
+		MainEvents.once(Events.RoomChanged, () => {
+			effect?.destroy();
+		});
 		effect.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
-			effect.destroy();
+			effect?.destroy();
 			stateMachine.popState();
 			stateMachine.pushState(this.#nextState);
 		});
@@ -1044,6 +1067,9 @@ export class SeekingVine<AllStates extends string>
 		);
 
 		sprite.once(Events.MonsterDying, () => {
+			this.#effect?.destroy();
+		});
+		MainEvents.once(Events.RoomChanged, () => {
 			this.#effect?.destroy();
 		});
 
@@ -1146,7 +1172,7 @@ export class SummonCircle<AllStates extends string>
 		sprite.scene.time.addEvent({
 			delay: 450 * (numberOfEffects + 1),
 			callback: () => {
-				this.#sprite.data.set("SummonCircle", { effects: this.effects });
+				this.#sprite?.data?.set("SummonCircle", { effects: this.effects });
 				stateMachine.popState();
 				stateMachine.pushState(this.#nextState);
 			},
@@ -1167,7 +1193,10 @@ export class SummonCircle<AllStates extends string>
 		enemyManager.enemies.add(monster);
 		sprite.once(Events.MonsterDying, () => {
 			console.log("spawner is dying so killing spawned creatures");
-			monster.emit(Events.MonsterKillRequest);
+			monster?.emit(Events.MonsterKillRequest);
+		});
+		MainEvents.once(Events.RoomChanged, () => {
+			monster?.emit(Events.MonsterKillRequest);
 		});
 		if (!isDynamicSprite(monster)) {
 			throw new Error("Could not update monster");
@@ -1244,6 +1273,9 @@ export class BlackOrbAttack<AllStates extends string>
 		sprite.scene.physics.add.overlap(enemyManager.player, enemy, () => {
 			MainEvents.emit(Events.EnemyHitPlayer, true);
 			enemy.emit(Events.MonsterKillRequest);
+		});
+		MainEvents.once(Events.RoomChanged, () => {
+			enemy?.emit(Events.MonsterKillRequest);
 		});
 
 		sprite.scene.time.addEvent({
@@ -1336,6 +1368,10 @@ export class RangedFireBall<AllStates extends string>
 			fireSound?.stop();
 			effect?.destroy();
 		});
+		MainEvents.once(Events.RoomChanged, () => {
+			fireSound?.stop();
+			effect?.destroy();
+		});
 
 		sprite.scene.time.addEvent({
 			delay: this.#postAttackTime,
@@ -1347,7 +1383,7 @@ export class RangedFireBall<AllStates extends string>
 
 		effect.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
 			fireSound?.stop();
-			effect.destroy();
+			effect?.destroy();
 		});
 	}
 
@@ -1423,6 +1459,10 @@ export class RangedIceBall<AllStates extends string>
 			sprite.scene?.sound.stopByKey("ice");
 			effect?.destroy();
 		});
+		MainEvents.once(Events.RoomChanged, () => {
+			sprite.scene?.sound.stopByKey("ice");
+			effect?.destroy();
+		});
 
 		sprite.scene.time.addEvent({
 			delay: this.#postAttackTime,
@@ -1434,7 +1474,7 @@ export class RangedIceBall<AllStates extends string>
 
 		effect.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
 			sprite?.scene?.sound?.stopByKey("ice");
-			effect.destroy();
+			effect?.destroy();
 		});
 	}
 
@@ -1517,9 +1557,13 @@ export class WalkWithFire<AllStates extends string>
 			walkSound.stop();
 			this.#effect?.destroy();
 		});
-		this.#effect.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
+		MainEvents.once(Events.RoomChanged, () => {
 			walkSound.stop();
-			this.#effect.destroy();
+			this.#effect?.destroy();
+		});
+		this.#effect.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
+			walkSound?.stop();
+			this.#effect?.destroy();
 			stateMachine.popState();
 			stateMachine.pushState(this.#nextState);
 		});
@@ -1637,9 +1681,13 @@ export class IceBeam<AllStates extends string>
 			sprite.scene?.sound.stopByKey("freeze");
 			effect?.destroy();
 		});
+		MainEvents.once(Events.RoomChanged, () => {
+			sprite.scene?.sound.stopByKey("freeze");
+			effect?.destroy();
+		});
 		effect.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
 			sprite.scene?.sound.stopByKey("freeze");
-			effect.destroy();
+			effect?.destroy();
 			stateMachine.popState();
 			stateMachine.pushState(this.#nextState);
 		});
@@ -2024,6 +2072,9 @@ class Seeker extends Phaser.Physics.Arcade.Sprite {
 			MainEvents.emit(Events.EnemyHitPlayer, true);
 			this.destroy();
 		});
+		MainEvents.once(Events.RoomChanged, () => {
+			this.destroy();
+		});
 
 		this.scene.physics.add.overlap(this.#enemyManager.sword, this, () => {
 			if (!this.#enemyManager.sword.data.get(DataKeys.SwordAttackActive)) {
@@ -2132,6 +2183,12 @@ export class ThrowRocks<AllStates extends string>
 		if (!isDynamicSprite(rock)) {
 			throw new Error("Could not create rock");
 		}
+		this.#sprite.once(Events.MonsterDying, () => {
+			rock?.destroy();
+		});
+		MainEvents.once(Events.RoomChanged, () => {
+			rock?.destroy();
+		});
 		this.#rocksCreated.push(rock);
 		return rock;
 	}
