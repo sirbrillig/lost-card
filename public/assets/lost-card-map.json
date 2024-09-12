@@ -4306,8 +4306,8 @@
                  "type":"",
                  "visible":true,
                  "width":0,
-                 "x":791.838450016927,
-                 "y":1529.61277181626
+                 "x":785.26087953228,
+                 "y":1524.23112323792
                 }, 
                 {
                  "height":0,
@@ -10801,7 +10801,7 @@
          "y":0
         }],
  "nextlayerid":17,
- "nextobjectid":800,
+ "nextobjectid":801,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.0",

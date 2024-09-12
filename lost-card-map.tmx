@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.0" orientation="orthogonal" renderorder="right-down" width="200" height="200" tilewidth="16" tileheight="16" infinite="0" nextlayerid="17" nextobjectid="800">
+<map version="1.10" tiledversion="1.11.0" orientation="orthogonal" renderorder="right-down" width="200" height="200" tilewidth="16" tileheight="16" infinite="0" nextlayerid="17" nextobjectid="801">
  <editorsettings>
   <export target="public/assets/lost-card-map.json" format="json"/>
  </editorsettings>
@@ -8477,7 +8477,7 @@
   <object id="640" name="SkyBlob" x="693.645" y="2084.92">
    <point/>
   </object>
-  <object id="645" name="SkyBlobSpitter" x="791.838" y="1529.61">
+  <object id="645" name="SkyBlobSpitter" x="785.261" y="1524.23">
    <point/>
   </object>
   <object id="654" name="SkyBlob" x="467.819" y="1838.69">
