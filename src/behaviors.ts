@@ -160,6 +160,7 @@ export class SpawnEnemies<AllStates extends string>
 	#nextState: AllStates;
 	#maxSpawnedEnemies: number = 18;
 	#enemiesToSpawn: number = 6;
+	#postSpawnTime: number = 1000;
 	#createMonster: (
 		scene: Phaser.Scene,
 		enemyManager: EnemyManager,
@@ -217,9 +218,12 @@ export class SpawnEnemies<AllStates extends string>
 			this.#addEnemy(sprite, enemyManager);
 		}
 
-		sprite.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
-			stateMachine.popState();
-			stateMachine.pushState(this.#nextState);
+		sprite.scene.time.addEvent({
+			delay: this.#postSpawnTime,
+			callback: () => {
+				stateMachine.popState();
+				stateMachine.pushState(this.#nextState);
+			},
 		});
 	}
 
@@ -751,6 +755,7 @@ export class PowerUp<AllStates extends string>
 	implements Behavior<AllStates, Phaser.GameObjects.Sprite>
 {
 	#nextState: AllStates;
+	#chargeTime = 1300;
 	name: AllStates;
 
 	constructor(name: AllStates, nextState: AllStates) {
@@ -769,7 +774,7 @@ export class PowerUp<AllStates extends string>
 			key: "powerup",
 			frames: sprite.anims.generateFrameNumbers("ice_powerup"),
 			frameRate: 24,
-			repeat: 2,
+			repeat: -1,
 			showOnStart: true,
 			hideOnComplete: true,
 		});
@@ -792,11 +797,14 @@ export class PowerUp<AllStates extends string>
 			stateMachine.popState();
 			stateMachine.pushState(this.#nextState);
 		});
-		effect.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
-			sprite?.scene?.sound.stopByKey("ice-charge");
-			effect?.destroy();
-			stateMachine.popState();
-			stateMachine.pushState(this.#nextState);
+		sprite.scene.time.addEvent({
+			delay: this.#chargeTime,
+			callback: () => {
+				sprite?.scene?.sound.stopByKey("ice-charge");
+				effect?.destroy();
+				stateMachine.popState();
+				stateMachine.pushState(this.#nextState);
+			},
 		});
 	}
 
@@ -879,6 +887,8 @@ export class SlashTowardPlayer<AllStates extends string>
 		});
 		MainEvents.once(Events.LeavingRoom, () => {
 			this.#effect?.destroy();
+			stateMachine.popState();
+			stateMachine.pushState(this.#nextState);
 		});
 		this.#effect.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
 			this.#effect?.destroy();
