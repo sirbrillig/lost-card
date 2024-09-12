@@ -3016,6 +3016,9 @@ export class Game extends Scene {
 	}
 
 	isPlayerInvincible(): boolean {
+		if (this.isPlayerUsingPower() && this.getActivePower() === "SpiritCard") {
+			return true;
+		}
 		return this.player.data?.get("invinciblePlayer");
 	}
 
@@ -3081,7 +3084,7 @@ export class Game extends Scene {
 	playSpiritPowerAnimation() {
 		this.power.anims.play("spirit-power", true);
 		this.power.setAlpha(0.5);
-		this.setPlayerHiddenInvincible(true);
+		this.setPlayerInvincible(true);
 		const endAnimation = this.tweens.add({
 			delay: config.spiritPowerTime - 1000,
 			targets: this.power,
@@ -3098,7 +3101,7 @@ export class Game extends Scene {
 				this.power.anims.complete();
 				this.sound.stopByKey("spirit");
 				this.power.setAlpha(1);
-				this.setPlayerHiddenInvincible(false);
+				this.setPlayerInvincible(false);
 			},
 		});
 	}
