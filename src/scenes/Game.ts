@@ -18,6 +18,7 @@ import { WaterDipper } from "../WaterDipper";
 import { GreatGhost } from "../GreatGhost";
 import { MountainBoss } from "../MountainBoss";
 import { PlantSpitter } from "../PlantSpitter";
+import { SkyBlobSpitter } from "../SkyBlobSpitter";
 import { IceBoss } from "../IceBoss";
 import { PlantBoss } from "../PlantBoss";
 import { SpiritBoss } from "../SpiritBoss";
@@ -2425,6 +2426,9 @@ export class Game extends Scene {
 			}
 
 			const enemyType = point.name;
+			if (this.wasBossDefeated(enemyType)) {
+				return;
+			}
 			switch (enemyType) {
 				case "MountainMonster": {
 					const monster = new MountainMonster(
@@ -2470,6 +2474,7 @@ export class Game extends Scene {
 					);
 					this.enemyManager.enemies.add(monster);
 					monster.once("defeated", () => {
+						this.markBossDefeated("GreatGhost");
 						this.showAllHiddenItemsInRoom();
 					});
 					break;
@@ -2512,6 +2517,7 @@ export class Game extends Scene {
 						point.y
 					);
 					monster.once(Events.MonsterDefeated, () => {
+						this.markBossDefeated("WaterDipper");
 						this.showAllHiddenItemsInRoom();
 					});
 					this.enemyManager.enemies.add(monster);
@@ -2537,6 +2543,20 @@ export class Game extends Scene {
 					this.enemyManager.enemies.add(monster);
 					break;
 				}
+				case "SkyBlobSpitter": {
+					const monster = new SkyBlobSpitter(
+						this,
+						this.enemyManager,
+						point.x,
+						point.y
+					);
+					monster.once(Events.MonsterDefeated, () => {
+						this.markBossDefeated("SkyBlobSpitter");
+						this.showAllHiddenItemsInRoom();
+					});
+					this.enemyManager.enemies.add(monster);
+					break;
+				}
 				case "PlantSpitter": {
 					const monster = new PlantSpitter(
 						this,
@@ -2558,9 +2578,6 @@ export class Game extends Scene {
 					break;
 				}
 				case "MountainBoss": {
-					if (this.wasBossDefeated("MountainBoss")) {
-						break;
-					}
 					const boss = new MountainBoss(
 						this,
 						this.enemyManager,
@@ -2576,9 +2593,6 @@ export class Game extends Scene {
 					break;
 				}
 				case "IceBoss": {
-					if (this.wasBossDefeated("IceBoss")) {
-						break;
-					}
 					const boss = new IceBoss(this, this.enemyManager, point.x, point.y);
 					boss.once(Events.MonsterDefeated, () => {
 						this.markBossDefeated("IceBoss");
@@ -2589,9 +2603,6 @@ export class Game extends Scene {
 					break;
 				}
 				case "CloudBoss": {
-					if (this.wasBossDefeated("CloudBoss")) {
-						break;
-					}
 					const boss = new CloudBoss(this, this.enemyManager, point.x, point.y);
 					boss.once(Events.MonsterDefeated, () => {
 						this.markBossDefeated("CloudBoss");
@@ -2602,9 +2613,6 @@ export class Game extends Scene {
 					break;
 				}
 				case "SpiritBoss": {
-					if (this.wasBossDefeated("SpiritBoss")) {
-						break;
-					}
 					const boss = new SpiritBoss(
 						this,
 						this.enemyManager,
@@ -2620,9 +2628,6 @@ export class Game extends Scene {
 					break;
 				}
 				case "PlantBoss": {
-					if (this.wasBossDefeated("PlantBoss")) {
-						break;
-					}
 					const boss = new PlantBoss(this, this.enemyManager, point.x, point.y);
 					boss.once(Events.MonsterDefeated, () => {
 						this.markBossDefeated("PlantBoss");
@@ -2633,9 +2638,6 @@ export class Game extends Scene {
 					break;
 				}
 				case "FireBoss": {
-					if (this.wasBossDefeated("FireBoss")) {
-						break;
-					}
 					const boss = new FireBoss(this, this.enemyManager, point.x, point.y);
 					boss.once(Events.MonsterDefeated, () => {
 						this.markBossDefeated("FireBoss");
