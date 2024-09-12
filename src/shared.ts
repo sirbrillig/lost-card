@@ -683,6 +683,7 @@ export function loadSavedRegistry(
 	registry: Phaser.Data.DataManager,
 	saveData: SaveData
 ): void {
+	registry.reset();
 	Object.keys(saveData).forEach((key) => {
 		if (key === "playerHitPoints") {
 			// Always give player full HP when they load
