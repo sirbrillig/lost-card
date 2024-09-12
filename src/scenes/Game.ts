@@ -1088,7 +1088,7 @@ export class Game extends Scene {
 			? config.regionTransitionFadeTime
 			: config.roomTransitionFadeTime;
 
-		MainEvents.emit(Events.RoomChanged);
+		MainEvents.emit(Events.LeavingRoom);
 		this.setPlayerStunned(true);
 		this.setPlayerHiddenInvincible(true);
 		this.cameras.main.fadeOut(
@@ -1110,6 +1110,7 @@ export class Game extends Scene {
 					this.setPlayerStunned(false);
 					this.setPlayerHiddenInvincible(false);
 					this.cameras.main.fadeIn(fadeTime);
+					MainEvents.emit(Events.EnteredRoom);
 				}
 			}
 		);

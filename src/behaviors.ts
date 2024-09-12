@@ -250,7 +250,7 @@ export class SpawnEnemies<AllStates extends string>
 			console.log("spawner is dying so killing spawned creatures");
 			monster.emit(Events.MonsterKillRequest);
 		});
-		MainEvents.once(Events.RoomChanged, () => {
+		MainEvents.once(Events.LeavingRoom, () => {
 			monster.emit(Events.MonsterKillRequest);
 		});
 	}
@@ -557,7 +557,7 @@ export class RandomTeleport<AllStates extends string>
 		sprite.once(Events.MonsterDying, () => {
 			effect1?.destroy();
 		});
-		MainEvents.once(Events.RoomChanged, () => {
+		MainEvents.once(Events.LeavingRoom, () => {
 			effect1?.destroy();
 		});
 
@@ -593,7 +593,7 @@ export class RandomTeleport<AllStates extends string>
 		sprite.once(Events.MonsterDying, () => {
 			effect2?.destroy();
 		});
-		MainEvents.once(Events.RoomChanged, () => {
+		MainEvents.once(Events.LeavingRoom, () => {
 			effect2?.destroy();
 		});
 
@@ -787,8 +787,10 @@ export class PowerUp<AllStates extends string>
 			sprite.scene?.sound.stopByKey("ice-charge");
 			effect?.destroy();
 		});
-		MainEvents.once(Events.RoomChanged, () => {
+		MainEvents.once(Events.LeavingRoom, () => {
 			effect?.destroy();
+			stateMachine.popState();
+			stateMachine.pushState(this.#nextState);
 		});
 		effect.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
 			sprite?.scene?.sound.stopByKey("ice-charge");
@@ -875,7 +877,7 @@ export class SlashTowardPlayer<AllStates extends string>
 		sprite.once(Events.MonsterDying, () => {
 			this.#effect?.destroy();
 		});
-		MainEvents.once(Events.RoomChanged, () => {
+		MainEvents.once(Events.LeavingRoom, () => {
 			this.#effect?.destroy();
 		});
 		this.#effect.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
@@ -947,8 +949,10 @@ export class BigSwing<AllStates extends string>
 		sprite.once(Events.MonsterDying, () => {
 			effect?.destroy();
 		});
-		MainEvents.once(Events.RoomChanged, () => {
+		MainEvents.once(Events.LeavingRoom, () => {
 			effect?.destroy();
+			stateMachine.popState();
+			stateMachine.pushState(this.#nextState);
 		});
 		effect.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
 			effect?.destroy();
@@ -1014,8 +1018,10 @@ export class IceAttack<AllStates extends string>
 		sprite.once(Events.MonsterDying, () => {
 			effect?.destroy();
 		});
-		MainEvents.once(Events.RoomChanged, () => {
+		MainEvents.once(Events.LeavingRoom, () => {
 			effect?.destroy();
+			stateMachine.popState();
+			stateMachine.pushState(this.#nextState);
 		});
 		effect.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
 			effect?.destroy();
@@ -1069,7 +1075,7 @@ export class SeekingVine<AllStates extends string>
 		sprite.once(Events.MonsterDying, () => {
 			this.#effect?.destroy();
 		});
-		MainEvents.once(Events.RoomChanged, () => {
+		MainEvents.once(Events.LeavingRoom, () => {
 			this.#effect?.destroy();
 		});
 
@@ -1195,7 +1201,7 @@ export class SummonCircle<AllStates extends string>
 			console.log("spawner is dying so killing spawned creatures");
 			monster?.emit(Events.MonsterKillRequest);
 		});
-		MainEvents.once(Events.RoomChanged, () => {
+		MainEvents.once(Events.LeavingRoom, () => {
 			monster?.emit(Events.MonsterKillRequest);
 		});
 		if (!isDynamicSprite(monster)) {
@@ -1274,7 +1280,7 @@ export class BlackOrbAttack<AllStates extends string>
 			MainEvents.emit(Events.EnemyHitPlayer, true);
 			enemy.emit(Events.MonsterKillRequest);
 		});
-		MainEvents.once(Events.RoomChanged, () => {
+		MainEvents.once(Events.LeavingRoom, () => {
 			enemy?.emit(Events.MonsterKillRequest);
 		});
 
@@ -1368,7 +1374,7 @@ export class RangedFireBall<AllStates extends string>
 			fireSound?.stop();
 			effect?.destroy();
 		});
-		MainEvents.once(Events.RoomChanged, () => {
+		MainEvents.once(Events.LeavingRoom, () => {
 			fireSound?.stop();
 			effect?.destroy();
 		});
@@ -1459,7 +1465,7 @@ export class RangedIceBall<AllStates extends string>
 			sprite.scene?.sound.stopByKey("ice");
 			effect?.destroy();
 		});
-		MainEvents.once(Events.RoomChanged, () => {
+		MainEvents.once(Events.LeavingRoom, () => {
 			sprite.scene?.sound.stopByKey("ice");
 			effect?.destroy();
 		});
@@ -1557,9 +1563,11 @@ export class WalkWithFire<AllStates extends string>
 			walkSound.stop();
 			this.#effect?.destroy();
 		});
-		MainEvents.once(Events.RoomChanged, () => {
+		MainEvents.once(Events.LeavingRoom, () => {
 			walkSound.stop();
 			this.#effect?.destroy();
+			stateMachine.popState();
+			stateMachine.pushState(this.#nextState);
 		});
 		this.#effect.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
 			walkSound?.stop();
@@ -1681,9 +1689,11 @@ export class IceBeam<AllStates extends string>
 			sprite.scene?.sound.stopByKey("freeze");
 			effect?.destroy();
 		});
-		MainEvents.once(Events.RoomChanged, () => {
+		MainEvents.once(Events.LeavingRoom, () => {
 			sprite.scene?.sound.stopByKey("freeze");
 			effect?.destroy();
+			stateMachine.popState();
+			stateMachine.pushState(this.#nextState);
 		});
 		effect.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
 			sprite.scene?.sound.stopByKey("freeze");
@@ -2072,7 +2082,7 @@ class Seeker extends Phaser.Physics.Arcade.Sprite {
 			MainEvents.emit(Events.EnemyHitPlayer, true);
 			this.destroy();
 		});
-		MainEvents.once(Events.RoomChanged, () => {
+		MainEvents.once(Events.LeavingRoom, () => {
 			this.destroy();
 		});
 
@@ -2186,7 +2196,7 @@ export class ThrowRocks<AllStates extends string>
 		this.#sprite.once(Events.MonsterDying, () => {
 			rock?.destroy();
 		});
-		MainEvents.once(Events.RoomChanged, () => {
+		MainEvents.once(Events.LeavingRoom, () => {
 			rock?.destroy();
 		});
 		this.#rocksCreated.push(rock);

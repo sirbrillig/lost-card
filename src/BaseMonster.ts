@@ -1,4 +1,4 @@
-import { isDynamicSprite, Events, DataKeys } from "./shared";
+import { isDynamicSprite, Events, DataKeys, isPointInRoom } from "./shared";
 import { BehaviorMachineInterface, Behavior, StateMachine } from "./behavior";
 import { EnemyManager } from "./EnemyManager";
 import { MainEvents } from "./MainEvents";
@@ -53,11 +53,28 @@ export class BaseMonster<AllStates extends string> extends Phaser.Physics.Arcade
 		this.on(Events.MonsterHit, this.hit);
 		this.on(Events.MonsterStun, this.setStunned);
 		this.on(Events.MonsterKillRequest, this.kill);
-		MainEvents.on(Events.RoomChanged, () => {
+
+		MainEvents.on(Events.LeavingRoom, () => {
 			this.active = false;
+		});
+		MainEvents.on(Events.EnteredRoom, () => {
+			if (this.isInActiveRoom()) {
+				this.active = true;
+			}
 		});
 
 		this.initSprites();
+	}
+
+	isInActiveRoom(): boolean {
+		if (!this.#enemyManager.activeRoom || !this.body) {
+			return false;
+		}
+		return isPointInRoom(
+			this.body.center.x,
+			this.body.center.y,
+			this.#enemyManager.activeRoom
+		);
 	}
 
 	getInitialState(): AllStates {
