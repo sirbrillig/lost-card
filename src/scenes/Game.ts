@@ -483,6 +483,7 @@ export class Game extends Scene {
 		);
 		const fadeTime = config.roomTransitionFadeTime;
 		this.setPlayerStunned(true);
+		this.setPlayerHiddenInvincible(true);
 		this.cameras.main.fadeOut(
 			fadeTime,
 			0,
@@ -493,6 +494,7 @@ export class Game extends Scene {
 					this.respawnRegion(getRegionFromRoomName("FB"));
 					this.movePlayerToPoint(destinationX, destinationY);
 					this.playMusicForRegion(getRegionFromRoomName("FB"));
+					this.setPlayerHiddenInvincible(false);
 					this.setPlayerStunned(false);
 					this.cameras.main.fadeIn(fadeTime);
 				}
@@ -1084,6 +1086,7 @@ export class Game extends Scene {
 			: config.roomTransitionFadeTime;
 
 		this.setPlayerStunned(true);
+		this.setPlayerHiddenInvincible(true);
 		this.cameras.main.fadeOut(
 			fadeTime,
 			0,
@@ -1101,6 +1104,7 @@ export class Game extends Scene {
 					}
 					this.movePlayerToPoint(destinationX, destinationY);
 					this.setPlayerStunned(false);
+					this.setPlayerHiddenInvincible(false);
 					this.cameras.main.fadeIn(fadeTime);
 				}
 			}
