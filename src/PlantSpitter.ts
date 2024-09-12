@@ -63,6 +63,7 @@ export class PlantSpitter extends BaseMonster<AllStates> {
 				return new SpawnEnemies(state, "idle2", {
 					enemiesToSpawn: 1,
 					maxSpawnedEnemies: 5,
+					postSpawnTime: 1900,
 					createMonster: () => {
 						const bug = new PlantBug(
 							this.scene,

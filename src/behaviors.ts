@@ -177,6 +177,7 @@ export class SpawnEnemies<AllStates extends string>
 		config?: {
 			enemiesToSpawn?: number;
 			maxSpawnedEnemies?: number;
+			postSpawnTime?: number;
 			createMonster: (
 				scene: Phaser.Scene,
 				enemyManager: EnemyManager,
@@ -192,6 +193,9 @@ export class SpawnEnemies<AllStates extends string>
 		}
 		if (config?.maxSpawnedEnemies) {
 			this.#maxSpawnedEnemies = config.maxSpawnedEnemies;
+		}
+		if (config?.postSpawnTime) {
+			this.#postSpawnTime = config.postSpawnTime;
 		}
 		if (config?.createMonster) {
 			this.#createMonster = config.createMonster;
