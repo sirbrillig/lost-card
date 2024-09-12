@@ -2387,12 +2387,7 @@ export class Game extends Scene {
 			if (name === "appear" && progress > 0.8) {
 				this.setPlayerStunned(false);
 				this.player.setVisible(true);
-				this.time.addEvent({
-					delay: config.postAppearInvincibilityTime,
-					callback: () => {
-						this.setPlayerInvincible(false);
-					},
-				});
+				// The player will remain invincible until they move. See finishPlayerAppear()
 			}
 		});
 		effect.on(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
@@ -3303,6 +3298,15 @@ export class Game extends Scene {
 		return this.keyDown.isDown || this.keyS.isDown;
 	}
 
+	finishPlayerAppear() {
+		this.time.addEvent({
+			delay: config.postAppearInvincibilityTime,
+			callback: () => {
+				this.setPlayerInvincible(false);
+			},
+		});
+	}
+
 	updatePlayerMovement(): void {
 		if (!this.canPlayerMove()) {
 			this.walkSound.stop();
@@ -3334,16 +3338,24 @@ export class Game extends Scene {
 			this.player.setFlipX(false);
 			this.player.anims.play("left-walk", true);
 			this.playWalkSound();
+			this.finishPlayerAppear();
+			MainEvents.emit(Events.PlayerMoved);
 		} else if (this.isPressingRight()) {
 			this.player.setFlipX(true);
 			this.player.anims.play("left-walk", true);
 			this.playWalkSound();
+			this.finishPlayerAppear();
+			MainEvents.emit(Events.PlayerMoved);
 		} else if (this.isPressingUp()) {
 			this.player.anims.play("up-walk", true);
 			this.playWalkSound();
+			this.finishPlayerAppear();
+			MainEvents.emit(Events.PlayerMoved);
 		} else if (this.isPressingDown()) {
 			this.player.anims.play("down-walk", true);
 			this.playWalkSound();
+			this.finishPlayerAppear();
+			MainEvents.emit(Events.PlayerMoved);
 		} else {
 			this.walkSound.stop();
 			this.setPlayerIdleFrame();
@@ -3407,6 +3419,7 @@ export class Game extends Scene {
 		this.updatePlayerMovement();
 		this.updateHealEffectPosition();
 
+		// Keep in mind that the player may be moving unintentionally (eg: via knockback).
 		const isMoving =
 			this.player.body.velocity.x !== 0 || this.player.body.velocity.y !== 0;
 		if (isMoving) {

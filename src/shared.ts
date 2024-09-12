@@ -28,6 +28,7 @@ export const Events = {
 	GameSaved: "gameSaved",
 	PowerEquipped: "PowerEquipped",
 	RoomChanged: "RoomChanged",
+	PlayerMoved: "PlayerMoved",
 };
 
 export const DataKeys = {

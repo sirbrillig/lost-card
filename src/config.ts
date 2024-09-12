@@ -21,7 +21,7 @@ export const config = {
 	roomTransitionFadeTime: 300,
 	regionTransitionFadeTime: 1000,
 	sceneStartFadeTime: 1000,
-	postAppearInvincibilityTime: 1200,
+	postAppearInvincibilityTime: 2000,
 	icePowerVelocity: 80,
 	iceCardFrozenTime: 3000,
 	iceMeltTime: 4000,
