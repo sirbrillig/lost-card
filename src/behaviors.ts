@@ -2277,11 +2277,11 @@ export class ThrowRocks<AllStates extends string>
 						loop: false,
 						volume: 0.5,
 					});
-					rock.setOrigin(0.6, 0.5);
-					rock.anims.play("explode", true);
-					this.#sprite.scene.cameras.main.shake(200, 0.004);
+					rock?.setOrigin(0.6, 0.5);
+					rock?.anims?.play("explode", true);
+					this.#sprite.scene?.cameras.main.shake(200, 0.004);
 					vibrate(this.#sprite.scene, 1, 200);
-					rock.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
+					rock?.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
 						rock.destroy();
 					});
 				});
