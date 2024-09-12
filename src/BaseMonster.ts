@@ -67,7 +67,7 @@ export class BaseMonster<AllStates extends string> extends Phaser.Physics.Arcade
 	}
 
 	isInActiveRoom(): boolean {
-		if (!this.#enemyManager.activeRoom || !this.body) {
+		if (!this.#enemyManager?.activeRoom || !this.body) {
 			return false;
 		}
 		return isPointInRoom(
