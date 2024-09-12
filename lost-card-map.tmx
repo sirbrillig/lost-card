@@ -8626,7 +8626,7 @@
    </properties>
   </object>
   <object id="576" name="PotionVial" gid="2823" x="2928.74" y="2301.73" width="16" height="16"/>
-  <object id="577" name="PotionVial" gid="2799" x="2879.41" y="1806.09" width="16" height="16"/>
+  <object id="577" name="PotionVial" gid="2823" x="2879.41" y="1806.09" width="16" height="16"/>
   <object id="641" name="PotionBottle" gid="2791" x="845.678" y="2030.97" width="16" height="16"/>
   <object id="657" name="PotionVial" gid="2823" x="464" y="1504" width="16" height="16"/>
   <object id="659" name="PotionVial" gid="2823" x="1050.1" y="1858.35" width="16" height="16"/>
