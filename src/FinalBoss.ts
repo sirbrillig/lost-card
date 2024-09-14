@@ -47,7 +47,7 @@ type AllStates =
 	| "attack6";
 
 export class FinalBoss extends BaseMonster<AllStates> {
-	hitPoints: number = 20;
+	hitPoints: number = 26;
 	enemyManager: EnemyManager;
 
 	constructor(
