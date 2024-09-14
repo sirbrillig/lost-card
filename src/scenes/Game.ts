@@ -97,6 +97,7 @@ export class Game extends Scene {
 	playerDirection: SpriteDirection = SpriteDown;
 	enteredRoomAt: number = 0;
 	isPlayerBeingKnockedBack: boolean = false;
+	heartCardTimer: Phaser.Time.TimerEvent | undefined;
 
 	keyLeft: Phaser.Input.Keyboard.Key;
 	keyDown: Phaser.Input.Keyboard.Key;
@@ -648,9 +649,7 @@ export class Game extends Scene {
 			return;
 		}
 		// Use Potion
-		const totalHitPoints =
-			this.registry.get("playerTotalHitPoints") ??
-			config.playerInitialHitPoints;
+		const totalHitPoints = this.getPlayerTotalHitPoints();
 		this.healSound.play();
 		if (this.healEffect) {
 			this.healEffect.destroy();
@@ -1729,7 +1728,20 @@ export class Game extends Scene {
 		);
 	}
 
+	getPlayerTotalHitPoints(): number {
+		return (
+			this.registry.get("playerTotalHitPoints") ?? config.playerInitialHitPoints
+		);
+	}
+
 	setPlayerHitPoints(hitPoints: number) {
+		const playerTotalHitPoints = this.getPlayerTotalHitPoints();
+		if (hitPoints > playerTotalHitPoints) {
+			hitPoints = playerTotalHitPoints;
+		}
+		if (hitPoints < 0) {
+			hitPoints = 0;
+		}
 		this.registry.set("playerHitPoints", hitPoints);
 	}
 
@@ -1755,9 +1767,7 @@ export class Game extends Scene {
 
 	pickUpHeart() {
 		this.sound.play("heart");
-		let playerTotalHitPoints =
-			this.registry.get("playerTotalHitPoints") ??
-			config.playerInitialHitPoints;
+		let playerTotalHitPoints = this.getPlayerTotalHitPoints();
 		playerTotalHitPoints += 1;
 		this.registry.set("playerTotalHitPoints", playerTotalHitPoints);
 		this.restorePlayerHitPoints();
@@ -1873,10 +1883,10 @@ export class Game extends Scene {
 	}
 
 	restorePlayerHitPoints() {
-		const playerTotalHitPoints =
-			this.registry.get("playerTotalHitPoints") ??
-			config.playerInitialHitPoints;
+		const playerTotalHitPoints = this.getPlayerTotalHitPoints();
 		this.setPlayerHitPoints(playerTotalHitPoints);
+		this.heartCardTimer?.remove();
+		this.heartCardTimer = undefined;
 	}
 
 	restorePlayerPotions() {
@@ -2906,6 +2916,8 @@ export class Game extends Scene {
 			}
 		});
 		this.setPlayerHitPoints(this.getPlayerHitPoints() - 1);
+		this.heartCardTimer?.remove();
+		this.heartCardTimer = undefined;
 
 		if (this.getPlayerHitPoints() <= 0) {
 			return;
@@ -3472,6 +3484,23 @@ export class Game extends Scene {
 		}
 	}
 
+	updateHeartCard() {
+		const hasHeartCard = this.registry.get(getPowerEquippedKey("HeartCard"));
+		if (!hasHeartCard) {
+			return;
+		}
+		if (this.heartCardTimer) {
+			return;
+		}
+		this.heartCardTimer = this.time.addEvent({
+			repeat: -1,
+			delay: config.heartCardHealTime,
+			callback: () => {
+				this.setPlayerHitPoints(this.getPlayerHitPoints() + 1);
+			},
+		});
+	}
+
 	updatePlayer(): void {
 		this.updatePlayerTint();
 		this.updatePlayerAlpha();
@@ -3482,6 +3511,7 @@ export class Game extends Scene {
 		this.updatePowerHitboxPosition();
 		this.updatePlayerMovement();
 		this.updateHealEffectPosition();
+		this.updateHeartCard();
 
 		// Keep in mind that the player may be moving unintentionally (eg: via knockback).
 		const isMoving =

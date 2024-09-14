@@ -34,4 +34,5 @@ export const config = {
 	droppedItemLifetime: 10000,
 	finalBossDoorInside: 738,
 	spiritPowerTime: 4000,
+	heartCardHealTime: 10000,
 };
