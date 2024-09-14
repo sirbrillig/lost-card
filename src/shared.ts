@@ -56,6 +56,7 @@ export type Auras =
 	| "SunCard"
 	| "HeartCard"
 	| "SwordCard"
+	| "MountainCard"
 	| "ClockCard"
 	| "FishCard";
 
@@ -79,6 +80,7 @@ export const powerOrder: Powers[] = [
 export const auraOrder: Auras[] = [
 	"HeartCard",
 	"SwordCard",
+	"MountainCard",
 	"SunCard",
 	"ClockCard",
 	"FishCard",
@@ -88,6 +90,8 @@ export function getPowerEquippedKey(power: Powers | Auras): string {
 	switch (power) {
 		case "ClockCard":
 			return "hasClockCard";
+		case "MountainCard":
+			return "hasMountainCard";
 		case "SwordCard":
 			return "hasSwordCard";
 		case "SunCard":
@@ -124,6 +128,8 @@ export function getIconForPower(power: Powers | Auras): {
 			return { texture: "cards", frame: 43 };
 		case "SunCard":
 			return { texture: "cards", frame: 24 };
+		case "MountainCard":
+			return { texture: "cards", frame: 26 };
 		case "SwordCard":
 			return { texture: "cards", frame: 29 };
 		case "HeartCard":

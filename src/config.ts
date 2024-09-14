@@ -30,6 +30,7 @@ export const config = {
 	plantCardVelocity: 140,
 	firePowerVelocity: 120,
 	gateCloseSpeed: 340,
+	gateAwareDistance: 60,
 	newRegionMessageTime: 1000,
 	initialPotionCount: 1,
 	chanceToDropPotion: 20,

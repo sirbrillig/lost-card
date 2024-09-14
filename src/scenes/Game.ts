@@ -62,6 +62,7 @@ import {
 	getButtonNames,
 	vibrate,
 	doRectanglesOverlap,
+	auraOrder,
 } from "../shared";
 
 export class Game extends Scene {
@@ -671,11 +672,9 @@ export class Game extends Scene {
 			}
 			// Cheat: gain all auras
 			this.equipSword();
-			this.equipAura("HeartCard");
-			this.equipAura("FishCard");
-			this.equipAura("SwordCard");
-			this.equipAura("SunCard");
-			this.equipAura("ClockCard");
+			auraOrder.forEach((card) => {
+				this.equipAura(card);
+			});
 		});
 		this.input.keyboard.on("keydown-FIVE", () => {
 			if (!isCheatMode) {
@@ -1099,7 +1098,11 @@ export class Game extends Scene {
 			gatePosition,
 			this.player.body.center
 		);
-		if (distance > 60) {
+		let gateAwareDistance = config.gateAwareDistance;
+		if (gatePillar.data?.get("gateAwareDistance")) {
+			gateAwareDistance = gatePillar.data?.get("gateAwareDistance");
+		}
+		if (distance > gateAwareDistance) {
 			this.openGatePillars();
 			return;
 		}
@@ -1113,6 +1116,8 @@ export class Game extends Scene {
 		if (!gatePillar) {
 			return;
 		}
+		let gateCloseSpeed =
+			gatePillar.data.get("gateCloseSpeed") ?? config.gateCloseSpeed;
 		gatePillar.data.set("openGate", false);
 		this.createdTiles
 			.filter((tile) => tile.name === "GateWall")
@@ -1124,7 +1129,7 @@ export class Game extends Scene {
 						targets: tile,
 						x: tilePosition.x,
 						y: tilePosition.y,
-						duration: config.gateCloseSpeed,
+						duration: gateCloseSpeed,
 					});
 				}
 			});
@@ -1777,6 +1782,9 @@ export class Game extends Scene {
 				case "SunCard":
 					this.pickUpAura(touchingItem.name);
 					break;
+				case "MountainCard":
+					this.pickUpAura(touchingItem.name);
+					break;
 				case "SwordCard":
 					this.pickUpAura(touchingItem.name);
 					break;
@@ -1930,6 +1938,8 @@ export class Game extends Scene {
 
 	getCardNameForPower(card: Powers | Auras): string {
 		switch (card) {
+			case "MountainCard":
+				return "Mountain Card";
 			case "FishCard":
 				return "Fish Card";
 			case "ClockCard":
@@ -1963,6 +1973,8 @@ export class Game extends Scene {
 				return "Your powers can be used more frequently.";
 			case "HeartCard":
 				return "Given time, your hearts will slowly restore on their own.";
+			case "MountainCard":
+				return "You can no longer be pushed by attacks or when attacking.";
 			case "SwordCard":
 				return "Your sword will now deal considerably more damage per hit.";
 			case "SunCard":
@@ -2986,13 +2998,15 @@ export class Game extends Scene {
 		enemy.emit(Events.MonsterHit, damage);
 
 		// Knock the player back a bit when they hit an enemy.
-		this.knockBack(
-			this.player.body,
-			config.postHitEnemyKnockback,
-			config.playerKnockBackSpeed,
-			invertSpriteDirection(this.playerDirection),
-			() => {}
-		);
+		if (!this.hasAura("MountainCard")) {
+			this.knockBack(
+				this.player.body,
+				config.postHitEnemyKnockback,
+				config.playerKnockBackSpeed,
+				invertSpriteDirection(this.playerDirection),
+				() => {}
+			);
+		}
 
 		// Knock back monster when they are hit.
 		this.pushEnemy(enemy);
@@ -3067,18 +3081,20 @@ export class Game extends Scene {
 			},
 		});
 
-		this.setPlayerStunned(true);
-		this.isPlayerBeingKnockedBack = true;
-		this.knockBack(
-			this.player.body,
-			config.postHitPlayerKnockback,
-			config.playerKnockBackSpeed,
-			invertSpriteDirection(this.playerDirection),
-			() => {
-				this.setPlayerStunned(false);
-				this.isPlayerBeingKnockedBack = false;
-			}
-		);
+		if (!this.hasAura("MountainCard")) {
+			this.setPlayerStunned(true);
+			this.isPlayerBeingKnockedBack = true;
+			this.knockBack(
+				this.player.body,
+				config.postHitPlayerKnockback,
+				config.playerKnockBackSpeed,
+				invertSpriteDirection(this.playerDirection),
+				() => {
+					this.setPlayerStunned(false);
+					this.isPlayerBeingKnockedBack = false;
+				}
+			);
+		}
 
 		this.setPlayerBeingHit(true);
 	}
