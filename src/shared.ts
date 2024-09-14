@@ -52,7 +52,12 @@ export const DataKeys = {
 
 export type Region = "MK" | "IK" | "CK" | "FK" | "PK" | "SK" | "FB";
 
-export type Auras = "SunCard" | "HeartCard" | "SwordCard" | "ClockCard";
+export type Auras =
+	| "SunCard"
+	| "HeartCard"
+	| "SwordCard"
+	| "ClockCard"
+	| "FishCard";
 
 export type Powers =
 	| "IceCard"
@@ -76,6 +81,7 @@ export const auraOrder: Auras[] = [
 	"SwordCard",
 	"SunCard",
 	"ClockCard",
+	"FishCard",
 ];
 
 export function getPowerEquippedKey(power: Powers | Auras): string {
@@ -100,6 +106,8 @@ export function getPowerEquippedKey(power: Powers | Auras): string {
 			return "hasSpiritCard";
 		case "CloudCard":
 			return "hasCloudCard";
+		case "FishCard":
+			return "hasFishCard";
 		default:
 			throw new Error(`Unknown power ${power}`);
 	}
@@ -110,6 +118,8 @@ export function getIconForPower(power: Powers | Auras): {
 	frame: number;
 } {
 	switch (power) {
+		case "FishCard":
+			return { texture: "cards", frame: 68 };
 		case "ClockCard":
 			return { texture: "cards", frame: 43 };
 		case "SunCard":

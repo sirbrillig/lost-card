@@ -196,6 +196,13 @@ export class Game extends Scene {
 			(_, tile) => {
 				if (
 					isTileWithPropertiesObject(tile) &&
+					(tile.properties.isWater || tile.properties.isLava) &&
+					this.hasAura("FishCard")
+				) {
+					return false;
+				}
+				if (
+					isTileWithPropertiesObject(tile) &&
 					tile.properties.affectedBySpiritCard &&
 					this.isPlayerUsingPower() &&
 					this.getActivePower() === "SpiritCard"
@@ -208,7 +215,52 @@ export class Game extends Scene {
 				return true;
 			}
 		);
-		this.physics.add.collider(this.hiddenRoomLayer, this.player);
+		this.physics.add.collider(
+			this.hiddenRoomLayer,
+			this.player,
+			(_, tile) => {
+				if (!isTileWithPropertiesObject(tile) || !tile.properties.hurts) {
+					return;
+				}
+				this.enemyHitPlayer();
+			},
+			(_, tile) => {
+				if (
+					isTileWithPropertiesObject(tile) &&
+					(tile.properties.isWater || tile.properties.isLava) &&
+					this.hasAura("FishCard")
+				) {
+					return false;
+				}
+				if (
+					isTileWithPropertiesObject(tile) &&
+					tile.properties.affectedBySpiritCard &&
+					this.isPlayerUsingPower() &&
+					this.getActivePower() === "SpiritCard"
+				) {
+					return false;
+				}
+				if (this.player.data.get("isPlantCardGrappleActive")) {
+					return false;
+				}
+				return true;
+			}
+		);
+		this.physics.add.collider(
+			this.hiddenRoomLayer,
+			this.enemyManager.enemies,
+			undefined,
+			(enemy, tile) => {
+				if (!isDynamicSprite(enemy)) {
+					console.error(enemy);
+					throw new Error("Non-sprite ran into something");
+				}
+				if (!isEnemy(enemy)) {
+					throw new Error("Non-enemy ran into something");
+				}
+				return enemy.doesCollideWithTile(tile);
+			}
+		);
 		this.physics.add.collider(
 			this.landLayer,
 			this.enemyManager.enemies,
@@ -362,6 +414,15 @@ export class Game extends Scene {
 				this.playerHitEnemy(enemy);
 			}
 		);
+		this.physics.add.overlap(this.power, this.hiddenRoomLayer, (_, tile) => {
+			if (!isTilemapTile(tile)) {
+				return;
+			}
+			if (!this.isPlayerUsingPower() || this.getActivePower() !== "IceCard") {
+				return;
+			}
+			this.freezeWaterTile(tile);
+		});
 		this.physics.add.overlap(this.power, this.landLayer, (_, tile) => {
 			if (!isTilemapTile(tile)) {
 				return;
@@ -566,6 +627,11 @@ export class Game extends Scene {
 			} else {
 				this.debugGraphic = this.physics.world.createDebugGraphic();
 				this.layerDebugGraphic = this.add.graphics();
+				this.hiddenRoomLayer.renderDebug(this.layerDebugGraphic, {
+					tileColor: null,
+					collidingTileColor: new Phaser.Display.Color(243, 134, 48, 200),
+					faceColor: new Phaser.Display.Color(40, 39, 37, 255),
+				});
 				this.landLayer.renderDebug(this.layerDebugGraphic, {
 					tileColor: null,
 					collidingTileColor: new Phaser.Display.Color(243, 134, 48, 200),
@@ -606,6 +672,7 @@ export class Game extends Scene {
 			// Cheat: gain all auras
 			this.equipSword();
 			this.equipAura("HeartCard");
+			this.equipAura("FishCard");
 			this.equipAura("SwordCard");
 			this.equipAura("SunCard");
 			this.equipAura("ClockCard");
@@ -1547,6 +1614,14 @@ export class Game extends Scene {
 				this.destroyCreatedTile(tile);
 			}
 		});
+		this.physics.add.collider(this.hiddenRoomLayer, tile, (collideTile) => {
+			if (!isDynamicSprite(collideTile)) {
+				return;
+			}
+			if (collideTile.data.get("beingPushed")) {
+				this.destroyCreatedTile(tile);
+			}
+		});
 		this.physics.add.collider(this.createdDoors, tile, (_, collideTile) => {
 			if (!isDynamicSprite(collideTile)) {
 				return;
@@ -1688,6 +1763,9 @@ export class Game extends Scene {
 					this.pickUpAura(touchingItem.name);
 					break;
 				case "SwordCard":
+					this.pickUpAura(touchingItem.name);
+					break;
+				case "FishCard":
 					this.pickUpAura(touchingItem.name);
 					break;
 				case "HeartCard":
@@ -1837,6 +1915,8 @@ export class Game extends Scene {
 
 	getCardNameForPower(card: Powers | Auras): string {
 		switch (card) {
+			case "FishCard":
+				return "Fish Card";
 			case "ClockCard":
 				return "Clock Card";
 			case "SwordCard":
@@ -1862,6 +1942,8 @@ export class Game extends Scene {
 
 	getAuraDescription(card: Auras): string {
 		switch (card) {
+			case "FishCard":
+				return "You can now walk through water or lava safely.";
 			case "ClockCard":
 				return "Your powers can be used more frequently.";
 			case "HeartCard":
