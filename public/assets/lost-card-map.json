@@ -2751,7 +2751,7 @@
                 }, 
                 {
                  "gid":1648,
-                 "height":12.4342111965768,
+                 "height":12.4342,
                  "id":835,
                  "name":"",
                  "properties":[
@@ -5809,8 +5809,8 @@
                  "type":"",
                  "visible":true,
                  "width":16,
-                 "x":1398.95254885407,
-                 "y":927.503389367566
+                 "x":1398.95,
+                 "y":927.503
                 }, 
                 {
                  "gid":2921,
@@ -5823,6 +5823,24 @@
                  "width":16,
                  "x":1888,
                  "y":1504
+                }, 
+                {
+                 "gid":2883,
+                 "height":16,
+                 "id":868,
+                 "name":"CrownCard",
+                 "properties":[
+                        {
+                         "name":"hidden",
+                         "type":"bool",
+                         "value":true
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":16,
+                 "x":1927.72778827977,
+                 "y":523.527950310559
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -11702,7 +11720,7 @@
          "y":0
         }],
  "nextlayerid":18,
- "nextobjectid":868,
+ "nextobjectid":869,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.0",

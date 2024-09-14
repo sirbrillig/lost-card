@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.0" orientation="orthogonal" renderorder="right-down" width="200" height="200" tilewidth="16" tileheight="16" infinite="0" nextlayerid="18" nextobjectid="868">
+<map version="1.10" tiledversion="1.11.0" orientation="orthogonal" renderorder="right-down" width="200" height="200" tilewidth="16" tileheight="16" infinite="0" nextlayerid="18" nextobjectid="869">
  <editorsettings>
   <export target="public/assets/lost-card-map.json" format="json"/>
  </editorsettings>
@@ -8797,6 +8797,11 @@
   <object id="827" name="SunCard" gid="2877" x="560" y="1552" width="16" height="16"/>
   <object id="831" name="TimeCard" gid="2896" x="1398.95" y="927.503" width="16" height="16"/>
   <object id="845" name="FishCard" gid="2921" x="1888" y="1504" width="16" height="16"/>
+  <object id="868" name="CrownCard" gid="2883" x="1927.73" y="523.528" width="16" height="16">
+   <properties>
+    <property name="hidden" type="bool" value="true"/>
+   </properties>
+  </object>
  </objectgroup>
  <objectgroup id="11" name="SavePoints">
   <object id="244" gid="2717" x="1600" y="1664" width="16" height="16"/>

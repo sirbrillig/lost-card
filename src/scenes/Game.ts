@@ -1756,6 +1756,21 @@ export class Game extends Scene {
 				case "PotionVial":
 					this.pickUpPotionVial();
 					break;
+				case "CrownCard":
+					this.cameras.main.fadeOut(
+						1000,
+						0,
+						0,
+						0,
+						(_: unknown, progress: number) => {
+							if (progress === 1) {
+								this.scene.stop();
+								this.scene.get("Overlay")?.scene.stop();
+								this.scene.start("Victory");
+							}
+						}
+					);
+					break;
 				case "ClockCard":
 					this.pickUpAura(touchingItem.name);
 					break;
@@ -2827,19 +2842,7 @@ export class Game extends Scene {
 					const boss = new FinalBoss(this, this.enemyManager, point.x, point.y);
 					this.enemyManager.enemies.add(boss);
 					boss.once(Events.MonsterDefeated, () => {
-						this.cameras.main.fadeOut(
-							1000,
-							0,
-							0,
-							0,
-							(_: unknown, progress: number) => {
-								if (progress === 1) {
-									this.scene.stop();
-									this.scene.get("Overlay")?.scene.stop();
-									this.scene.start("Victory");
-								}
-							}
-						);
+						this.showAllHiddenItemsInRoom();
 					});
 					break;
 				}

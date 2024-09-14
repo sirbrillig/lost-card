@@ -1,4 +1,5 @@
 import { Scene } from "phaser";
+import { powerOrder, auraOrder, getPowerEquippedKey } from "../shared";
 
 export class Victory extends Scene {
 	constructor() {
@@ -16,12 +17,21 @@ export class Victory extends Scene {
 
 		this.cameras.main.setBackgroundColor("black");
 
+		// The +1 is the CrownCard which came from the final boss.
+		const totalCardsCount = 1 + [...powerOrder, ...auraOrder].length;
+		let cardCount = 1;
+		[...powerOrder, ...auraOrder].forEach((card) => {
+			if (this.registry.get(getPowerEquippedKey(card))) {
+				cardCount += 1;
+			}
+		});
+
 		this.add
 			.bitmapText(
 				this.cameras.main.width / 2,
 				80,
 				"RetroGamingWhiteSmall",
-				"With the monsters defeated and the cards restored, the people of the six kingdoms were free once again. Your spirit may return to its rest.\r\nThe End.",
+				`With the Crown Card restored, the people of the six kingdoms are free once again. Your spirit may return to its rest.\r\nThe End.\r\n\r\nYou collected ${cardCount} / ${totalCardsCount} cards.`,
 				12
 			)
 			.setMaxWidth(this.cameras.main.width - 10)
