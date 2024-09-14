@@ -112,6 +112,7 @@ export class Game extends Scene {
 
 	map: Phaser.Tilemaps.Tilemap;
 	landLayer: Phaser.Tilemaps.TilemapLayer;
+	landLayer2: Phaser.Tilemaps.TilemapLayer;
 	stuffLayer: Phaser.Tilemaps.TilemapLayer;
 	createdFinalDoors: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody[] = [];
 	createdDoors: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody[] = [];
@@ -178,6 +179,7 @@ export class Game extends Scene {
 		);
 
 		this.landLayer = this.createTileLayer("Background", tilesetTile, 0);
+		this.landLayer2 = this.createTileLayer("HiddenRooms", tilesetTile, 0);
 		this.physics.add.collider(
 			this.landLayer,
 			this.player,
@@ -202,6 +204,7 @@ export class Game extends Scene {
 				return true;
 			}
 		);
+		this.physics.add.collider(this.landLayer2, this.player);
 		this.physics.add.collider(
 			this.landLayer,
 			this.enemyManager.enemies,
@@ -735,6 +738,7 @@ export class Game extends Scene {
 			);
 		}
 		this.landLayer.setCollisionByProperty({ collides: true });
+		this.landLayer2.setCollisionByProperty({ collides: true });
 	}
 
 	turnOffAllLanterns() {
