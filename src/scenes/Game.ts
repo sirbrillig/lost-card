@@ -601,6 +601,16 @@ export class Game extends Scene {
 			if (!isCheatMode) {
 				return;
 			}
+			// Cheat: gain all auras
+			this.equipSword();
+			this.equipAura("HeartCard");
+			this.equipAura("SwordCard");
+			this.equipAura("SunCard");
+		});
+		this.input.keyboard.on("keydown-FIVE", () => {
+			if (!isCheatMode) {
+				return;
+			}
 			// Cheat: be invincible
 			this.setPlayerInvincible(true);
 		});
@@ -2860,7 +2870,11 @@ export class Game extends Scene {
 		}
 		this.cameras.main.shake(200, 0.004);
 		vibrate(this, 1, 200);
-		enemy.emit(Events.MonsterHit);
+		let damage = 1;
+		if (this.hasAura("SwordCard")) {
+			damage = 2;
+		}
+		enemy.emit(Events.MonsterHit, damage);
 
 		// Knock the player back a bit when they hit an enemy.
 		this.knockBack(
@@ -3484,9 +3498,12 @@ export class Game extends Scene {
 		}
 	}
 
+	hasAura(aura: Auras): boolean {
+		return this.registry.get(getPowerEquippedKey(aura));
+	}
+
 	updateHeartCard() {
-		const hasHeartCard = this.registry.get(getPowerEquippedKey("HeartCard"));
-		if (!hasHeartCard) {
+		if (!this.hasAura("HeartCard")) {
 			return;
 		}
 		if (this.heartCardTimer) {

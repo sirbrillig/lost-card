@@ -50,7 +50,7 @@ export class BaseMonster<AllStates extends string> extends Phaser.Physics.Arcade
 		this.data.set(DataKeys.Hittable, true);
 		this.data.set(DataKeys.Pushable, true);
 		this.data.set(DataKeys.Freezable, true);
-		this.on(Events.MonsterHit, this.hit);
+		this.on(Events.MonsterHit, (damage: number) => this.hit(damage));
 		this.on(Events.MonsterStun, this.setStunned);
 		this.on(Events.MonsterKillRequest, this.kill);
 
@@ -153,7 +153,7 @@ export class BaseMonster<AllStates extends string> extends Phaser.Physics.Arcade
 		this.scene.sound.play("destroy");
 	}
 
-	hit() {
+	hit(damage: number) {
 		if (!this.baseIsHittable()) {
 			return;
 		}
@@ -168,7 +168,7 @@ export class BaseMonster<AllStates extends string> extends Phaser.Physics.Arcade
 				this.#isBeingHit = false;
 			},
 		});
-		this.hitPoints -= 1;
+		this.hitPoints -= damage;
 
 		if (this.hitPoints <= 0) {
 			this.kill();
