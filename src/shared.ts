@@ -52,7 +52,7 @@ export const DataKeys = {
 
 export type Region = "MK" | "IK" | "CK" | "FK" | "PK" | "SK" | "FB";
 
-export type Auras = "SunCard" | "HeartCard" | "SwordCard";
+export type Auras = "SunCard" | "HeartCard" | "SwordCard" | "ClockCard";
 
 export type Powers =
 	| "IceCard"
@@ -71,10 +71,17 @@ export const powerOrder: Powers[] = [
 	"CloudCard",
 ];
 
-export const auraOrder: Auras[] = ["HeartCard", "SwordCard", "SunCard"];
+export const auraOrder: Auras[] = [
+	"HeartCard",
+	"SwordCard",
+	"SunCard",
+	"ClockCard",
+];
 
 export function getPowerEquippedKey(power: Powers | Auras): string {
 	switch (power) {
+		case "ClockCard":
+			return "hasClockCard";
 		case "SwordCard":
 			return "hasSwordCard";
 		case "SunCard":
@@ -103,6 +110,8 @@ export function getIconForPower(power: Powers | Auras): {
 	frame: number;
 } {
 	switch (power) {
+		case "ClockCard":
+			return { texture: "cards", frame: 43 };
 		case "SunCard":
 			return { texture: "cards", frame: 24 };
 		case "SwordCard":

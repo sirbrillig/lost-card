@@ -3,6 +3,7 @@ export const config = {
 	cloudCardSpeed: 450,
 	postAttackCooldown: 150,
 	postPowerCooldown: 600,
+	clockCardCooldown: 150,
 	postHitPlayerKnockback: 200,
 	postHitEnemyKnockback: 50,
 	postHitInvincibilityTime: 800,

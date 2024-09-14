@@ -608,6 +608,7 @@ export class Game extends Scene {
 			this.equipAura("HeartCard");
 			this.equipAura("SwordCard");
 			this.equipAura("SunCard");
+			this.equipAura("ClockCard");
 		});
 		this.input.keyboard.on("keydown-FIVE", () => {
 			if (!isCheatMode) {
@@ -1486,17 +1487,31 @@ export class Game extends Scene {
 		tile.setAlpha(1);
 		tile.data.set("hidden", false);
 		tile.body.pushable = false;
-		this.physics.add.collider(this.player, tile, () => {
-			if (this.player.data.get("isPlantCardGrappleActive")) {
-				// In case we were being pulled by the PlantCard
-				this.player.data.set("isPlantCardGrappleActive", false);
-				this.power.anims.stop();
-				this.power.visible = false;
+		this.physics.add.collider(
+			this.player,
+			tile,
+			() => {
+				if (this.player.data.get("isPlantCardGrappleActive")) {
+					// In case we were being pulled by the PlantCard
+					this.player.data.set("isPlantCardGrappleActive", false);
+					this.power.anims.stop();
+					this.power.visible = false;
+				}
+
+				if (tile.name.endsWith("Sign")) {
+					this.showSign(tile.name);
+				}
+			},
+			() => {
+				if (
+					tile.data?.get("affectedBySpiritCard") &&
+					this.isPlayerUsingPower() &&
+					this.getActivePower() === "SpiritCard"
+				) {
+					return false;
+				}
 			}
-			if (tile.name.endsWith("Sign")) {
-				this.showSign(tile.name);
-			}
-		});
+		);
 		this.physics.add.collider(
 			this.enemyManager.enemies,
 			tile,
@@ -1666,6 +1681,9 @@ export class Game extends Scene {
 				case "PotionVial":
 					this.pickUpPotionVial();
 					break;
+				case "ClockCard":
+					this.pickUpAura(touchingItem.name);
+					break;
 				case "SunCard":
 					this.pickUpAura(touchingItem.name);
 					break;
@@ -1819,6 +1837,8 @@ export class Game extends Scene {
 
 	getCardNameForPower(card: Powers | Auras): string {
 		switch (card) {
+			case "ClockCard":
+				return "Clock Card";
 			case "SwordCard":
 				return "Sword Card";
 			case "HeartCard":
@@ -1842,6 +1862,8 @@ export class Game extends Scene {
 
 	getAuraDescription(card: Auras): string {
 		switch (card) {
+			case "ClockCard":
+				return "Your powers can be used more frequently.";
 			case "HeartCard":
 				return "Given time, your hearts will slowly restore on their own.";
 			case "SwordCard":
@@ -3060,13 +3082,16 @@ export class Game extends Scene {
 	}
 
 	canPlayerUsePower(): boolean {
+		const postPowerCooldown = this.hasAura("ClockCard")
+			? config.clockCardCooldown
+			: config.postPowerCooldown;
 		return (
 			this.getPlayerHitPoints() > 0 &&
 			this.doesPlayerHavePower() &&
 			!this.isPlayerFrozen() &&
 			!this.isPlayerStunned() &&
 			!this.isPlayerAttacking() &&
-			this.getTimeSinceLastPower() > config.postPowerCooldown &&
+			this.getTimeSinceLastPower() > postPowerCooldown &&
 			!this.isPlayerUsingPower()
 		);
 	}
