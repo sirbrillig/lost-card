@@ -5,6 +5,7 @@ import {
 	Powers,
 	Events,
 	powerOrder,
+	auraOrder,
 	getPowerEquippedKey,
 	getIconForPower,
 } from "../shared";
@@ -14,6 +15,43 @@ const itemSize: number = 17;
 const portraitPadding = 22;
 const inactiveFrame = 13;
 const activeFrame = 29;
+const itemTopMargin = 35;
+const itemLeftMargin = itemSize;
+
+class Aura {
+	image: Phaser.GameObjects.Image;
+	scene: Phaser.Scene;
+	name: string;
+
+	constructor(
+		scene: Phaser.Scene,
+		count: number,
+		texture: string,
+		frame: number,
+		name: string
+	) {
+		const image = scene.add
+			.image(
+				portraitPadding + itemLeftMargin + itemSize * count,
+				scene.cameras.main.y + itemSize + itemTopMargin,
+				texture,
+				frame
+			)
+			.setDepth(6)
+			.setOrigin(1);
+		this.image = image;
+		this.name = name;
+		this.scene = scene;
+	}
+
+	update() {
+		// noop for now
+	}
+
+	destroy() {
+		this.image.destroy();
+	}
+}
 
 class Card {
 	image: Phaser.GameObjects.Image;
@@ -31,8 +69,8 @@ class Card {
 	) {
 		const image = scene.add
 			.image(
-				portraitPadding + itemSize * count,
-				scene.cameras.main.y + 35,
+				portraitPadding + itemLeftMargin + itemSize * count,
+				scene.cameras.main.y + itemTopMargin,
 				texture,
 				frame
 			)
@@ -169,7 +207,9 @@ class Heart {
 }
 
 export class Overlay extends Scene {
-	items: (Card | PotionItem)[] = [];
+	potions: PotionItem[] = [];
+	items: Card[] = [];
+	auras: Aura[] = [];
 	hearts: Heart[] = [];
 	keyCount: number = 0;
 	totalHearts: number = 0;
@@ -186,6 +226,10 @@ export class Overlay extends Scene {
 	create() {
 		console.log("creating overlay");
 		this.keyCount = this.getKeyCount();
+		this.potions.forEach((item) => item.destroy());
+		this.potions = [];
+		this.auras.forEach((item) => item.destroy());
+		this.auras = [];
 		this.items.forEach((item) => item.destroy());
 		this.items = [];
 		this.hearts.forEach((item) => item.destroy());
@@ -218,6 +262,11 @@ export class Overlay extends Scene {
 		MainEvents.on(Events.PowerEquipped, () => {
 			this.items.forEach((item) => item.destroy());
 			this.items = [];
+		});
+
+		MainEvents.on(Events.AuraEquipped, () => {
+			this.auras.forEach((item) => item.destroy());
+			this.auras = [];
 		});
 
 		MainEvents.on(Events.GameSaved, () => {
@@ -374,9 +423,22 @@ export class Overlay extends Scene {
 	}
 
 	updateItems() {
-		if (!this.items.some((item) => item.name === "Potion")) {
-			this.items.push(new PotionItem(this, 0, "icons3", 2, "Potion"));
+		if (!this.potions.some((item) => item.name === "Potion")) {
+			this.potions.push(new PotionItem(this, 0, "icons3", 2, "Potion"));
 		}
+
+		auraOrder.forEach((aura) => {
+			if (!this.registry.get(getPowerEquippedKey(aura))) {
+				return;
+			}
+			if (this.auras.some((item) => item.name === aura)) {
+				return;
+			}
+			const icon = getIconForPower(aura);
+			this.auras.push(
+				new Aura(this, this.auras.length, icon.texture, icon.frame, aura)
+			);
+		});
 
 		powerOrder.forEach((power) => {
 			if (!this.registry.get(getPowerEquippedKey(power))) {
@@ -391,7 +453,9 @@ export class Overlay extends Scene {
 			);
 		});
 
+		this.potions.forEach((item) => item.update());
 		this.items.forEach((item) => item.update());
+		this.auras.forEach((item) => item.update());
 	}
 
 	getBackgroundWidth() {

@@ -27,6 +27,7 @@ export const Events = {
 	FreezePlayer: "freezePlayer",
 	GameSaved: "gameSaved",
 	PowerEquipped: "PowerEquipped",
+	AuraEquipped: "AuraEquipped",
 	LeavingRoom: "LeavingRoom",
 	EnteredRoom: "EnteredRoom",
 	PlayerMoved: "PlayerMoved",
@@ -51,6 +52,8 @@ export const DataKeys = {
 
 export type Region = "MK" | "IK" | "CK" | "FK" | "PK" | "SK" | "FB";
 
+export type Auras = "SunCard" | "HeartCard" | "SwordCard";
+
 export type Powers =
 	| "IceCard"
 	| "WindCard"
@@ -68,8 +71,16 @@ export const powerOrder: Powers[] = [
 	"CloudCard",
 ];
 
-export function getPowerEquippedKey(power: Powers): string {
+export const auraOrder: Auras[] = ["HeartCard", "SwordCard", "SunCard"];
+
+export function getPowerEquippedKey(power: Powers | Auras): string {
 	switch (power) {
+		case "SwordCard":
+			return "hasSwordCard";
+		case "SunCard":
+			return "hasSunCard";
+		case "HeartCard":
+			return "hasHeartCard";
 		case "WindCard":
 			return "hasWindCard";
 		case "IceCard":
@@ -87,11 +98,17 @@ export function getPowerEquippedKey(power: Powers): string {
 	}
 }
 
-export function getIconForPower(power: Powers): {
+export function getIconForPower(power: Powers | Auras): {
 	texture: string;
 	frame: number;
 } {
 	switch (power) {
+		case "SunCard":
+			return { texture: "cards", frame: 24 };
+		case "SwordCard":
+			return { texture: "cards", frame: 29 };
+		case "HeartCard":
+			return { texture: "cards", frame: 17 };
 		case "WindCard":
 			return { texture: "cards", frame: 44 };
 		case "IceCard":

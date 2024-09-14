@@ -25,6 +25,7 @@ import { SpiritBoss } from "../SpiritBoss";
 import { CloudBoss } from "../CloudBoss";
 import { FireBoss } from "../FireBoss";
 import {
+	Auras,
 	Powers,
 	Events,
 	DataKeys,
@@ -112,7 +113,7 @@ export class Game extends Scene {
 
 	map: Phaser.Tilemaps.Tilemap;
 	landLayer: Phaser.Tilemaps.TilemapLayer;
-	landLayer2: Phaser.Tilemaps.TilemapLayer;
+	hiddenRoomLayer: Phaser.Tilemaps.TilemapLayer;
 	stuffLayer: Phaser.Tilemaps.TilemapLayer;
 	createdFinalDoors: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody[] = [];
 	createdDoors: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody[] = [];
@@ -179,7 +180,7 @@ export class Game extends Scene {
 		);
 
 		this.landLayer = this.createTileLayer("Background", tilesetTile, 0);
-		this.landLayer2 = this.createTileLayer("HiddenRooms", tilesetTile, 0);
+		this.hiddenRoomLayer = this.createTileLayer("HiddenRooms", tilesetTile, 0);
 		this.physics.add.collider(
 			this.landLayer,
 			this.player,
@@ -204,7 +205,7 @@ export class Game extends Scene {
 				return true;
 			}
 		);
-		this.physics.add.collider(this.landLayer2, this.player);
+		this.physics.add.collider(this.hiddenRoomLayer, this.player);
 		this.physics.add.collider(
 			this.landLayer,
 			this.enemyManager.enemies,
@@ -738,7 +739,7 @@ export class Game extends Scene {
 			);
 		}
 		this.landLayer.setCollisionByProperty({ collides: true });
-		this.landLayer2.setCollisionByProperty({ collides: true });
+		this.hiddenRoomLayer.setCollisionByProperty({ collides: true });
 	}
 
 	turnOffAllLanterns() {
@@ -1654,6 +1655,15 @@ export class Game extends Scene {
 				case "PotionVial":
 					this.pickUpPotionVial();
 					break;
+				case "SunCard":
+					this.pickUpAura(touchingItem.name);
+					break;
+				case "SwordCard":
+					this.pickUpAura(touchingItem.name);
+					break;
+				case "HeartCard":
+					this.pickUpAura(touchingItem.name);
+					break;
 				case "PlantCard":
 					this.pickUpCard(touchingItem.name);
 					break;
@@ -1785,8 +1795,14 @@ export class Game extends Scene {
 		}
 	}
 
-	getCardNameForPower(card: Powers): string {
+	getCardNameForPower(card: Powers | Auras): string {
 		switch (card) {
+			case "SwordCard":
+				return "Sword Card";
+			case "HeartCard":
+				return "Heart Card";
+			case "SunCard":
+				return "Sun Card";
 			case "IceCard":
 				return "Ice Card";
 			case "PlantCard":
@@ -1800,6 +1816,36 @@ export class Game extends Scene {
 			case "CloudCard":
 				return "Cloud Card";
 		}
+	}
+
+	getAuraDescription(card: Auras): string {
+		switch (card) {
+			case "HeartCard":
+				return "Given time, your hearts will slowly restore on their own.";
+			case "SwordCard":
+				return "Your sword will now deal considerably more damage per hit.";
+			case "SunCard":
+				return "When you are hit, you will become invincible for a few moments.";
+		}
+	}
+
+	pickUpAura(card: Auras) {
+		this.equipAura(card);
+		this.sound.play("bonus");
+		this.setPlayerHiddenInvincible(true);
+		this.setPlayerStunned(true);
+		this.time.addEvent({
+			delay: config.gotItemFreeze,
+			callback: () => {
+				this.stopSoundEffects();
+				this.showDialog({
+					heading: this.getCardNameForPower(card),
+					text: this.getAuraDescription(card),
+				});
+				this.setPlayerHiddenInvincible(false);
+				this.setPlayerStunned(false);
+			},
+		});
 	}
 
 	pickUpCard(card: Powers) {
@@ -2961,6 +3007,11 @@ export class Game extends Scene {
 
 	equipSword(): void {
 		this.registry.set("hasSword", true);
+	}
+
+	equipAura(card: Auras): void {
+		this.registry.set(getPowerEquippedKey(card), true);
+		MainEvents.emit(Events.AuraEquipped);
 	}
 
 	equipPower(power: Powers): void {
