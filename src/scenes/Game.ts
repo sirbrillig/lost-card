@@ -1594,7 +1594,7 @@ export class Game extends Scene {
 				if (tile.body.velocity.x === 0 && tile.body.velocity.y === 0) {
 					return;
 				}
-				this.sendHitToEnemy(enemy);
+				this.sendHitToEnemy(enemy, 1);
 			},
 			(tile, enemy) => {
 				if (!isDynamicSprite(enemy)) {
@@ -2906,7 +2906,11 @@ export class Game extends Scene {
 		// If the player is not in the attack animation, do nothing. Also do
 		// nothing if the player is in the warmup for the attack or the cooldown.
 		if (this.isPlayerSwordActive()) {
-			this.sendHitToEnemy(enemy);
+			let damage = 1;
+			if (this.hasAura("SwordCard")) {
+				damage = 2;
+			}
+			this.sendHitToEnemy(enemy, damage);
 		}
 		if (this.isPlayerUsingPower() && this.getActivePower() === "WindCard") {
 			this.pushEnemy(enemy);
@@ -2918,7 +2922,7 @@ export class Game extends Scene {
 			this.pullEnemy(enemy);
 		}
 		if (this.isPlayerUsingPower() && this.getActivePower() === "FireCard") {
-			this.sendHitToEnemy(enemy);
+			this.sendHitToEnemy(enemy, 1);
 			this.power.anims.stop();
 			this.power.setVisible(false);
 			const effect = this.add.sprite(
@@ -2985,16 +2989,15 @@ export class Game extends Scene {
 		this.power.body.stop();
 	}
 
-	sendHitToEnemy(enemy: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody) {
+	sendHitToEnemy(
+		enemy: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody,
+		damage: number
+	) {
 		if (enemy.data.get(DataKeys.Hittable) !== true) {
 			return;
 		}
 		this.cameras.main.shake(200, 0.004);
 		vibrate(this, 1, 200);
-		let damage = 1;
-		if (this.hasAura("SwordCard")) {
-			damage = 2;
-		}
 		enemy.emit(Events.MonsterHit, damage);
 
 		// Knock the player back a bit when they hit an enemy.
