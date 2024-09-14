@@ -91,6 +91,7 @@ export class Game extends Scene {
 	freezeSound: Sound;
 	plantSound: Sound;
 
+	hasPlayerMovedSinceAppearing: boolean = false;
 	lastAttackedAt: number = 0;
 	lastPowerAt: number = 0;
 	lastDialogData: { heading: string; text?: string } | undefined;
@@ -129,6 +130,7 @@ export class Game extends Scene {
 
 	create(saveData: SaveData | undefined) {
 		this.isGameOver = false;
+		this.hasPlayerMovedSinceAppearing = false;
 		this.cameras.main.fadeIn(config.sceneStartFadeTime);
 		this.map = this.make.tilemap({ key: "map" });
 		const tilesetTile = this.map.addTilesetImage(
@@ -2914,6 +2916,7 @@ export class Game extends Scene {
 		}
 		this.hitSound.play();
 
+		this.setPlayerInvincible(true);
 		this.enemyCollider.active = false;
 		this.cameras.main.shake(300, 0.009);
 		vibrate(this, 2, 300);
@@ -2943,6 +2946,16 @@ export class Game extends Scene {
 				if (this.getPlayerHitPoints() > 0) {
 					this.setPlayerBeingHit(false);
 					this.enemyCollider.active = true;
+				}
+			},
+		});
+		this.time.addEvent({
+			delay: this.hasAura("SunCard")
+				? config.sunCardInvincibilityTime
+				: config.postHitInvincibilityTime,
+			callback: () => {
+				if (this.getPlayerHitPoints() > 0) {
+					this.setPlayerInvincible(false);
 				}
 			},
 		});
@@ -3389,6 +3402,10 @@ export class Game extends Scene {
 	}
 
 	finishPlayerAppear() {
+		if (this.hasPlayerMovedSinceAppearing) {
+			return;
+		}
+		this.hasPlayerMovedSinceAppearing = true;
 		this.time.addEvent({
 			delay: config.postAppearInvincibilityTime,
 			callback: () => {
