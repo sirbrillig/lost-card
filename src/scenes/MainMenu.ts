@@ -19,7 +19,7 @@ export class MainMenu extends Scene {
 				this.cameras.main.width / 2,
 				50,
 				"RetroGamingWhite",
-				"Lost Card",
+				"The Lost Card",
 				24
 			)
 			.setOrigin(0.5);

@@ -649,6 +649,31 @@ export class TeleportToPlatform<AllStates extends string>
 			throw new Error("Cannot create monster outside of room");
 		}
 		sprite.body.setVelocity(0);
+
+		sprite.scene.anims.create({
+			key: "teleport",
+			frames: sprite.anims.generateFrameNumbers("white_fire_circle"),
+			frameRate: 24,
+			repeat: 0,
+			showOnStart: true,
+			hideOnComplete: true,
+		});
+		const effect1 = sprite.scene.add.sprite(
+			sprite.body.center.x,
+			sprite.body.center.y,
+			"teleport",
+			0
+		);
+		effect1.setDepth(5);
+		effect1.anims.play("teleport", true);
+		sprite.scene.sound.play("holy");
+		sprite.once(Events.MonsterDying, () => {
+			effect1?.destroy();
+		});
+		MainEvents.once(Events.LeavingRoom, () => {
+			effect1?.destroy();
+		});
+
 		// Get all platform tiles in room
 		const tiles = getTilesInRoom(
 			enemyManager.map,
@@ -683,10 +708,27 @@ export class TeleportToPlatform<AllStates extends string>
 		sprite.setPosition(x, targetTile.pixelY);
 		sprite.scene.sound.play("holy");
 
+		const effect2 = sprite.scene.add.sprite(
+			x,
+			targetTile.pixelY,
+			"teleport",
+			0
+		);
+		effect2.setDepth(8);
+		effect2.anims.play("teleport", true);
+		sprite.once(Events.MonsterDying, () => {
+			effect2?.destroy();
+		});
+		MainEvents.once(Events.LeavingRoom, () => {
+			effect2?.destroy();
+		});
+
 		// Move to next state
 		sprite.scene.time.addEvent({
 			delay: this.#postTeleportDelay,
 			callback: () => {
+				effect1?.destroy();
+				effect2?.destroy();
 				stateMachine.popState();
 				stateMachine.pushState(this.#nextState);
 			},
@@ -1508,10 +1550,25 @@ export class WalkWithFire<AllStates extends string>
 	name: AllStates;
 	#effect: Phaser.GameObjects.Sprite;
 	#enemySpeed = 50;
+	#endAfter = 1000;
+	#rotateDistance = 25;
 
-	constructor(name: AllStates, nextState: AllStates) {
+	constructor(
+		name: AllStates,
+		nextState: AllStates,
+		config?: { speed?: number; endAfter?: number; rotateDistance?: number }
+	) {
 		this.name = name;
 		this.#nextState = nextState;
+		if (config?.speed) {
+			this.#enemySpeed = config.speed;
+		}
+		if (config?.endAfter) {
+			this.#endAfter = config.endAfter;
+		}
+		if (config?.rotateDistance) {
+			this.#rotateDistance = config.rotateDistance;
+		}
 	}
 
 	init(
@@ -1583,11 +1640,14 @@ export class WalkWithFire<AllStates extends string>
 			stateMachine.popState();
 			stateMachine.pushState(this.#nextState);
 		});
-		this.#effect.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
-			walkSound?.stop();
-			this.#effect?.destroy();
-			stateMachine.popState();
-			stateMachine.pushState(this.#nextState);
+		sprite.scene.time.addEvent({
+			delay: this.#endAfter,
+			callback: () => {
+				walkSound?.stop();
+				this.#effect?.destroy();
+				stateMachine.popState();
+				stateMachine.pushState(this.#nextState);
+			},
 		});
 	}
 
@@ -1614,7 +1674,7 @@ export class WalkWithFire<AllStates extends string>
 			[this.#effect],
 			sprite.body.center,
 			Phaser.Math.DegToRad(5),
-			25
+			this.#rotateDistance
 		);
 	}
 }

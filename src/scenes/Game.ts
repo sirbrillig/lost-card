@@ -13,6 +13,7 @@ import { SkyBlob } from "../SkyBlob";
 import { PlantBug } from "../PlantBug";
 import { IceMonster } from "../IceMonster";
 import { FireMonster } from "../FireMonster";
+import { FireGiant } from "../FireGiant";
 import { FireSpout } from "../FireSpout";
 import { WaterDipper } from "../WaterDipper";
 import { GreatGhost } from "../GreatGhost";
@@ -2767,6 +2768,20 @@ export class Game extends Scene {
 						point.x,
 						point.y
 					);
+					this.enemyManager.enemies.add(monster);
+					break;
+				}
+				case "FireGiant": {
+					const monster = new FireGiant(
+						this,
+						this.enemyManager,
+						point.x,
+						point.y
+					);
+					monster.once(Events.MonsterDefeated, () => {
+						this.markBossDefeated("FireGiant");
+						this.showAllHiddenItemsInRoom();
+					});
 					this.enemyManager.enemies.add(monster);
 					break;
 				}
