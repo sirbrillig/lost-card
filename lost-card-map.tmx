@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.0" orientation="orthogonal" renderorder="right-down" width="200" height="200" tilewidth="16" tileheight="16" infinite="0" nextlayerid="18" nextobjectid="892">
+<map version="1.10" tiledversion="1.11.0" orientation="orthogonal" renderorder="right-down" width="200" height="200" tilewidth="16" tileheight="16" infinite="0" nextlayerid="18" nextobjectid="894">
  <editorsettings>
   <export target="public/assets/lost-card-map.json" format="json"/>
  </editorsettings>
@@ -8844,9 +8844,11 @@
   <object id="402" gid="2717" x="977.248" y="2140.71" width="16" height="16"/>
   <object id="448" gid="2717" x="2849.14" y="1950.83" width="16" height="16"/>
   <object id="801" gid="2717" x="2368" y="1872" width="16" height="16"/>
+  <object id="893" gid="2717" x="2208.09" y="1680.76" width="16" height="16"/>
   <object id="449" gid="2717" x="2896.53" y="2304.3" width="16" height="16"/>
   <object id="535" gid="2717" x="2609.57" y="1615.87" width="16" height="16"/>
   <object id="536" gid="2717" x="462.852" y="1533.39" width="16" height="16"/>
+  <object id="892" gid="2717" x="577.074" y="1791.86" width="16" height="16"/>
  </objectgroup>
  <objectgroup id="7" name="Transients">
   <object id="144" name="Rock" gid="2260" x="1328.81" y="1068.33" width="12.163" height="12.163"/>
