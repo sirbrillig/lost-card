@@ -1218,6 +1218,9 @@ export class SummonCircle<AllStates extends string>
 			sprite.scene.time.addEvent({
 				delay: 450 * x,
 				callback: () => {
+					if (!sprite.body || !isDynamicSprite(sprite)) {
+						return;
+					}
 					this.effects.push(this.createEffect(sprite, enemyManager));
 					Phaser.Actions.PlaceOnCircle(
 						this.effects,
