@@ -6,6 +6,8 @@ import {
 	DataKeys,
 } from "../shared";
 
+const showVictoryTimer = 20000;
+
 export class Victory extends Scene {
 	constructor() {
 		super("Victory");
@@ -14,7 +16,7 @@ export class Victory extends Scene {
 	create() {
 		this.sound.stopAll();
 		this.time.addEvent({
-			delay: 8000,
+			delay: showVictoryTimer,
 			callback: () => {
 				this.scene.start("MainMenu");
 			},
