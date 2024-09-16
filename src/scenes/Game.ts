@@ -449,7 +449,10 @@ export class Game extends Scene {
 		);
 
 		MainEvents.on(Events.FreezePlayer, (setting: boolean) => {
-			if (this.isPlayerInvincible() || this.isPlayerHiddenInvincible()) {
+			if (
+				setting === true &&
+				(this.isPlayerInvincible() || this.isPlayerHiddenInvincible())
+			) {
 				return;
 			}
 			this.setPlayerFrozen(setting);
