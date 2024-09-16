@@ -1079,6 +1079,17 @@ export class Game extends Scene {
 		this.createEnemiesInRoom();
 
 		this.closeGatePillars();
+
+		this.recordRoomVisit(room.name);
+	}
+
+	recordRoomVisit(roomName: string) {
+		if (!roomName.includes("Secret")) {
+			return;
+		}
+		const secretRooms = this.registry.get(DataKeys.SecretRoomsFound) ?? [];
+		secretRooms.push(roomName);
+		this.registry.set(DataKeys.SecretRoomsFound, secretRooms);
 	}
 
 	openGatePillars() {

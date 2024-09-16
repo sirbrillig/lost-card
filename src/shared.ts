@@ -48,6 +48,7 @@ export const DataKeys = {
 	CollectedItems: "itemsRemoved",
 	RevealedItems: "itemsRevealed",
 	ItemObjectId: "objectId",
+	SecretRoomsFound: "SecretRoomsFound",
 };
 
 export type Region = "MK" | "IK" | "CK" | "FK" | "PK" | "SK" | "FB";
