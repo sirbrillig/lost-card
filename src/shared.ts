@@ -31,6 +31,7 @@ export const Events = {
 	LeavingRoom: "LeavingRoom",
 	EnteredRoom: "EnteredRoom",
 	PlayerMoved: "PlayerMoved",
+	PlayerPositionChanged: "PlayerPositionChanged",
 };
 
 export const DataKeys = {

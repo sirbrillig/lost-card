@@ -38,4 +38,10 @@ export const config = {
 	finalBossDoorInside: 738,
 	spiritPowerTime: 4000,
 	heartCardHealTime: 10000,
+	postHitSlowMotionScale: 2.3,
+	postHitSlowMotionDelay: 200,
+	postHitCameraFlashDelay: 150,
+	postHitCameraShakeDelay: 300,
+	postHitCameraShakeIntensity: 0.01,
+	openingTextDelay: 18000,
 };

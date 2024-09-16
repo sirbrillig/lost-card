@@ -1,4 +1,5 @@
 import { Scene } from "phaser";
+import { config } from "../config";
 
 export class Opening extends Scene {
 	constructor() {
@@ -8,7 +9,7 @@ export class Opening extends Scene {
 	create() {
 		this.sound.stopAll();
 		this.time.addEvent({
-			delay: 18000,
+			delay: config.openingTextDelay,
 			callback: () => {
 				if (this.scene.isActive("Opening")) {
 					this.scene.start("MainMenu");

@@ -2393,6 +2393,13 @@ export class Game extends Scene {
 			hideOnComplete: true,
 		});
 		anims.create({
+			key: "player-hit",
+			frames: anims.generateFrameNumbers("player-hit"),
+			frameRate: 20,
+			showOnStart: true,
+			hideOnComplete: true,
+		});
+		anims.create({
 			key: "white_fire_circle",
 			frames: anims.generateFrameNumbers("white_fire_circle"),
 			frameRate: 20,
@@ -3105,8 +3112,50 @@ export class Game extends Scene {
 
 		this.setPlayerInvincible(true);
 		this.enemyCollider.active = false;
-		this.cameras.main.shake(300, 0.009);
+		this.cameras.main.shake(
+			config.postHitCameraShakeDelay,
+			config.postHitCameraShakeIntensity
+		);
+		this.cameras.main.flash(config.postHitCameraFlashDelay);
 		vibrate(this, 2, 300);
+
+		this.tweens.timeScale = 1 / config.postHitSlowMotionScale;
+		// physics.world.timeScale is the opposite (bigger for slower) of other timeScales for some reason.
+		this.physics.world.timeScale = config.postHitSlowMotionScale;
+		this.time.timeScale = 1 / config.postHitSlowMotionScale;
+		this.anims.globalTimeScale = 1 / config.postHitSlowMotionScale;
+
+		const effect = this.add.sprite(
+			this.player.body.center.x,
+			this.player.body.center.y - 5,
+			"player-hit",
+			0
+		);
+		effect.setDepth(5);
+		effect.setAlpha(0.9);
+		effect.anims.play("player-hit", true);
+		effect.on(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
+			effect.destroy();
+		});
+		MainEvents.on(Events.PlayerPositionChanged, () => {
+			if (effect?.active) {
+				effect.setPosition(
+					this.player.body.center.x,
+					this.player.body.center.y - 5
+				);
+			}
+		});
+
+		this.time.addEvent({
+			delay: config.postHitSlowMotionDelay,
+			callback: () => {
+				this.tweens.timeScale = 1;
+				this.physics.world.timeScale = 1;
+				this.time.timeScale = 1;
+				this.anims.globalTimeScale = 1;
+			},
+		});
+
 		this.cameras.main.zoomTo(1.5, 600, "Linear", false, (_, progress) => {
 			if (progress === 1) {
 				this.time.addEvent({
@@ -3119,6 +3168,7 @@ export class Game extends Scene {
 				});
 			}
 		});
+
 		this.setPlayerHitPoints(this.getPlayerHitPoints() - 1);
 		this.heartCardTimer?.remove();
 		this.heartCardTimer = undefined;
@@ -3743,6 +3793,8 @@ export class Game extends Scene {
 		const isMoving =
 			this.player.body.velocity.x !== 0 || this.player.body.velocity.y !== 0;
 		if (isMoving) {
+			// This differs from PlayerMoved because this is any movement and PlayerMoved is intentional movement.
+			MainEvents.emit(Events.PlayerPositionChanged);
 			this.maybeChangeRoom();
 			this.maybePickUpItem();
 		}
