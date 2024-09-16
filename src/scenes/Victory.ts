@@ -1,5 +1,10 @@
 import { Scene } from "phaser";
-import { powerOrder, auraOrder, getPowerEquippedKey } from "../shared";
+import {
+	powerOrder,
+	auraOrder,
+	getPowerEquippedKey,
+	DataKeys,
+} from "../shared";
 
 export class Victory extends Scene {
 	constructor() {
@@ -26,12 +31,16 @@ export class Victory extends Scene {
 			}
 		});
 
+		const secretRooms =
+			this.registry.get(DataKeys.SecretRoomsFound)?.length ?? 0;
+		const secretRoomsTotal = this.registry.get(DataKeys.SecretRoomsTotal) ?? 0;
+
 		this.add
 			.bitmapText(
 				this.cameras.main.width / 2,
 				80,
 				"RetroGamingWhiteSmall",
-				`With the Crown Card restored, the people of the six kingdoms are free once again. Your spirit may return to its rest.\r\nThe End.\r\n\r\nYou collected ${cardCount} / ${totalCardsCount} cards.`,
+				`With the Crown Card restored, the people of the six kingdoms are free once again. Your spirit may return to its rest.\r\nThe End.\r\n\r\nYou collected ${cardCount} / ${totalCardsCount} cards and found ${secretRooms} / ${secretRoomsTotal} secret rooms.`,
 				12
 			)
 			.setMaxWidth(this.cameras.main.width - 10)

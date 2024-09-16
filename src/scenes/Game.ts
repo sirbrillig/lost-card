@@ -43,6 +43,7 @@ import {
 	getDoorDestinationCoordinates,
 	getItemTouchingPlayer,
 	getItemsInRoom,
+	getRooms,
 	createVelocityForDirection,
 	isPointInRoom,
 	invertSpriteDirection,
@@ -453,6 +454,15 @@ export class Game extends Scene {
 			}
 			this.setPlayerFrozen(setting);
 		});
+
+		this.recordSecretRoomsTotal();
+	}
+
+	recordSecretRoomsTotal() {
+		const secretRoomsCount = getRooms(this.map).filter((room) =>
+			room.name.includes("Secret")
+		).length;
+		this.registry.set(DataKeys.SecretRoomsTotal, secretRoomsCount);
 	}
 
 	playMusicForRegion(region: Region) {
