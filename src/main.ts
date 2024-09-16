@@ -6,6 +6,7 @@ import { Opening } from "./scenes/Opening";
 import { Overlay } from "./scenes/Overlay";
 import { Dialog } from "./scenes/Dialog";
 import { GameMap } from "./scenes/Map";
+import { Debug } from "./scenes/Debug";
 import { MainMenu } from "./scenes/MainMenu";
 import { Preloader } from "./scenes/Preloader";
 
@@ -43,6 +44,7 @@ const config: Types.Core.GameConfig = {
 		Overlay,
 		Dialog,
 		GameMap,
+		Debug,
 		Victory,
 	],
 };

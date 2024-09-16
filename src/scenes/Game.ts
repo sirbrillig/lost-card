@@ -600,6 +600,54 @@ export class Game extends Scene {
 		this.keyR = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.R);
 		this.keyP = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.P);
 
+		this.setUpControls();
+		this.setUpDebugMode();
+	}
+
+	setUpControls() {
+		if (!this.input.keyboard) {
+			throw new Error("No keyboard controls could be found");
+		}
+		this.input.keyboard.on("keydown-SPACE", () => {
+			// Attack
+			if (this.canPlayerAttack()) {
+				this.activateAttack();
+			}
+		});
+		this.input.keyboard.on("keydown-SHIFT", () => {
+			// Power
+			if (this.canPlayerUsePower()) {
+				this.activatePower();
+			}
+		});
+		this.keyP.on("down", () => {
+			this.usePotion();
+		});
+		this.keyR.on("down", () => {
+			this.usePotion();
+		});
+
+		this.input.gamepad?.on("down", () => {
+			if (this.input.gamepad?.pad1?.A) {
+				if (this.canPlayerAttack()) {
+					this.activateAttack();
+				}
+			}
+			if (this.input.gamepad?.pad1?.X) {
+				if (this.canPlayerUsePower()) {
+					this.activatePower();
+				}
+			}
+			if (this.input.gamepad?.pad1?.Y) {
+				this.usePotion();
+			}
+		});
+	}
+
+	setUpDebugMode() {
+		if (!this.input.keyboard) {
+			throw new Error("No keyboard controls could be found");
+		}
 		const cheatCode = "lostcard";
 		let successfulCheatCode = "";
 		let isCheatMode = false;
@@ -667,6 +715,7 @@ export class Game extends Scene {
 			this.setPotionCount(10);
 			this.setKeyCount(6);
 		});
+
 		this.input.keyboard.on("keydown-FOUR", () => {
 			if (!isCheatMode) {
 				return;
@@ -677,6 +726,7 @@ export class Game extends Scene {
 				this.equipAura(card);
 			});
 		});
+
 		this.input.keyboard.on("keydown-FIVE", () => {
 			if (!isCheatMode) {
 				return;
@@ -684,39 +734,13 @@ export class Game extends Scene {
 			// Cheat: be invincible
 			this.setPlayerInvincible(true);
 		});
-		this.input.keyboard.on("keydown-SPACE", () => {
-			// Attack
-			if (this.canPlayerAttack()) {
-				this.activateAttack();
-			}
-		});
-		this.input.keyboard.on("keydown-SHIFT", () => {
-			// Power
-			if (this.canPlayerUsePower()) {
-				this.activatePower();
-			}
-		});
-		this.keyP.on("down", () => {
-			this.usePotion();
-		});
-		this.keyR.on("down", () => {
-			this.usePotion();
-		});
 
-		this.input.gamepad?.on("down", () => {
-			if (this.input.gamepad?.pad1?.A) {
-				if (this.canPlayerAttack()) {
-					this.activateAttack();
-				}
+		this.input.keyboard.on("keydown-SIX", () => {
+			if (!isCheatMode) {
+				return;
 			}
-			if (this.input.gamepad?.pad1?.X) {
-				if (this.canPlayerUsePower()) {
-					this.activatePower();
-				}
-			}
-			if (this.input.gamepad?.pad1?.Y) {
-				this.usePotion();
-			}
+			this.scene.pause("Game");
+			this.scene.launch("Debug");
 		});
 	}
 
