@@ -7,7 +7,7 @@ export const config = {
 	postHitPlayerKnockback: 200,
 	postHitEnemyKnockback: 50,
 	postHitInvincibilityTime: 800,
-	sunCardInvincibilityTime: 3500,
+	sunCardInvincibilityTime: 3000,
 	attackFrameRate: 35,
 	attackDelay: 0,
 	gotItemFreeze: 1000,
