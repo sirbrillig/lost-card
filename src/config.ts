@@ -42,6 +42,9 @@ export const config = {
 	postHitSlowMotionDelay: 300,
 	postHitCameraShakeDelay: 300,
 	postHitCameraShakeIntensity: 0.01,
+	postHitCameraZoomScale: 1.5,
+	postHitCameraZoomInDelay: 600,
+	postHitCameraZoomOutDelay: 400,
 	openingTextDelay: 18000,
 	maxActiveAuras: 2,
 };
