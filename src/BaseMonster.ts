@@ -159,8 +159,9 @@ export class BaseMonster<AllStates extends string> extends Phaser.Physics.Arcade
 		}
 
 		this.playHitSound();
+		this.playEffectForHurtMonster();
 		this.#isBeingHit = true;
-		this.tint = 0xff0000;
+		this.setTint(0xff0000);
 		this.scene.time.addEvent({
 			delay: this.#freeTimeAfterHit,
 			callback: () => {
@@ -173,6 +174,29 @@ export class BaseMonster<AllStates extends string> extends Phaser.Physics.Arcade
 		if (this.hitPoints <= 0) {
 			this.kill();
 		}
+	}
+
+	playEffectForHurtMonster() {
+		if (!this.body?.center?.x) {
+			return;
+		}
+		const effect = this.scene.add.sprite(
+			this.body.center.x,
+			this.body.center.y - 5,
+			"player-hit",
+			2
+		);
+		effect.setDepth(5);
+		effect.setAlpha(0.9);
+		effect.anims.play("player-hit", true);
+		effect.on(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
+			effect.destroy();
+		});
+		MainEvents.on(Events.PlayerPositionChanged, () => {
+			if (effect?.active && this.body?.center?.x) {
+				effect.setPosition(this.body.center.x, this.body.center.y - 5);
+			}
+		});
 	}
 
 	setStunned(setting: boolean) {
