@@ -3134,8 +3134,7 @@ export class Game extends Scene {
 		);
 		this.playEffectForHurtPlayer();
 		this.zoomCameraForHurtPlayer();
-		// TODO: I am still tweaking this effect
-		// this.slowTimeForHurtPlayer();
+		this.slowTimeForHurtPlayer();
 		vibrate(this, 2, 300);
 	}
 
