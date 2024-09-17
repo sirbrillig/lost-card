@@ -3061,31 +3061,24 @@ export class Game extends Scene {
 		});
 	}
 
-	enemyHitPlayer(): void {
-		if (
-			this.isPlayerBeingHit() ||
-			this.isPlayerInvincible() ||
-			this.isPlayerHiddenInvincible()
-		) {
-			return;
-		}
-		this.hitSound.play();
-
-		this.setPlayerInvincible(true);
-		this.enemyCollider.active = false;
-		this.cameras.main.shake(
-			config.postHitCameraShakeDelay,
-			config.postHitCameraShakeIntensity
-		);
-		this.cameras.main.flash(config.postHitCameraFlashDelay);
-		vibrate(this, 2, 300);
-
+	slowTimeForHurtPlayer() {
 		this.tweens.timeScale = 1 / config.postHitSlowMotionScale;
 		// physics.world.timeScale is the opposite (bigger for slower) of other timeScales for some reason.
 		this.physics.world.timeScale = config.postHitSlowMotionScale;
 		this.time.timeScale = 1 / config.postHitSlowMotionScale;
 		this.anims.globalTimeScale = 1 / config.postHitSlowMotionScale;
+		this.time.addEvent({
+			delay: config.postHitSlowMotionDelay,
+			callback: () => {
+				this.tweens.timeScale = 1;
+				this.physics.world.timeScale = 1;
+				this.time.timeScale = 1;
+				this.anims.globalTimeScale = 1;
+			},
+		});
+	}
 
+	playEffectForHurtPlayer() {
 		const effect = this.add.sprite(
 			this.player.body.center.x,
 			this.player.body.center.y - 5,
@@ -3106,17 +3099,9 @@ export class Game extends Scene {
 				);
 			}
 		});
+	}
 
-		this.time.addEvent({
-			delay: config.postHitSlowMotionDelay,
-			callback: () => {
-				this.tweens.timeScale = 1;
-				this.physics.world.timeScale = 1;
-				this.time.timeScale = 1;
-				this.anims.globalTimeScale = 1;
-			},
-		});
-
+	zoomCameraForHurtPlayer() {
 		this.cameras.main.zoomTo(1.5, 600, "Linear", false, (_, progress) => {
 			if (progress === 1) {
 				this.time.addEvent({
@@ -3129,10 +3114,37 @@ export class Game extends Scene {
 				});
 			}
 		});
+	}
 
+	doCameraEffectsForHurtPlayer() {
+		this.cameras.main.shake(
+			config.postHitCameraShakeDelay,
+			config.postHitCameraShakeIntensity
+		);
+		this.cameras.main.flash(config.postHitCameraFlashDelay);
+		this.slowTimeForHurtPlayer();
+		this.playEffectForHurtPlayer();
+		this.zoomCameraForHurtPlayer();
+		vibrate(this, 2, 300);
+	}
+
+	enemyHitPlayer(): void {
+		if (
+			this.isPlayerBeingHit() ||
+			this.isPlayerInvincible() ||
+			this.isPlayerHiddenInvincible()
+		) {
+			return;
+		}
+		this.hitSound.play();
+
+		this.setPlayerInvincible(true);
+		this.enemyCollider.active = false;
 		this.setPlayerHitPoints(this.getPlayerHitPoints() - 1);
 		this.heartCardTimer?.remove();
 		this.heartCardTimer = undefined;
+
+		this.doCameraEffectsForHurtPlayer();
 
 		if (this.getPlayerHitPoints() <= 0) {
 			return;
