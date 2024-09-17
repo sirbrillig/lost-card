@@ -2355,7 +2355,7 @@ export class Game extends Scene {
 		});
 		anims.create({
 			key: "player-hit",
-			frames: anims.generateFrameNumbers("player-hit"),
+			frames: anims.generateFrameNumbers("player-hit", { start: 2 }),
 			frameRate: 20,
 			showOnStart: true,
 			hideOnComplete: true,
@@ -3083,7 +3083,7 @@ export class Game extends Scene {
 			this.player.body.center.x,
 			this.player.body.center.y - 5,
 			"player-hit",
-			0
+			2
 		);
 		effect.setDepth(5);
 		effect.setAlpha(0.9);
@@ -3121,10 +3121,9 @@ export class Game extends Scene {
 			config.postHitCameraShakeDelay,
 			config.postHitCameraShakeIntensity
 		);
-		this.cameras.main.flash(config.postHitCameraFlashDelay);
-		this.slowTimeForHurtPlayer();
 		this.playEffectForHurtPlayer();
 		this.zoomCameraForHurtPlayer();
+		this.slowTimeForHurtPlayer();
 		vibrate(this, 2, 300);
 	}
 
