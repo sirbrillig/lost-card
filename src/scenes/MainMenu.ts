@@ -28,7 +28,7 @@ export class MainMenu extends Scene {
 			this.cameras.main.width / 2 - 50,
 			100,
 			"RetroGamingWhite",
-			"Start",
+			"New game",
 			18
 		);
 
@@ -36,7 +36,7 @@ export class MainMenu extends Scene {
 			this.cameras.main.width / 2 - 50,
 			125,
 			"RetroGamingWhite",
-			"Load",
+			"Load save",
 			18
 		);
 
