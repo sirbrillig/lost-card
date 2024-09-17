@@ -44,4 +44,5 @@ export const config = {
 	postHitCameraShakeDelay: 300,
 	postHitCameraShakeIntensity: 0.01,
 	openingTextDelay: 18000,
+	maxActiveAuras: 2,
 };

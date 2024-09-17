@@ -8,6 +8,7 @@ import {
 	auraOrder,
 	getPowerEquippedKey,
 	getIconForPower,
+	isAuraActive,
 } from "../shared";
 
 const heartSize: number = 18;
@@ -22,6 +23,7 @@ class Aura {
 	image: Phaser.GameObjects.Image;
 	scene: Phaser.Scene;
 	name: string;
+	isSelected: boolean = false;
 
 	constructor(
 		scene: Phaser.Scene,
@@ -45,7 +47,11 @@ class Aura {
 	}
 
 	update() {
-		// noop for now
+		if (!this.isSelected) {
+			this.image.setAlpha(0.5);
+			return;
+		}
+		this.image.clearAlpha();
 	}
 
 	destroy() {
@@ -224,7 +230,6 @@ export class Overlay extends Scene {
 	}
 
 	create() {
-		console.log("creating overlay");
 		this.keyCount = this.getKeyCount();
 		this.potions.forEach((item) => item.destroy());
 		this.potions = [];
@@ -435,9 +440,19 @@ export class Overlay extends Scene {
 				return;
 			}
 			const icon = getIconForPower(aura);
-			this.auras.push(
-				new Aura(this, this.auras.length, icon.texture, icon.frame, aura)
+			const auraObject = new Aura(
+				this,
+				this.auras.length,
+				icon.texture,
+				icon.frame,
+				aura
 			);
+			if (isAuraActive(this.registry, aura)) {
+				auraObject.isSelected = true;
+			} else {
+				auraObject.isSelected = false;
+			}
+			this.auras.push(auraObject);
 		});
 
 		powerOrder.forEach((power) => {

@@ -1,4 +1,5 @@
 import { BaseMonster } from "./BaseMonster";
+import { MainEvents } from "./MainEvents";
 
 // 0 is up, 1 is right, 2 is down, 3 is left
 export const SpriteUp = 0;
@@ -51,6 +52,7 @@ export const DataKeys = {
 	ItemObjectId: "objectId",
 	SecretRoomsFound: "SecretRoomsFound",
 	SecretRoomsTotal: "SecretRoomsTotal",
+	ActiveAuras: "ActiveAuras",
 };
 
 export type Region = "MK" | "IK" | "CK" | "FK" | "PK" | "SK" | "FB";
@@ -88,6 +90,36 @@ export const auraOrder: Auras[] = [
 	"ClockCard",
 	"FishCard",
 ];
+
+export function getEquippedAuras(registry: Phaser.Data.DataManager): Auras[] {
+	return auraOrder.filter((aura) => {
+		return registry.get(getPowerEquippedKey(aura)) ?? false;
+	});
+}
+
+export function isAuraActive(
+	registry: Phaser.Data.DataManager,
+	aura: Auras
+): boolean {
+	return getActiveAuras(registry).includes(aura);
+}
+
+export function deactivateAura(registry: Phaser.Data.DataManager, aura: Auras) {
+	const auras = getActiveAuras(registry).filter((aa) => aa !== aura);
+	registry.set(DataKeys.ActiveAuras, auras);
+	MainEvents.emit(Events.AuraEquipped);
+}
+
+export function activateAura(registry: Phaser.Data.DataManager, aura: Auras) {
+	const auras = getActiveAuras(registry);
+	auras.push(aura);
+	registry.set(DataKeys.ActiveAuras, auras);
+	MainEvents.emit(Events.AuraEquipped);
+}
+
+export function getActiveAuras(registry: Phaser.Data.DataManager): Auras[] {
+	return registry.get(DataKeys.ActiveAuras) ?? [];
+}
 
 export function getPowerEquippedKey(power: Powers | Auras): string {
 	switch (power) {
@@ -844,4 +876,50 @@ export function vibrate(
 		strongMagnitude: intensity === 1 ? 0.1 : 0.3,
 		weakMagnitude: intensity === 1 ? 0.2 : 0.5,
 	});
+}
+
+export function getCardNameForPower(card: Powers | Auras): string {
+	switch (card) {
+		case "MountainCard":
+			return "Mountain Card";
+		case "FishCard":
+			return "Fish Card";
+		case "ClockCard":
+			return "Clock Card";
+		case "SwordCard":
+			return "Sword Card";
+		case "HeartCard":
+			return "Heart Card";
+		case "SunCard":
+			return "Sun Card";
+		case "IceCard":
+			return "Ice Card";
+		case "PlantCard":
+			return "Plant Card";
+		case "SpiritCard":
+			return "Spirit Card";
+		case "WindCard":
+			return "Wind Card";
+		case "FireCard":
+			return "Fire Card";
+		case "CloudCard":
+			return "Cloud Card";
+	}
+}
+
+export function getAuraDescription(card: Auras): string {
+	switch (card) {
+		case "FishCard":
+			return "You can walk through water or lava safely.";
+		case "ClockCard":
+			return "Your powers can be used more frequently.";
+		case "HeartCard":
+			return "Your hearts will slowly restore on their own.";
+		case "MountainCard":
+			return "You can no longer be pushed by attacks.";
+		case "SwordCard":
+			return "Your sword will deal more damage per hit.";
+		case "SunCard":
+			return "You will be invincible for longer after being hit.";
+	}
 }

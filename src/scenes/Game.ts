@@ -65,6 +65,11 @@ import {
 	vibrate,
 	doRectanglesOverlap,
 	auraOrder,
+	isAuraActive,
+	getAuraDescription,
+	getCardNameForPower,
+	getActiveAuras,
+	activateAura,
 } from "../shared";
 
 export class Game extends Scene {
@@ -200,7 +205,7 @@ export class Game extends Scene {
 				if (
 					isTileWithPropertiesObject(tile) &&
 					(tile.properties.isWater || tile.properties.isLava) &&
-					this.hasAura("FishCard")
+					isAuraActive(this.registry, "FishCard")
 				) {
 					return false;
 				}
@@ -231,7 +236,7 @@ export class Game extends Scene {
 				if (
 					isTileWithPropertiesObject(tile) &&
 					(tile.properties.isWater || tile.properties.isLava) &&
-					this.hasAura("FishCard")
+					isAuraActive(this.registry, "FishCard")
 				) {
 					return false;
 				}
@@ -1985,52 +1990,6 @@ export class Game extends Scene {
 		}
 	}
 
-	getCardNameForPower(card: Powers | Auras): string {
-		switch (card) {
-			case "MountainCard":
-				return "Mountain Card";
-			case "FishCard":
-				return "Fish Card";
-			case "ClockCard":
-				return "Clock Card";
-			case "SwordCard":
-				return "Sword Card";
-			case "HeartCard":
-				return "Heart Card";
-			case "SunCard":
-				return "Sun Card";
-			case "IceCard":
-				return "Ice Card";
-			case "PlantCard":
-				return "Plant Card";
-			case "SpiritCard":
-				return "Spirit Card";
-			case "WindCard":
-				return "Wind Card";
-			case "FireCard":
-				return "Fire Card";
-			case "CloudCard":
-				return "Cloud Card";
-		}
-	}
-
-	getAuraDescription(card: Auras): string {
-		switch (card) {
-			case "FishCard":
-				return "You can now walk through water or lava safely.";
-			case "ClockCard":
-				return "Your powers can be used more frequently.";
-			case "HeartCard":
-				return "Given time, your hearts will slowly restore on their own.";
-			case "MountainCard":
-				return "You can no longer be pushed by attacks or when attacking.";
-			case "SwordCard":
-				return "Your sword will now deal considerably more damage per hit.";
-			case "SunCard":
-				return "When you are hit, you will become invincible for a few moments.";
-		}
-	}
-
 	pickUpAura(card: Auras) {
 		this.equipAura(card);
 		this.sound.play("bonus");
@@ -2041,8 +2000,10 @@ export class Game extends Scene {
 			callback: () => {
 				this.stopSoundEffects();
 				this.showDialog({
-					heading: this.getCardNameForPower(card),
-					text: this.getAuraDescription(card),
+					heading: getCardNameForPower(card),
+					text:
+						getAuraDescription(card) +
+						"\r\nUse the map screen to change active powers.",
 				});
 				this.setPlayerHiddenInvincible(false);
 				this.setPlayerStunned(false);
@@ -2061,7 +2022,7 @@ export class Game extends Scene {
 			callback: () => {
 				this.stopSoundEffects();
 				this.showDialog({
-					heading: this.getCardNameForPower(card),
+					heading: getCardNameForPower(card),
 					text: `Press ${
 						getButtonNames(this).power
 					} to use the power.\r\nPress ${
@@ -2977,7 +2938,7 @@ export class Game extends Scene {
 		// nothing if the player is in the warmup for the attack or the cooldown.
 		if (this.isPlayerSwordActive()) {
 			let damage = 1;
-			if (this.hasAura("SwordCard")) {
+			if (isAuraActive(this.registry, "SwordCard")) {
 				damage = 2;
 			}
 			this.sendHitToEnemy(enemy, damage);
@@ -3071,7 +3032,7 @@ export class Game extends Scene {
 		enemy.emit(Events.MonsterHit, damage);
 
 		// Knock the player back a bit when they hit an enemy.
-		if (!this.hasAura("MountainCard")) {
+		if (!isAuraActive(this.registry, "MountainCard")) {
 			this.knockBack(
 				this.player.body,
 				config.postHitEnemyKnockback,
@@ -3187,7 +3148,7 @@ export class Game extends Scene {
 			},
 		});
 		this.time.addEvent({
-			delay: this.hasAura("SunCard")
+			delay: isAuraActive(this.registry, "SunCard")
 				? config.sunCardInvincibilityTime
 				: config.postHitInvincibilityTime,
 			callback: () => {
@@ -3197,7 +3158,7 @@ export class Game extends Scene {
 			},
 		});
 
-		if (!this.hasAura("MountainCard")) {
+		if (!isAuraActive(this.registry, "MountainCard")) {
 			this.setPlayerStunned(true);
 			this.isPlayerBeingKnockedBack = true;
 			this.knockBack(
@@ -3289,6 +3250,11 @@ export class Game extends Scene {
 
 	equipAura(card: Auras): void {
 		this.registry.set(getPowerEquippedKey(card), true);
+
+		if (getActiveAuras(this.registry).length < config.maxActiveAuras) {
+			activateAura(this.registry, card);
+		}
+
 		MainEvents.emit(Events.AuraEquipped);
 	}
 
@@ -3299,7 +3265,7 @@ export class Game extends Scene {
 	}
 
 	canPlayerUsePower(): boolean {
-		const postPowerCooldown = this.hasAura("ClockCard")
+		const postPowerCooldown = isAuraActive(this.registry, "ClockCard")
 			? config.clockCardCooldown
 			: config.postPowerCooldown;
 		return (
@@ -3757,12 +3723,8 @@ export class Game extends Scene {
 		}
 	}
 
-	hasAura(aura: Auras): boolean {
-		return this.registry.get(getPowerEquippedKey(aura));
-	}
-
 	updateHeartCard() {
-		if (!this.hasAura("HeartCard")) {
+		if (!isAuraActive(this.registry, "HeartCard")) {
 			return;
 		}
 		if (this.heartCardTimer) {
