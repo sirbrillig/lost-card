@@ -70,6 +70,7 @@ import {
 	getCardNameForPower,
 	getActiveAuras,
 	activateAura,
+	knockBack,
 } from "../shared";
 
 export class Game extends Scene {
@@ -390,6 +391,14 @@ export class Game extends Scene {
 					return false;
 				}
 				if (!enemy.visible || !enemy.active) {
+					return false;
+				}
+				// Dying enemies should be stunned but that doesn't appear to be true
+				// here for some reason so we check isDying and isStunned here also.
+				if ("isDying" in enemy && enemy.isDying) {
+					return false;
+				}
+				if ("isStunned" in enemy && enemy.isStunned) {
 					return false;
 				}
 				if (enemy.data?.get(DataKeys.Stunned)) {
@@ -1958,9 +1967,14 @@ export class Game extends Scene {
 		this.restorePlayerHitPoints();
 	}
 
+	setPlayerDirection(direction: SpriteDirection) {
+		this.playerDirection = direction;
+		this.player.data.set(DataKeys.PlayerDirection, direction);
+	}
+
 	playCardAnimation(card: Powers) {
 		// Face right
-		this.playerDirection = SpriteRight;
+		this.setPlayerDirection(SpriteRight);
 		this.setPlayerIdleFrame();
 		this.updatePowerHitboxPosition();
 		this.power.setRotation(Phaser.Math.DegToRad(0));
@@ -2992,7 +3006,8 @@ export class Game extends Scene {
 		if (enemy.data.get(DataKeys.Pushable) === true) {
 			// We can't use MonsterStun event here because it is too slow.
 			enemy.data.set(DataKeys.Stunned, true);
-			this.knockBack(
+			knockBack(
+				this,
 				enemy.body,
 				config.enemyKnockbackTime,
 				config.enemyKnockBackSpeed,
@@ -3033,7 +3048,8 @@ export class Game extends Scene {
 
 		// Knock the player back a bit when they hit an enemy.
 		if (!isAuraActive(this.registry, "MountainCard")) {
-			this.knockBack(
+			knockBack(
+				this,
 				this.player.body,
 				config.postHitEnemyKnockback,
 				config.playerKnockBackSpeed,
@@ -3041,9 +3057,6 @@ export class Game extends Scene {
 				() => {}
 			);
 		}
-
-		// Knock back monster when they are hit.
-		this.pushEnemy(enemy);
 	}
 
 	gameOver() {
@@ -3134,6 +3147,9 @@ export class Game extends Scene {
 			}
 		);
 		emitter.explode(10);
+		emitter.once(Phaser.GameObjects.Particles.Events.COMPLETE, () => {
+			emitter?.destroy();
+		});
 	}
 
 	doCameraEffectsForHurtPlayer() {
@@ -3193,7 +3209,8 @@ export class Game extends Scene {
 		if (!isAuraActive(this.registry, "MountainCard")) {
 			this.setPlayerStunned(true);
 			this.isPlayerBeingKnockedBack = true;
-			this.knockBack(
+			knockBack(
+				this,
 				this.player.body,
 				config.postHitPlayerKnockback,
 				config.playerKnockBackSpeed,
@@ -3206,38 +3223,6 @@ export class Game extends Scene {
 		}
 
 		this.setPlayerBeingHit(true);
-	}
-
-	knockBack(
-		body: Phaser.Physics.Arcade.Body,
-		time: number,
-		speed: number,
-		direction: SpriteDirection,
-		completeCallback?: () => void
-	) {
-		this.time.addEvent({
-			delay: time,
-			callback: () => {
-				body.stop();
-				completeCallback?.();
-			},
-		});
-
-		body.stop();
-		switch (direction) {
-			case SpriteUp:
-				body.setVelocityY(-speed);
-				break;
-			case SpriteRight:
-				body.setVelocityX(speed);
-				break;
-			case SpriteDown:
-				body.setVelocityY(speed);
-				break;
-			case SpriteLeft:
-				body.setVelocityX(-speed);
-				break;
-		}
 	}
 
 	getTimeSinceLastAttack(): number {
@@ -3665,17 +3650,17 @@ export class Game extends Scene {
 		// Set velocity based on key press
 		if (this.isPressingLeft()) {
 			this.player.body.setVelocityX(-this.getPlayerSpeed());
-			this.playerDirection = SpriteLeft;
+			this.setPlayerDirection(SpriteLeft);
 		} else if (this.isPressingRight()) {
 			this.player.body.setVelocityX(this.getPlayerSpeed());
-			this.playerDirection = SpriteRight;
+			this.setPlayerDirection(SpriteRight);
 		}
 		if (this.isPressingUp()) {
 			this.player.body.setVelocityY(-this.getPlayerSpeed());
-			this.playerDirection = SpriteUp;
+			this.setPlayerDirection(SpriteUp);
 		} else if (this.isPressingDown()) {
 			this.player.body.setVelocityY(this.getPlayerSpeed());
-			this.playerDirection = SpriteDown;
+			this.setPlayerDirection(SpriteDown);
 		}
 
 		this.player.body.velocity.normalize().scale(this.getPlayerSpeed());

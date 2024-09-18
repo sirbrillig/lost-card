@@ -1,7 +1,14 @@
-import { isDynamicSprite, Events, DataKeys, isPointInRoom } from "./shared";
+import {
+	isDynamicSprite,
+	Events,
+	DataKeys,
+	isPointInRoom,
+	knockBack,
+} from "./shared";
 import { BehaviorMachineInterface, Behavior, StateMachine } from "./behavior";
 import { EnemyManager } from "./EnemyManager";
 import { MainEvents } from "./MainEvents";
+import { config } from "./config";
 
 export class BaseMonster<AllStates extends string> extends Phaser.Physics.Arcade
 	.Sprite {
@@ -10,7 +17,8 @@ export class BaseMonster<AllStates extends string> extends Phaser.Physics.Arcade
 	#enemyManager: EnemyManager;
 	#isBeingHit: boolean = false;
 	#freeTimeAfterHit: number = 600;
-	#isDying = false;
+	isDying = false;
+	isStunned = false;
 
 	hitPoints: number = 1;
 	primaryColor: number = 0xc7a486;
@@ -108,7 +116,7 @@ export class BaseMonster<AllStates extends string> extends Phaser.Physics.Arcade
 			this.anims.pause();
 			return;
 		}
-		if (this.data.get(DataKeys.Stunned)) {
+		if (this.isStunned) {
 			return;
 		}
 		if (this.hitPoints <= 0) {
@@ -175,6 +183,8 @@ export class BaseMonster<AllStates extends string> extends Phaser.Physics.Arcade
 		if (this.hitPoints <= 0) {
 			this.kill();
 		}
+
+		this.knockBackForHurtMonster();
 	}
 
 	playEffectForHurtMonster() {
@@ -222,9 +232,67 @@ export class BaseMonster<AllStates extends string> extends Phaser.Physics.Arcade
 			}
 		);
 		emitter.explode(10);
+		emitter.once(Phaser.GameObjects.Particles.Events.COMPLETE, () => {
+			emitter?.destroy();
+		});
+	}
+
+	knockBackForHurtMonster() {
+		if (this.hitPoints <= 0) {
+			return;
+		}
+		if (!this.body || !isDynamicSprite(this)) {
+			throw new Error("Could not update monster");
+		}
+		if (this.data.get(DataKeys.Pushable) === true) {
+			this.setStunned(true);
+			knockBack(
+				this.scene,
+				this.body,
+				config.enemyKnockbackTime,
+				config.enemyKnockBackSpeed,
+				this.#enemyManager.player.data.get(DataKeys.PlayerDirection),
+				() => {
+					this.setStunned(false);
+				}
+			);
+		}
 	}
 
 	showBossExplosion() {
+		this.scene.cameras.main.flash();
+		if (!this.body?.center?.x) {
+			return;
+		}
+		const emitter = this.scene.add.particles(
+			this.body.center.x,
+			this.body.center.y - 5,
+			"ice_powerup",
+			{
+				frame: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+				lifespan: 200,
+				scale: 0.3,
+				speed: 250,
+				duration: 900,
+				frequency: 2,
+			}
+		);
+		this.scene.tweens.add({
+			targets: emitter,
+			rotation: 10,
+		});
+		this.scene.time.addEvent({
+			delay: 800,
+			callback: () => {
+				this.showBossExplosion2();
+			},
+		});
+		emitter.once(Phaser.GameObjects.Particles.Events.COMPLETE, () => {
+			emitter?.destroy();
+		});
+	}
+
+	showBossExplosion2() {
 		if (!this.body?.center?.x) {
 			return;
 		}
@@ -242,13 +310,66 @@ export class BaseMonster<AllStates extends string> extends Phaser.Physics.Arcade
 				duration: 2000,
 			}
 		);
+		// This flashes red
+		this.scene.tweens.add({
+			targets: this,
+			tint: 0xf0f0f0,
+			duration: 3000,
+		});
 		emitter.once(Phaser.GameObjects.Particles.Events.COMPLETE, () => {
+			emitter?.destroy();
+			this.showBossExplosion3();
+		});
+	}
+
+	showBossExplosion3() {
+		this.setVisible(false);
+		if (!this.body?.center?.x) {
+			return;
+		}
+		const effect = this.scene.add.sprite(
+			this.body.center.x + 1,
+			this.body.center.y - 1,
+			"explode",
+			0
+		);
+		effect.setDepth(5);
+		effect.setScale(3);
+		effect.setTintFill();
+		effect.anims.play("explode");
+		this.showBossExplosion4();
+		effect.on(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
+			effect.destroy();
+		});
+	}
+
+	showBossExplosion4() {
+		this.scene.cameras.main.flash();
+		if (!this.body?.center?.x) {
+			return;
+		}
+		const emitter = this.scene.add.particles(
+			this.body.center.x,
+			this.body.center.y - 5,
+			"player-hit",
+			{
+				frame: 0,
+				lifespan: 800,
+				speed: 350,
+				emitting: false,
+			}
+		);
+		emitter.explode(40);
+		this.playDestroySound();
+		emitter.once(Phaser.GameObjects.Particles.Events.COMPLETE, () => {
+			emitter.destroy();
 			this.emit(Events.MonsterDefeated);
 			this.destroy();
 		});
 	}
 
 	showRegularExplosion() {
+		this.setVisible(false);
 		if (!this.body?.center?.x) {
 			return;
 		}
@@ -261,6 +382,7 @@ export class BaseMonster<AllStates extends string> extends Phaser.Physics.Arcade
 		effect.setDepth(5);
 		effect.setTint(this.primaryColor);
 		effect.anims.play("explode");
+		this.playDestroySound();
 		effect.on(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
 			effect.destroy();
 			this.emit(Events.MonsterDefeated);
@@ -269,6 +391,7 @@ export class BaseMonster<AllStates extends string> extends Phaser.Physics.Arcade
 	}
 
 	setStunned(setting: boolean) {
+		this.isStunned = setting;
 		this.data.set(DataKeys.Stunned, setting);
 		this.setVelocity(0);
 	}
@@ -277,19 +400,18 @@ export class BaseMonster<AllStates extends string> extends Phaser.Physics.Arcade
 		if (!this.body || !isDynamicSprite(this)) {
 			throw new Error("Could not update monster");
 		}
-		if (this.#isDying) {
+		if (this.isDying) {
 			return;
 		}
-		this.#isDying = true;
+		this.isDying = true;
 
 		this.body.stop();
-		this.setVisible(false);
+		this.anims.stop();
 		this.stateMachine.empty();
-		this.data.set(DataKeys.Stunned, true);
+		this.setStunned(true);
 		this.emit(Events.MonsterDying);
 
 		MainEvents.emit(Events.MonsterDying, this);
-		this.playDestroySound();
 		if (this.isBoss) {
 			this.showBossExplosion();
 		} else {
@@ -301,7 +423,7 @@ export class BaseMonster<AllStates extends string> extends Phaser.Physics.Arcade
 		if (this.#isBeingHit) {
 			return false;
 		}
-		if (this.#isDying) {
+		if (this.isDying) {
 			return false;
 		}
 		return this.isHittable();

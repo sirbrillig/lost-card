@@ -53,6 +53,7 @@ export const DataKeys = {
 	SecretRoomsFound: "SecretRoomsFound",
 	SecretRoomsTotal: "SecretRoomsTotal",
 	ActiveAuras: "ActiveAuras",
+	PlayerDirection: "PlayerDirection",
 };
 
 export type Region = "MK" | "IK" | "CK" | "FK" | "PK" | "SK" | "FB";
@@ -921,5 +922,38 @@ export function getAuraDescription(card: Auras): string {
 			return "Your sword will deal more damage per hit.";
 		case "SunCard":
 			return "You will be invincible for longer after being hit.";
+	}
+}
+
+export function knockBack(
+	scene: Phaser.Scene,
+	body: Phaser.Physics.Arcade.Body,
+	time: number,
+	speed: number,
+	direction: SpriteDirection,
+	completeCallback?: () => void
+) {
+	scene.time.addEvent({
+		delay: time,
+		callback: () => {
+			body.stop();
+			completeCallback?.();
+		},
+	});
+
+	body.stop();
+	switch (direction) {
+		case SpriteUp:
+			body.setVelocityY(-speed);
+			break;
+		case SpriteRight:
+			body.setVelocityX(speed);
+			break;
+		case SpriteDown:
+			body.setVelocityY(speed);
+			break;
+		case SpriteLeft:
+			body.setVelocityX(-speed);
+			break;
 	}
 }
