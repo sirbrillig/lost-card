@@ -13,7 +13,8 @@ export class BaseMonster<AllStates extends string> extends Phaser.Physics.Arcade
 	#isDying = false;
 
 	hitPoints: number = 1;
-	primaryColor: number = 0xC7A486;
+	primaryColor: number = 0xc7a486;
+	isBoss: boolean = false;
 
 	constructor(
 		scene: Phaser.Scene,
@@ -223,6 +224,50 @@ export class BaseMonster<AllStates extends string> extends Phaser.Physics.Arcade
 		emitter.explode(10);
 	}
 
+	showBossExplosion() {
+		if (!this.body?.center?.x) {
+			return;
+		}
+		const emitter = this.scene.add.particles(
+			this.body.center.x,
+			this.body.center.y - 5,
+			"monster_explode1",
+			{
+				frame: [1, 2, 3, 4, 5, 6, 7, 8],
+				lifespan: 800,
+				speed: { min: 40, max: 80 },
+				scale: { start: 0.7, end: 0 },
+				alpha: 0.9,
+				tint: this.primaryColor,
+				duration: 2000,
+			}
+		);
+		emitter.once(Phaser.GameObjects.Particles.Events.COMPLETE, () => {
+			this.emit(Events.MonsterDefeated);
+			this.destroy();
+		});
+	}
+
+	showRegularExplosion() {
+		if (!this.body?.center?.x) {
+			return;
+		}
+		const effect = this.scene.add.sprite(
+			this.body.center.x + 1,
+			this.body.center.y - 1,
+			"explode",
+			0
+		);
+		effect.setDepth(5);
+		effect.setTint(this.primaryColor);
+		effect.anims.play("explode");
+		effect.on(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
+			effect.destroy();
+			this.emit(Events.MonsterDefeated);
+			this.destroy();
+		});
+	}
+
 	setStunned(setting: boolean) {
 		this.data.set(DataKeys.Stunned, setting);
 		this.setVelocity(0);
@@ -243,22 +288,13 @@ export class BaseMonster<AllStates extends string> extends Phaser.Physics.Arcade
 		this.data.set(DataKeys.Stunned, true);
 		this.emit(Events.MonsterDying);
 
-		const effect = this.scene.add.sprite(
-			this.body.center.x + 1,
-			this.body.center.y - 1,
-			"explode",
-			0
-		);
-		effect.setDepth(5);
-		effect.setTint(this.primaryColor);
-		effect.anims.play("explode");
 		MainEvents.emit(Events.MonsterDying, this);
 		this.playDestroySound();
-		effect.on(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
-			effect.destroy();
-			this.emit(Events.MonsterDefeated);
-			this.destroy();
-		});
+		if (this.isBoss) {
+			this.showBossExplosion();
+		} else {
+			this.showRegularExplosion();
+		}
 	}
 
 	baseIsHittable(): boolean {

@@ -15,6 +15,7 @@ type AllStates =
 export class FireBoss extends BaseMonster<AllStates> {
 	hitPoints: number = 10;
 	primaryColor = 0xB80000;
+	isBoss = true;
 
 	constructor(
 		scene: Phaser.Scene,

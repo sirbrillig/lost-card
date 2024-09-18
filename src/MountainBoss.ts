@@ -21,6 +21,7 @@ type AllStates =
 
 export class MountainBoss extends BaseMonster<AllStates> {
 	hitPoints: number = 14;
+	isBoss = true;
 	enemyManager: EnemyManager;
 
 	constructor(

@@ -14,7 +14,8 @@ type AllStates =
 
 export class CloudBoss extends BaseMonster<AllStates> {
 	hitPoints: number = 8;
-	primaryColor = 0xE38D2F;
+	primaryColor = 0xe38d2f;
+	isBoss = true;
 
 	constructor(
 		scene: Phaser.Scene,

@@ -49,7 +49,8 @@ type AllStates =
 export class FinalBoss extends BaseMonster<AllStates> {
 	hitPoints: number = 26;
 	enemyManager: EnemyManager;
-	primaryColor = 0xB80000;
+	primaryColor = 0xb80000;
+	isBoss = true;
 
 	constructor(
 		scene: Phaser.Scene,
