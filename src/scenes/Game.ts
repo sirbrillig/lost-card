@@ -2218,7 +2218,7 @@ export class Game extends Scene {
 			) {
 				return 24;
 			}
-			return 10;
+			return 16;
 		})();
 		const height = (() => {
 			if (["SpiritCard"].includes(this.getActivePower() as string)) {
@@ -2233,7 +2233,7 @@ export class Game extends Scene {
 			) {
 				return 24;
 			}
-			return 10;
+			return 16;
 		})();
 
 		this.power.body.setSize(width, height);
