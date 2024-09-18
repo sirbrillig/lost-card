@@ -3061,21 +3061,13 @@ export class Game extends Scene {
 		});
 	}
 
-	slowTimeForHurtPlayer() {
-		this.tweens.timeScale = 1 / config.postHitSlowMotionScale;
-		// physics.world.timeScale is the opposite (bigger for slower) of other timeScales for some reason.
-		this.physics.world.timeScale = config.postHitSlowMotionScale;
-		this.time.timeScale = 1 / config.postHitSlowMotionScale;
-		this.anims.globalTimeScale = 1 / config.postHitSlowMotionScale;
-		this.time.addEvent({
-			delay: config.postHitSlowMotionDelay,
-			callback: () => {
-				this.tweens.timeScale = 1;
-				this.physics.world.timeScale = 1;
-				this.time.timeScale = 1;
-				this.anims.globalTimeScale = 1;
-			},
-		});
+	hitStopForHurtPlayer() {
+		this.scene.pause();
+		// This cannot use the built-in timer class because it's been paused so we
+		// have to use setTimeout.
+		setTimeout(() => {
+			this.scene.resume();
+		}, config.playerHitStopTime);
 	}
 
 	playEffectForHurtPlayer() {
@@ -3152,7 +3144,7 @@ export class Game extends Scene {
 		this.playEffectForHurtPlayer();
 		this.showParticlesForHurtPlayer();
 		this.zoomCameraForHurtPlayer();
-		this.slowTimeForHurtPlayer();
+		this.hitStopForHurtPlayer();
 		vibrate(this, 2, 300);
 	}
 
