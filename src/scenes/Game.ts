@@ -3716,26 +3716,20 @@ export class Game extends Scene {
 		this.walkSound.play();
 	}
 
-	getPlayerTint(): number {
+	updatePlayerTint() {
 		if (this.getPlayerHitPoints() === 0) {
-			return 0xff0000;
+			this.player.setTint(0xff0000);
+			return;
 		}
 		if (this.isPlayerBeingHit()) {
-			return 0xff0000;
+			this.player.setTint(0xff8587);
+			return;
 		}
 		if (this.isPlayerFrozen()) {
-			return 0x0000ff;
+			this.player.setTint(0x0000ff);
+			return;
 		}
-		return 0;
-	}
-
-	updatePlayerTint() {
-		const tint = this.getPlayerTint();
-		if (tint) {
-			this.player.setTint(tint);
-		} else {
-			this.player.clearTint();
-		}
+		this.player.clearTint();
 	}
 
 	updatePlayerAlpha() {
