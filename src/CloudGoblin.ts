@@ -6,6 +6,7 @@ type AllStates = "randomwalk1" | "randomwalk2" | "randomwalk3" | "attack";
 
 export class CloudGoblin extends BaseMonster<AllStates> {
 	hitPoints: number = 3;
+	primaryColor = 0xd0693b;
 
 	constructor(
 		scene: Phaser.Scene,
@@ -56,11 +57,6 @@ export class CloudGoblin extends BaseMonster<AllStates> {
 			}),
 			frameRate: 10,
 			repeat: -1,
-		});
-		this.anims.create({
-			key: "explode",
-			frames: this.anims.generateFrameNumbers("monster_explode1"),
-			frameRate: 20,
 		});
 	}
 

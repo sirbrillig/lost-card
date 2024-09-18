@@ -8,6 +8,7 @@ export class PlantBug extends BaseMonster<AllStates> {
 	awareDistance: number = 90;
 	speed: number = 50;
 	hitPoints = 2;
+	primaryColor = 0x97a21a;
 
 	constructor(
 		scene: Phaser.Scene,
@@ -58,11 +59,6 @@ export class PlantBug extends BaseMonster<AllStates> {
 			}),
 			frameRate: 10,
 			repeat: -1,
-		});
-		this.anims.create({
-			key: "explode",
-			frames: this.anims.generateFrameNumbers("monster_explode1"),
-			frameRate: 20,
 		});
 	}
 

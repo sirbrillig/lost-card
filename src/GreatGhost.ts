@@ -9,6 +9,7 @@ export class GreatGhost extends BaseMonster<AllStates> {
 	awareDistance: number = 200;
 	speed: number = 15;
 	hitPoints = 6;
+	primaryColor = 0x23a487;
 	#enemyManager: EnemyManager;
 
 	constructor(

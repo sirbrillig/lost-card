@@ -12,6 +12,7 @@ type AllStates =
 
 export class FireGiant extends BaseMonster<AllStates> {
 	hitPoints: number = 8;
+	primaryColor = 0xb80000;
 
 	constructor(
 		scene: Phaser.Scene,

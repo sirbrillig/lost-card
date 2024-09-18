@@ -13,6 +13,7 @@ export class BaseMonster<AllStates extends string> extends Phaser.Physics.Arcade
 	#isDying = false;
 
 	hitPoints: number = 1;
+	primaryColor: number = 0xC7A486;
 
 	constructor(
 		scene: Phaser.Scene,
@@ -160,6 +161,7 @@ export class BaseMonster<AllStates extends string> extends Phaser.Physics.Arcade
 
 		this.playHitSound();
 		this.playEffectForHurtMonster();
+		this.showParticlesForHurtMonster();
 		this.#isBeingHit = true;
 		this.scene.time.addEvent({
 			delay: this.#freeTimeAfterHit,
@@ -200,6 +202,27 @@ export class BaseMonster<AllStates extends string> extends Phaser.Physics.Arcade
 		});
 	}
 
+	showParticlesForHurtMonster() {
+		if (!this.body?.center?.x) {
+			return;
+		}
+		const emitter = this.scene.add.particles(
+			this.body.center.x,
+			this.body.center.y - 5,
+			"monster_explode1",
+			{
+				frame: [1, 2, 3],
+				lifespan: 800,
+				speed: { min: 40, max: 80 },
+				scale: { start: 0.7, end: 0 },
+				alpha: 0.9,
+				tint: this.primaryColor,
+				emitting: false,
+			}
+		);
+		emitter.explode(10);
+	}
+
 	setStunned(setting: boolean) {
 		this.data.set(DataKeys.Stunned, setting);
 		this.setVelocity(0);
@@ -227,6 +250,7 @@ export class BaseMonster<AllStates extends string> extends Phaser.Physics.Arcade
 			0
 		);
 		effect.setDepth(5);
+		effect.setTint(this.primaryColor);
 		effect.anims.play("explode");
 		MainEvents.emit(Events.MonsterDying, this);
 		this.playDestroySound();
@@ -238,7 +262,13 @@ export class BaseMonster<AllStates extends string> extends Phaser.Physics.Arcade
 	}
 
 	baseIsHittable(): boolean {
-		return !this.#isBeingHit && this.isHittable();
+		if (this.#isBeingHit) {
+			return false;
+		}
+		if (this.#isDying) {
+			return false;
+		}
+		return this.isHittable();
 	}
 
 	isHittable(): boolean {

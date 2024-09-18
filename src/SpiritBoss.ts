@@ -22,6 +22,7 @@ type AllStates =
 
 export class SpiritBoss extends BaseMonster<AllStates> {
 	hitPoints: number = 10;
+	primaryColor = 0x23A487;
 
 	constructor(
 		scene: Phaser.Scene,

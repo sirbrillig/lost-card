@@ -9,6 +9,7 @@ export class SkyBlob extends BaseMonster<AllStates> {
 	awareDistance: number = 90;
 	speed: number = 60;
 	hitPoints = 2;
+	primaryColor = 0x23a487;
 
 	constructor(
 		scene: Phaser.Scene,

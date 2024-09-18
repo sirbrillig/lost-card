@@ -8,6 +8,7 @@ type AllStates = "idle" | "spawn" | "idle2";
 
 export class PlantSpitter extends BaseMonster<AllStates> {
 	hitPoints: number = 3;
+	primaryColor = 0x97a21a;
 	#enemyManager;
 
 	constructor(
@@ -43,11 +44,6 @@ export class PlantSpitter extends BaseMonster<AllStates> {
 				frames: [3, 4, 5, 15, 16, 17, 27, 28, 29].reverse(),
 			}),
 			frameRate: 10,
-		});
-		this.anims.create({
-			key: "explode",
-			frames: this.anims.generateFrameNumbers("monster_explode1"),
-			frameRate: 20,
 		});
 	}
 

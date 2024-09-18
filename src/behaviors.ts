@@ -132,6 +132,9 @@ export class Roar<AllStates extends string>
 			"orange_boom",
 			0
 		);
+		if ("primaryColor" in sprite) {
+			effect.setTint(sprite.primaryColor as number);
+		}
 		effect.setDepth(5);
 		effect.anims.play("orange_boom", true);
 		sprite.once(Events.MonsterDying, () => {

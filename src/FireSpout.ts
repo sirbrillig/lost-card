@@ -7,6 +7,7 @@ type AllStates = "idle1" | "spitfire" | "idle2" | "idle3";
 
 export class FireSpout extends BaseMonster<AllStates> {
 	hitPoints: number = 2;
+	primaryColor = 0xb80000;
 
 	constructor(
 		scene: Phaser.Scene,
@@ -40,11 +41,6 @@ export class FireSpout extends BaseMonster<AllStates> {
 				frames: [3, 4, 5, 15, 16, 17, 27, 28, 29].reverse(),
 			}),
 			frameRate: 10,
-		});
-		this.anims.create({
-			key: "explode",
-			frames: this.anims.generateFrameNumbers("monster_explode1"),
-			frameRate: 20,
 		});
 	}
 

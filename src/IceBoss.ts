@@ -14,6 +14,7 @@ type AllStates = "initial" | "roar1" | "leftrightmarch" | "powerup" | "icebeam";
 
 export class IceBoss extends BaseMonster<AllStates> {
 	hitPoints: number = 10;
+	primaryColor: number = 0x39b7e0;
 
 	constructor(
 		scene: Phaser.Scene,

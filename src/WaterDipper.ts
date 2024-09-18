@@ -8,6 +8,7 @@ type AllStates = "waterteleport" | "powerup" | "iceball";
 
 export class WaterDipper extends BaseMonster<AllStates> {
 	hitPoints: number = 8;
+	primaryColor: number = 0x39b7e0;
 
 	constructor(
 		scene: Phaser.Scene,

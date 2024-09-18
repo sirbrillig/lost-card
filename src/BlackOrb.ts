@@ -6,6 +6,7 @@ type AllStates = "wait1" | "wait2";
 
 export class BlackOrb extends BaseMonster<AllStates> {
 	hitPoints = 1;
+	primaryColor = 0x797B7B;
 
 	constructor(
 		scene: Phaser.Scene,

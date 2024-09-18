@@ -20,6 +20,7 @@ type AllStates =
 
 export class PlantBoss extends BaseMonster<AllStates> {
 	hitPoints: number = 12;
+	primaryColor = 0x97A21A;
 
 	constructor(
 		scene: Phaser.Scene,

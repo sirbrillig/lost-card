@@ -8,6 +8,7 @@ type AllStates = "idle" | "spawn1" | "spawn2" | "spawn3" | "idle2";
 
 export class SkyBlobSpitter extends BaseMonster<AllStates> {
 	hitPoints: number = 6;
+	primaryColor = 0x23A487;
 	#enemyManager;
 
 	constructor(
@@ -43,11 +44,6 @@ export class SkyBlobSpitter extends BaseMonster<AllStates> {
 				frames: [3, 4, 5, 15, 16, 17, 27, 28, 29].reverse(),
 			}),
 			frameRate: 10,
-		});
-		this.anims.create({
-			key: "explode",
-			frames: this.anims.generateFrameNumbers("monster_explode1"),
-			frameRate: 20,
 		});
 	}
 

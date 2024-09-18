@@ -6,6 +6,7 @@ type AllStates = "randomwalk" | "powerup" | "iceattack";
 
 export class IceMonster extends BaseMonster<AllStates> {
 	hitPoints: number = 2;
+	primaryColor: number = 0x39B7E0;
 
 	constructor(
 		scene: Phaser.Scene,
@@ -52,11 +53,6 @@ export class IceMonster extends BaseMonster<AllStates> {
 			}),
 			frameRate: 10,
 			repeat: -1,
-		});
-		this.anims.create({
-			key: "explode",
-			frames: this.anims.generateFrameNumbers("monster_explode1"),
-			frameRate: 20,
 		});
 	}
 

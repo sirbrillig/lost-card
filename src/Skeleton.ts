@@ -6,6 +6,7 @@ type AllStates = "randomwalk1" | "randomwalk2";
 
 export class Skeleton extends BaseMonster<AllStates> {
 	hitPoints = 3;
+	primaryColor = 0x23a487;
 
 	constructor(
 		scene: Phaser.Scene,

@@ -6,6 +6,7 @@ type AllStates = "randomwalk1" | "walkwithfire";
 
 export class FireMonster extends BaseMonster<AllStates> {
 	hitPoints: number = 3;
+	primaryColor = 0xb80000;
 
 	constructor(
 		scene: Phaser.Scene,
@@ -52,11 +53,6 @@ export class FireMonster extends BaseMonster<AllStates> {
 			}),
 			frameRate: 10,
 			repeat: -1,
-		});
-		this.anims.create({
-			key: "explode",
-			frames: this.anims.generateFrameNumbers("monster_explode1"),
-			frameRate: 20,
 		});
 	}
 
