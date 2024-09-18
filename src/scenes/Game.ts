@@ -3127,12 +3127,30 @@ export class Game extends Scene {
 		);
 	}
 
+	showParticlesForHurtPlayer() {
+		const emitter = this.add.particles(
+			this.player.body.center.x,
+			this.player.body.center.y - 5,
+			"player-hit",
+			{
+				frame: 1,
+				lifespan: 800,
+				speed: { min: 40, max: 80 },
+				scale: { start: 0.7, end: 0 },
+				alpha: 0.8,
+				emitting: false,
+			}
+		);
+		emitter.explode(10);
+	}
+
 	doCameraEffectsForHurtPlayer() {
 		this.cameras.main.shake(
 			config.postHitCameraShakeDelay,
 			config.postHitCameraShakeIntensity
 		);
 		this.playEffectForHurtPlayer();
+		this.showParticlesForHurtPlayer();
 		this.zoomCameraForHurtPlayer();
 		this.slowTimeForHurtPlayer();
 		vibrate(this, 2, 300);
