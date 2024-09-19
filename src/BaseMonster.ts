@@ -264,33 +264,39 @@ export class BaseMonster<AllStates extends string> extends Phaser.Physics.Arcade
 		if (!this.body?.center?.x) {
 			return;
 		}
-		const emitter = this.scene.add.particles(
-			this.body.center.x,
-			this.body.center.y - 5,
-			"ice_powerup",
-			{
-				frame: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
-				lifespan: 200,
-				scale: 0.3,
-				speed: 250,
-				duration: 900,
-				frequency: 2,
-			}
-		);
+
+		const star = this.scene.add
+			.star(this.body.center.x, this.body.center.y - 5, 20, 4, 70, 0xffffff)
+			.setDepth(4);
+		star.setAlpha(0);
 		this.scene.tweens.add({
-			targets: emitter,
-			rotation: 10,
+			targets: star,
+			alpha: 0.7,
+			duration: 800,
+		});
+		this.scene.tweens.add({
+			targets: star,
+			rotation: 2,
+			duration: 1500,
 		});
 		this.scene.time.addEvent({
-			delay: 800,
+			delay: 1500,
 			callback: () => {
+				this.scene.tweens.add({
+					targets: star,
+					alpha: 0,
+					duration: 300,
+				});
+			},
+		});
+		this.scene.time.addEvent({
+			delay: 1800,
+			callback: () => {
+				star.destroy();
 				this.showBossExplosion2();
 			},
 		});
 		this.scene.sound.play("dark-void");
-		emitter.once(Phaser.GameObjects.Particles.Events.COMPLETE, () => {
-			emitter?.destroy();
-		});
 	}
 
 	showBossExplosion2() {
