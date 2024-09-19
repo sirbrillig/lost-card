@@ -196,18 +196,33 @@ class Heart {
 			.setOrigin(0);
 		heart.setDisplaySize(heartSize, heartSize);
 		this.image = heart;
+		this.showEffectForGainedHeart();
 	}
 
 	update() {
 		if (this.isActive && !this.isImageActive) {
 			this.image.setFrame(activeFrame);
 			this.isImageActive = true;
+			this.showEffectForGainedHeart();
 		}
 		if (!this.isActive && this.isImageActive) {
 			this.image.setFrame(inactiveFrame);
 			this.isImageActive = false;
 			this.showParticlesForLostHeart();
 		}
+	}
+
+	showEffectForGainedHeart() {
+		const glow = this.image.postFX?.addGlow(0xff0000, 1, 1);
+		this.scene.tweens.add({
+			targets: glow,
+			outerStrength: 0,
+			innerStrength: 0,
+			duration: 600,
+			onComplete: () => {
+				glow?.destroy();
+			},
+		});
 	}
 
 	showParticlesForLostHeart() {
