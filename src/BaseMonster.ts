@@ -272,7 +272,7 @@ export class BaseMonster<AllStates extends string> extends Phaser.Physics.Arcade
 		this.scene.tweens.add({
 			targets: star,
 			alpha: 0.7,
-			duration: 800,
+			duration: 300,
 		});
 		this.scene.tweens.add({
 			targets: star,
@@ -280,7 +280,7 @@ export class BaseMonster<AllStates extends string> extends Phaser.Physics.Arcade
 			duration: 1500,
 		});
 		this.scene.time.addEvent({
-			delay: 1500,
+			delay: 900,
 			callback: () => {
 				this.scene.tweens.add({
 					targets: star,
@@ -290,7 +290,7 @@ export class BaseMonster<AllStates extends string> extends Phaser.Physics.Arcade
 			},
 		});
 		this.scene.time.addEvent({
-			delay: 1800,
+			delay: 1200,
 			callback: () => {
 				star.destroy();
 				this.showBossExplosion2();
@@ -317,11 +317,24 @@ export class BaseMonster<AllStates extends string> extends Phaser.Physics.Arcade
 				duration: 2000,
 			}
 		);
-		// This flashes red
-		this.scene.tweens.add({
-			targets: this,
-			tint: 0xf0f0f0,
-			duration: 3000,
+		let c1 = Phaser.Display.Color.HexStringToColor("#ffffff"); // From no tint
+		let c2 = Phaser.Display.Color.HexStringToColor("#ff0000"); // To RED
+		this.setTint(0xffffff);
+		this.scene.tweens.addCounter({
+			from: 0,
+			to: 100,
+			duration: 1200,
+			onUpdate: (twn) => {
+				const value = twn.getValue();
+				let col = Phaser.Display.Color.Interpolate.ColorWithColor(
+					c1,
+					c2,
+					100,
+					value
+				);
+				let colourInt = Phaser.Display.Color.GetColor(col.r, col.g, col.b);
+				this.setTint(colourInt);
+			},
 		});
 		emitter.once(Phaser.GameObjects.Particles.Events.COMPLETE, () => {
 			emitter?.destroy();
