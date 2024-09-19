@@ -779,8 +779,12 @@ export class Game extends Scene {
 		if (potionCount === 0) {
 			return;
 		}
-		// Use Potion
 		const totalHitPoints = this.getPlayerTotalHitPoints();
+		if (this.getPlayerHitPoints() === totalHitPoints) {
+			return;
+		}
+
+		// Use Potion
 		this.healSound.play();
 		if (this.healEffect) {
 			this.healEffect.destroy();
@@ -788,8 +792,8 @@ export class Game extends Scene {
 		const healEffect = this.add.sprite(
 			this.player.body.center.x + 1,
 			this.player.body.center.y - 1,
-			"use-potion-charge",
-			0
+			"icons3",
+			2
 		);
 		this.physics.add.existing(healEffect);
 		if (!isDynamicSprite(healEffect)) {
@@ -797,20 +801,16 @@ export class Game extends Scene {
 		}
 		this.healEffect = healEffect;
 		this.healEffect.setDepth(5);
-		this.healEffect.setAlpha(0.8);
-		this.healEffect.anims.play("use-potion-charge");
-		if (this.getPlayerHitPoints() === totalHitPoints) {
-			this.healEffect.on(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
-				this.healEffect?.setVisible(false);
-			});
-			return;
-		}
-		this.healEffect.anims.chain("use-potion");
-		this.healEffect.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
-			const name = this.healEffect?.anims.getName();
-			if (name === "use-potion") {
+		this.healEffect.setAlpha(0.5);
+		this.healEffect.setScale(0.2);
+
+		this.tweens.add({
+			targets: this.healEffect,
+			scale: 2,
+			duration: 500,
+			onComplete: () => {
 				this.healEffect?.destroy();
-			}
+			},
 		});
 
 		this.setPotionCount(potionCount - 1);
