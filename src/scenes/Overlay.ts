@@ -157,9 +157,40 @@ class PotionItem {
 			.setOrigin(0.5);
 	}
 
+	playUsePotionEffect() {
+		const emitter = this.scene.add.particles(
+			this.image.getCenter().x,
+			this.image.getCenter().y,
+			"fire-power",
+			{
+				frame: 8,
+				lifespan: 700,
+				speed: { min: 50, max: 90 },
+				scale: { start: 0.8, end: 0 },
+				tint: 0xe00a06,
+				emitting: false,
+				gravityY: 150,
+				bounce: 0.5,
+				bounds: new Phaser.Geom.Rectangle(
+					this.image.getCenter().x - 50,
+					this.image.getCenter().y - 10,
+					50,
+					40
+				),
+			}
+		);
+		emitter.explode(20);
+		emitter.once(Phaser.GameObjects.Particles.Events.COMPLETE, () => {
+			emitter?.destroy();
+		});
+	}
+
 	update() {
 		const totalPotions = this.scene.registry.get(DataKeys.PotionCount) ?? 0;
 		if (this.totalPotions !== totalPotions) {
+			if (this.totalPotions > totalPotions) {
+				this.playUsePotionEffect();
+			}
 			this.totalPotions = totalPotions;
 			try {
 				this.countLabel.setText(`${this.totalPotions}`);
@@ -235,7 +266,7 @@ class Heart {
 				lifespan: 600,
 				speed: { min: 40, max: 80 },
 				scale: { start: 0.7, end: 0 },
-				tint: 0xE00A06,
+				tint: 0xe00a06,
 				emitting: false,
 			}
 		);
