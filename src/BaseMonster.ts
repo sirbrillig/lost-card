@@ -287,6 +287,7 @@ export class BaseMonster<AllStates extends string> extends Phaser.Physics.Arcade
 				this.showBossExplosion2();
 			},
 		});
+		this.scene.sound.play("dark-void");
 		emitter.once(Phaser.GameObjects.Particles.Events.COMPLETE, () => {
 			emitter?.destroy();
 		});
