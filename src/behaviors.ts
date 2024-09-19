@@ -705,10 +705,43 @@ export class TeleportToPlatform<AllStates extends string>
 				targetTile = tile;
 			}
 		});
-
+		sprite.setVisible(false);
 		const x = targetTile.pixelX + targetTile.width / 2;
+
+		// Create movement effect between tiles
+		const moveEffect = sprite.scene.add.sprite(
+			sprite.body.center.x,
+			sprite.body.center.y,
+			"teleport",
+			0
+		);
+		moveEffect.setDepth(8);
+		moveEffect.anims.play(
+			{
+				key: "teleport",
+				repeat: -1,
+			},
+			true
+		);
+		sprite.scene.tweens.add({
+			targets: moveEffect,
+			duration: 400,
+			x,
+			y: targetTile.pixelY,
+			onComplete: () => {
+				moveEffect?.destroy();
+			},
+		});
+		sprite.once(Events.MonsterDying, () => {
+			moveEffect?.destroy();
+		});
+		MainEvents.once(Events.LeavingRoom, () => {
+			moveEffect?.destroy();
+		});
+
 		// Move to tile
 		sprite.setPosition(x, targetTile.pixelY);
+		sprite.setVisible(true);
 		sprite.scene.sound.play("holy");
 
 		const effect2 = sprite.scene.add.sprite(
