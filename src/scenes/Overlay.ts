@@ -179,11 +179,13 @@ class PotionItem {
 }
 
 class Heart {
+	scene: Phaser.Scene;
 	isActive: boolean = false;
 	isImageActive: boolean = false;
 	image: Phaser.GameObjects.Image;
 
 	constructor(scene: Phaser.Scene, count: number) {
+		this.scene = scene;
 		const heart = scene.add
 			.image(
 				portraitPadding + scene.cameras.main.x + heartSize * count,
@@ -204,7 +206,27 @@ class Heart {
 		if (!this.isActive && this.isImageActive) {
 			this.image.setFrame(inactiveFrame);
 			this.isImageActive = false;
+			this.showParticlesForLostHeart();
 		}
+	}
+
+	showParticlesForLostHeart() {
+		const emitter = this.scene.add.particles(
+			this.image.getCenter().x,
+			this.image.getCenter().y,
+			"fire-power",
+			{
+				frame: 8,
+				lifespan: 700,
+				speed: { min: 40, max: 80 },
+				scale: { start: 0.7, end: 0 },
+				emitting: false,
+			}
+		);
+		emitter.explode(20);
+		emitter.once(Phaser.GameObjects.Particles.Events.COMPLETE, () => {
+			emitter?.destroy();
+		});
 	}
 
 	destroy() {
