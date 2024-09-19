@@ -3063,8 +3063,9 @@ export class Game extends Scene {
 		if (!this.scene.isActive()) {
 			return;
 		}
-		this.sound.stopAll();
 		this.isGameOver = true;
+		this.tweens.add({ targets: this.player, duration: 800, alpha: 0 });
+		this.sound.stopAll();
 		this.cameras.main.fadeOut(1000, 0, 0, 0, (_: unknown, progress: number) => {
 			if (progress === 1) {
 				this.scene.stop();
@@ -3718,6 +3719,9 @@ export class Game extends Scene {
 	}
 
 	updatePlayerAlpha() {
+		if (this.isGameOver) {
+			return;
+		}
 		if (this.isPlayerInvincible()) {
 			this.player.setAlpha(0.5);
 		} else {
