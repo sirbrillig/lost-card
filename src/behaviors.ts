@@ -115,7 +115,7 @@ export class Roar<AllStates extends string>
 		});
 		roar.play();
 		MainEvents.emit(Events.StunPlayer, true);
-		sprite.scene.cameras.main.shake(2000, 0.009);
+		sprite.scene.cameras.main.shake(2000, 0.009, true);
 		vibrate(sprite.scene, 2, 1800);
 
 		sprite.scene.anims.create({
