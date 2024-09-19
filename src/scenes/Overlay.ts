@@ -232,9 +232,10 @@ class Heart {
 			"fire-power",
 			{
 				frame: 8,
-				lifespan: 700,
+				lifespan: 600,
 				speed: { min: 40, max: 80 },
 				scale: { start: 0.7, end: 0 },
+				tint: 0xE00A06,
 				emitting: false,
 			}
 		);
