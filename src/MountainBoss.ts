@@ -129,7 +129,7 @@ export class MountainBoss extends BaseMonster<AllStates> {
 					speed: isBloodied ? 100 : 80,
 				});
 			case "preparethrow":
-				return new PowerUp(state, "throwrocks");
+				return new PowerUp(state, "throwrocks", { scale: 3 });
 			case "throwrocks":
 				return new ThrowRocks(state, "roar1", {
 					speed: 500,

@@ -859,11 +859,25 @@ export class PowerUp<AllStates extends string>
 {
 	#nextState: AllStates;
 	#chargeTime = 1300;
+	#scale = 1;
 	name: AllStates;
 
-	constructor(name: AllStates, nextState: AllStates) {
+	constructor(
+		name: AllStates,
+		nextState: AllStates,
+		config?: {
+			scale?: number;
+			chargeTime?: number;
+		}
+	) {
 		this.name = name;
 		this.#nextState = nextState;
+		if (config?.scale) {
+			this.#scale = config.scale;
+		}
+		if (config?.chargeTime) {
+			this.#chargeTime = config.chargeTime;
+		}
 	}
 
 	init(
@@ -887,6 +901,10 @@ export class PowerUp<AllStates extends string>
 			"powerup",
 			0
 		);
+		if ("primaryColor" in sprite) {
+			effect.setTint(sprite.primaryColor as number);
+		}
+		effect.setScale(this.#scale);
 		effect.setDepth(5);
 		effect.setAlpha(0.7);
 		effect.anims.play("powerup", true);
