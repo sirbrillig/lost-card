@@ -81,9 +81,9 @@ export class FireGiant extends BaseMonster<AllStates> {
 	}
 
 	constructNewBehaviorFor(state: string) {
-		const speed = 190;
-		const minWalkTime = 400;
-		const maxWalkTime = 800;
+		const speed = 110;
+		const minWalkTime = 1000;
+		const maxWalkTime = 1500;
 		switch (state) {
 			case "randomwalk1":
 				return new RandomlyWalk(state, "teleport1", {
@@ -92,7 +92,7 @@ export class FireGiant extends BaseMonster<AllStates> {
 					maxWalkTime,
 				});
 			case "teleport1":
-				return new TeleportToPlatform(state, "randomwalk2", 900);
+				return new TeleportToPlatform(state, "randomwalk2", 2000);
 			case "randomwalk2":
 				return new RandomlyWalk(state, "teleport2", {
 					speed,
@@ -100,10 +100,10 @@ export class FireGiant extends BaseMonster<AllStates> {
 					maxWalkTime,
 				});
 			case "teleport2":
-				return new TeleportToPlatform(state, this.chooseAttack(), 1000);
+				return new TeleportToPlatform(state, this.chooseAttack(), 2000);
 			case "walkwithfire":
 				return new WalkWithFire(state, "teleport1", {
-					speed: 60,
+					speed: 50,
 					endAfter: 2000,
 					rotateDistance: 40,
 				});
