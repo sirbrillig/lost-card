@@ -30,6 +30,7 @@ type AllStates =
 	| "fireball1"
 	| "fireball2"
 	| "fireball3"
+	| "fireball4"
 	| "iceball1"
 	| "iceball2"
 	| "iceball3"
@@ -229,11 +230,13 @@ export class FinalBoss extends BaseMonster<AllStates> {
 			case "iceball3":
 				return new RangedIceBall(state, "summoncircle", 60, 350);
 			case "fireball1":
-				return new RangedFireBall(state, "fireball2", 140, 350);
+				return new RangedFireBall(state, "fireball2", 180, 350);
 			case "fireball2":
-				return new RangedFireBall(state, "fireball3", 140, 350);
+				return new RangedFireBall(state, "fireball3", 180, 350);
 			case "fireball3":
-				return new RangedFireBall(state, "summoncircle", 140, 350);
+				return new RangedFireBall(state, "fireball4", 180, 350);
+			case "fireball4":
+				return new RangedFireBall(state, "summoncircle", 180, 350);
 			case "slash":
 				return new SlashTowardPlayer(state, "summoncircle", 180);
 			case "rocks":

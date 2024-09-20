@@ -10,7 +10,8 @@ type AllStates =
 	| "attack1"
 	| "attack2"
 	| "attack3"
-	| "attack4";
+	| "attack4"
+	| "attack5";
 
 export class FireBoss extends BaseMonster<AllStates> {
 	hitPoints: number = 10;
@@ -101,13 +102,15 @@ export class FireBoss extends BaseMonster<AllStates> {
 					maxWalkTime: 5000,
 				});
 			case "attack1":
-				return new RangedFireBall(state, "attack2", 140, 350);
+				return new RangedFireBall(state, "attack2", 180, 350);
 			case "attack2":
-				return new RangedFireBall(state, "attack3", 140, 350);
+				return new RangedFireBall(state, "attack3", 180, 350);
 			case "attack3":
-				return new RangedFireBall(state, "attack4", 140, 350);
+				return new RangedFireBall(state, "attack4", 180, 350);
 			case "attack4":
-				return new RangedFireBall(state, "walk", 140, 350);
+				return new RangedFireBall(state, "attack5", 180, 350);
+			case "attack5":
+				return new RangedFireBall(state, "walk", 180, 350);
 		}
 	}
 
