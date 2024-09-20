@@ -118,6 +118,27 @@ export class Roar<AllStates extends string>
 		sprite.scene.cameras.main.shake(2000, 0.009, true);
 		vibrate(sprite.scene, 2, 1800);
 
+		const emitter = sprite.scene.add.particles(
+			sprite.body.center.x,
+			sprite.body.center.y - 5,
+			"player-hit",
+			{
+				frame: [0, 1],
+				lifespan: 1500,
+				speed: { min: 70, max: 150 },
+				scale: { start: 0.9, end: 0 },
+				alpha: 0.9,
+				tint:
+					"primaryColor" in sprite
+						? (sprite.primaryColor as number)
+						: undefined,
+				duration: 2000,
+			}
+		);
+		emitter.once(Phaser.GameObjects.Particles.Events.COMPLETE, () => {
+			emitter.destroy();
+		});
+
 		sprite.scene.anims.create({
 			key: "orange_boom",
 			frames: sprite.anims.generateFrameNumbers("orange_boom"),
