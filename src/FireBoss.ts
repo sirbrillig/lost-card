@@ -90,6 +90,8 @@ export class FireBoss extends BaseMonster<AllStates> {
 	}
 
 	constructNewBehaviorFor(state: AllStates) {
+		const isBloodied = this.hitPoints < 5;
+		const fireSpeed = isBloodied ? 200 : 180;
 		switch (state) {
 			case "initial":
 				return new WaitForActive(state, "roar1");
@@ -102,15 +104,15 @@ export class FireBoss extends BaseMonster<AllStates> {
 					maxWalkTime: 5000,
 				});
 			case "attack1":
-				return new RangedFireBall(state, "attack2", 180, 350);
+				return new RangedFireBall(state, "attack2", fireSpeed, 350);
 			case "attack2":
-				return new RangedFireBall(state, "attack3", 180, 350);
+				return new RangedFireBall(state, "attack3", fireSpeed, 350);
 			case "attack3":
-				return new RangedFireBall(state, "attack4", 180, 350);
+				return new RangedFireBall(state, "attack4", fireSpeed, 350);
 			case "attack4":
-				return new RangedFireBall(state, "attack5", 180, 350);
+				return new RangedFireBall(state, "attack5", fireSpeed, 350);
 			case "attack5":
-				return new RangedFireBall(state, "walk", 180, 350);
+				return new RangedFireBall(state, "walk", fireSpeed, 350);
 		}
 	}
 
