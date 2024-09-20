@@ -266,36 +266,39 @@ export class BaseMonster<AllStates extends string> extends Phaser.Physics.Arcade
 		}
 
 		const star = this.scene.add
-			.star(this.body.center.x, this.body.center.y - 5, 20, 4, 70, 0xffffff)
+			.star(this.body.center.x, this.body.center.y - 5, 20, 4, 90, 0xffffff)
 			.setDepth(4);
 		star.setAlpha(0);
 		this.scene.tweens.add({
 			targets: star,
-			alpha: 0.7,
-			duration: 300,
+			alpha: 0.8,
+			duration: 850,
 		});
 		this.scene.tweens.add({
 			targets: star,
-			rotation: 2,
-			duration: 1500,
+			rotation: 1,
+			duration: 2500,
 		});
 		this.scene.time.addEvent({
-			delay: 900,
+			delay: 2000,
 			callback: () => {
 				this.scene.tweens.add({
 					targets: star,
 					alpha: 0,
-					duration: 300,
+					duration: 900,
+					onComplete: () => {
+						star?.destroy();
+					},
 				});
 			},
 		});
 		this.scene.time.addEvent({
-			delay: 1200,
+			delay: 1900,
 			callback: () => {
-				star.destroy();
 				this.showBossExplosion2();
 			},
 		});
+
 		this.scene.sound.play("dark-void");
 	}
 
@@ -309,7 +312,7 @@ export class BaseMonster<AllStates extends string> extends Phaser.Physics.Arcade
 			"monster_explode1",
 			{
 				frame: [1, 2, 3, 4, 5, 6, 7, 8],
-				lifespan: 800,
+				lifespan: 1000,
 				speed: { min: 40, max: 80 },
 				scale: { start: 0.7, end: 0 },
 				alpha: 0.9,
@@ -317,6 +320,7 @@ export class BaseMonster<AllStates extends string> extends Phaser.Physics.Arcade
 				duration: 2000,
 			}
 		);
+
 		let c1 = Phaser.Display.Color.HexStringToColor("#ffffff"); // From no tint
 		let c2 = Phaser.Display.Color.HexStringToColor("#ff0000"); // To RED
 		this.setTint(0xffffff);
@@ -336,6 +340,7 @@ export class BaseMonster<AllStates extends string> extends Phaser.Physics.Arcade
 				this.setTint(colourInt);
 			},
 		});
+
 		emitter.once(Phaser.GameObjects.Particles.Events.COMPLETE, () => {
 			emitter?.destroy();
 			this.showBossExplosion3();
@@ -373,16 +378,43 @@ export class BaseMonster<AllStates extends string> extends Phaser.Physics.Arcade
 			this.body.center.y - 5,
 			"player-hit",
 			{
-				frame: 0,
+				frame: [0, 1],
 				lifespan: 800,
-				speed: 350,
+				speed: { min: 150, max: 400 },
+				scale: { start: 0.9, end: 0 },
+				tint: this.primaryColor,
 				emitting: false,
 			}
 		);
-		emitter.explode(40);
+		emitter.explode(50);
+
+		const circleGraphics = this.scene.add.graphics();
+		const circleThickness = 4;
+		const circle = new Phaser.Geom.Circle(
+			this.body.center.x,
+			this.body.center.y,
+			10
+		);
+		circleGraphics.postFX.addGlow(this.primaryColor);
+		circleGraphics.lineStyle(circleThickness, this.primaryColor);
+		circleGraphics.strokeCircleShape(circle);
+		circleGraphics.setDepth(5);
+		this.scene.tweens.addCounter({
+			from: 10,
+			to: 300,
+			duration: 1000,
+			onUpdate: (twn) => {
+				circleGraphics.clear();
+				circleGraphics.lineStyle(circleThickness, this.primaryColor);
+				circle.radius = twn.getValue();
+				circleGraphics.strokeCircleShape(circle);
+			},
+		});
+
 		this.playDestroySound();
 		emitter.once(Phaser.GameObjects.Particles.Events.COMPLETE, () => {
 			emitter.destroy();
+			circleGraphics.destroy();
 			this.emit(Events.MonsterDefeated);
 			this.destroy();
 		});
