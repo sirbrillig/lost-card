@@ -107,6 +107,9 @@ export class Game extends Scene {
 	playerDirection: SpriteDirection = SpriteDown;
 	enteredRoomAt: number = 0;
 	isPlayerBeingKnockedBack: boolean = false;
+	isPlayerCheatInvincible: boolean = false;
+	isPlayerAppearingInvincible: boolean = false;
+	isPlayerBeingHitInvincible: boolean = false;
 	heartCardTimer: Phaser.Time.TimerEvent | undefined;
 
 	keyLeft: Phaser.Input.Keyboard.Key;
@@ -759,7 +762,7 @@ export class Game extends Scene {
 				return;
 			}
 			// Cheat: be invincible
-			this.setPlayerInvincible(true);
+			this.isPlayerCheatInvincible = true;
 		});
 
 		this.input.keyboard.on("keydown-SIX", () => {
@@ -2606,7 +2609,7 @@ export class Game extends Scene {
 	}
 
 	makePlayerAppear() {
-		this.setPlayerInvincible(true);
+		this.isPlayerAppearingInvincible = true;
 		this.setPlayerStunned(true);
 		this.player.setVisible(false);
 		const effect = this.add.sprite(
@@ -3175,7 +3178,7 @@ export class Game extends Scene {
 		}
 		this.hitSound.play();
 
-		this.setPlayerInvincible(true);
+		this.isPlayerBeingHitInvincible = true;
 		this.enemyCollider.active = false;
 		this.setPlayerHitPoints(this.getPlayerHitPoints() - 1);
 		this.heartCardTimer?.remove();
@@ -3202,7 +3205,7 @@ export class Game extends Scene {
 				: config.postHitInvincibilityTime,
 			callback: () => {
 				if (this.getPlayerHitPoints() > 0) {
-					this.setPlayerInvincible(false);
+					this.isPlayerBeingHitInvincible = false;
 				}
 			},
 		});
@@ -3333,15 +3336,18 @@ export class Game extends Scene {
 		this.player.data?.set("invinciblePlayerHidden", setting);
 	}
 
-	setPlayerInvincible(setting: boolean) {
-		this.player.data?.set("invinciblePlayer", setting);
-	}
-
 	isPlayerInvincible(): boolean {
 		if (this.isPlayerUsingPower() && this.getActivePower() === "SpiritCard") {
 			return true;
 		}
-		return this.player.data?.get("invinciblePlayer");
+		if (
+			this.isPlayerCheatInvincible ||
+			this.isPlayerAppearingInvincible ||
+			this.isPlayerBeingHitInvincible
+		) {
+			return true;
+		}
+		return false;
 	}
 
 	isPlayerHiddenInvincible(): boolean {
@@ -3406,7 +3412,6 @@ export class Game extends Scene {
 	playSpiritPowerAnimation() {
 		this.power.anims.play("spirit-power", true);
 		this.power.setAlpha(0.5);
-		this.setPlayerInvincible(true);
 		const endAnimation = this.tweens.add({
 			delay: config.spiritPowerTime - 1000,
 			targets: this.power,
@@ -3423,7 +3428,6 @@ export class Game extends Scene {
 				this.power.anims.complete();
 				this.sound.stopByKey("spirit");
 				this.power.setAlpha(1);
-				this.setPlayerInvincible(false);
 			},
 		});
 	}
@@ -3635,7 +3639,7 @@ export class Game extends Scene {
 		this.time.addEvent({
 			delay: config.postAppearInvincibilityTime,
 			callback: () => {
-				this.setPlayerInvincible(false);
+				this.isPlayerAppearingInvincible = false;
 			},
 		});
 	}
