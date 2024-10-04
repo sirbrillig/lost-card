@@ -83,7 +83,6 @@ export class Game extends Scene {
 	attackSprite: Phaser.GameObjects.Sprite;
 	enemyManager: EnemyManager;
 	enemyCollider: Phaser.Physics.Arcade.Collider;
-	isGameOver: boolean = false;
 
 	backgroundMusic: Sound | undefined;
 	attackSound: Sound;
@@ -100,6 +99,7 @@ export class Game extends Scene {
 	freezeSound: Sound;
 	plantSound: Sound;
 
+	isGameOver: boolean = false;
 	hasPlayerMovedSinceAppearing: boolean = false;
 	lastAttackedAt: number = 0;
 	lastPowerAt: number = 0;
@@ -141,8 +141,17 @@ export class Game extends Scene {
 	}
 
 	create(saveData: SaveData | undefined) {
-		this.isGameOver = false;
 		this.hasPlayerMovedSinceAppearing = false;
+		this.lastAttackedAt = 0;
+		this.lastPowerAt = 0;
+		this.playerDirection = SpriteDown;
+		this.enteredRoomAt = 0;
+		this.isPlayerBeingKnockedBack = false;
+		this.isPlayerCheatInvincible = false;
+		this.isPlayerAppearingInvincible = false;
+		this.isPlayerBeingHitInvincible = false;
+		this.isGameOver = false;
+
 		this.cameras.main.fadeIn(config.sceneStartFadeTime);
 		this.map = this.make.tilemap({ key: "map" });
 		const tilesetTile = this.map.addTilesetImage(
