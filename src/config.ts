@@ -45,5 +45,6 @@ export const config = {
 	postHitCameraZoomInDelay: 600,
 	postHitCameraZoomOutDelay: 400,
 	openingTextDelay: 18000,
+	howToPlayDelay: 4000,
 	maxActiveAuras: 2,
 };

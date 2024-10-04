@@ -84,7 +84,7 @@ export class MainMenu extends Scene {
 	confirmSelection() {
 		if (this.selectedButton === 0) {
 			this.registry.reset();
-			this.scene.start("Game", {});
+			this.scene.start("HowToPlay");
 			return;
 		}
 		if (this.selectedButton === 1) {
