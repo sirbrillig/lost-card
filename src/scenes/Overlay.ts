@@ -299,7 +299,6 @@ export class Overlay extends Scene {
 	}
 
 	create() {
-		this.keyCount = this.getKeyCount();
 		this.potions.forEach((item) => item.destroy());
 		this.potions = [];
 		this.auras.forEach((item) => item.destroy());
