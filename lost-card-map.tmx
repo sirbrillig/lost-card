@@ -8826,7 +8826,7 @@
   <object id="807" name="HeartCard" gid="2870" x="1680" y="1968" width="16" height="16"/>
   <object id="810" name="SwordCard" gid="2882" x="1728" y="1872" width="16" height="16"/>
   <object id="827" name="SunCard" gid="2877" x="560" y="1552" width="16" height="16"/>
-  <object id="831" name="TimeCard" gid="2896" x="1398.95" y="927.503" width="16" height="16"/>
+  <object id="831" name="ClockCard" gid="2896" x="1398.95" y="927.503" width="16" height="16"/>
   <object id="845" name="FishCard" gid="2921" x="1888" y="1504" width="16" height="16"/>
   <object id="868" name="CrownCard" gid="2883" x="1927.73" y="523.528" width="16" height="16">
    <properties>
