@@ -290,8 +290,8 @@ export class Overlay extends Scene {
 	totalHearts: number = 0;
 	activeHearts: number = 0;
 	bg: Phaser.GameObjects.NineSlice;
-	keyCountIcon: Phaser.GameObjects.Image;
-	keyCountLabel: Phaser.GameObjects.BitmapText;
+	keyCountIcon: Phaser.GameObjects.Image | undefined;
+	keyCountLabel: Phaser.GameObjects.BitmapText | undefined;
 	saveMessageTime = 1000;
 
 	constructor() {
@@ -299,6 +299,9 @@ export class Overlay extends Scene {
 	}
 
 	create() {
+		this.keyCount = 0;
+		this.keyCountIcon = undefined;
+		this.keyCountLabel = undefined;
 		this.potions.forEach((item) => item.destroy());
 		this.potions = [];
 		this.auras.forEach((item) => item.destroy());
