@@ -1794,7 +1794,7 @@ export class Game extends Scene {
 		effect.on(Phaser.Animations.Events.ANIMATION_UPDATE, () => {
 			const name = effect.anims.getName();
 			const progress = effect.anims.getProgress();
-			if (name === "appear" && progress > 0.8) {
+			if (name === "appear" && progress > 0.8 && item?.data) {
 				item.data.set("hidden", false);
 				item.setVisible(true);
 				item.setActive(true);
