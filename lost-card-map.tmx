@@ -8417,13 +8417,13 @@
   <object id="884" name="FKMiniBoss" x="3088" y="1968" width="112" height="272"/>
  </objectgroup>
  <objectgroup id="12" name="Creatures">
-  <object id="45" name="MountainMonster" x="1391.67" y="1008.53">
+  <object id="45" name="MountainMonster" x="1444.51" y="989.496">
    <properties>
     <property name="isMonster" type="bool" value="true"/>
    </properties>
    <point/>
   </object>
-  <object id="46" name="MountainMonster" x="1391.88" y="1031.13">
+  <object id="46" name="MountainMonster" x="1443.87" y="1019.48">
    <properties>
     <property name="isMonster" type="bool" value="true"/>
    </properties>
@@ -8871,11 +8871,11 @@
   <object id="170" name="Rock" gid="2260" x="1251.51" y="1294.39" width="12.163" height="12.163"/>
   <object id="171" name="Rock" gid="2260" x="1203.57" y="1326.18" width="12.163" height="12.163"/>
   <object id="172" name="Rock" gid="2260" x="1172.55" y="1309.26" width="12.163" height="12.163"/>
-  <object id="158" name="Rock" gid="2260" x="1474.21" y="1006.4" width="12.163" height="12.163"/>
-  <object id="317" name="Rock" gid="2260" x="1442" y="991.824" width="12.163" height="12.163"/>
-  <object id="318" name="Rock" gid="2260" x="1474.21" y="974.534" width="12.163" height="12.163"/>
-  <object id="299" name="Rock" gid="2260" x="1441.05" y="1021.14" width="12.163" height="12.163"/>
-  <object id="160" name="Rock" gid="2260" x="1473.71" y="1039.21" width="12.163" height="12.163"/>
+  <object id="158" name="Rock" gid="2260" x="1488.7" y="1006.97" width="12.163" height="12.163"/>
+  <object id="317" name="Rock" gid="2260" x="1459.05" y="990.688" width="12.163" height="12.163"/>
+  <object id="318" name="Rock" gid="2260" x="1487.56" y="973.682" width="12.163" height="12.163"/>
+  <object id="299" name="Rock" gid="2260" x="1459.52" y="1021.42" width="12.163" height="12.163"/>
+  <object id="160" name="Rock" gid="2260" x="1489.62" y="1039.21" width="12.163" height="12.163"/>
   <object id="145" name="Rock" gid="2260" x="1299.57" y="1009.65" width="12.163" height="12.163"/>
   <object id="336" name="Rock" gid="2260" x="1330.88" y="893.803" width="12.163" height="12.163"/>
   <object id="320" name="Rock" gid="2260" x="1330.52" y="1052.5" width="12.163" height="12.163"/>
