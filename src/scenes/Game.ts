@@ -565,7 +565,6 @@ export class Game extends Scene {
 			return;
 		}
 		if (this.getKeyCount() < 6) {
-			this.sound.stopAll();
 			this.showDialog({
 				heading: "Golden door",
 				text: `The survivors of the kingdoms are trapped behind this door but it requires six keys to open. You have ${this.getKeyCount()} keys.`,
