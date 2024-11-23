@@ -1,12 +1,11 @@
-import { RandomlyWalk, WalkWithFire } from "./behaviors";
-import { EnemyManager } from "./EnemyManager";
+import { RandomlyWalk } from "../lib/behaviors";
+import { EnemyManager } from "../lib/EnemyManager";
 import { BaseMonster } from "./BaseMonster";
 
-type AllStates = "randomwalk1" | "walkwithfire";
+type AllStates = "randomwalk1" | "randomwalk2";
 
-export class FireMonster extends BaseMonster<AllStates> {
-	hitPoints: number = 3;
-	primaryColor = 0xb80000;
+export class MountainMonster extends BaseMonster<AllStates> {
+	hitPoints = 2;
 
 	constructor(
 		scene: Phaser.Scene,
@@ -14,15 +13,19 @@ export class FireMonster extends BaseMonster<AllStates> {
 		x: number,
 		y: number
 	) {
-		super(scene, enemyManager, x, y, "monsters1", 57);
+		super(scene, enemyManager, x, y, "monsters1", 54);
+	}
+
+	getInitialState(): AllStates {
+		return "randomwalk1";
 	}
 
 	initSprites() {
 		this.anims.create({
 			key: "down",
 			frames: this.anims.generateFrameNumbers("monsters1", {
-				start: 57,
-				end: 59,
+				start: 54,
+				end: 56,
 			}),
 			frameRate: 10,
 			repeat: -1,
@@ -30,8 +33,8 @@ export class FireMonster extends BaseMonster<AllStates> {
 		this.anims.create({
 			key: "left",
 			frames: this.anims.generateFrameNumbers("monsters1", {
-				start: 69,
-				end: 71,
+				start: 66,
+				end: 68,
 			}),
 			frameRate: 10,
 			repeat: -1,
@@ -39,8 +42,8 @@ export class FireMonster extends BaseMonster<AllStates> {
 		this.anims.create({
 			key: "right",
 			frames: this.anims.generateFrameNumbers("monsters1", {
-				start: 81,
-				end: 83,
+				start: 78,
+				end: 80,
 			}),
 			frameRate: 10,
 			repeat: -1,
@@ -48,24 +51,20 @@ export class FireMonster extends BaseMonster<AllStates> {
 		this.anims.create({
 			key: "up",
 			frames: this.anims.generateFrameNumbers("monsters1", {
-				start: 93,
-				end: 95,
+				start: 90,
+				end: 92,
 			}),
 			frameRate: 10,
 			repeat: -1,
 		});
 	}
 
-	getInitialState(): AllStates {
-		return "randomwalk1";
-	}
-
 	constructNewBehaviorFor(state: string) {
 		switch (state) {
 			case "randomwalk1":
-				return new RandomlyWalk(state, "walkwithfire");
-			case "walkwithfire":
-				return new WalkWithFire(state, "randomwalk1");
+				return new RandomlyWalk(state, "randomwalk2");
+			case "randomwalk2":
+				return new RandomlyWalk(state, "randomwalk1");
 		}
 	}
 }

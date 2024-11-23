@@ -1,6 +1,10 @@
-import { RandomlyWalk, TeleportToPlatform, WalkWithFire } from "./behaviors";
-import { DataKeys } from "./shared";
-import { EnemyManager } from "./EnemyManager";
+import {
+	RandomlyWalk,
+	TeleportToPlatform,
+	WalkWithFire,
+} from "../lib/behaviors";
+import { DataKeys } from "../lib/shared";
+import { EnemyManager } from "../lib/EnemyManager";
 import { BaseMonster } from "./BaseMonster";
 
 type AllStates =

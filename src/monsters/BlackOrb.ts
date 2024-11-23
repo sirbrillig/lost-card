@@ -1,12 +1,12 @@
-import { Nothing } from "./behaviors";
-import { EnemyManager } from "./EnemyManager";
+import { Nothing } from "../lib/behaviors";
+import { EnemyManager } from "../lib/EnemyManager";
 import { BaseMonster } from "./BaseMonster";
 
 type AllStates = "wait1" | "wait2";
 
 export class BlackOrb extends BaseMonster<AllStates> {
 	hitPoints = 1;
-	primaryColor = 0x797B7B;
+	primaryColor = 0x797b7b;
 
 	constructor(
 		scene: Phaser.Scene,

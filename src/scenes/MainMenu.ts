@@ -1,5 +1,5 @@
 import { Scene } from "phaser";
-import { loadSavedRegistry, loadSavedData } from "../shared";
+import { loadSavedRegistry, loadSavedData } from "../lib/shared";
 
 export class MainMenu extends Scene {
 	selectedButton: 0 | 1 = 0;

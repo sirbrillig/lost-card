@@ -1,6 +1,12 @@
-import { DataKeys } from "./shared";
-import { EnemyManager } from "./EnemyManager";
-import { WaitForActive, Roar, RandomlyWalk, RangedFireBall } from "./behaviors";
+import { DataKeys } from "../lib/shared";
+import { isTileWithPropertiesObject } from "../lib/shared";
+import { EnemyManager } from "../lib/EnemyManager";
+import {
+	WaitForActive,
+	Roar,
+	RandomlyWalk,
+	SwoopAttack,
+} from "../lib/behaviors";
 import { BaseMonster } from "./BaseMonster";
 
 type AllStates =
@@ -9,13 +15,11 @@ type AllStates =
 	| "walk"
 	| "attack1"
 	| "attack2"
-	| "attack3"
-	| "attack4"
-	| "attack5";
+	| "attack3";
 
-export class FireBoss extends BaseMonster<AllStates> {
-	hitPoints: number = 10;
-	primaryColor = 0xB80000;
+export class CloudBoss extends BaseMonster<AllStates> {
+	hitPoints: number = 8;
+	primaryColor = 0xe38d2f;
 	isBoss = true;
 
 	constructor(
@@ -24,7 +28,7 @@ export class FireBoss extends BaseMonster<AllStates> {
 		x: number,
 		y: number
 	) {
-		super(scene, enemyManager, x, y, "bosses1", 69);
+		super(scene, enemyManager, x, y, "bosses1", 9);
 
 		if (!this.body) {
 			throw new Error("Could not create monster");
@@ -34,6 +38,7 @@ export class FireBoss extends BaseMonster<AllStates> {
 		this.setOffset(this.body.offset.x, this.body.offset.y + 10);
 		this.setOrigin(0.5, 0.75);
 		this.data.set(DataKeys.Freezable, false);
+		this.data.set(DataKeys.Pushable, false);
 	}
 
 	getInitialState(): AllStates {
@@ -44,75 +49,97 @@ export class FireBoss extends BaseMonster<AllStates> {
 		this.anims.create({
 			key: "roar",
 			frames: this.anims.generateFrameNumbers("bosses1", {
-				start: 57,
-				end: 59,
+				start: 9,
+				end: 11,
 			}),
-			frameRate: 10,
+			frameRate: 8,
 			repeat: 8,
 		});
 
 		this.anims.create({
+			key: "down",
+			frames: this.anims.generateFrameNumbers("bosses1", {
+				start: 9,
+				end: 11,
+			}),
+			frameRate: 8,
+			repeat: -1,
+		});
+		this.anims.create({
 			key: "left",
 			frames: this.anims.generateFrameNumbers("bosses1", {
-				start: 69,
-				end: 71,
+				start: 21,
+				end: 23,
 			}),
-			frameRate: 10,
+			frameRate: 8,
 			repeat: -1,
 		});
 		this.anims.create({
 			key: "right",
 			frames: this.anims.generateFrameNumbers("bosses1", {
-				start: 81,
-				end: 83,
+				start: 33,
+				end: 35,
 			}),
-			frameRate: 10,
+			frameRate: 8,
 			repeat: -1,
 		});
 		this.anims.create({
 			key: "up",
 			frames: this.anims.generateFrameNumbers("bosses1", {
-				start: 93,
-				end: 95,
+				start: 45,
+				end: 47,
 			}),
-			frameRate: 10,
-			repeat: -1,
-		});
-		this.anims.create({
-			key: "down",
-			frames: this.anims.generateFrameNumbers("bosses1", {
-				start: 57,
-				end: 59,
-			}),
-			frameRate: 10,
+			frameRate: 8,
 			repeat: -1,
 		});
 	}
 
+	doesCollideWithTile(
+		tile: Phaser.Tilemaps.Tile | Phaser.Types.Physics.Arcade.GameObjectWithBody
+	): boolean {
+		if (!isTileWithPropertiesObject(tile)) {
+			return true;
+		}
+		if (tile.properties.isSky) {
+			return false;
+		}
+		return true;
+	}
+
 	constructNewBehaviorFor(state: AllStates) {
-		const isBloodied = this.hitPoints < 5;
-		const fireSpeed = isBloodied ? 200 : 180;
 		switch (state) {
 			case "initial":
 				return new WaitForActive(state, "roar1");
 			case "roar1":
-				return new Roar(state, "walk");
+				return new Roar(state, "attack1");
 			case "walk":
+				this.body?.stop();
 				return new RandomlyWalk(state, "attack1", {
-					speed: 60,
-					minWalkTime: 2000,
-					maxWalkTime: 5000,
+					speed: 30,
+					minWalkTime: 2200,
+					maxWalkTime: 3000,
 				});
 			case "attack1":
-				return new RangedFireBall(state, "attack2", fireSpeed, 350);
+				return new SwoopAttack(state, "attack2", {
+					awareDistance: 600,
+					speed: 250,
+					maxSpeed: 850,
+					followTime: 2000,
+				});
 			case "attack2":
-				return new RangedFireBall(state, "attack3", fireSpeed, 350);
+				return new SwoopAttack(state, "attack3", {
+					awareDistance: 600,
+					speed: 250,
+					maxSpeed: 850,
+					followTime: 2000,
+				});
 			case "attack3":
-				return new RangedFireBall(state, "attack4", fireSpeed, 350);
-			case "attack4":
-				return new RangedFireBall(state, "attack5", fireSpeed, 350);
-			case "attack5":
-				return new RangedFireBall(state, "walk", fireSpeed, 350);
+				return new SwoopAttack(state, "walk", {
+					awareDistance: 600,
+					speed: 250,
+					maxSpeed: 850,
+					followTime: 2000,
+				});
 		}
 	}
 

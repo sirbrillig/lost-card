@@ -1,5 +1,5 @@
-import { WaitForActive, FollowPlayer, SpawnEnemies } from "./behaviors";
-import { EnemyManager } from "./EnemyManager";
+import { WaitForActive, FollowPlayer, SpawnEnemies } from "../lib/behaviors";
+import { EnemyManager } from "../lib/EnemyManager";
 import { BaseMonster } from "./BaseMonster";
 import { Ghost } from "./Ghost";
 

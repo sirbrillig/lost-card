@@ -1,6 +1,6 @@
-import { Idle, SpawnEnemies } from "./behaviors";
-import { DataKeys } from "./shared";
-import { EnemyManager } from "./EnemyManager";
+import { Idle, SpawnEnemies } from "../lib/behaviors";
+import { DataKeys } from "../lib/shared";
+import { EnemyManager } from "../lib/EnemyManager";
 import { BaseMonster } from "./BaseMonster";
 import { PlantBug } from "./PlantBug";
 

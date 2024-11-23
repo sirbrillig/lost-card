@@ -1,12 +1,11 @@
-import { DataKeys } from "./shared";
-import { EnemyManager } from "./EnemyManager";
+import { DataKeys } from "../lib/shared";
+import { EnemyManager } from "../lib/EnemyManager";
 import {
 	WaitForActive,
 	Roar,
 	RandomlyWalk,
-	SeekingVine,
-	TeleportToPlatform,
-} from "./behaviors";
+	RangedFireBall,
+} from "../lib/behaviors";
 import { BaseMonster } from "./BaseMonster";
 
 type AllStates =
@@ -16,12 +15,13 @@ type AllStates =
 	| "attack1"
 	| "attack2"
 	| "attack3"
-	| "teleport";
+	| "attack4"
+	| "attack5";
 
-export class PlantBoss extends BaseMonster<AllStates> {
-	hitPoints: number = 12;
+export class FireBoss extends BaseMonster<AllStates> {
+	hitPoints: number = 10;
+	primaryColor = 0xb80000;
 	isBoss = true;
-	primaryColor = 0x97a21a;
 
 	constructor(
 		scene: Phaser.Scene,
@@ -29,7 +29,7 @@ export class PlantBoss extends BaseMonster<AllStates> {
 		x: number,
 		y: number
 	) {
-		super(scene, enemyManager, x, y, "bosses1", 0);
+		super(scene, enemyManager, x, y, "bosses1", 69);
 
 		if (!this.body) {
 			throw new Error("Could not create monster");
@@ -49,27 +49,18 @@ export class PlantBoss extends BaseMonster<AllStates> {
 		this.anims.create({
 			key: "roar",
 			frames: this.anims.generateFrameNumbers("bosses1", {
-				start: 0,
-				end: 2,
+				start: 57,
+				end: 59,
 			}),
 			frameRate: 10,
 			repeat: 8,
 		});
 
 		this.anims.create({
-			key: "down",
-			frames: this.anims.generateFrameNumbers("bosses1", {
-				start: 0,
-				end: 2,
-			}),
-			frameRate: 10,
-			repeat: -1,
-		});
-		this.anims.create({
 			key: "left",
 			frames: this.anims.generateFrameNumbers("bosses1", {
-				start: 12,
-				end: 14,
+				start: 69,
+				end: 71,
 			}),
 			frameRate: 10,
 			repeat: -1,
@@ -77,8 +68,8 @@ export class PlantBoss extends BaseMonster<AllStates> {
 		this.anims.create({
 			key: "right",
 			frames: this.anims.generateFrameNumbers("bosses1", {
-				start: 24,
-				end: 26,
+				start: 81,
+				end: 83,
 			}),
 			frameRate: 10,
 			repeat: -1,
@@ -86,8 +77,17 @@ export class PlantBoss extends BaseMonster<AllStates> {
 		this.anims.create({
 			key: "up",
 			frames: this.anims.generateFrameNumbers("bosses1", {
-				start: 36,
-				end: 38,
+				start: 93,
+				end: 95,
+			}),
+			frameRate: 10,
+			repeat: -1,
+		});
+		this.anims.create({
+			key: "down",
+			frames: this.anims.generateFrameNumbers("bosses1", {
+				start: 57,
+				end: 59,
 			}),
 			frameRate: 10,
 			repeat: -1,
@@ -95,26 +95,29 @@ export class PlantBoss extends BaseMonster<AllStates> {
 	}
 
 	constructNewBehaviorFor(state: AllStates) {
-		const vineSpeed = 50;
+		const isBloodied = this.hitPoints < 5;
+		const fireSpeed = isBloodied ? 200 : 180;
 		switch (state) {
 			case "initial":
 				return new WaitForActive(state, "roar1");
 			case "roar1":
-				return new Roar(state, "attack1");
+				return new Roar(state, "walk");
 			case "walk":
 				return new RandomlyWalk(state, "attack1", {
-					speed: 75,
-					minWalkTime: 500,
-					maxWalkTime: 3000,
+					speed: 60,
+					minWalkTime: 2000,
+					maxWalkTime: 5000,
 				});
 			case "attack1":
-				return new SeekingVine(state, "attack2", vineSpeed, 550);
+				return new RangedFireBall(state, "attack2", fireSpeed, 350);
 			case "attack2":
-				return new SeekingVine(state, "attack3", vineSpeed, 900);
+				return new RangedFireBall(state, "attack3", fireSpeed, 350);
 			case "attack3":
-				return new SeekingVine(state, "teleport", vineSpeed * 3, 2000);
-			case "teleport":
-				return new TeleportToPlatform(state, "walk", 2500);
+				return new RangedFireBall(state, "attack4", fireSpeed, 350);
+			case "attack4":
+				return new RangedFireBall(state, "attack5", fireSpeed, 350);
+			case "attack5":
+				return new RangedFireBall(state, "walk", fireSpeed, 350);
 		}
 	}
 

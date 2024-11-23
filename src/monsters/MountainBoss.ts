@@ -1,4 +1,4 @@
-import { EnemyManager } from "./EnemyManager";
+import { EnemyManager } from "../lib/EnemyManager";
 import {
 	WaitForActive,
 	Roar,
@@ -6,7 +6,7 @@ import {
 	LeftRightMarch,
 	ThrowRocks,
 	PowerUp,
-} from "./behaviors";
+} from "../lib/behaviors";
 import { BaseMonster } from "./BaseMonster";
 import { MountainMonster } from "./MountainMonster";
 

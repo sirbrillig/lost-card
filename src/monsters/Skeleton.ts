@@ -1,11 +1,12 @@
-import { RandomlyWalk } from "./behaviors";
-import { EnemyManager } from "./EnemyManager";
+import { RandomlyWalk } from "../lib/behaviors";
+import { EnemyManager } from "../lib/EnemyManager";
 import { BaseMonster } from "./BaseMonster";
 
 type AllStates = "randomwalk1" | "randomwalk2";
 
-export class MountainMonster extends BaseMonster<AllStates> {
-	hitPoints = 2;
+export class Skeleton extends BaseMonster<AllStates> {
+	hitPoints = 3;
+	primaryColor = 0x23a487;
 
 	constructor(
 		scene: Phaser.Scene,
@@ -13,7 +14,7 @@ export class MountainMonster extends BaseMonster<AllStates> {
 		x: number,
 		y: number
 	) {
-		super(scene, enemyManager, x, y, "monsters1", 54);
+		super(scene, enemyManager, x, y, "monsters1", 0);
 	}
 
 	getInitialState(): AllStates {
@@ -24,8 +25,8 @@ export class MountainMonster extends BaseMonster<AllStates> {
 		this.anims.create({
 			key: "down",
 			frames: this.anims.generateFrameNumbers("monsters1", {
-				start: 54,
-				end: 56,
+				start: 0,
+				end: 2,
 			}),
 			frameRate: 10,
 			repeat: -1,
@@ -33,8 +34,8 @@ export class MountainMonster extends BaseMonster<AllStates> {
 		this.anims.create({
 			key: "left",
 			frames: this.anims.generateFrameNumbers("monsters1", {
-				start: 66,
-				end: 68,
+				start: 12,
+				end: 14,
 			}),
 			frameRate: 10,
 			repeat: -1,
@@ -42,8 +43,8 @@ export class MountainMonster extends BaseMonster<AllStates> {
 		this.anims.create({
 			key: "right",
 			frames: this.anims.generateFrameNumbers("monsters1", {
-				start: 78,
-				end: 80,
+				start: 24,
+				end: 26,
 			}),
 			frameRate: 10,
 			repeat: -1,
@@ -51,8 +52,8 @@ export class MountainMonster extends BaseMonster<AllStates> {
 		this.anims.create({
 			key: "up",
 			frames: this.anims.generateFrameNumbers("monsters1", {
-				start: 90,
-				end: 92,
+				start: 36,
+				end: 38,
 			}),
 			frameRate: 10,
 			repeat: -1,

@@ -9,8 +9,8 @@ import {
 	getButtonNames,
 	getAuraDescription,
 	Auras,
-} from "../shared";
-import { config } from "../config";
+} from "../lib/shared";
+import { config } from "../lib/config";
 
 const topPadding = 35;
 const auraTopPadding = 35;

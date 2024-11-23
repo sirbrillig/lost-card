@@ -1,15 +1,14 @@
-import { WaitForActive, FollowPlayer } from "./behaviors";
-import { isTileWithPropertiesObject } from "./shared";
-import { EnemyManager } from "./EnemyManager";
+import { WaitForActive, FollowPlayer } from "../lib/behaviors";
+import { EnemyManager } from "../lib/EnemyManager";
 import { BaseMonster } from "./BaseMonster";
 
 type AllStates = "wait" | "follow";
 
-export class SkyBlob extends BaseMonster<AllStates> {
+export class PlantBug extends BaseMonster<AllStates> {
 	awareDistance: number = 90;
-	speed: number = 60;
+	speed: number = 50;
 	hitPoints = 2;
-	primaryColor = 0x23a487;
+	primaryColor = 0x97a21a;
 
 	constructor(
 		scene: Phaser.Scene,
@@ -17,7 +16,7 @@ export class SkyBlob extends BaseMonster<AllStates> {
 		x: number,
 		y: number
 	) {
-		super(scene, enemyManager, x, y, "monsters2", 0);
+		super(scene, enemyManager, x, y, "monsters3", 48);
 	}
 
 	getInitialState(): AllStates {
@@ -27,52 +26,44 @@ export class SkyBlob extends BaseMonster<AllStates> {
 	initSprites() {
 		this.anims.create({
 			key: "down",
-			frames: this.anims.generateFrameNumbers("monsters2", {
-				start: 0,
-				end: 2,
+			frames: this.anims.generateFrameNumbers("monsters3", {
+				start: 48,
+				end: 50,
 			}),
 			frameRate: 10,
 			repeat: -1,
 		});
 		this.anims.create({
 			key: "left",
-			frames: this.anims.generateFrameNumbers("monsters2", {
-				start: 12,
-				end: 14,
+			frames: this.anims.generateFrameNumbers("monsters3", {
+				start: 60,
+				end: 62,
 			}),
 			frameRate: 10,
 			repeat: -1,
 		});
 		this.anims.create({
 			key: "right",
-			frames: this.anims.generateFrameNumbers("monsters2", {
-				start: 24,
-				end: 26,
+			frames: this.anims.generateFrameNumbers("monsters3", {
+				start: 72,
+				end: 74,
 			}),
 			frameRate: 10,
 			repeat: -1,
 		});
 		this.anims.create({
 			key: "up",
-			frames: this.anims.generateFrameNumbers("monsters2", {
-				start: 36,
-				end: 38,
+			frames: this.anims.generateFrameNumbers("monsters3", {
+				start: 84,
+				end: 86,
 			}),
 			frameRate: 10,
 			repeat: -1,
 		});
 	}
 
-	doesCollideWithTile(
-		tile: Phaser.Tilemaps.Tile | Phaser.Types.Physics.Arcade.GameObjectWithBody
-	) {
-		if (!isTileWithPropertiesObject(tile)) {
-			return true;
-		}
-		if (tile.properties.isSky) {
-			return false;
-		}
-		return true;
+	doesCollideWithTile() {
+		return false;
 	}
 
 	constructNewBehaviorFor(state: string) {

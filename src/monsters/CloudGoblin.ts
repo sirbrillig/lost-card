@@ -1,5 +1,5 @@
-import { RandomlyWalk, BigSwing } from "./behaviors";
-import { EnemyManager } from "./EnemyManager";
+import { RandomlyWalk, BigSwing } from "../lib/behaviors";
+import { EnemyManager } from "../lib/EnemyManager";
 import { BaseMonster } from "./BaseMonster";
 
 type AllStates = "randomwalk1" | "randomwalk2" | "randomwalk3" | "attack";

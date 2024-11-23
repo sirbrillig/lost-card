@@ -1,7 +1,7 @@
-import { TeleportToWater, PowerUp, RangedIceBall } from "./behaviors";
-import { DataKeys } from "./shared";
-import { EnemyManager } from "./EnemyManager";
-import { isTileWithPropertiesObject } from "./shared";
+import { TeleportToWater, PowerUp, RangedIceBall } from "../lib/behaviors";
+import { DataKeys } from "../lib/shared";
+import { EnemyManager } from "../lib/EnemyManager";
+import { isTileWithPropertiesObject } from "../lib/shared";
 import { BaseMonster } from "./BaseMonster";
 
 type AllStates = "waterteleport" | "powerup" | "iceball";

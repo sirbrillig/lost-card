@@ -1,29 +1,27 @@
-import { DataKeys } from "./shared";
-import { EnemyManager } from "./EnemyManager";
+import { DataKeys } from "../lib/shared";
+import { EnemyManager } from "../lib/EnemyManager";
 import {
 	WaitForActive,
 	Roar,
 	RandomlyWalk,
-	SlashTowardPlayer,
-	RandomTeleport,
-	Idle,
-} from "./behaviors";
+	SeekingVine,
+	TeleportToPlatform,
+} from "../lib/behaviors";
 import { BaseMonster } from "./BaseMonster";
 
 type AllStates =
 	| "initial"
 	| "roar1"
 	| "walk"
-	| "idle"
-	| "teleport"
 	| "attack1"
 	| "attack2"
-	| "attack3";
+	| "attack3"
+	| "teleport";
 
-export class SpiritBoss extends BaseMonster<AllStates> {
-	hitPoints: number = 10;
-	primaryColor = 0x23A487;
+export class PlantBoss extends BaseMonster<AllStates> {
+	hitPoints: number = 12;
 	isBoss = true;
+	primaryColor = 0x97a21a;
 
 	constructor(
 		scene: Phaser.Scene,
@@ -31,7 +29,7 @@ export class SpiritBoss extends BaseMonster<AllStates> {
 		x: number,
 		y: number
 	) {
-		super(scene, enemyManager, x, y, "bosses1", 3);
+		super(scene, enemyManager, x, y, "bosses1", 0);
 
 		if (!this.body) {
 			throw new Error("Could not create monster");
@@ -51,18 +49,27 @@ export class SpiritBoss extends BaseMonster<AllStates> {
 		this.anims.create({
 			key: "roar",
 			frames: this.anims.generateFrameNumbers("bosses1", {
-				start: 3,
-				end: 5,
+				start: 0,
+				end: 2,
 			}),
 			frameRate: 10,
 			repeat: 8,
 		});
 
 		this.anims.create({
+			key: "down",
+			frames: this.anims.generateFrameNumbers("bosses1", {
+				start: 0,
+				end: 2,
+			}),
+			frameRate: 10,
+			repeat: -1,
+		});
+		this.anims.create({
 			key: "left",
 			frames: this.anims.generateFrameNumbers("bosses1", {
-				start: 15,
-				end: 17,
+				start: 12,
+				end: 14,
 			}),
 			frameRate: 10,
 			repeat: -1,
@@ -70,8 +77,8 @@ export class SpiritBoss extends BaseMonster<AllStates> {
 		this.anims.create({
 			key: "right",
 			frames: this.anims.generateFrameNumbers("bosses1", {
-				start: 27,
-				end: 29,
+				start: 24,
+				end: 26,
 			}),
 			frameRate: 10,
 			repeat: -1,
@@ -79,17 +86,8 @@ export class SpiritBoss extends BaseMonster<AllStates> {
 		this.anims.create({
 			key: "up",
 			frames: this.anims.generateFrameNumbers("bosses1", {
-				start: 39,
-				end: 41,
-			}),
-			frameRate: 10,
-			repeat: -1,
-		});
-		this.anims.create({
-			key: "down",
-			frames: this.anims.generateFrameNumbers("bosses1", {
-				start: 3,
-				end: 5,
+				start: 36,
+				end: 38,
 			}),
 			frameRate: 10,
 			repeat: -1,
@@ -97,27 +95,26 @@ export class SpiritBoss extends BaseMonster<AllStates> {
 	}
 
 	constructNewBehaviorFor(state: AllStates) {
+		const vineSpeed = 50;
 		switch (state) {
 			case "initial":
 				return new WaitForActive(state, "roar1");
 			case "roar1":
-				return new Roar(state, "teleport");
+				return new Roar(state, "attack1");
 			case "walk":
-				return new RandomlyWalk(state, "teleport", {
-					speed: 60,
-					minWalkTime: 1000,
-					maxWalkTime: 4000,
+				return new RandomlyWalk(state, "attack1", {
+					speed: 75,
+					minWalkTime: 500,
+					maxWalkTime: 3000,
 				});
-			case "teleport":
-				return new RandomTeleport(state, "attack1");
 			case "attack1":
-				return new SlashTowardPlayer(state, "attack2", 180);
+				return new SeekingVine(state, "attack2", vineSpeed, 550);
 			case "attack2":
-				return new SlashTowardPlayer(state, "idle", 180);
-			case "idle":
-				return new Idle(state, "attack3", "right", 500);
+				return new SeekingVine(state, "attack3", vineSpeed, 900);
 			case "attack3":
-				return new SlashTowardPlayer(state, "walk", 180);
+				return new SeekingVine(state, "teleport", vineSpeed * 3, 2000);
+			case "teleport":
+				return new TeleportToPlatform(state, "walk", 2500);
 		}
 	}
 

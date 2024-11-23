@@ -1,6 +1,6 @@
-import { Idle, RangedFireBall } from "./behaviors";
-import { DataKeys } from "./shared";
-import { EnemyManager } from "./EnemyManager";
+import { Idle, RangedFireBall } from "../lib/behaviors";
+import { DataKeys } from "../lib/shared";
+import { EnemyManager } from "../lib/EnemyManager";
 import { BaseMonster } from "./BaseMonster";
 
 type AllStates = "idle1" | "spitfire" | "idle2" | "idle3";

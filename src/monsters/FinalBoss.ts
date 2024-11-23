@@ -2,9 +2,9 @@ import {
 	DataKeys,
 	isDynamicSprite,
 	isTileWithPropertiesObject,
-} from "./shared";
+} from "../lib/shared";
 import { BlackOrb } from "./BlackOrb";
-import { EnemyManager } from "./EnemyManager";
+import { EnemyManager } from "../lib/EnemyManager";
 import {
 	WaitForActive,
 	Roar,
@@ -18,7 +18,7 @@ import {
 	SeekingVine,
 	SlashTowardPlayer,
 	ThrowRocks,
-} from "./behaviors";
+} from "../lib/behaviors";
 import { BaseMonster } from "./BaseMonster";
 
 type AllStates =

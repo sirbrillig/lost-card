@@ -1,5 +1,5 @@
 import { Scene } from "phaser";
-import { loadSavedRegistry, loadSavedData } from "../shared";
+import { loadSavedRegistry, loadSavedData } from "../lib/shared";
 
 export class GameOver extends Scene {
 	constructor() {

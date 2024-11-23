@@ -1,5 +1,5 @@
 import { Scene } from "phaser";
-import { getRegionName, Region } from "../shared";
+import { getRegionName, Region } from "../lib/shared";
 
 const lineHeight = 14;
 const startHeight = 60;

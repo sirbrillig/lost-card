@@ -1,30 +1,30 @@
 import { Scene } from "phaser";
-import { soundKeys, musicKeys } from "../sound";
-import { config } from "../config";
-import { MainEvents } from "../MainEvents";
-import { EnemyManager } from "../EnemyManager";
-import { MountainMonster } from "../MountainMonster";
-import { Ghost } from "../Ghost";
-import { BlackOrb } from "../BlackOrb";
-import { FinalBoss } from "../FinalBoss";
-import { Skeleton } from "../Skeleton";
-import { CloudGoblin } from "../CloudGoblin";
-import { SkyBlob } from "../SkyBlob";
-import { PlantBug } from "../PlantBug";
-import { IceMonster } from "../IceMonster";
-import { FireMonster } from "../FireMonster";
-import { FireGiant } from "../FireGiant";
-import { FireSpout } from "../FireSpout";
-import { WaterDipper } from "../WaterDipper";
-import { GreatGhost } from "../GreatGhost";
-import { MountainBoss } from "../MountainBoss";
-import { PlantSpitter } from "../PlantSpitter";
-import { SkyBlobSpitter } from "../SkyBlobSpitter";
-import { IceBoss } from "../IceBoss";
-import { PlantBoss } from "../PlantBoss";
-import { SpiritBoss } from "../SpiritBoss";
-import { CloudBoss } from "../CloudBoss";
-import { FireBoss } from "../FireBoss";
+import { soundKeys, musicKeys } from "../lib/sound";
+import { config } from "../lib/config";
+import { MainEvents } from "../lib/MainEvents";
+import { EnemyManager } from "../lib/EnemyManager";
+import { MountainMonster } from "../monsters/MountainMonster";
+import { Ghost } from "../monsters/Ghost";
+import { BlackOrb } from "../monsters/BlackOrb";
+import { FinalBoss } from "../monsters/FinalBoss";
+import { Skeleton } from "../monsters/Skeleton";
+import { CloudGoblin } from "../monsters/CloudGoblin";
+import { SkyBlob } from "../monsters/SkyBlob";
+import { PlantBug } from "../monsters/PlantBug";
+import { IceMonster } from "../monsters/IceMonster";
+import { FireMonster } from "../monsters/FireMonster";
+import { FireGiant } from "../monsters/FireGiant";
+import { FireSpout } from "../monsters/FireSpout";
+import { WaterDipper } from "../monsters/WaterDipper";
+import { GreatGhost } from "../monsters/GreatGhost";
+import { MountainBoss } from "../monsters/MountainBoss";
+import { PlantSpitter } from "../monsters/PlantSpitter";
+import { SkyBlobSpitter } from "../monsters/SkyBlobSpitter";
+import { IceBoss } from "../monsters/IceBoss";
+import { PlantBoss } from "../monsters/PlantBoss";
+import { SpiritBoss } from "../monsters/SpiritBoss";
+import { CloudBoss } from "../monsters/CloudBoss";
+import { FireBoss } from "../monsters/FireBoss";
 import {
 	Auras,
 	Powers,
@@ -71,7 +71,7 @@ import {
 	getActiveAuras,
 	activateAura,
 	knockBack,
-} from "../shared";
+} from "../lib/shared";
 
 export class Game extends Scene {
 	debugGraphic: Phaser.GameObjects.Graphics | undefined;

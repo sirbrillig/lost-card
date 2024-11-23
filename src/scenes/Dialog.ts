@@ -1,5 +1,5 @@
 import { Scene } from "phaser";
-import { getButtonNames } from "../shared";
+import { getButtonNames } from "../lib/shared";
 
 export interface DialogData {
 	heading: string;

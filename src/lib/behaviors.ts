@@ -19,7 +19,7 @@ import {
 import { EnemyManager } from "./EnemyManager";
 import { Behavior, BehaviorMachineInterface } from "./behavior";
 import { MainEvents } from "./MainEvents";
-import { MountainMonster } from "./MountainMonster";
+import { MountainMonster } from "../monsters/MountainMonster";
 
 export class WaitForActive<AllStates extends string>
 	implements Behavior<AllStates, Phaser.GameObjects.Sprite>

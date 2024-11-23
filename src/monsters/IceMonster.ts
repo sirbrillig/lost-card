@@ -1,5 +1,5 @@
-import { RandomlyWalk, PowerUp, IceAttack } from "./behaviors";
-import { EnemyManager } from "./EnemyManager";
+import { RandomlyWalk, PowerUp, IceAttack } from "../lib/behaviors";
+import { EnemyManager } from "../lib/EnemyManager";
 import { BaseMonster } from "./BaseMonster";
 
 type AllStates = "randomwalk" | "powerup" | "iceattack";

@@ -1,5 +1,5 @@
 import { Scene } from "phaser";
-import { MainEvents } from "../MainEvents";
+import { MainEvents } from "../lib/MainEvents";
 import {
 	DataKeys,
 	Powers,
@@ -9,7 +9,7 @@ import {
 	getPowerEquippedKey,
 	getIconForPower,
 	isAuraActive,
-} from "../shared";
+} from "../lib/shared";
 
 const heartSize: number = 18;
 const itemSize: number = 17;

@@ -1,5 +1,5 @@
-import { WaitForActive, FollowPlayer } from "./behaviors";
-import { EnemyManager } from "./EnemyManager";
+import { WaitForActive, FollowPlayer } from "../lib/behaviors";
+import { EnemyManager } from "../lib/EnemyManager";
 import { BaseMonster } from "./BaseMonster";
 
 type AllStates = "wait" | "follow";

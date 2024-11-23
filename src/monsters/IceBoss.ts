@@ -1,13 +1,12 @@
-import { DataKeys } from "./shared";
-import { isTileWithPropertiesObject } from "./shared";
-import { EnemyManager } from "./EnemyManager";
+import { DataKeys, isTileWithPropertiesObject } from "../lib/shared";
+import { EnemyManager } from "../lib/EnemyManager";
 import {
 	WaitForActive,
 	Roar,
 	LeftRightMarch,
 	IceBeam,
 	PowerUp,
-} from "./behaviors";
+} from "../lib/behaviors";
 import { BaseMonster } from "./BaseMonster";
 
 type AllStates = "initial" | "roar1" | "leftrightmarch" | "powerup" | "icebeam";

@@ -4,7 +4,7 @@ import {
 	auraOrder,
 	getPowerEquippedKey,
 	DataKeys,
-} from "../shared";
+} from "../lib/shared";
 
 const showVictoryTimer = 20000;
 

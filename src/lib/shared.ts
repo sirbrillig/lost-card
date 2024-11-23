@@ -1,4 +1,4 @@
-import { BaseMonster } from "./BaseMonster";
+import { BaseMonster } from "../monsters/BaseMonster";
 import { MainEvents } from "./MainEvents";
 
 // 0 is up, 1 is right, 2 is down, 3 is left
