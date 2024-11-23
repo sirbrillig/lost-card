@@ -2966,9 +2966,11 @@ export class Game extends Scene {
 		// If the player is not in the attack animation, do nothing. Also do
 		// nothing if the player is in the warmup for the attack or the cooldown.
 		if (this.isPlayerSwordActive()) {
-			let damage = 1;
+			let damage = config.normalSwordDamage;
 			if (isAuraActive(this.registry, "SwordCard")) {
-				damage = 2;
+				// Note: bosses will not take quite this much extra damage. See
+				// config.maxBossDamageTakenPerHit.
+				damage = config.swordCardDamage;
 			}
 			this.sendHitToEnemy(enemy, damage);
 		}

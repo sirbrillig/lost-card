@@ -47,4 +47,7 @@ export const config = {
 	openingTextDelay: 18000,
 	howToPlayDelay: 4000,
 	maxActiveAuras: 2,
+	normalSwordDamage: 1,
+	swordCardDamage: 2,
+	maxBossDamageTakenPerHit: 1.2,
 };

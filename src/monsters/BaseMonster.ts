@@ -172,6 +172,10 @@ export class BaseMonster<AllStates extends string> extends Phaser.Physics.Arcade
 			return;
 		}
 
+		if (this.isBoss && damage > config.maxBossDamageTakenPerHit) {
+			damage = config.maxBossDamageTakenPerHit;
+		}
+
 		this.playHitSound();
 		this.playEffectForHurtMonster();
 		this.showParticlesForHurtMonster();
