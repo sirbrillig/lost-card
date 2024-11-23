@@ -14,6 +14,7 @@ import {
 	TeleportToPlatform,
 	RangedFireBall,
 	RangedIceBall,
+	IceBeam,
 	IceAttack,
 	SeekingVine,
 	SlashTowardPlayer,
@@ -34,6 +35,7 @@ type AllStates =
 	| "iceball1"
 	| "iceball2"
 	| "iceball3"
+	| "iceball4"
 	| "freeze"
 	| "vine1"
 	| "vine2"
@@ -228,6 +230,8 @@ export class FinalBoss extends BaseMonster<AllStates> {
 			case "iceball2":
 				return new RangedIceBall(state, "iceball3", 60, 350);
 			case "iceball3":
+				return new IceBeam(state, "iceball4", 200);
+			case "iceball4":
 				return new RangedIceBall(state, "summoncircle", 60, 350);
 			case "fireball1":
 				return new RangedFireBall(state, "fireball2", 180, 350);
