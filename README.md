@@ -5,3 +5,11 @@ Long ago a sage gifted a set of magical tarot cards to the six kingdoms to be us
 This is a TypeScript game using Phaser that I made for fun. It's a pretty simple top-down metroidvania.
 
 Learn more about it and play the game here: https://sirbrillig.itch.io/lost-card
+
+## Development
+
+To run this locally, run `npm install` and then `npm run dev`.
+
+## Release
+
+To compile a release version, run `npm run prepare-release`. That will create a file called `lost-card.zip`. Then you can upload that zip file to the itch.io site.
