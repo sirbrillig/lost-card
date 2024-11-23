@@ -1126,9 +1126,13 @@ export class Game extends Scene {
 		if (!roomName.includes("Secret")) {
 			return;
 		}
-		const secretRooms = this.registry.get(DataKeys.SecretRoomsFound) ?? [];
-		secretRooms.push(roomName);
-		this.registry.set(DataKeys.SecretRoomsFound, secretRooms);
+		const secretRoomsFound: string[] =
+			this.registry.get(DataKeys.SecretRoomsFound) ?? [];
+		if (secretRoomsFound.some((foundRoomName) => foundRoomName === roomName)) {
+			return;
+		}
+		secretRoomsFound.push(roomName);
+		this.registry.set(DataKeys.SecretRoomsFound, secretRoomsFound);
 	}
 
 	openGatePillars() {
