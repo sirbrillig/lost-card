@@ -73,6 +73,12 @@ export class Skeleton extends BaseMonster<AllStates> {
 		}
 	}
 
+	updateBeforeBehavior(): void {
+		if (this.hitPoints === 0) {
+			this.setVisible(false);
+		}
+	}
+
 	shouldRemovePostKill(): boolean {
 		if (!this.body) {
 			return true;
@@ -91,7 +97,6 @@ export class Skeleton extends BaseMonster<AllStates> {
 				bones.setVisible(true);
 			}
 		});
-		// FIXME: if the room is hidden and we enter again, the skeleton is shown
 		this.scene.time.addEvent({
 			delay: this.#postDeathReviveMs,
 			callback: () => {

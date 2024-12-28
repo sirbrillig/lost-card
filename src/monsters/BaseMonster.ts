@@ -120,6 +120,7 @@ export class BaseMonster<AllStates extends string> extends Phaser.Physics.Arcade
 			this.anims.pause();
 			return;
 		}
+		this.updateBeforeBehavior();
 		if (this.isStunned) {
 			return;
 		}
@@ -154,6 +155,8 @@ export class BaseMonster<AllStates extends string> extends Phaser.Physics.Arcade
 
 		this.updateAfterBehavior(this.#currentPlayingState?.name);
 	}
+
+	updateBeforeBehavior(): void {}
 
 	updateAfterBehavior(_: string | undefined) {}
 
