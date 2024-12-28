@@ -1,4 +1,5 @@
-import { DataKeys } from "../lib/shared";
+import { DataKeys, Events } from "../lib/shared";
+import { MainEvents } from "../lib/MainEvents";
 import { RandomlyWalk } from "../lib/behaviors";
 import { EnemyManager } from "../lib/EnemyManager";
 import { BaseMonster } from "./BaseMonster";
@@ -82,8 +83,14 @@ export class Skeleton extends BaseMonster<AllStates> {
 			this.body.center.y,
 			"bones"
 		);
-		// FIXME: if the room is hidden, the bones are not
-		// FIXME: if the room is hidden and we revive, the skeleton is shown
+		MainEvents.on(Events.LeavingRoom, () => {
+			bones.setVisible(false);
+		});
+		MainEvents.on(Events.EnteredRoom, () => {
+			if (this.isInActiveRoom()) {
+				bones.setVisible(true);
+			}
+		});
 		// FIXME: if the room is hidden and we enter again, the skeleton is shown
 		this.scene.time.addEvent({
 			delay: this.#postDeathReviveMs,
@@ -101,7 +108,9 @@ export class Skeleton extends BaseMonster<AllStates> {
 			return;
 		}
 		this.data.set(DataKeys.Hittable, true);
-		this.setVisible(true);
+		if (this.isInActiveRoom()) {
+			this.setVisible(true);
+		}
 		this.hitPoints = this.#originalHitPoints;
 		this.isDying = false;
 		this.setStunned(false);
