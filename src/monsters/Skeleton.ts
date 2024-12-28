@@ -1,3 +1,4 @@
+import { DataKeys } from "../lib/shared";
 import { RandomlyWalk } from "../lib/behaviors";
 import { EnemyManager } from "../lib/EnemyManager";
 import { BaseMonster } from "./BaseMonster";
@@ -5,8 +6,10 @@ import { BaseMonster } from "./BaseMonster";
 type AllStates = "randomwalk1" | "randomwalk2";
 
 export class Skeleton extends BaseMonster<AllStates> {
-	hitPoints = 3;
+	hitPoints = 2;
+	#originalHitPoints = 2;
 	primaryColor = 0x23a487;
+	#postDeathReviveMs = 5000;
 
 	constructor(
 		scene: Phaser.Scene,
@@ -67,5 +70,40 @@ export class Skeleton extends BaseMonster<AllStates> {
 			case "randomwalk2":
 				return new RandomlyWalk(state, "randomwalk1");
 		}
+	}
+
+	shouldRemovePostKill(): boolean {
+		if (!this.body) {
+			return true;
+		}
+		this.data.set(DataKeys.Hittable, false);
+		const bones = this.scene.add.sprite(
+			this.body.center.x,
+			this.body.center.y,
+			"bones"
+		);
+		// FIXME: if the room is hidden, the bones are not
+		// FIXME: if the room is hidden and we revive, the skeleton is shown
+		// FIXME: if the room is hidden and we enter again, the skeleton is shown
+		this.scene.time.addEvent({
+			delay: this.#postDeathReviveMs,
+			callback: () => {
+				bones?.destroy();
+				this.revive();
+			},
+		});
+		return false;
+	}
+
+	revive(): void {
+		// NOTE: this monster may have been deleted by the time this runs.
+		if (!this.data || !this.body) {
+			return;
+		}
+		this.data.set(DataKeys.Hittable, true);
+		this.setVisible(true);
+		this.hitPoints = this.#originalHitPoints;
+		this.isDying = false;
+		this.setStunned(false);
 	}
 }

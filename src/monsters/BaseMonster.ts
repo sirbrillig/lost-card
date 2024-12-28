@@ -445,9 +445,19 @@ export class BaseMonster<AllStates extends string> extends Phaser.Physics.Arcade
 		this.playDestroySound();
 		effect.on(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
 			effect.destroy();
-			this.emit(Events.MonsterDefeated);
-			this.destroy();
+			if (this.shouldRemovePostKill()) {
+				this.removeDeadMonster();
+			}
 		});
+	}
+
+	shouldRemovePostKill(): boolean {
+		return true;
+	}
+
+	removeDeadMonster(): void {
+		this.emit(Events.MonsterDefeated);
+		this.destroy();
 	}
 
 	setStunned(setting: boolean) {
