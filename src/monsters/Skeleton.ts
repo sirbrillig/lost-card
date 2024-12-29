@@ -7,10 +7,10 @@ import { BaseMonster } from "./BaseMonster";
 type AllStates = "randomwalk1" | "randomwalk2";
 
 export class Skeleton extends BaseMonster<AllStates> {
-	hitPoints = 2;
-	#originalHitPoints = 2;
+	hitPoints = 1;
+	#originalHitPoints = 1;
 	primaryColor = 0x23a487;
-	#postDeathReviveMs = 5000;
+	#postDeathReviveMs = 3000;
 
 	constructor(
 		scene: Phaser.Scene,
