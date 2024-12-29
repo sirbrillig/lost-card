@@ -1,4 +1,5 @@
 import { DataKeys } from "../lib/shared";
+import { Skeleton } from "./Skeleton";
 import { EnemyManager } from "../lib/EnemyManager";
 import {
 	WaitForActive,
@@ -7,12 +8,14 @@ import {
 	SlashTowardPlayer,
 	RandomTeleport,
 	Idle,
+	SpawnEnemies,
 } from "../lib/behaviors";
 import { BaseMonster } from "./BaseMonster";
 
 type AllStates =
 	| "initial"
 	| "roar1"
+	| "spawn"
 	| "walk"
 	| "idle"
 	| "teleport"
@@ -24,6 +27,9 @@ export class SpiritBoss extends BaseMonster<AllStates> {
 	hitPoints: number = 10;
 	primaryColor = 0x23a487;
 	isBoss = true;
+	#enemyManager;
+	#minSpawnDistance = 5;
+	#maxSpawnDistance = 40;
 
 	constructor(
 		scene: Phaser.Scene,
@@ -37,6 +43,7 @@ export class SpiritBoss extends BaseMonster<AllStates> {
 			throw new Error("Could not create monster");
 		}
 
+		this.#enemyManager = enemyManager;
 		this.setSize(this.width * 0.6, this.height * 0.65);
 		this.setOffset(this.body.offset.x, this.body.offset.y + 10);
 		this.setOrigin(0.5, 0.75);
@@ -101,7 +108,25 @@ export class SpiritBoss extends BaseMonster<AllStates> {
 			case "initial":
 				return new WaitForActive(state, "roar1");
 			case "roar1":
-				return new Roar(state, "teleport");
+				return new Roar(state, "spawn");
+			case "spawn":
+				return new SpawnEnemies(state, "teleport", {
+					createMonster: () => {
+						const x =
+							this.x +
+							Phaser.Math.Between(
+								this.#minSpawnDistance,
+								this.#maxSpawnDistance
+							);
+						const y =
+							this.y +
+							Phaser.Math.Between(
+								this.#minSpawnDistance,
+								this.#maxSpawnDistance
+							);
+						return new Skeleton(this.scene, this.#enemyManager, x, y);
+					},
+				});
 			case "walk":
 				return new RandomlyWalk(state, "teleport", {
 					speed: 60,
