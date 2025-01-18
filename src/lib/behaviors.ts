@@ -1445,6 +1445,7 @@ export class RangedFireBall<AllStates extends string>
 	#postAttackTime = 1000;
 	#hitsWalls = false;
 	#forceDirectionDegree: number | undefined = undefined;
+	#colorTint: number | undefined;
 	name: AllStates;
 
 	constructor(
@@ -1455,6 +1456,7 @@ export class RangedFireBall<AllStates extends string>
 			postAttackTime?: number;
 			hitsWalls?: boolean;
 			forceDirectionDegree?: number;
+			colorTint?: number;
 		}
 	) {
 		this.name = name;
@@ -1463,6 +1465,7 @@ export class RangedFireBall<AllStates extends string>
 		this.#postAttackTime = config?.postAttackTime ?? this.#postAttackTime;
 		this.#hitsWalls = config?.hitsWalls ?? this.#hitsWalls;
 		this.#forceDirectionDegree = config?.forceDirectionDegree;
+		this.#colorTint = config?.colorTint;
 	}
 
 	init(
@@ -1504,6 +1507,9 @@ export class RangedFireBall<AllStates extends string>
 		}
 		effect.setDisplaySize(effect.body.width * 0.8, effect.body.height * 0.8);
 		effect.body.setSize(effect.body.width * 0.5, effect.body.height * 0.5);
+		if (this.#colorTint) {
+			effect.setTint(this.#colorTint);
+		}
 
 		if (undefined === this.#forceDirectionDegree) {
 			sprite.scene.physics.moveToObject(
