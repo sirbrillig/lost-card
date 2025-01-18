@@ -234,13 +234,25 @@ export class FinalBoss extends BaseMonster<AllStates> {
 			case "iceball4":
 				return new RangedIceBall(state, "summoncircle", 60, 350);
 			case "fireball1":
-				return new RangedFireBall(state, "fireball2", 180, 350);
+				return new RangedFireBall(state, "fireball2", {
+					speed: 180,
+					postAttackTime: 350,
+				});
 			case "fireball2":
-				return new RangedFireBall(state, "fireball3", 180, 350);
+				return new RangedFireBall(state, "fireball3", {
+					speed: 180,
+					postAttackTime: 350,
+				});
 			case "fireball3":
-				return new RangedFireBall(state, "fireball4", 180, 350);
+				return new RangedFireBall(state, "fireball4", {
+					speed: 180,
+					postAttackTime: 350,
+				});
 			case "fireball4":
-				return new RangedFireBall(state, "summoncircle", 180, 350);
+				return new RangedFireBall(state, "summoncircle", {
+					speed: 180,
+					postAttackTime: 350,
+				});
 			case "slash":
 				return new SlashTowardPlayer(state, "summoncircle", 180);
 			case "rocks":

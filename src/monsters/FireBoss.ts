@@ -109,15 +109,30 @@ export class FireBoss extends BaseMonster<AllStates> {
 					maxWalkTime: 5000,
 				});
 			case "attack1":
-				return new RangedFireBall(state, "attack2", fireSpeed, 350);
+				return new RangedFireBall(state, "attack2", {
+					speed: fireSpeed,
+					postAttackTime: 350,
+				});
 			case "attack2":
-				return new RangedFireBall(state, "attack3", fireSpeed, 350);
+				return new RangedFireBall(state, "attack3", {
+					speed: fireSpeed,
+					postAttackTime: 350,
+				});
 			case "attack3":
-				return new RangedFireBall(state, "attack4", fireSpeed, 350);
+				return new RangedFireBall(state, "attack4", {
+					speed: fireSpeed,
+					postAttackTime: 350,
+				});
 			case "attack4":
-				return new RangedFireBall(state, "attack5", fireSpeed, 350);
+				return new RangedFireBall(state, "attack5", {
+					speed: fireSpeed,
+					postAttackTime: 350,
+				});
 			case "attack5":
-				return new RangedFireBall(state, "walk", fireSpeed, 350);
+				return new RangedFireBall(state, "walk", {
+					speed: fireSpeed,
+					postAttackTime: 350,
+				});
 		}
 	}
 

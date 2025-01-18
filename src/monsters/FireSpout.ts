@@ -56,7 +56,10 @@ export class FireSpout extends BaseMonster<AllStates> {
 			}
 			case "spitfire": {
 				const randomNumber = Phaser.Math.Between(1000, 1500);
-				return new RangedFireBall(state, "idle2", 60, randomNumber);
+				return new RangedFireBall(state, "idle2", {
+					speed: 60,
+					postAttackTime: randomNumber,
+				});
 			}
 			case "idle2": {
 				const randomNumber = Phaser.Math.Between(400, 900);

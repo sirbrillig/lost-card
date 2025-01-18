@@ -1443,18 +1443,19 @@ export class RangedFireBall<AllStates extends string>
 	#nextState: AllStates;
 	#speed = 50;
 	#postAttackTime = 1000;
+	#hitsWalls = false;
 	name: AllStates;
 
 	constructor(
 		name: AllStates,
 		nextState: AllStates,
-		speed: number,
-		postAttackTime: number
+		config?: { speed?: number; postAttackTime?: number; hitsWalls?: boolean }
 	) {
 		this.name = name;
 		this.#nextState = nextState;
-		this.#speed = speed;
-		this.#postAttackTime = postAttackTime;
+		this.#speed = config?.speed ?? this.#speed;
+		this.#postAttackTime = config?.postAttackTime ?? this.#postAttackTime;
+		this.#hitsWalls = config?.hitsWalls ?? this.#hitsWalls;
 	}
 
 	init(
@@ -1497,6 +1498,17 @@ export class RangedFireBall<AllStates extends string>
 		effect.setDisplaySize(effect.body.width * 0.8, effect.body.height * 0.8);
 		effect.body.setSize(effect.body.width * 0.5, effect.body.height * 0.5);
 		sprite.scene.physics.moveToObject(effect, enemyManager.player, this.#speed);
+
+		if (this.#hitsWalls) {
+			const stuffLayer = enemyManager.map.getLayer("Stuff");
+			if (!stuffLayer) {
+				throw new Error("Could not find stuff layer for RangedFireBall");
+			}
+			sprite.scene.physics.add.collider(effect, stuffLayer.tilemapLayer, () => {
+				fireSound?.stop();
+				effect?.destroy();
+			});
+		}
 
 		sprite.scene.physics.add.overlap(enemyManager.player, effect, () => {
 			fireSound?.stop();
