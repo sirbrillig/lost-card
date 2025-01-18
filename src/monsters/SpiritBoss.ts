@@ -29,6 +29,14 @@ type AllStates =
 	| "fireball6"
 	| "fireball7"
 	| "fireball8"
+	| "fireball9"
+	| "fireball10"
+	| "fireball11"
+	| "fireball12"
+	| "fireball13"
+	| "fireball14"
+	| "fireball15"
+	| "fireball16"
 	| "teleport"
 	| "attack1"
 	| "attack2"
@@ -39,7 +47,7 @@ export class SpiritBoss extends BaseMonster<AllStates> {
 	primaryColor = 0x23a487;
 	isBoss = true;
 	#enemyManager;
-	#minSpawnDistance = 5;
+	#minSpawnDistance = -40;
 	#maxSpawnDistance = 40;
 
 	constructor(
@@ -147,7 +155,7 @@ export class SpiritBoss extends BaseMonster<AllStates> {
 			case "charge":
 				return new PowerUp(state, "fireball1", {
 					scale: 3,
-					chargeTime: 800,
+					chargeTime: 1000,
 				});
 			case "fireball1":
 			case "fireball2":
@@ -157,25 +165,33 @@ export class SpiritBoss extends BaseMonster<AllStates> {
 			case "fireball6":
 			case "fireball7":
 			case "fireball8":
+			case "fireball9":
+			case "fireball10":
+			case "fireball11":
+			case "fireball12":
+			case "fireball13":
+			case "fireball14":
+			case "fireball15":
+			case "fireball16":
 				const fireballNumber = parseInt(state.match(/(\d+)/)?.[1] ?? "0");
 				if (!fireballNumber) {
 					throw new Error("Could not determine fireballNumber");
 				}
 				return new RangedFireBall(
 					state,
-					state === "fireball8"
+					fireballNumber === 16
 						? "attack1"
 						: (`fireball${fireballNumber + 1}` as AllStates),
 					{
-						speed: 90,
-						postAttackTime: state === "fireball8" ? 350 : 0,
+						speed: 115,
+						postAttackTime: fireballNumber === 16 ? 1350 : 0,
 						hitsWalls: true,
-						forceDirectionDegree: (360 / 8) * fireballNumber,
+						forceDirectionDegree: (360 / 16) * fireballNumber,
 						colorTint: 0xA4EE00,
 					}
 				);
 			case "teleport":
-				return new TeleportToPlatform(state, "charge", 100);
+				return new TeleportToPlatform(state, "charge", 450);
 			case "attack1":
 				return new SlashTowardPlayer(state, "attack2", 180);
 			case "attack2":
