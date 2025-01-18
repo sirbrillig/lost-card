@@ -1444,18 +1444,25 @@ export class RangedFireBall<AllStates extends string>
 	#speed = 50;
 	#postAttackTime = 1000;
 	#hitsWalls = false;
+	#forceDirectionDegree: number | undefined = undefined;
 	name: AllStates;
 
 	constructor(
 		name: AllStates,
 		nextState: AllStates,
-		config?: { speed?: number; postAttackTime?: number; hitsWalls?: boolean }
+		config?: {
+			speed?: number;
+			postAttackTime?: number;
+			hitsWalls?: boolean;
+			forceDirectionDegree?: number;
+		}
 	) {
 		this.name = name;
 		this.#nextState = nextState;
 		this.#speed = config?.speed ?? this.#speed;
 		this.#postAttackTime = config?.postAttackTime ?? this.#postAttackTime;
 		this.#hitsWalls = config?.hitsWalls ?? this.#hitsWalls;
+		this.#forceDirectionDegree = config?.forceDirectionDegree;
 	}
 
 	init(
@@ -1497,7 +1504,24 @@ export class RangedFireBall<AllStates extends string>
 		}
 		effect.setDisplaySize(effect.body.width * 0.8, effect.body.height * 0.8);
 		effect.body.setSize(effect.body.width * 0.5, effect.body.height * 0.5);
-		sprite.scene.physics.moveToObject(effect, enemyManager.player, this.#speed);
+
+		if (undefined === this.#forceDirectionDegree) {
+			sprite.scene.physics.moveToObject(
+				effect,
+				enemyManager.player,
+				this.#speed
+			);
+		}
+		if (undefined !== this.#forceDirectionDegree) {
+			const velocity = sprite.scene.physics.velocityFromAngle(
+				this.#forceDirectionDegree,
+				1
+			);
+			effect.body.setVelocity(
+				velocity.x * this.#speed,
+				velocity.y * this.#speed
+			);
+		}
 
 		if (this.#hitsWalls) {
 			const stuffLayer = enemyManager.map.getLayer("Stuff");
