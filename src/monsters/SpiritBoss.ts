@@ -163,7 +163,9 @@ export class SpiritBoss extends BaseMonster<AllStates> {
 				}
 				return new RangedFireBall(
 					state,
-					state === "fireball8" ? "attack1" : `fireball${fireballNumber + 1}`,
+					state === "fireball8"
+						? "attack1"
+						: (`fireball${fireballNumber + 1}` as AllStates),
 					{
 						speed: 150,
 						postAttackTime: state === "fireball8" ? 350 : 0,
