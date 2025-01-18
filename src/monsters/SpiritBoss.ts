@@ -6,7 +6,7 @@ import {
 	Roar,
 	RandomlyWalk,
 	SlashTowardPlayer,
-	RandomTeleport,
+	TeleportToPlatform,
 	Idle,
 	SpawnEnemies,
 	RangedFireBall,
@@ -175,7 +175,7 @@ export class SpiritBoss extends BaseMonster<AllStates> {
 					}
 				);
 			case "teleport":
-				return new RandomTeleport(state, "charge");
+				return new TeleportToPlatform(state, "charge", 100);
 			case "attack1":
 				return new SlashTowardPlayer(state, "attack2", 180);
 			case "attack2":
