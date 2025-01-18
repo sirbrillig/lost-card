@@ -9,6 +9,8 @@ import {
 	RandomTeleport,
 	Idle,
 	SpawnEnemies,
+	RangedFireBall,
+	PowerUp,
 } from "../lib/behaviors";
 import { BaseMonster } from "./BaseMonster";
 
@@ -18,6 +20,15 @@ type AllStates =
 	| "spawn"
 	| "walk"
 	| "idle"
+	| "charge"
+	| "fireball1"
+	| "fireball2"
+	| "fireball3"
+	| "fireball4"
+	| "fireball5"
+	| "fireball6"
+	| "fireball7"
+	| "fireball8"
 	| "teleport"
 	| "attack1"
 	| "attack2"
@@ -133,8 +144,35 @@ export class SpiritBoss extends BaseMonster<AllStates> {
 					minWalkTime: 1000,
 					maxWalkTime: 4000,
 				});
+			case "charge":
+				return new PowerUp(state, "fireball1", {
+					scale: 3,
+					chargeTime: 800,
+				});
+			case "fireball1":
+			case "fireball2":
+			case "fireball3":
+			case "fireball4":
+			case "fireball5":
+			case "fireball6":
+			case "fireball7":
+			case "fireball8":
+				const fireballNumber = parseInt(state.match(/(\d+)/)?.[1] ?? "0");
+				if (!fireballNumber) {
+					throw new Error("Could not determine fireballNumber");
+				}
+				return new RangedFireBall(
+					state,
+					state === "fireball8" ? "attack1" : `fireball${fireballNumber + 1}`,
+					{
+						speed: 150,
+						postAttackTime: state === "fireball8" ? 350 : 0,
+						hitsWalls: true,
+						forceDirectionDegree: (360 / 8) * fireballNumber,
+					}
+				);
 			case "teleport":
-				return new RandomTeleport(state, "attack1");
+				return new RandomTeleport(state, "charge");
 			case "attack1":
 				return new SlashTowardPlayer(state, "attack2", 180);
 			case "attack2":
