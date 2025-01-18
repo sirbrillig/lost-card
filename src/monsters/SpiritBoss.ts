@@ -167,11 +167,11 @@ export class SpiritBoss extends BaseMonster<AllStates> {
 						? "attack1"
 						: (`fireball${fireballNumber + 1}` as AllStates),
 					{
-						speed: 150,
+						speed: 90,
 						postAttackTime: state === "fireball8" ? 350 : 0,
 						hitsWalls: true,
 						forceDirectionDegree: (360 / 8) * fireballNumber,
-						colorTint: this.primaryColor,
+						colorTint: 0xA4EE00,
 					}
 				);
 			case "teleport":
