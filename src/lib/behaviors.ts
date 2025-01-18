@@ -966,6 +966,7 @@ export class SlashTowardPlayer<AllStates extends string>
 			enemyManager.player.body.center.y,
 			this.#speed
 		);
+		// FIXME: change this to be the facing direction instead of the moving direction (eg: if you hit a wall you will stop moving but will continue facing)
 		const direction = getDirectionOfSpriteMovement(sprite.body);
 		if (!direction) {
 			return;
@@ -1023,6 +1024,7 @@ export class SlashTowardPlayer<AllStates extends string>
 			throw new Error("Could not update monster");
 		}
 
+		// FIXME: change this to be the facing direction instead of the moving direction (eg: if you hit a wall you will stop moving but will continue facing)
 		const direction = getDirectionOfSpriteMovement(sprite.body);
 		if (!direction) {
 			return;
