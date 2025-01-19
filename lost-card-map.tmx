@@ -8731,24 +8731,9 @@
   </object>
   <object id="374" name="PotionVial" gid="2823" x="1470.52" y="381.114" width="16" height="16"/>
   <object id="578" name="PotionBottle" gid="2791" x="1297.71" y="975.803" width="16" height="16"/>
-  <object id="375" name="PotionBottle" gid="2791" x="1474.44" y="130.818" width="16" height="16">
-   <properties>
-    <property name="hidden" type="bool" value="true"/>
-   </properties>
-  </object>
   <object id="376" name="PotionBottle" gid="2791" x="1796.15" y="2401.62" width="16" height="16"/>
   <object id="378" name="PotionVial" gid="2823" x="2000.84" y="1870.13" width="16" height="16"/>
   <object id="403" name="PlantCard" gid="2878" x="1048.6" y="1882.21" width="16" height="16"/>
-  <object id="405" name="PotionBottle" gid="2791" x="959.42" y="2578.61" width="16" height="16">
-   <properties>
-    <property name="hidden" type="bool" value="true"/>
-   </properties>
-  </object>
-  <object id="406" name="PotionBottle" gid="2791" x="1887.92" y="2656.04" width="16" height="16">
-   <properties>
-    <property name="hidden" type="bool" value="true"/>
-   </properties>
-  </object>
   <object id="407" name="PotionBottle" gid="2791" x="1584.1" y="1839.14" width="16" height="16"/>
   <object id="472" name="FireCard" gid="2871" x="3136" y="2160" width="16" height="16">
    <properties>
@@ -8761,16 +8746,6 @@
    </properties>
   </object>
   <object id="537" name="SpiritCard" gid="2890" x="2846.72" y="1655.2" width="16" height="16">
-   <properties>
-    <property name="hidden" type="bool" value="true"/>
-   </properties>
-  </object>
-  <object id="538" name="PotionBottle" gid="2791" x="2560.23" y="1522.74" width="16" height="16">
-   <properties>
-    <property name="hidden" type="bool" value="true"/>
-   </properties>
-  </object>
-  <object id="539" name="PotionBottle" gid="2791" x="530.082" y="1376.27" width="16" height="16">
    <properties>
     <property name="hidden" type="bool" value="true"/>
    </properties>
@@ -8801,11 +8776,6 @@
    </properties>
   </object>
   <object id="559" name="Key" gid="2817" x="2895.72" y="2530.85" width="16" height="16">
-   <properties>
-    <property name="hidden" type="bool" value="true"/>
-   </properties>
-  </object>
-  <object id="560" name="PotionBottle" gid="2791" x="2864.49" y="2529.33" width="16" height="16">
    <properties>
     <property name="hidden" type="bool" value="true"/>
    </properties>

@@ -5425,24 +5425,6 @@
                 {
                  "gid":2791,
                  "height":16,
-                 "id":375,
-                 "name":"PotionBottle",
-                 "properties":[
-                        {
-                         "name":"hidden",
-                         "type":"bool",
-                         "value":true
-                        }],
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":16,
-                 "x":1474.44,
-                 "y":130.818
-                }, 
-                {
-                 "gid":2791,
-                 "height":16,
                  "id":376,
                  "name":"PotionBottle",
                  "rotation":0,
@@ -5475,42 +5457,6 @@
                  "width":16,
                  "x":1048.6,
                  "y":1882.21
-                }, 
-                {
-                 "gid":2791,
-                 "height":16,
-                 "id":405,
-                 "name":"PotionBottle",
-                 "properties":[
-                        {
-                         "name":"hidden",
-                         "type":"bool",
-                         "value":true
-                        }],
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":16,
-                 "x":959.42,
-                 "y":2578.61
-                }, 
-                {
-                 "gid":2791,
-                 "height":16,
-                 "id":406,
-                 "name":"PotionBottle",
-                 "properties":[
-                        {
-                         "name":"hidden",
-                         "type":"bool",
-                         "value":true
-                        }],
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":16,
-                 "x":1887.92,
-                 "y":2656.04
                 }, 
                 {
                  "gid":2791,
@@ -5577,42 +5523,6 @@
                  "width":16,
                  "x":2846.72,
                  "y":1655.2
-                }, 
-                {
-                 "gid":2791,
-                 "height":16,
-                 "id":538,
-                 "name":"PotionBottle",
-                 "properties":[
-                        {
-                         "name":"hidden",
-                         "type":"bool",
-                         "value":true
-                        }],
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":16,
-                 "x":2560.23,
-                 "y":1522.74
-                }, 
-                {
-                 "gid":2791,
-                 "height":16,
-                 "id":539,
-                 "name":"PotionBottle",
-                 "properties":[
-                        {
-                         "name":"hidden",
-                         "type":"bool",
-                         "value":true
-                        }],
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":16,
-                 "x":530.082,
-                 "y":1376.27
                 }, 
                 {
                  "gid":2817,
@@ -5721,24 +5631,6 @@
                  "width":16,
                  "x":2895.72,
                  "y":2530.85
-                }, 
-                {
-                 "gid":2791,
-                 "height":16,
-                 "id":560,
-                 "name":"PotionBottle",
-                 "properties":[
-                        {
-                         "name":"hidden",
-                         "type":"bool",
-                         "value":true
-                        }],
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":16,
-                 "x":2864.49,
-                 "y":2529.33
                 }, 
                 {
                  "gid":2823,
