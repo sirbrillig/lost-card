@@ -72,6 +72,7 @@ import {
 	activateAura,
 	knockBack,
 	addVisitedRoom,
+	saveGameKey,
 } from "../lib/shared";
 
 export class Game extends Scene {
@@ -965,7 +966,7 @@ export class Game extends Scene {
 		if (this.getPlayerHitPoints() === 0) {
 			return;
 		}
-		localStorage.setItem("lost-card-save", JSON.stringify(this.getSaveData()));
+		localStorage.setItem(saveGameKey, JSON.stringify(this.getSaveData()));
 		MainEvents.emit(Events.GameSaved);
 	}
 

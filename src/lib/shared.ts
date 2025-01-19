@@ -1,6 +1,8 @@
 import { BaseMonster } from "../monsters/BaseMonster";
 import { MainEvents } from "./MainEvents";
 
+export const saveGameKey = "lost-card-save";
+
 // 0 is up, 1 is right, 2 is down, 3 is left
 export const SpriteUp = 0;
 export const SpriteRight = 1;
@@ -808,7 +810,7 @@ export function loadSavedRegistry(
 }
 
 export function loadSavedData(): SaveData | undefined {
-	const rawSaveData = localStorage.getItem("lost-card-save");
+	const rawSaveData = localStorage.getItem(saveGameKey);
 	if (!rawSaveData) {
 		return undefined;
 	}
