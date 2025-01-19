@@ -781,6 +781,14 @@ export class Game extends Scene {
 			this.scene.pause("Game");
 			this.scene.launch("Debug");
 		});
+		this.input.keyboard.on("keydown-SEVEN", () => {
+			if (!isCheatMode) {
+				return;
+			}
+			this.showNotice("Printed save data", 1500);
+			const saveData = loadSavedData();
+			console.log(JSON.stringify(saveData));
+		});
 	}
 
 	usePotion() {
