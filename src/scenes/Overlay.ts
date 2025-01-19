@@ -1,5 +1,6 @@
 import { Scene } from "phaser";
 import { MainEvents } from "../lib/MainEvents";
+import { EnemyManager } from "../lib/EnemyManager";
 import {
 	DataKeys,
 	Powers,
@@ -281,6 +282,10 @@ class Heart {
 	}
 }
 
+export interface OverlayData {
+	enemyManager: EnemyManager;
+}
+
 export class Overlay extends Scene {
 	potions: PotionItem[] = [];
 	items: Card[] = [];
@@ -293,12 +298,14 @@ export class Overlay extends Scene {
 	keyCountIcon: Phaser.GameObjects.Image | undefined;
 	keyCountLabel: Phaser.GameObjects.BitmapText | undefined;
 	saveMessageTime = 1000;
+	enemyManager: EnemyManager;
 
 	constructor() {
 		super("Overlay");
 	}
 
-	create() {
+	create(data: OverlayData) {
+		this.enemyManager = data.enemyManager;
 		this.keyCount = 0;
 		this.keyCountIcon = undefined;
 		this.keyCountLabel = undefined;
@@ -431,7 +438,7 @@ export class Overlay extends Scene {
 			this.scene.resume("Game");
 		} else {
 			this.scene.pause("Game");
-			this.scene.launch("GameMap");
+			this.scene.launch("GameMap", { enemyManager: this.enemyManager });
 		}
 	}
 

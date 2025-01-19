@@ -1,4 +1,5 @@
 import { Scene } from "phaser";
+import { EnemyManager } from "../lib/EnemyManager";
 import {
 	getEquippedAuras,
 	getIconForPower,
@@ -8,6 +9,10 @@ import {
 	isAuraActive,
 	getButtonNames,
 	getAuraDescription,
+	getRooms,
+	getRoomsVisited,
+	getRegionColor,
+	getRegionFromRoomName,
 	Auras,
 } from "../lib/shared";
 import { config } from "../lib/config";
@@ -59,17 +64,23 @@ class Aura {
 	}
 }
 
+export interface GameMapData {
+	enemyManager: EnemyManager;
+}
+
 export class GameMap extends Scene {
 	auras: Aura[] = [];
 	selectedAura: number = 0;
 	auraDescription: Phaser.GameObjects.BitmapText | undefined;
 	selector: Phaser.GameObjects.Image;
+	enemyManager: EnemyManager;
 
 	constructor() {
 		super("GameMap");
 	}
 
-	create() {
+	create(data: GameMapData) {
+		this.enemyManager = data.enemyManager;
 		this.add
 			.nineslice(
 				this.cameras.main.x,
@@ -243,20 +254,44 @@ export class GameMap extends Scene {
 		});
 	}
 
-	createMap() {
-		// Map is 150 x 150
+	drawVisitedRooms(mapScale: number, mapOffset: { x: number; y: number }) {
+		const allRooms = getRooms(this.enemyManager.map);
+		const visitedRooms = getRoomsVisited(this.registry);
+		const roomBorderColor = 0xffffff;
+		allRooms.forEach((room) => {
+			const regionName = getRegionFromRoomName(room.name);
+			const roomBackgroundColor = getRegionColor(regionName);
+			if (!room.x || !room.y || !room.width || !room.height) {
+				return;
+			}
+			if (!visitedRooms.includes(room.name)) {
+				return;
+			}
+			this.add
+				.rectangle(
+					room.x * mapScale + mapOffset.x,
+					room.y * mapScale + mapOffset.y,
+					room.width * mapScale,
+					room.height * mapScale,
+					roomBackgroundColor
+				)
+				.setDepth(9)
+				.setOrigin(0)
+				.setStrokeStyle(1, roomBorderColor);
+		});
+	}
+
+	getMapOffset(): { x: number; y: number } {
 		const mapOffset = { x: 100, y: topPadding + 30 };
 		const auras = getEquippedAuras(this.registry);
 		if (auras.length < 1) {
 			mapOffset.x = 50;
 			mapOffset.y = 50;
 		}
+		return mapOffset;
+	}
 
-		this.add
-			.image(mapOffset.x, mapOffset.y, "game-map")
-			.setDepth(9)
-			.setOrigin(0);
-
+	drawPlayerOnMap(mapScale: number, mapOffset: { x: number; y: number }): void {
 		const playerX = this.registry.get("playerX");
 		const playerY = this.registry.get("playerY");
 
@@ -264,17 +299,16 @@ export class GameMap extends Scene {
 			return;
 		}
 
-		const newPoints = this.mapGamePointToMapPoint(playerX, playerY);
-		const playerAdjust = -2;
-
+		const playerPosition = this.mapGamePointToMapPoint(
+			playerX,
+			playerY,
+			mapScale,
+			mapOffset
+		);
 		const playerPoint = this.add
-			.sprite(
-				newPoints.x + playerAdjust + mapOffset.x,
-				newPoints.y + playerAdjust + mapOffset.y,
-				"icons2",
-				5
-			)
+			.sprite(playerPosition.x, playerPosition.y, "icons2", 5)
 			.setOrigin(0.5)
+			.setScale(0.8)
 			.setDepth(10);
 
 		this.tweens.add({
@@ -288,11 +322,22 @@ export class GameMap extends Scene {
 		});
 	}
 
-	mapGamePointToMapPoint(x: number, y: number): { x: number; y: number } {
-		const mapScale = 4.7;
+	createMap() {
+		const mapScale = 0.04;
+		const mapOffset = this.getMapOffset();
+		this.drawVisitedRooms(mapScale, mapOffset);
+		this.drawPlayerOnMap(mapScale, mapOffset);
+	}
+
+	mapGamePointToMapPoint(
+		x: number,
+		y: number,
+		mapScale: number,
+		mapOffset: { x: number; y: number }
+	): { x: number; y: number } {
 		return {
-			x: x / (100 / mapScale),
-			y: y / (100 / mapScale),
+			x: x * mapScale + mapOffset.x,
+			y: y * mapScale + mapOffset.y,
 		};
 	}
 

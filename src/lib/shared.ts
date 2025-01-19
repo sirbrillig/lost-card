@@ -54,6 +54,7 @@ export const DataKeys = {
 	SecretRoomsTotal: "SecretRoomsTotal",
 	ActiveAuras: "ActiveAuras",
 	PlayerDirection: "PlayerDirection",
+	RoomsVisited: "RoomsVisited",
 };
 
 export type Region = "MK" | "IK" | "CK" | "FK" | "PK" | "SK" | "FB";
@@ -344,6 +345,41 @@ export function getRoomsInRegion(
 	return getRooms(map).filter((room) => {
 		return room.name.startsWith(region);
 	});
+}
+
+export function getRoomsVisited(registry: Phaser.Data.DataManager): string[] {
+	return registry.get(DataKeys.RoomsVisited) ?? [];
+}
+
+export function addVisitedRoom(
+	registry: Phaser.Data.DataManager,
+	room: string
+): void {
+	const rooms = getRoomsVisited(registry);
+	if (rooms.some((roomName) => roomName === room)) {
+		return;
+	}
+	rooms.push(room);
+	registry.set(DataKeys.RoomsVisited, rooms);
+}
+
+export function getRegionColor(code: Region): number {
+	switch (code) {
+		case "MK":
+			return 0xf89211;
+		case "CK":
+			return 0xcbcac8;
+		case "IK":
+			return 0x21d3da;
+		case "PK":
+			return 0x3fe048;
+		case "FK":
+			return 0xce0000;
+		case "SK":
+			return 0xb33fe0;
+		case "FB":
+			return 0xf2f433;
+	}
 }
 
 export function isPointInRegion(

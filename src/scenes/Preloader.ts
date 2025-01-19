@@ -27,7 +27,6 @@ export class Preloader extends Scene {
 		this.load.setPath("assets");
 
 		this.load.image("Mountain-Dusk", "Mountain-Dusk.png");
-		this.load.image("game-map", "lost-card-map.png");
 		this.load.image("side_portrait", "Side_Portrait_Small.png");
 		this.load.bitmapFont(
 			"RetroGamingWhite",

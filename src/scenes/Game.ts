@@ -71,6 +71,7 @@ import {
 	getActiveAuras,
 	activateAura,
 	knockBack,
+	addVisitedRoom,
 } from "../lib/shared";
 
 export class Game extends Scene {
@@ -1122,6 +1123,7 @@ export class Game extends Scene {
 	}
 
 	recordRoomVisit(roomName: string) {
+		addVisitedRoom(this.registry, roomName);
 		if (!roomName.includes("Secret")) {
 			return;
 		}
@@ -2327,7 +2329,7 @@ export class Game extends Scene {
 		if (!this.registry.has("playerHitPoints")) {
 			this.setPlayerHitPoints(config.playerInitialHitPoints);
 		}
-		this.scene.launch("Overlay");
+		this.scene.launch("Overlay", { enemyManager: this.enemyManager });
 	}
 
 	preload() {
