@@ -4,6 +4,7 @@ import {
 	auraOrder,
 	getPowerEquippedKey,
 	DataKeys,
+	getDataFromRegistry,
 } from "../lib/shared";
 
 const showVictoryTimer = 20000;
@@ -28,14 +29,15 @@ export class Victory extends Scene {
 		const totalCardsCount = 1 + [...powerOrder, ...auraOrder].length;
 		let cardCount = 1;
 		[...powerOrder, ...auraOrder].forEach((card) => {
-			if (this.registry.get(getPowerEquippedKey(card))) {
+			if (getDataFromRegistry(this.registry, getPowerEquippedKey(card))) {
 				cardCount += 1;
 			}
 		});
 
 		const secretRooms =
-			this.registry.get(DataKeys.SecretRoomsFound)?.length ?? 0;
-		const secretRoomsTotal = this.registry.get(DataKeys.SecretRoomsTotal) ?? 0;
+			getDataFromRegistry(this.registry, "SecretRoomsFound")?.length ?? 0;
+		const secretRoomsTotal =
+			getDataFromRegistry(this.registry, "SecretRoomsTotal") ?? 0;
 
 		this.add
 			.bitmapText(

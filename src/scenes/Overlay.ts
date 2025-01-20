@@ -2,7 +2,6 @@ import { Scene } from "phaser";
 import { MainEvents } from "../lib/MainEvents";
 import { EnemyManager } from "../lib/EnemyManager";
 import {
-	DataKeys,
 	Powers,
 	Events,
 	powerOrder,
@@ -10,6 +9,8 @@ import {
 	getPowerEquippedKey,
 	getIconForPower,
 	isAuraActive,
+	getDataFromRegistry,
+	saveDataToRegistry,
 } from "../lib/shared";
 
 const heartSize: number = 18;
@@ -187,7 +188,8 @@ class PotionItem {
 	}
 
 	update() {
-		const totalPotions = this.scene.registry.get(DataKeys.PotionCount) ?? 0;
+		const totalPotions =
+			getDataFromRegistry(this.scene.registry, "potionCount") ?? 0;
 		if (this.totalPotions !== totalPotions) {
 			if (this.totalPotions > totalPotions) {
 				this.playUsePotionEffect();
@@ -317,8 +319,10 @@ export class Overlay extends Scene {
 		this.items = [];
 		this.hearts.forEach((item) => item.destroy());
 		this.hearts = [];
-		this.totalHearts = this.registry.get("playerTotalHitPoints") ?? 0;
-		this.activeHearts = this.registry.get("playerHitPoints") ?? 0;
+		this.totalHearts =
+			getDataFromRegistry(this.registry, "playerTotalHitPoints") ?? 0;
+		this.activeHearts =
+			getDataFromRegistry(this.registry, "playerHitPoints") ?? 0;
 		this.bg = this.add
 			.nineslice(
 				this.cameras.main.x,
@@ -443,20 +447,23 @@ export class Overlay extends Scene {
 	}
 
 	setActivePower(power: Powers): void {
-		this.registry.set(DataKeys.ActivePower, power);
+		saveDataToRegistry(this.registry, "activePower", power);
 	}
 
 	isPowerEquipped(power: Powers): boolean {
-		return this.registry.get(getPowerEquippedKey(power));
+		return (
+			getDataFromRegistry(this.registry, getPowerEquippedKey(power)) ?? false
+		);
 	}
 
 	getActivePower(): Powers | undefined {
-		return this.registry.get(DataKeys.ActivePower);
+		return getDataFromRegistry(this.registry, "activePower");
 	}
 
 	updateSelectedItem() {
-		const activePower: Powers | undefined = this.registry.get(
-			DataKeys.ActivePower
+		const activePower: Powers | undefined = getDataFromRegistry(
+			this.registry,
+			"activePower"
 		);
 		if (!activePower) {
 			return;
@@ -502,7 +509,7 @@ export class Overlay extends Scene {
 	}
 
 	getKeyCount(): number {
-		return this.registry.get(DataKeys.KeyCount) ?? 0;
+		return getDataFromRegistry(this.registry, "keyCount") ?? 0;
 	}
 
 	updateItems() {
@@ -511,7 +518,7 @@ export class Overlay extends Scene {
 		}
 
 		auraOrder.forEach((aura) => {
-			if (!this.registry.get(getPowerEquippedKey(aura))) {
+			if (!getDataFromRegistry(this.registry, getPowerEquippedKey(aura))) {
 				return;
 			}
 			if (this.auras.some((item) => item.name === aura)) {
@@ -534,7 +541,7 @@ export class Overlay extends Scene {
 		});
 
 		powerOrder.forEach((power) => {
-			if (!this.registry.get(getPowerEquippedKey(power))) {
+			if (!getDataFromRegistry(this.registry, getPowerEquippedKey(power))) {
 				return;
 			}
 			if (this.items.some((item) => item.name === power)) {
@@ -562,8 +569,10 @@ export class Overlay extends Scene {
 	}
 
 	update() {
-		const totalHearts = this.registry.get("playerTotalHitPoints") ?? 0;
-		const activeHearts = this.registry.get("playerHitPoints") ?? 0;
+		const totalHearts =
+			getDataFromRegistry(this.registry, "playerTotalHitPoints") ?? 0;
+		const activeHearts =
+			getDataFromRegistry(this.registry, "playerHitPoints") ?? 0;
 		const keyCount = this.getKeyCount();
 
 		if (this.totalHearts !== totalHearts) {

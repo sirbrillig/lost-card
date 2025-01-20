@@ -73,6 +73,8 @@ import {
 	knockBack,
 	addVisitedRoom,
 	saveGameKey,
+	getDataFromRegistry,
+	saveDataToRegistry,
 } from "../lib/shared";
 
 export class Game extends Scene {
@@ -493,7 +495,7 @@ export class Game extends Scene {
 		const secretRoomsCount = getRooms(this.map).filter((room) =>
 			room.name.includes("Secret")
 		).length;
-		this.registry.set(DataKeys.SecretRoomsTotal, secretRoomsCount);
+		saveDataToRegistry(this.registry, "SecretRoomsTotal", secretRoomsCount);
 	}
 
 	playMusicForRegion(region: Region) {
@@ -1045,7 +1047,7 @@ export class Game extends Scene {
 			return true;
 		}
 		const itemsRemoved: Array<number> =
-			this.registry.get(DataKeys.CollectedItems) ?? [];
+			getDataFromRegistry(this.registry, "itemsRemoved") ?? [];
 		return !itemsRemoved.includes(layerObject.id);
 	}
 
@@ -1137,12 +1139,12 @@ export class Game extends Scene {
 			return;
 		}
 		const secretRoomsFound: string[] =
-			this.registry.get(DataKeys.SecretRoomsFound) ?? [];
+			getDataFromRegistry(this.registry, "SecretRoomsFound") ?? [];
 		if (secretRoomsFound.some((foundRoomName) => foundRoomName === roomName)) {
 			return;
 		}
 		secretRoomsFound.push(roomName);
-		this.registry.set(DataKeys.SecretRoomsFound, secretRoomsFound);
+		saveDataToRegistry(this.registry, "SecretRoomsFound", secretRoomsFound);
 	}
 
 	openGatePillars() {
@@ -1754,7 +1756,7 @@ export class Game extends Scene {
 				// If the item has been previous revealed, do not hide it.
 				const itemId: number | undefined = item.data.get(DataKeys.ItemObjectId);
 				const shownItems: number[] =
-					this.registry.get(DataKeys.RevealedItems) ?? [];
+					getDataFromRegistry(this.registry, "itemsRevealed") ?? [];
 				if (itemId && !shownItems.includes(itemId)) {
 					item.setVisible(false);
 					item.setActive(false);
@@ -1787,9 +1789,10 @@ export class Game extends Scene {
 	showHiddenItem(item: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody) {
 		const itemId = item.data.get(DataKeys.ItemObjectId);
 		if (itemId) {
-			const shownItems = this.registry.get(DataKeys.RevealedItems) ?? [];
+			const shownItems =
+				getDataFromRegistry(this.registry, "itemsRevealed") ?? [];
 			shownItems.push(itemId);
-			this.registry.set(DataKeys.RevealedItems, shownItems);
+			saveDataToRegistry(this.registry, "itemsRevealed", shownItems);
 		}
 
 		const effect = this.add.sprite(
@@ -1932,25 +1935,28 @@ export class Game extends Scene {
 		this.createdItems = this.createdItems.filter(
 			(item) => item !== itemToRemove
 		);
-		const itemsRemoved = this.registry.get(DataKeys.CollectedItems) ?? [];
+		const itemsRemoved =
+			getDataFromRegistry(this.registry, "itemsRemoved") ?? [];
 		const itemObject = this.findItemObjectMatchingCreatedItem(itemToRemove);
 		if (!itemObject) {
 			return;
 		}
 		itemsRemoved.push(itemObject.id);
-		this.registry.set(DataKeys.CollectedItems, itemsRemoved);
+		saveDataToRegistry(this.registry, "itemsRemoved", itemsRemoved);
 		itemToRemove.destroy();
 	}
 
 	getPlayerHitPoints(): number {
 		return (
-			this.registry.get("playerHitPoints") ?? config.playerInitialHitPoints
+			getDataFromRegistry(this.registry, "playerHitPoints") ??
+			config.playerInitialHitPoints
 		);
 	}
 
 	getPlayerTotalHitPoints(): number {
 		return (
-			this.registry.get("playerTotalHitPoints") ?? config.playerInitialHitPoints
+			getDataFromRegistry(this.registry, "playerTotalHitPoints") ??
+			config.playerInitialHitPoints
 		);
 	}
 
@@ -1962,15 +1968,15 @@ export class Game extends Scene {
 		if (hitPoints < 0) {
 			hitPoints = 0;
 		}
-		this.registry.set("playerHitPoints", hitPoints);
+		saveDataToRegistry(this.registry, "playerHitPoints", hitPoints);
 	}
 
 	setKeyCount(count: number) {
-		this.registry.set(DataKeys.KeyCount, count);
+		saveDataToRegistry(this.registry, "keyCount", count);
 	}
 
 	getKeyCount(): number {
-		return this.registry.get(DataKeys.KeyCount) ?? 0;
+		return getDataFromRegistry(this.registry, "keyCount") ?? 0;
 	}
 
 	pickUpKey() {
@@ -1989,7 +1995,11 @@ export class Game extends Scene {
 		this.sound.play("heart");
 		let playerTotalHitPoints = this.getPlayerTotalHitPoints();
 		playerTotalHitPoints += 1;
-		this.registry.set("playerTotalHitPoints", playerTotalHitPoints);
+		saveDataToRegistry(
+			this.registry,
+			"playerTotalHitPoints",
+			playerTotalHitPoints
+		);
 		this.restorePlayerHitPoints();
 	}
 
@@ -2332,10 +2342,16 @@ export class Game extends Scene {
 	}
 
 	createOverlay() {
-		if (!this.registry.has("playerTotalHitPoints")) {
-			this.registry.set("playerTotalHitPoints", config.playerInitialHitPoints);
+		if (
+			getDataFromRegistry(this.registry, "playerTotalHitPoints") === undefined
+		) {
+			saveDataToRegistry(
+				this.registry,
+				"playerTotalHitPoints",
+				config.playerInitialHitPoints
+			);
 		}
-		if (!this.registry.has("playerHitPoints")) {
+		if (getDataFromRegistry(this.registry, "playerHitPoints") === undefined) {
 			this.setPlayerHitPoints(config.playerInitialHitPoints);
 		}
 		this.scene.launch("Overlay", { enemyManager: this.enemyManager });
@@ -2961,14 +2977,14 @@ export class Game extends Scene {
 	}
 
 	wasBossDefeated(name: string) {
-		const defeated = this.registry.get(DataKeys.DefeatedBosses) ?? [];
+		const defeated = getDataFromRegistry(this.registry, "DefeatedBosses") ?? [];
 		return defeated.includes(name);
 	}
 
 	markBossDefeated(name: string) {
-		const defeated = this.registry.get(DataKeys.DefeatedBosses) ?? [];
+		const defeated = getDataFromRegistry(this.registry, "DefeatedBosses") ?? [];
 		defeated.push(name);
-		this.registry.set(DataKeys.DefeatedBosses, defeated);
+		saveDataToRegistry(this.registry, "DefeatedBosses", defeated);
 	}
 
 	playerHitEnemy(
@@ -3275,27 +3291,27 @@ export class Game extends Scene {
 	}
 
 	getPotionTotalCount(): number {
-		return this.registry.get(DataKeys.PotionTotalCount) ?? 0;
+		return getDataFromRegistry(this.registry, "potionTotalCount") ?? 0;
 	}
 
 	setPotionTotalCount(count: number) {
-		this.registry.set(DataKeys.PotionTotalCount, count);
+		saveDataToRegistry(this.registry, "potionTotalCount", count);
 	}
 
 	getPotionCount(): number {
-		return this.registry.get(DataKeys.PotionCount) ?? 0;
+		return getDataFromRegistry(this.registry, "potionCount") ?? 0;
 	}
 
 	setPotionCount(count: number) {
-		this.registry.set(DataKeys.PotionCount, count);
+		saveDataToRegistry(this.registry, "potionCount", count);
 	}
 
 	equipSword(): void {
-		this.registry.set("hasSword", true);
+		saveDataToRegistry(this.registry, "hasSword", true);
 	}
 
 	equipAura(card: Auras): void {
-		this.registry.set(getPowerEquippedKey(card), true);
+		saveDataToRegistry(this.registry, getPowerEquippedKey(card), true);
 
 		if (getActiveAuras(this.registry).length < config.maxActiveAuras) {
 			activateAura(this.registry, card);
@@ -3305,7 +3321,7 @@ export class Game extends Scene {
 	}
 
 	equipPower(power: Powers): void {
-		this.registry.set(getPowerEquippedKey(power), true);
+		saveDataToRegistry(this.registry, getPowerEquippedKey(power), true);
 		this.setActivePower(power);
 		MainEvents.emit(Events.PowerEquipped);
 	}
@@ -3327,17 +3343,18 @@ export class Game extends Scene {
 
 	doesPlayerHavePower(): boolean {
 		return (
-			this.registry.get("hasWindCard") === true ||
-			this.registry.get("hasIceCard") === true ||
-			this.registry.get("hasFireCard") === true ||
-			this.registry.get("hasSpiritCard") === true ||
-			this.registry.get("hasCloudCard") === true ||
-			this.registry.get("hasPlantCard") === true
+			getDataFromRegistry(this.registry, "hasWindCard") === true ||
+			getDataFromRegistry(this.registry, "hasIceCard") === true ||
+			getDataFromRegistry(this.registry, "hasIceCard") === true ||
+			getDataFromRegistry(this.registry, "hasFireCard") === true ||
+			getDataFromRegistry(this.registry, "hasSpiritCard") === true ||
+			getDataFromRegistry(this.registry, "hasCloudCard") === true ||
+			getDataFromRegistry(this.registry, "hasPlantCard") === true
 		);
 	}
 
 	doesPlayerHaveSword(): boolean {
-		return this.registry.get("hasSword") === true;
+		return getDataFromRegistry(this.registry, "hasSword") === true;
 	}
 
 	setPlayerFrozen(setting: boolean) {
@@ -3404,11 +3421,11 @@ export class Game extends Scene {
 	}
 
 	getActivePower(): Powers | undefined {
-		return this.registry.get(DataKeys.ActivePower);
+		return getDataFromRegistry(this.registry, "activePower");
 	}
 
 	setActivePower(power: Powers): void {
-		this.registry.set(DataKeys.ActivePower, power);
+		saveDataToRegistry(this.registry, "activePower", power);
 	}
 
 	playPowerSound() {
@@ -3786,8 +3803,8 @@ export class Game extends Scene {
 	updatePlayer(): void {
 		this.updatePlayerTint();
 		this.updatePlayerAlpha();
-		this.registry.set("playerX", this.player.x);
-		this.registry.set("playerY", this.player.y);
+		saveDataToRegistry(this.registry, "playerX", this.player.x);
+		saveDataToRegistry(this.registry, "playerY", this.player.y);
 
 		this.updateSwordHitbox();
 		this.updatePowerHitboxPosition();

@@ -14,6 +14,7 @@ import {
 	getRegionColor,
 	getRegionFromRoomName,
 	Auras,
+	getDataFromRegistry,
 } from "../lib/shared";
 import { config } from "../lib/config";
 
@@ -292,8 +293,8 @@ export class GameMap extends Scene {
 	}
 
 	drawPlayerOnMap(mapScale: number, mapOffset: { x: number; y: number }): void {
-		const playerX = this.registry.get("playerX");
-		const playerY = this.registry.get("playerY");
+		const playerX = getDataFromRegistry(this.registry, "playerX");
+		const playerY = getDataFromRegistry(this.registry, "playerY");
 
 		if (!playerX || !playerY) {
 			return;

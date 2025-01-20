@@ -44,19 +44,9 @@ export const DataKeys = {
 	Freezable: "freezable",
 	MonsterPosition: "monsterPosition",
 	ActivePower: "activePower",
-	PotionCount: "potionCount",
-	PotionTotalCount: "potionTotalCount",
-	KeyCount: "keyCount",
 	SwordAttackActive: "attackActive",
-	DefeatedBosses: "DefeatedBosses",
-	CollectedItems: "itemsRemoved",
-	RevealedItems: "itemsRevealed",
 	ItemObjectId: "objectId",
-	SecretRoomsFound: "SecretRoomsFound",
-	SecretRoomsTotal: "SecretRoomsTotal",
-	ActiveAuras: "ActiveAuras",
 	PlayerDirection: "PlayerDirection",
-	RoomsVisited: "RoomsVisited",
 };
 
 export type Region = "MK" | "IK" | "CK" | "FK" | "PK" | "SK" | "FB";
@@ -97,7 +87,7 @@ export const auraOrder: Auras[] = [
 
 export function getEquippedAuras(registry: Phaser.Data.DataManager): Auras[] {
 	return auraOrder.filter((aura) => {
-		return registry.get(getPowerEquippedKey(aura)) ?? false;
+		return getDataFromRegistry(registry, getPowerEquippedKey(aura)) ?? false;
 	});
 }
 
@@ -110,22 +100,24 @@ export function isAuraActive(
 
 export function deactivateAura(registry: Phaser.Data.DataManager, aura: Auras) {
 	const auras = getActiveAuras(registry).filter((aa) => aa !== aura);
-	registry.set(DataKeys.ActiveAuras, auras);
+	saveDataToRegistry(registry, "ActiveAuras", auras);
 	MainEvents.emit(Events.AuraEquipped);
 }
 
 export function activateAura(registry: Phaser.Data.DataManager, aura: Auras) {
 	const auras = getActiveAuras(registry);
 	auras.push(aura);
-	registry.set(DataKeys.ActiveAuras, auras);
+	saveDataToRegistry(registry, "ActiveAuras", auras);
 	MainEvents.emit(Events.AuraEquipped);
 }
 
 export function getActiveAuras(registry: Phaser.Data.DataManager): Auras[] {
-	return registry.get(DataKeys.ActiveAuras) ?? [];
+	return getDataFromRegistry(registry, "ActiveAuras") ?? [];
 }
 
-export function getPowerEquippedKey(power: Powers | Auras): string {
+export function getPowerEquippedKey(
+	power: Powers | Auras
+): keyof SaveDataHasCard {
 	switch (power) {
 		case "ClockCard":
 			return "hasClockCard";
@@ -350,7 +342,7 @@ export function getRoomsInRegion(
 }
 
 export function getRoomsVisited(registry: Phaser.Data.DataManager): string[] {
-	return registry.get(DataKeys.RoomsVisited) ?? [];
+	return getDataFromRegistry(registry, "RoomsVisited") ?? [];
 }
 
 export function addVisitedRoom(
@@ -362,7 +354,7 @@ export function addVisitedRoom(
 		return;
 	}
 	rooms.push(room);
-	registry.set(DataKeys.RoomsVisited, rooms);
+	saveDataToRegistry(registry, "RoomsVisited", rooms);
 }
 
 export function getRegionColor(code: Region): number {
@@ -790,10 +782,54 @@ function setSpritePropertiesFromJSON(
 	}
 }
 
-export type SaveData = Record<string, string | number | boolean> & {
-	playerX: number;
-	playerY: number;
-};
+export interface SaveDataHasCard {
+	hasClockCard?: boolean;
+	hasMountainCard?: boolean;
+	hasSwordCard?: boolean;
+	hasSunCard?: boolean;
+	hasHeartCard?: boolean;
+	hasWindCard?: boolean;
+	hasIceCard?: boolean;
+	hasPlantCard?: boolean;
+	hasFireCard?: boolean;
+	hasSpiritCard?: boolean;
+	hasCloudCard?: boolean;
+	hasFishCard?: boolean;
+}
+
+export type SaveData = {
+	playerX?: number;
+	playerY?: number;
+	activePower?: Powers;
+	potionCount?: number;
+	potionTotalCount?: number;
+	keyCount?: number;
+	DefeatedBosses?: string[];
+	itemsRemoved?: number[];
+	itemsRevealed?: number[];
+	SecretRoomsFound?: string[];
+	SecretRoomsTotal?: number;
+	ActiveAuras?: Auras[];
+	RoomsVisited?: string[];
+	playerTotalHitPoints?: number;
+	playerHitPoints?: number;
+	hasSword?: boolean;
+} & SaveDataHasCard;
+
+export function getDataFromRegistry<K extends keyof SaveData>(
+	registry: Phaser.Data.DataManager,
+	key: K
+): SaveData[K] {
+	return registry.get(key);
+}
+
+export function saveDataToRegistry<K extends keyof SaveData>(
+	registry: Phaser.Data.DataManager,
+	key: K,
+	value: SaveData[K]
+): void {
+	registry.set(key, value);
+}
 
 export function loadSavedRegistry(
 	registry: Phaser.Data.DataManager,
@@ -805,7 +841,11 @@ export function loadSavedRegistry(
 			// Always give player full HP when they load
 			return;
 		}
-		registry.set(key, saveData[key]);
+		saveDataToRegistry(
+			registry,
+			key as keyof SaveData,
+			saveData[key as keyof SaveData]
+		);
 	});
 }
 

@@ -1,5 +1,5 @@
 import { Scene } from "phaser";
-import { getRegionName, Region } from "../lib/shared";
+import { getRegionName, Region, saveDataToRegistry } from "../lib/shared";
 
 const lineHeight = 14;
 const startHeight = 60;
@@ -100,8 +100,8 @@ export class Debug extends Scene {
 	confirmSelection() {
 		const selectedPosition = this.getLocations()[this.selectedButton];
 		if (selectedPosition) {
-			this.registry.set("playerX", selectedPosition.x);
-			this.registry.set("playerY", selectedPosition.y);
+			saveDataToRegistry(this.registry, "playerX", selectedPosition.x);
+			saveDataToRegistry(this.registry, "playerY", selectedPosition.y);
 			this.scene.start("Game", this.registry.getAll());
 			return;
 		}
