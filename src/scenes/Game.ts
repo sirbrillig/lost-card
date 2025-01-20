@@ -75,6 +75,9 @@ import {
 	saveGameKey,
 	getDataFromRegistry,
 	saveDataToRegistry,
+	savePlayerPositionToRegistry,
+	getPlayerCoordinates,
+	getSavedDataPlayerPosition,
 } from "../lib/shared";
 
 export class Game extends Scene {
@@ -171,9 +174,12 @@ export class Game extends Scene {
 		}
 
 		const spawnPoint = this.getSpawnPoint();
+		const playerCoordinates = saveData
+			? getPlayerCoordinates(saveData, this.map)
+			: undefined;
 		this.createPlayer(
-			saveData?.playerX ?? spawnPoint.x,
-			saveData?.playerY ?? spawnPoint.y
+			playerCoordinates?.x ?? spawnPoint.x,
+			playerCoordinates?.y ?? spawnPoint.y
 		);
 		this.attackSprite = this.add.sprite(
 			this.player.body.center.x,
@@ -3803,8 +3809,10 @@ export class Game extends Scene {
 	updatePlayer(): void {
 		this.updatePlayerTint();
 		this.updatePlayerAlpha();
-		saveDataToRegistry(this.registry, "playerX", this.player.x);
-		saveDataToRegistry(this.registry, "playerY", this.player.y);
+		savePlayerPositionToRegistry(
+			this.registry,
+			getSavedDataPlayerPosition(this.map, this.player.x, this.player.y)
+		);
 
 		this.updateSwordHitbox();
 		this.updatePowerHitboxPosition();

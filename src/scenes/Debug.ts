@@ -1,5 +1,9 @@
 import { Scene } from "phaser";
-import { getRegionName, Region, saveDataToRegistry } from "../lib/shared";
+import {
+	getRegionName,
+	Region,
+	getAllSavedDataFromRegistry,
+} from "../lib/shared";
 
 const lineHeight = 14;
 const startHeight = 60;
@@ -15,12 +19,12 @@ export class Debug extends Scene {
 
 	getLocations() {
 		return [
-			{ name: "MK", x: 1514, y: 998 },
-			{ name: "IK", x: 1610, y: 1684 },
-			{ name: "PK", x: 984, y: 2104 },
-			{ name: "CK", x: 619, y: 1786 },
-			{ name: "FK", x: 2377, y: 1886 },
-			{ name: "SK", x: 2181, y: 1784 },
+			{ name: "MK", x: 100, y: 100, room: "MK1" },
+			{ name: "IK", x: 100, y: 100, room: "IK1" },
+			{ name: "PK", x: 100, y: 100, room: "PKVillage" },
+			{ name: "CK", x: 100, y: 100, room: "CKMaze" },
+			{ name: "FK", x: 100, y: 100, room: "FKHall" },
+			{ name: "SK", x: 100, y: 100, room: "SKTunnel" },
 		];
 	}
 
@@ -100,9 +104,11 @@ export class Debug extends Scene {
 	confirmSelection() {
 		const selectedPosition = this.getLocations()[this.selectedButton];
 		if (selectedPosition) {
-			saveDataToRegistry(this.registry, "playerX", selectedPosition.x);
-			saveDataToRegistry(this.registry, "playerY", selectedPosition.y);
-			this.scene.start("Game", this.registry.getAll());
+			const saveData = getAllSavedDataFromRegistry(this.registry);
+			saveData.playerActiveRoom = selectedPosition.room;
+			saveData.playerRoomX = selectedPosition.x;
+			saveData.playerRoomY = selectedPosition.y;
+			this.scene.start("Game", saveData);
 			return;
 		}
 	}

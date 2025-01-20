@@ -797,9 +797,13 @@ export interface SaveDataHasCard {
 	hasFishCard?: boolean;
 }
 
+export interface SaveDataPlayerPosition {
+	playerActiveRoom?: string;
+	playerRoomX?: number;
+	playerRoomY?: number;
+}
+
 export type SaveData = {
-	playerX?: number;
-	playerY?: number;
 	activePower?: Powers;
 	potionCount?: number;
 	potionTotalCount?: number;
@@ -814,7 +818,8 @@ export type SaveData = {
 	playerTotalHitPoints?: number;
 	playerHitPoints?: number;
 	hasSword?: boolean;
-} & SaveDataHasCard;
+} & SaveDataHasCard &
+	SaveDataPlayerPosition;
 
 export function getDataFromRegistry<K extends keyof SaveData>(
 	registry: Phaser.Data.DataManager,
@@ -829,6 +834,12 @@ export function saveDataToRegistry<K extends keyof SaveData>(
 	value: SaveData[K]
 ): void {
 	registry.set(key, value);
+}
+
+export function getAllSavedDataFromRegistry(
+	registry: Phaser.Data.DataManager
+): SaveData {
+	return registry.getAll();
 }
 
 export function loadSavedRegistry(
@@ -855,10 +866,61 @@ export function loadSavedData(): SaveData | undefined {
 		return undefined;
 	}
 	const saveData = JSON.parse(rawSaveData);
-	if (saveData?.playerX === undefined || saveData.playerY === undefined) {
+	if (typeof saveData !== "object") {
 		return undefined;
 	}
 	return saveData;
+}
+
+export function savePlayerPositionToRegistry(
+	registry: Phaser.Data.DataManager,
+	position: SaveDataPlayerPosition
+): void {
+	saveDataToRegistry(registry, "playerActiveRoom", position.playerActiveRoom);
+	saveDataToRegistry(registry, "playerRoomY", position.playerRoomY);
+	saveDataToRegistry(registry, "playerRoomX", position.playerRoomX);
+}
+
+export function getPlayerCoordinates(
+	saveData: SaveDataPlayerPosition,
+	map: Phaser.Tilemaps.Tilemap
+): { x: number; y: number } | undefined {
+	const playerRoomX = saveData.playerRoomX;
+	const playerRoomY = saveData.playerRoomY;
+	const roomName = saveData.playerActiveRoom;
+	if (!playerRoomX || !playerRoomY || !roomName) {
+		return undefined;
+	}
+	const matchingRoom = getRooms(map).find((room) => room.name === roomName);
+	if (!matchingRoom?.x || !matchingRoom.y) {
+		return undefined;
+	}
+	const globalX = matchingRoom.x + playerRoomX;
+	const globalY = matchingRoom.y + playerRoomY;
+	// Just double-check
+	if (!isPointInRoom(globalX, globalY, matchingRoom)) {
+		return undefined;
+	}
+	return {
+		x: globalX,
+		y: globalY,
+	};
+}
+
+export function getSavedDataPlayerPosition(
+	map: Phaser.Tilemaps.Tilemap,
+	globalPlayerX: number,
+	globalPlayerY: number
+): SaveDataPlayerPosition {
+	const room = getRoomForPoint(map, globalPlayerX, globalPlayerY);
+	if (!room.x || !room.y) {
+		throw new Error("Could not get position for room with player");
+	}
+	return {
+		playerActiveRoom: room.name,
+		playerRoomX: globalPlayerX - room.x,
+		playerRoomY: globalPlayerY - room.y,
+	};
 }
 
 export function isEnemy(

@@ -15,6 +15,7 @@ import {
 	getRegionFromRoomName,
 	Auras,
 	getDataFromRegistry,
+	getPlayerCoordinates,
 } from "../lib/shared";
 import { config } from "../lib/config";
 
@@ -293,27 +294,42 @@ export class GameMap extends Scene {
 	}
 
 	drawPlayerOnMap(mapScale: number, mapOffset: { x: number; y: number }): void {
-		const playerX = getDataFromRegistry(this.registry, "playerX");
-		const playerY = getDataFromRegistry(this.registry, "playerY");
+		const playerRoomX = getDataFromRegistry(this.registry, "playerRoomX");
+		const playerRoomY = getDataFromRegistry(this.registry, "playerRoomY");
+		const playerActiveRoom = getDataFromRegistry(
+			this.registry,
+			"playerActiveRoom"
+		);
 
-		if (!playerX || !playerY) {
+		if (!playerRoomX || !playerRoomY || !playerActiveRoom) {
+			return;
+		}
+		const playerCoordinates = getPlayerCoordinates(
+			{
+				playerRoomX,
+				playerRoomY,
+				playerActiveRoom,
+			},
+			this.enemyManager.map
+		);
+		if (!playerCoordinates?.x || !playerCoordinates.y) {
 			return;
 		}
 
-		const playerPosition = this.mapGamePointToMapPoint(
-			playerX,
-			playerY,
+		const playerPositionOnMap = this.mapGamePointToMapPoint(
+			playerCoordinates.x,
+			playerCoordinates.y,
 			mapScale,
 			mapOffset
 		);
-		const playerPoint = this.add
-			.sprite(playerPosition.x, playerPosition.y, "icons2", 5)
+		const playerMarker = this.add
+			.sprite(playerPositionOnMap.x, playerPositionOnMap.y, "icons2", 5)
 			.setOrigin(0.5)
 			.setScale(0.8)
 			.setDepth(10);
 
 		this.tweens.add({
-			targets: playerPoint,
+			targets: playerMarker,
 			alpha: 0,
 			ease: "Cubic.easeOut",
 			duration: 800,

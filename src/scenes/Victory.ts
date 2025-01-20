@@ -3,7 +3,6 @@ import {
 	powerOrder,
 	auraOrder,
 	getPowerEquippedKey,
-	DataKeys,
 	getDataFromRegistry,
 } from "../lib/shared";
 
