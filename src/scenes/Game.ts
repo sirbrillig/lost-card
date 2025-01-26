@@ -135,6 +135,7 @@ export class Game extends Scene {
 	map: Phaser.Tilemaps.Tilemap;
 	landLayer: Phaser.Tilemaps.TilemapLayer;
 	hiddenRoomLayer: Phaser.Tilemaps.TilemapLayer;
+	aboveLayer: Phaser.Tilemaps.TilemapLayer;
 	stuffLayer: Phaser.Tilemaps.TilemapLayer;
 	createdFinalDoors: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody[] = [];
 	createdDoors: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody[] = [];
@@ -307,6 +308,7 @@ export class Game extends Scene {
 				return enemy.doesCollideWithTile(tile);
 			}
 		);
+		this.aboveLayer = this.createTileLayer("Above", tilesetTile, 10);
 		this.stuffLayer = this.createTileLayer("Stuff", tilesetTile, 0);
 		this.physics.add.collider(this.stuffLayer, this.player, undefined, () => {
 			if (this.isPlayerUsingPower() && this.getActivePower() === "SpiritCard") {
