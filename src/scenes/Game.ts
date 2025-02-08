@@ -355,6 +355,13 @@ export class Game extends Scene {
 			this.enemyHitPlayer();
 		});
 
+		MainEvents.on(Events.ConfusePlayer, () => {
+			if (this.isPlayerInvincible() || this.isPlayerHiddenInvincible()) {
+				return;
+			}
+			this.setPlayerConfused(true);
+		});
+
 		let isSaving = false;
 		this.physics.add.collider(
 			this.player,
@@ -3397,6 +3404,10 @@ export class Game extends Scene {
 		this.player.body.setVelocity(0);
 	}
 
+	setPlayerConfused(setting: boolean) {
+		this.player.data?.set("confusedPlayer", setting);
+	}
+
 	// Same as setPlayerInvincible but there will be no visual cue. Useful for
 	// times when the player should just not be able to take damage like a "got
 	// powerup" period.
@@ -3428,6 +3439,10 @@ export class Game extends Scene {
 
 	isPlayerStunned(): boolean {
 		return this.player.data.get("stunPlayer") === true;
+	}
+
+	isPlayerConfused(): boolean {
+		return this.player.data.get("confusedPlayer") === true;
 	}
 
 	isPlayerBeingHit(): boolean {
@@ -3721,17 +3736,27 @@ export class Game extends Scene {
 		this.player.body.setVelocity(0);
 
 		// Set velocity based on key press
-		if (this.isPressingLeft()) {
+		let isLeft = this.isPressingLeft();
+		let isRight = this.isPressingRight();
+		let isUp = this.isPressingUp();
+		let isDown = this.isPressingDown();
+		if (this.isPlayerConfused()) {
+			isLeft = this.isPressingUp();
+			isRight = this.isPressingDown();
+			isUp = this.isPressingRight();
+			isDown = this.isPressingLeft();
+		}
+		if (isLeft) {
 			this.player.body.setVelocityX(-this.getPlayerSpeed());
 			this.setPlayerDirection(SpriteLeft);
-		} else if (this.isPressingRight()) {
+		} else if (isRight) {
 			this.player.body.setVelocityX(this.getPlayerSpeed());
 			this.setPlayerDirection(SpriteRight);
 		}
-		if (this.isPressingUp()) {
+		if (isUp) {
 			this.player.body.setVelocityY(-this.getPlayerSpeed());
 			this.setPlayerDirection(SpriteUp);
-		} else if (this.isPressingDown()) {
+		} else if (isDown) {
 			this.player.body.setVelocityY(this.getPlayerSpeed());
 			this.setPlayerDirection(SpriteDown);
 		}
@@ -3739,24 +3764,24 @@ export class Game extends Scene {
 		this.player.body.velocity.normalize().scale(this.getPlayerSpeed());
 
 		// Set animation based on direction (if multiple, just pick one)
-		if (this.isPressingLeft()) {
+		if (isLeft) {
 			this.player.setFlipX(false);
 			this.player.anims.play("left-walk", true);
 			this.playWalkSound();
 			this.finishPlayerAppear();
 			MainEvents.emit(Events.PlayerMoved);
-		} else if (this.isPressingRight()) {
+		} else if (isRight) {
 			this.player.setFlipX(true);
 			this.player.anims.play("left-walk", true);
 			this.playWalkSound();
 			this.finishPlayerAppear();
 			MainEvents.emit(Events.PlayerMoved);
-		} else if (this.isPressingUp()) {
+		} else if (isUp) {
 			this.player.anims.play("up-walk", true);
 			this.playWalkSound();
 			this.finishPlayerAppear();
 			MainEvents.emit(Events.PlayerMoved);
-		} else if (this.isPressingDown()) {
+		} else if (isDown) {
 			this.player.anims.play("down-walk", true);
 			this.playWalkSound();
 			this.finishPlayerAppear();

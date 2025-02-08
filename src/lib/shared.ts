@@ -26,6 +26,7 @@ export const Events = {
 	MonsterStun: "stun",
 	MonsterKillRequest: "kill",
 	EnemyHitPlayer: "enemyHitPlayer",
+	ConfusePlayer: "confusePlayer",
 	StunPlayer: "stunPlayer",
 	FreezePlayer: "freezePlayer",
 	GameSaved: "gameSaved",

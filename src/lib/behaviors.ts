@@ -1226,7 +1226,7 @@ export class Poof<AllStates extends string>
 				// If a particle hits the player, then trigger an effect.
 				const didHit = enemyManager.player.body?.hitTest(x, y) ?? false;
 				if (didHit) {
-					MainEvents.emit(Events.EnemyHitPlayer, true);
+					MainEvents.emit(Events.ConfusePlayer, true);
 				}
 				return didHit;
 			},
