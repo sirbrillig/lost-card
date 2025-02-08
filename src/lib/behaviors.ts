@@ -477,13 +477,19 @@ export class LeftRightMarch<AllStates extends string>
 	#enemySpeed = 70;
 	#minWalkTime = 600;
 	#maxWalkTime = 4000;
+	#moveUpDown = false;
 	#nextState: AllStates;
 	name: AllStates;
 
 	constructor(
 		name: AllStates,
 		nextState: AllStates,
-		config?: { speed?: number; minWalkTime?: number; maxWalkTime?: number }
+		config?: {
+			speed?: number;
+			minWalkTime?: number;
+			maxWalkTime?: number;
+			moveUpDown?: boolean;
+		}
 	) {
 		this.name = name;
 		this.#nextState = nextState;
@@ -496,6 +502,9 @@ export class LeftRightMarch<AllStates extends string>
 		if (config?.maxWalkTime) {
 			this.#maxWalkTime = config.maxWalkTime;
 		}
+		if (config?.moveUpDown) {
+			this.#moveUpDown = config.moveUpDown;
+		}
 	}
 
 	init(
@@ -506,7 +515,9 @@ export class LeftRightMarch<AllStates extends string>
 			throw new Error("invalid sprite");
 		}
 
-		const direction = getWalkingDirectionLeftRight(sprite);
+		const direction = this.#moveUpDown
+			? getWalkingDirectionUpDown(sprite)
+			: getWalkingDirectionLeftRight(sprite);
 		sprite.data.set("direction", direction);
 		const walkSound = sprite.scene.sound.add("enemy-walk", {
 			loop: true,
@@ -515,6 +526,14 @@ export class LeftRightMarch<AllStates extends string>
 		});
 		walkSound.play();
 		switch (direction) {
+			case SpriteUp:
+				sprite.anims.play("up", true);
+				sprite.body.setVelocityY(-this.#enemySpeed);
+				break;
+			case SpriteDown:
+				sprite.anims.play("down", true);
+				sprite.body.setVelocityY(this.#enemySpeed);
+				break;
 			case SpriteRight:
 				sprite.anims.play("right", true);
 				sprite.body.setVelocityX(this.#enemySpeed);
@@ -2207,6 +2226,20 @@ function getWalkingDirection(
 	if (previousDirection !== undefined) {
 		while (direction === previousDirection) {
 			direction = Phaser.Math.Between(0, 3);
+		}
+	}
+	return direction as SpriteDirection;
+}
+
+function getWalkingDirectionUpDown(
+	sprite: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody
+): SpriteDirection {
+	const previousDirection: SpriteDirection | undefined =
+		sprite.data.get("direction");
+	let direction = Phaser.Math.Between(0, 1) === 1 ? SpriteUp : SpriteDown;
+	if (previousDirection !== undefined) {
+		while (direction === previousDirection) {
+			direction = Phaser.Math.Between(0, 1) === 1 ? SpriteUp : SpriteDown;
 		}
 	}
 	return direction as SpriteDirection;
