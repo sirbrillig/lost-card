@@ -12,6 +12,7 @@ import { CloudGoblin } from "../monsters/CloudGoblin";
 import { SkyBlob } from "../monsters/SkyBlob";
 import { Slime } from "../monsters/Slime";
 import { Spike } from "../monsters/Spike";
+import { Flower } from "../monsters/Flower";
 import { PlantBug } from "../monsters/PlantBug";
 import { IceMonster } from "../monsters/IceMonster";
 import { FireMonster } from "../monsters/FireMonster";
@@ -2782,6 +2783,11 @@ export class Game extends Scene {
 				}
 				case "Spike": {
 					const monster = new Spike(this, this.enemyManager, point.x, point.y);
+					this.enemyManager.enemies.add(monster);
+					break;
+				}
+				case "Flower": {
+					const monster = new Flower(this, this.enemyManager, point.x, point.y);
 					this.enemyManager.enemies.add(monster);
 					break;
 				}

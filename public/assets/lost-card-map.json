@@ -7144,6 +7144,54 @@
                  "width":0,
                  "x":1045.97,
                  "y":2461.09
+                }, 
+                {
+                 "height":0,
+                 "id":1073,
+                 "name":"Flower",
+                 "point":true,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":1483.54563175616,
+                 "y":2706.42991316675
+                }, 
+                {
+                 "height":0,
+                 "id":1074,
+                 "name":"Flower",
+                 "point":true,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":1556.96189969874,
+                 "y":2761.82172603225
+                }, 
+                {
+                 "height":0,
+                 "id":1076,
+                 "name":"Flower",
+                 "point":true,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":1644.85840864788,
+                 "y":2711.13946482368
+                }, 
+                {
+                 "height":0,
+                 "id":1075,
+                 "name":"Flower",
+                 "point":true,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":1560.51,
+                 "y":2636
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -15106,7 +15154,7 @@
          "y":0
         }],
  "nextlayerid":19,
- "nextobjectid":1073,
+ "nextobjectid":1077,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.1",

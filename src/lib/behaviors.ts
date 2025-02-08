@@ -1185,6 +1185,88 @@ export class IceAttack<AllStates extends string>
 	update(): void {}
 }
 
+export class Poof<AllStates extends string>
+	implements Behavior<AllStates, Phaser.GameObjects.Sprite>
+{
+	#nextState: AllStates;
+	#postAttackTime = 1000;
+	name: AllStates;
+
+	constructor(
+		name: AllStates,
+		nextState: AllStates,
+		options?: {
+			postAttackTime: number;
+		}
+	) {
+		this.name = name;
+		this.#nextState = nextState;
+		this.#postAttackTime = options?.postAttackTime ?? this.#postAttackTime;
+	}
+
+	init(
+		sprite: Phaser.GameObjects.Sprite,
+		stateMachine: BehaviorMachineInterface<AllStates>,
+		enemyManager: EnemyManager
+	): void {
+		if (!sprite.body || !isDynamicSprite(sprite)) {
+			throw new Error("Could not update monster");
+		}
+
+		const deathZoneDetector = {
+			contains: (x: number, y: number) => {
+				// Particle coordinates are global but that was changed around 3.85 to
+				// make them local instead (see
+				// https://github.com/phaserjs/phaser/issues/6371). If we ever upgrade
+				// Phaser, we will need the following adjustments for the emitter
+				// position.
+				// x += sprite.body.x;
+				// y += sprite.body.y;
+
+				// If a particle hits the player, then trigger an effect.
+				const didHit = enemyManager.player.body?.hitTest(x, y) ?? false;
+				if (didHit) {
+					MainEvents.emit(Events.EnemyHitPlayer, true);
+				}
+				return didHit;
+			},
+		};
+		const emitter = sprite.scene.add.particles(
+			sprite.body.center.x,
+			sprite.body.center.y - 5,
+			"monsters2",
+			{
+				frame: [75, 76, 77],
+				lifespan: 800,
+				speed: { min: 15, max: 55 },
+				scale: { start: 1, end: 0.4 },
+				emitting: false,
+				deathZone: { source: deathZoneDetector, killOnEnter: true },
+			}
+		);
+		emitter.explode(20);
+		emitter.once(Phaser.GameObjects.Particles.Events.COMPLETE, () => {
+			emitter?.destroy();
+		});
+		sprite.once(Events.MonsterDying, () => {
+			emitter?.destroy?.();
+		});
+		MainEvents.once(Events.LeavingRoom, () => {
+			emitter?.destroy?.();
+		});
+
+		sprite.scene.time.addEvent({
+			delay: this.#postAttackTime,
+			callback: () => {
+				stateMachine.popState();
+				stateMachine.pushState(this.#nextState);
+			},
+		});
+	}
+
+	update(): void {}
+}
+
 export class SeekingVine<AllStates extends string>
 	implements Behavior<AllStates, Phaser.GameObjects.Sprite>
 {
