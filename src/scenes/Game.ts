@@ -90,6 +90,8 @@ export class Game extends Scene {
 	sword: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
 	power: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
 	healEffect: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody | undefined;
+	statusIcon: Phaser.GameObjects.Sprite | undefined;
+	statusBounce: Phaser.Tweens.Tween | undefined;
 	attackSprite: Phaser.GameObjects.Sprite;
 	enemyManager: EnemyManager;
 	enemyCollider: Phaser.Physics.Arcade.Collider;
@@ -359,7 +361,7 @@ export class Game extends Scene {
 			if (this.isPlayerInvincible() || this.isPlayerHiddenInvincible()) {
 				return;
 			}
-			this.setPlayerConfused(true);
+			this.makePlayerConfused();
 		});
 
 		let isSaving = false;
@@ -507,6 +509,47 @@ export class Game extends Scene {
 		});
 
 		this.recordSecretRoomsTotal();
+	}
+
+	restartStatusBounce() {
+		this.statusBounce?.destroy();
+		if (!this.statusIcon) {
+			return;
+		}
+		this.statusBounce = this.tweens.add({
+			targets: this.statusIcon,
+			y: "+=6",
+			ease: "Exponential.InOut",
+			yoyo: true,
+			repeat: -1,
+			duration: 400,
+		});
+	}
+
+	makePlayerConfused() {
+		if (this.isPlayerConfused()) {
+			return;
+		}
+		this.setPlayerConfused(true);
+		this.statusIcon?.destroy();
+		const statusIcon = this.add.sprite(
+			this.player.body.center.x + 1,
+			this.player.body.center.y - 1,
+			"status-icons",
+			3
+		);
+		this.statusIcon = statusIcon;
+		this.statusIcon.setDepth(5);
+		this.updateStatusIcon();
+		this.time.addEvent({
+			repeat: 0,
+			delay: config.playerConfusedTime,
+			callback: () => {
+				this.setPlayerConfused(false);
+				this.statusBounce?.destroy();
+				this.statusIcon?.destroy();
+			},
+		});
 	}
 
 	recordSecretRoomsTotal() {
@@ -3851,6 +3894,20 @@ export class Game extends Scene {
 		});
 	}
 
+	updateStatusIcon() {
+		if (this.statusIcon) {
+			const newX = this.player.body.center.x - config.statusIconOffsetX;
+			if (newX !== this.statusIcon.x) {
+				this.statusIcon.x = newX;
+			}
+			const newY = this.player.body.center.y - config.statusIconOffsetY;
+			if (newY !== this.statusIcon.y) {
+				this.statusIcon.y = newY;
+			}
+			this.restartStatusBounce();
+		}
+	}
+
 	updatePlayer(): void {
 		this.updatePlayerTint();
 		this.updatePlayerAlpha();
@@ -3873,6 +3930,7 @@ export class Game extends Scene {
 			MainEvents.emit(Events.PlayerPositionChanged);
 			this.maybeChangeRoom();
 			this.maybePickUpItem();
+			this.updateStatusIcon();
 		}
 	}
 

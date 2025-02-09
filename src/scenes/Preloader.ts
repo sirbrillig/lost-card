@@ -67,6 +67,10 @@ export class Preloader extends Scene {
 			frameWidth: 16,
 			frameHeight: 16,
 		});
+		this.load.spritesheet("status-icons", "statusailment-sheet.png", {
+			frameWidth: 32,
+			frameHeight: 32,
+		});
 		this.load.spritesheet("cards", "cards.png", {
 			frameWidth: 16,
 			frameHeight: 16,
