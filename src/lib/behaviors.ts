@@ -1458,6 +1458,128 @@ export class SummonCircle<AllStates extends string>
 	}
 }
 
+export class DashTowardPlayer<AllStates extends string>
+	implements Behavior<AllStates, Phaser.GameObjects.Sprite>
+{
+	#nextState: AllStates;
+	#speed = 80;
+	#postAttackTime = 1000;
+	#targetPosition: { x: number; y: number } | undefined = undefined;
+	name: AllStates;
+
+	constructor(
+		name: AllStates,
+		nextState: AllStates,
+		options?: {
+			speed?: number;
+			postAttackTime?: number;
+			targetPosition?: { x: number; y: number };
+		}
+	) {
+		this.name = name;
+		this.#nextState = nextState;
+		this.#speed = options?.speed ?? this.#speed;
+		this.#postAttackTime = options?.postAttackTime ?? this.#postAttackTime;
+		this.#targetPosition = options?.targetPosition;
+	}
+
+	init(
+		sprite: Phaser.GameObjects.Sprite,
+		stateMachine: BehaviorMachineInterface<AllStates>,
+		enemyManager: EnemyManager
+	): void {
+		if (!sprite.body || !isDynamicSprite(sprite)) {
+			throw new Error("Could not update monster");
+		}
+		sprite.scene.physics.moveToObject(
+			sprite,
+			this.#targetPosition ?? enemyManager.player,
+			this.#speed
+		);
+
+		sprite.scene.physics.add.overlap(enemyManager.player, sprite, () => {
+			MainEvents.emit(Events.EnemyHitPlayer, true);
+		});
+
+		sprite.scene.time.addEvent({
+			delay: this.#postAttackTime,
+			callback: () => {
+				stateMachine.popState();
+				stateMachine.pushState(this.#nextState);
+			},
+		});
+	}
+
+	update(): void {}
+}
+
+export class LaserSight<AllStates extends string>
+	implements Behavior<AllStates, Phaser.GameObjects.Sprite>
+{
+	#nextState: AllStates;
+	#speed = 50;
+	#postAttackTime = 1000;
+	#color = 0xff0000;
+	#onTarget: undefined | ((target: { x: number; y: number }) => void);
+	name: AllStates;
+
+	constructor(
+		name: AllStates,
+		nextState: AllStates,
+		options?: {
+			speed?: number;
+			postAttackTime?: number;
+			color?: number;
+			onTarget: undefined | ((target: { x: number; y: number }) => void);
+		}
+	) {
+		this.name = name;
+		this.#nextState = nextState;
+		this.#speed = options?.speed ?? this.#speed;
+		this.#postAttackTime = options?.postAttackTime ?? this.#postAttackTime;
+		this.#color = options?.color ?? this.#color;
+		this.#onTarget = options?.onTarget;
+	}
+
+	init(
+		sprite: Phaser.GameObjects.Sprite,
+		stateMachine: BehaviorMachineInterface<AllStates>,
+		enemyManager: EnemyManager
+	): void {
+		if (!sprite.body || !isDynamicSprite(sprite)) {
+			throw new Error("Could not update monster");
+		}
+		if (!enemyManager.player.body) {
+			throw new Error("Could not update monster");
+		}
+		const effect = sprite.scene.add.line(
+			0,
+			0,
+			sprite.body.x,
+			sprite.body.y,
+			enemyManager.player.body.x,
+			enemyManager.player.body.y,
+			this.#color
+		);
+		effect.setOrigin(0);
+		effect.setLineWidth(5);
+		sprite.scene.time.addEvent({
+			delay: this.#postAttackTime,
+			callback: () => {
+				effect?.destroy();
+				stateMachine.popState();
+				stateMachine.pushState(this.#nextState);
+			},
+		});
+		this.#onTarget?.({
+			x: enemyManager.player.body.x,
+			y: enemyManager.player.body.y,
+		});
+	}
+
+	update(): void {}
+}
+
 export class BlackOrbAttack<AllStates extends string>
 	implements Behavior<AllStates, Phaser.GameObjects.Sprite>
 {

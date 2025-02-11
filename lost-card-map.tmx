@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.1" orientation="orthogonal" renderorder="right-down" width="200" height="200" tilewidth="16" tileheight="16" infinite="0" nextlayerid="19" nextobjectid="1077">
+<map version="1.10" tiledversion="1.11.1" orientation="orthogonal" renderorder="right-down" width="200" height="200" tilewidth="16" tileheight="16" infinite="0" nextlayerid="19" nextobjectid="1078">
  <editorsettings>
   <export target="public/assets/lost-card-map.json" format="json"/>
  </editorsettings>
@@ -9112,6 +9112,9 @@
    <point/>
   </object>
   <object id="1075" name="Flower" x="1560.51" y="2636">
+   <point/>
+  </object>
+  <object id="1077" name="Snakey" x="1192.44" y="2662.99">
    <point/>
   </object>
  </objectgroup>

@@ -7166,8 +7166,8 @@
                  "type":"",
                  "visible":true,
                  "width":0,
-                 "x":1560.35622641509,
-                 "y":2757.48037735849
+                 "x":1560.36,
+                 "y":2757.48
                 }, 
                 {
                  "height":0,
@@ -7192,6 +7192,18 @@
                  "width":0,
                  "x":1560.51,
                  "y":2636
+                }, 
+                {
+                 "height":0,
+                 "id":1077,
+                 "name":"Snakey",
+                 "point":true,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":1192.43819680078,
+                 "y":2662.99079011149
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -15154,7 +15166,7 @@
          "y":0
         }],
  "nextlayerid":19,
- "nextobjectid":1077,
+ "nextobjectid":1078,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.1",

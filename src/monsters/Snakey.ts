@@ -1,14 +1,15 @@
-import { WaitForActive, Poof } from "../lib/behaviors";
+import { WaitForActive, LaserSight, DashTowardPlayer } from "../lib/behaviors";
 import { DataKeys } from "../lib/shared";
 import { EnemyManager } from "../lib/EnemyManager";
 import { BaseMonster } from "./BaseMonster";
 
-type AllStates = "wait" | "burst";
+type AllStates = "wait" | "aim" | "dash";
 
-export class Flower extends BaseMonster<AllStates> {
+export class Snakey extends BaseMonster<AllStates> {
 	awareDistance: number = 60;
 	hitPoints = 3;
 	primaryColor = 0x34c24c;
+	#targetPosition: { x: number; y: number };
 
 	constructor(
 		scene: Phaser.Scene,
@@ -16,8 +17,7 @@ export class Flower extends BaseMonster<AllStates> {
 		x: number,
 		y: number
 	) {
-		super(scene, enemyManager, x, y, "monsters2", 48);
-		this.data.set(DataKeys.Pushable, false);
+		super(scene, enemyManager, x, y, "monsters2", 6);
 	}
 
 	getInitialState(): AllStates {
@@ -28,8 +28,8 @@ export class Flower extends BaseMonster<AllStates> {
 		this.anims.create({
 			key: "down",
 			frames: this.anims.generateFrameNumbers("monsters2", {
-				start: 48,
-				end: 50,
+				start: 6,
+				end: 8,
 			}),
 			frameRate: 10,
 			repeat: -1,
@@ -38,8 +38,8 @@ export class Flower extends BaseMonster<AllStates> {
 		this.anims.create({
 			key: "left",
 			frames: this.anims.generateFrameNumbers("monsters2", {
-				start: 60,
-				end: 62,
+				start: 18,
+				end: 20,
 			}),
 			frameRate: 10,
 			repeat: -1,
@@ -48,8 +48,8 @@ export class Flower extends BaseMonster<AllStates> {
 		this.anims.create({
 			key: "right",
 			frames: this.anims.generateFrameNumbers("monsters2", {
-				start: 72,
-				end: 74,
+				start: 30,
+				end: 32,
 			}),
 			frameRate: 10,
 			repeat: -1,
@@ -58,8 +58,8 @@ export class Flower extends BaseMonster<AllStates> {
 		this.anims.create({
 			key: "up",
 			frames: this.anims.generateFrameNumbers("monsters2", {
-				start: 84,
-				end: 86,
+				start: 42,
+				end: 44,
 			}),
 			frameRate: 10,
 			repeat: -1,
@@ -70,11 +70,22 @@ export class Flower extends BaseMonster<AllStates> {
 	constructNewBehaviorFor(state: string) {
 		switch (state) {
 			case "wait":
-				return new WaitForActive(state, "burst", {
+				return new WaitForActive(state, "aim", {
 					distance: this.awareDistance,
 				});
-			case "burst":
-				return new Poof(state, "wait");
+			case "aim":
+				return new LaserSight(state, "dash", {
+					color: this.primaryColor,
+					onTarget: (target: { x: number; y: number }) =>
+						(this.#targetPosition = target),
+				});
+			case "dash":
+				if (!this.#targetPosition) {
+					throw new Error("No target for some reason");
+				}
+				return new DashTowardPlayer(state, "wait", {
+					targetPosition: this.#targetPosition,
+				});
 		}
 	}
 }
