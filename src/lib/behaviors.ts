@@ -1462,8 +1462,8 @@ export class DashTowardPlayer<AllStates extends string>
 	implements Behavior<AllStates, Phaser.GameObjects.Sprite>
 {
 	#nextState: AllStates;
-	#speed = 80;
-	#postAttackTime = 1000;
+	#speed = 90;
+	#postAttackTime = 900;
 	#targetPosition: { x: number; y: number } | undefined = undefined;
 	name: AllStates;
 
@@ -1562,7 +1562,7 @@ export class LaserSight<AllStates extends string>
 			this.#color
 		);
 		effect.setOrigin(0);
-		effect.setLineWidth(5);
+		effect.setLineWidth(2);
 		sprite.scene.time.addEvent({
 			delay: this.#postAttackTime,
 			callback: () => {

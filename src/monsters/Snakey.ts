@@ -6,9 +6,10 @@ import { BaseMonster } from "./BaseMonster";
 type AllStates = "wait" | "aim" | "dash";
 
 export class Snakey extends BaseMonster<AllStates> {
-	awareDistance: number = 60;
+	awareDistance: number = 80;
+	speed: number = 120;
 	hitPoints = 3;
-	primaryColor = 0x34c24c;
+	primaryColor = 0x097325;
 	#targetPosition: { x: number; y: number };
 
 	constructor(
@@ -85,6 +86,7 @@ export class Snakey extends BaseMonster<AllStates> {
 				}
 				return new DashTowardPlayer(state, "wait", {
 					targetPosition: this.#targetPosition,
+					speed: this.speed,
 				});
 		}
 	}
