@@ -262,7 +262,6 @@ export class SpawnEnemies<AllStates extends string>
 
 		const spawnedEnemyCount = sprite.data.get("spawnedEnemyCount") ?? 0;
 		if (spawnedEnemyCount >= this.#maxSpawnedEnemies) {
-			console.log("too many spawned enemies");
 			return;
 		}
 
@@ -279,7 +278,6 @@ export class SpawnEnemies<AllStates extends string>
 		});
 		enemyManager.enemies.add(monster);
 		sprite.once(Events.MonsterDying, () => {
-			console.log("spawner is dying so killing spawned creatures");
 			monster.emit(Events.MonsterKillRequest);
 		});
 		MainEvents.once(Events.LeavingRoom, () => {
@@ -623,7 +621,7 @@ export class RandomTeleport<AllStates extends string>
 			return true;
 		});
 		if (tiles.length < 1) {
-			console.log("No tiles in room to teleport to");
+			console.warn("No tiles in room to teleport to");
 			stateMachine.popState();
 			stateMachine.pushState(this.#nextState);
 		}
@@ -728,7 +726,7 @@ export class TeleportToPlatform<AllStates extends string>
 			return false;
 		});
 		if (tiles.length < 1) {
-			console.log("Too few platform tiles in room to teleport to");
+			console.warn("Too few platform tiles in room to teleport to");
 			stateMachine.popState();
 			stateMachine.pushState(this.#nextState);
 		}
@@ -849,7 +847,7 @@ export class TeleportToWater<AllStates extends string>
 			return false;
 		});
 		if (tiles.length < 1) {
-			console.log("No water tiles in room to teleport to");
+			console.warn("No water tiles in room to teleport to");
 			stateMachine.popState();
 			stateMachine.pushState(this.#nextState);
 		}
@@ -1435,7 +1433,6 @@ export class SummonCircle<AllStates extends string>
 		);
 		enemyManager.enemies.add(monster);
 		sprite.once(Events.MonsterDying, () => {
-			console.log("spawner is dying so killing spawned creatures");
 			monster?.emit(Events.MonsterKillRequest);
 		});
 		MainEvents.once(Events.LeavingRoom, () => {

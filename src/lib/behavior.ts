@@ -41,7 +41,6 @@ export class StateMachine<AllStates extends string>
 	}
 
 	pushState(state: AllStates): void {
-		console.log("pushing state", state);
 		this.#stateStack.push(state);
 	}
 

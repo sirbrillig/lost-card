@@ -576,7 +576,6 @@ export class Overlay extends Scene {
 		const keyCount = this.getKeyCount();
 
 		if (this.totalHearts !== totalHearts) {
-			console.log("resetting hearts");
 			this.totalHearts = totalHearts;
 			this.createHearts();
 		}
