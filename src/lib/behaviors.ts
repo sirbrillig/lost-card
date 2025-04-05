@@ -1461,6 +1461,7 @@ export class DashTowardPlayer<AllStates extends string>
 	#nextState: AllStates;
 	#speed = 90;
 	#postAttackTime = 900;
+	#previousDistance: number;
 	#targetPosition: { x: number; y: number } | undefined = undefined;
 	name: AllStates;
 
@@ -1507,7 +1508,35 @@ export class DashTowardPlayer<AllStates extends string>
 		});
 	}
 
-	update(): void {}
+	update(
+		sprite: Phaser.GameObjects.Sprite,
+		_: BehaviorMachineInterface<AllStates>,
+		enemyManager: EnemyManager
+	): void {
+		if (!isDynamicSprite(sprite) || !enemyManager.player.body) {
+			throw new Error("Could not update monster");
+		}
+		const distance = Phaser.Math.Distance.BetweenPoints(
+			sprite.body.center,
+			this.#targetPosition ?? enemyManager.player.body.center
+		);
+
+		// If you hit a wall, the direction will change as moveToObject tries to
+		// slide around it. We want to stop in that case so we check to see if the
+		// distance isn't getting closer.
+		if (this.#previousDistance && distance > this.#previousDistance) {
+			sprite.body.stop();
+			return;
+		}
+
+		// If you reach the target, stop.
+		if (distance < 5) {
+			sprite.body.stop();
+			return;
+		}
+
+		this.#previousDistance = distance;
+	}
 }
 
 export class LaserSight<AllStates extends string>

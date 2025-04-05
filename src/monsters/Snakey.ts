@@ -1,5 +1,4 @@
 import { WaitForActive, LaserSight, DashTowardPlayer } from "../lib/behaviors";
-import { DataKeys } from "../lib/shared";
 import { EnemyManager } from "../lib/EnemyManager";
 import { BaseMonster } from "./BaseMonster";
 
