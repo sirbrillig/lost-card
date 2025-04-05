@@ -29,6 +29,7 @@ import { PlantBoss } from "../monsters/PlantBoss";
 import { SpiritBoss } from "../monsters/SpiritBoss";
 import { CloudBoss } from "../monsters/CloudBoss";
 import { FireBoss } from "../monsters/FireBoss";
+import { BaseMonster } from "../monsters/BaseMonster";
 import {
 	Auras,
 	Powers,
@@ -950,7 +951,8 @@ export class Game extends Scene {
 					...this.createdFinalDoors,
 					...this.createdSavePoints,
 				],
-				this.enemyManager.activeRoom
+				this.enemyManager.activeRoom,
+				this.spawnPoints
 			);
 		}
 		this.landLayer.setCollisionByProperty({ collides: true });
@@ -1185,7 +1187,8 @@ export class Game extends Scene {
 				...this.createdFinalDoors,
 				...this.createdSavePoints,
 			],
-			room
+			room,
+			this.spawnPoints
 		);
 
 		this.createEnemiesInRoom();
@@ -1807,7 +1810,8 @@ export class Game extends Scene {
 					...this.createdFinalDoors,
 					...this.createdSavePoints,
 				],
-				this.enemyManager.activeRoom
+				this.enemyManager.activeRoom,
+				this.spawnPoints
 			);
 		}
 	}
@@ -2745,6 +2749,17 @@ export class Game extends Scene {
 		});
 	}
 
+	addEnemyToEnemyManager<T extends string, M extends BaseMonster<T>>(
+		monster: M,
+		point: { id: number }
+	) {
+		monster.mapSpawnPointId = point.id;
+		this.enemyManager.enemies.add(monster);
+		monster.once(Events.MonsterDefeated, () => {
+			this.enemyManager.enemies.remove(monster, true);
+		});
+	}
+
 	createEnemiesInRoom() {
 		this.spawnPoints.forEach((point) => {
 			if (
@@ -2775,7 +2790,7 @@ export class Game extends Scene {
 						point.x,
 						point.y
 					);
-					this.enemyManager.enemies.add(monster);
+					this.addEnemyToEnemyManager(monster, point);
 					break;
 				}
 				case "Skeleton": {
@@ -2785,12 +2800,12 @@ export class Game extends Scene {
 						point.x,
 						point.y
 					);
-					this.enemyManager.enemies.add(monster);
+					this.addEnemyToEnemyManager(monster, point);
 					break;
 				}
 				case "Ghost": {
 					const monster = new Ghost(this, this.enemyManager, point.x, point.y);
-					this.enemyManager.enemies.add(monster);
+					this.addEnemyToEnemyManager(monster, point);
 					break;
 				}
 				case "BlackOrb": {
@@ -2800,7 +2815,7 @@ export class Game extends Scene {
 						point.x,
 						point.y
 					);
-					this.enemyManager.enemies.add(monster);
+					this.addEnemyToEnemyManager(monster, point);
 					break;
 				}
 				case "GreatGhost": {
@@ -2810,7 +2825,7 @@ export class Game extends Scene {
 						point.x,
 						point.y
 					);
-					this.enemyManager.enemies.add(monster);
+					this.addEnemyToEnemyManager(monster, point);
 					monster.once("defeated", () => {
 						this.markBossDefeated("GreatGhost");
 						this.showAllHiddenItemsInRoom();
@@ -2824,27 +2839,27 @@ export class Game extends Scene {
 						point.x,
 						point.y
 					);
-					this.enemyManager.enemies.add(monster);
+					this.addEnemyToEnemyManager(monster, point);
 					break;
 				}
 				case "Slime": {
 					const monster = new Slime(this, this.enemyManager, point.x, point.y);
-					this.enemyManager.enemies.add(monster);
+					this.addEnemyToEnemyManager(monster, point);
 					break;
 				}
 				case "Spike": {
 					const monster = new Spike(this, this.enemyManager, point.x, point.y);
-					this.enemyManager.enemies.add(monster);
+					this.addEnemyToEnemyManager(monster, point);
 					break;
 				}
 				case "Flower": {
 					const monster = new Flower(this, this.enemyManager, point.x, point.y);
-					this.enemyManager.enemies.add(monster);
+					this.addEnemyToEnemyManager(monster, point);
 					break;
 				}
 				case "Snakey": {
 					const monster = new Snakey(this, this.enemyManager, point.x, point.y);
-					this.enemyManager.enemies.add(monster);
+					this.addEnemyToEnemyManager(monster, point);
 					break;
 				}
 				case "CloudGoblin": {
@@ -2854,7 +2869,7 @@ export class Game extends Scene {
 						point.x,
 						point.y
 					);
-					this.enemyManager.enemies.add(monster);
+					this.addEnemyToEnemyManager(monster, point);
 					break;
 				}
 				case "PlantBug": {
@@ -2864,7 +2879,7 @@ export class Game extends Scene {
 						point.x,
 						point.y
 					);
-					this.enemyManager.enemies.add(monster);
+					this.addEnemyToEnemyManager(monster, point);
 					break;
 				}
 				case "WaterDipper": {
@@ -2878,7 +2893,7 @@ export class Game extends Scene {
 						this.markBossDefeated("WaterDipper");
 						this.showAllHiddenItemsInRoom();
 					});
-					this.enemyManager.enemies.add(monster);
+					this.addEnemyToEnemyManager(monster, point);
 					break;
 				}
 				case "IceMonster": {
@@ -2888,7 +2903,7 @@ export class Game extends Scene {
 						point.x,
 						point.y
 					);
-					this.enemyManager.enemies.add(monster);
+					this.addEnemyToEnemyManager(monster, point);
 					break;
 				}
 				case "FireSpout": {
@@ -2898,7 +2913,7 @@ export class Game extends Scene {
 						point.x,
 						point.y
 					);
-					this.enemyManager.enemies.add(monster);
+					this.addEnemyToEnemyManager(monster, point);
 					break;
 				}
 				case "SkyBlobSpitter": {
@@ -2912,7 +2927,7 @@ export class Game extends Scene {
 						this.markBossDefeated("SkyBlobSpitter");
 						this.showAllHiddenItemsInRoom();
 					});
-					this.enemyManager.enemies.add(monster);
+					this.addEnemyToEnemyManager(monster, point);
 					break;
 				}
 				case "PlantSpitter": {
@@ -2922,7 +2937,7 @@ export class Game extends Scene {
 						point.x,
 						point.y
 					);
-					this.enemyManager.enemies.add(monster);
+					this.addEnemyToEnemyManager(monster, point);
 					break;
 				}
 				case "FireGiant": {
@@ -2936,7 +2951,7 @@ export class Game extends Scene {
 						this.markBossDefeated("FireGiant");
 						this.showAllHiddenItemsInRoom();
 					});
-					this.enemyManager.enemies.add(monster);
+					this.addEnemyToEnemyManager(monster, point);
 					break;
 				}
 				case "FireMonster": {
@@ -2946,7 +2961,7 @@ export class Game extends Scene {
 						point.x,
 						point.y
 					);
-					this.enemyManager.enemies.add(monster);
+					this.addEnemyToEnemyManager(monster, point);
 					break;
 				}
 				case "MountainBoss": {
@@ -2961,7 +2976,7 @@ export class Game extends Scene {
 						this.showAllHiddenItemsInRoom();
 						this.saveGame();
 					});
-					this.enemyManager.enemies.add(boss);
+					this.addEnemyToEnemyManager(boss, point);
 					break;
 				}
 				case "IceBoss": {
@@ -2971,7 +2986,7 @@ export class Game extends Scene {
 						this.showAllHiddenItemsInRoom();
 						this.saveGame();
 					});
-					this.enemyManager.enemies.add(boss);
+					this.addEnemyToEnemyManager(boss, point);
 					break;
 				}
 				case "CloudBoss": {
@@ -2981,7 +2996,7 @@ export class Game extends Scene {
 						this.showAllHiddenItemsInRoom();
 						this.saveGame();
 					});
-					this.enemyManager.enemies.add(boss);
+					this.addEnemyToEnemyManager(boss, point);
 					break;
 				}
 				case "SpiritBoss": {
@@ -2996,7 +3011,7 @@ export class Game extends Scene {
 						this.showAllHiddenItemsInRoom();
 						this.saveGame();
 					});
-					this.enemyManager.enemies.add(boss);
+					this.addEnemyToEnemyManager(boss, point);
 					break;
 				}
 				case "PlantBoss": {
@@ -3006,7 +3021,7 @@ export class Game extends Scene {
 						this.showAllHiddenItemsInRoom();
 						this.saveGame();
 					});
-					this.enemyManager.enemies.add(boss);
+					this.addEnemyToEnemyManager(boss, point);
 					break;
 				}
 				case "FireBoss": {
@@ -3016,12 +3031,12 @@ export class Game extends Scene {
 						this.showAllHiddenItemsInRoom();
 						this.saveGame();
 					});
-					this.enemyManager.enemies.add(boss);
+					this.addEnemyToEnemyManager(boss, point);
 					break;
 				}
 				case "FinalBoss": {
 					const boss = new FinalBoss(this, this.enemyManager, point.x, point.y);
-					this.enemyManager.enemies.add(boss);
+					this.addEnemyToEnemyManager(boss, point);
 					boss.once(Events.MonsterDefeated, () => {
 						this.showAllHiddenItemsInRoom();
 					});

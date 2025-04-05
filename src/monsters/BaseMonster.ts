@@ -24,6 +24,7 @@ export class BaseMonster<AllStates extends string> extends Phaser.Physics.Arcade
 	isDying = false;
 	isStunned = false;
 
+	mapSpawnPointId: number;
 	hitPoints: number = 1;
 	primaryColor: number = 0xc7a486;
 	isBoss: boolean = false;

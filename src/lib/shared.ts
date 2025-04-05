@@ -501,7 +501,8 @@ export function hideAllRoomsExcept(
 	map: Phaser.Tilemaps.Tilemap,
 	enemies: Phaser.Physics.Arcade.Group,
 	items: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody[],
-	activeRoom: Phaser.Types.Tilemaps.TiledObject
+	activeRoom: Phaser.Types.Tilemaps.TiledObject,
+	spawnPoints: Phaser.Types.Tilemaps.TiledObject[]
 ) {
 	const rooms = getRooms(map);
 	rooms.forEach((room) => {
@@ -510,10 +511,6 @@ export function hideAllRoomsExcept(
 			// show room
 			tiles.forEach((tile) => {
 				tile.visible = true;
-			});
-			getEnemiesInRoom(enemies, room).forEach((enemy) => {
-				enemy.setActive(true);
-				enemy.setVisible(true);
 			});
 			getItemsInRoom(items, room).forEach((item) => {
 				if (!item.data.get("hidden")) {
@@ -526,8 +523,27 @@ export function hideAllRoomsExcept(
 				tile.visible = false;
 			});
 			getEnemiesInRoom(enemies, room).forEach((enemy) => {
-				enemy.setActive(false);
-				enemy.setVisible(false);
+				// Restore each surviving enemy to spawnPoints in main scene so it can
+				// be respawned when that room is entered again, then destroy it.
+				const newSpawnPoint = map.findObject("Creatures", (point) => {
+					if (!hasXandY(point)) {
+						return false;
+					}
+					if (!("id" in point)) {
+						return false;
+					}
+					if (!("mapSpawnPointId" in enemy)) {
+						return false;
+					}
+					return point.id === enemy.mapSpawnPointId;
+				});
+				if (
+					newSpawnPoint &&
+					!spawnPoints.some((x) => x.id === newSpawnPoint.id)
+				) {
+					spawnPoints.push(newSpawnPoint);
+				}
+				enemy.destroy(true);
 			});
 			getItemsInRoom(items, room).forEach((item) => {
 				item.visible = false;
