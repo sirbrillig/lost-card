@@ -9096,24 +9096,6 @@
   <object id="1071" name="Spike" x="1242.59" y="2566.87">
    <point/>
   </object>
-  <object id="1083" name="Spike" x="1319.52" y="2700.12">
-   <point/>
-  </object>
-  <object id="1084" name="Spike" x="1255.29" y="2747.99">
-   <point/>
-  </object>
-  <object id="1085" name="Spike" x="1201.97" y="2724.96">
-   <point/>
-  </object>
-  <object id="1086" name="Spike" x="1381.32" y="2742.53">
-   <point/>
-  </object>
-  <object id="1087" name="Spike" x="1165.01" y="2698.3">
-   <point/>
-  </object>
-  <object id="1088" name="Spike" x="1400.71" y="2681.94">
-   <point/>
-  </object>
   <object id="1072" name="Spike" x="955.384" y="2492">
    <point/>
   </object>
@@ -9148,9 +9130,6 @@
    <point/>
   </object>
   <object id="1080" name="Snakey" x="1199.71" y="2774.48">
-   <point/>
-  </object>
-  <object id="1081" name="Snakey" x="1315.44" y="2723.58">
    <point/>
   </object>
   <object id="1082" name="Snakey" x="1426.93" y="2711.46">

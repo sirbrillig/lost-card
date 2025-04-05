@@ -7123,78 +7123,6 @@
                 }, 
                 {
                  "height":0,
-                 "id":1083,
-                 "name":"Spike",
-                 "point":true,
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":0,
-                 "x":1319.51720794959,
-                 "y":2700.11827435773
-                }, 
-                {
-                 "height":0,
-                 "id":1084,
-                 "name":"Spike",
-                 "point":true,
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":0,
-                 "x":1255.29035385361,
-                 "y":2747.98545807077
-                }, 
-                {
-                 "height":0,
-                 "id":1085,
-                 "name":"Spike",
-                 "point":true,
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":0,
-                 "x":1201.96994667959,
-                 "y":2724.96073679108
-                }, 
-                {
-                 "height":0,
-                 "id":1086,
-                 "name":"Spike",
-                 "point":true,
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":0,
-                 "x":1381.32040717402,
-                 "y":2742.53223460979
-                }, 
-                {
-                 "height":0,
-                 "id":1087,
-                 "name":"Spike",
-                 "point":true,
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":0,
-                 "x":1165.00920988851,
-                 "y":2698.30053320407
-                }, 
-                {
-                 "height":0,
-                 "id":1088,
-                 "name":"Spike",
-                 "point":true,
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":0,
-                 "x":1400.70964614639,
-                 "y":2681.94086282113
-                }, 
-                {
-                 "height":0,
                  "id":1072,
                  "name":"Spike",
                  "point":true,
@@ -7286,8 +7214,8 @@
                  "type":"",
                  "visible":true,
                  "width":0,
-                 "x":1146.99647115851,
-                 "y":2637.54162384876
+                 "x":1147,
+                 "y":2637.54
                 }, 
                 {
                  "height":0,
@@ -7298,8 +7226,8 @@
                  "type":"",
                  "visible":true,
                  "width":0,
-                 "x":1343.91842947164,
-                 "y":2642.99484730974
+                 "x":1343.92,
+                 "y":2642.99
                 }, 
                 {
                  "height":0,
@@ -7310,8 +7238,8 @@
                  "type":"",
                  "visible":true,
                  "width":0,
-                 "x":1306.35177896268,
-                 "y":2659.35451769268
+                 "x":1306.35,
+                 "y":2659.35
                 }, 
                 {
                  "height":0,
@@ -7322,8 +7250,8 @@
                  "type":"",
                  "visible":true,
                  "width":0,
-                 "x":1325.13510421716,
-                 "y":2773.26629665536
+                 "x":1325.14,
+                 "y":2773.27
                 }, 
                 {
                  "height":0,
@@ -7334,20 +7262,8 @@
                  "type":"",
                  "visible":true,
                  "width":0,
-                 "x":1199.71096461464,
-                 "y":2774.47812409113
-                }, 
-                {
-                 "height":0,
-                 "id":1081,
-                 "name":"Snakey",
-                 "point":true,
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":0,
-                 "x":1315.44048473097,
-                 "y":2723.58137178866
+                 "x":1199.71,
+                 "y":2774.48
                 }, 
                 {
                  "height":0,
@@ -7358,8 +7274,8 @@
                  "type":"",
                  "visible":true,
                  "width":0,
-                 "x":1426.9286088221,
-                 "y":2711.46309743093
+                 "x":1426.93,
+                 "y":2711.46
                 }],
          "opacity":1,
          "type":"objectgroup",
