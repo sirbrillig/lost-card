@@ -317,15 +317,33 @@ export class Game extends Scene {
 		);
 		this.aboveLayer = this.createTileLayer("Above", tilesetTile, 10);
 		this.stuffLayer = this.createTileLayer("Stuff", tilesetTile, 0);
-		this.physics.add.collider(this.stuffLayer, this.player, undefined, () => {
-			if (this.isPlayerUsingPower() && this.getActivePower() === "SpiritCard") {
-				return false;
+		this.physics.add.collider(
+			this.stuffLayer,
+			this.player,
+			undefined,
+			(_, tile) => {
+				if (
+					isTileWithPropertiesObject(tile) &&
+					tile.properties.oneway !== undefined
+				) {
+					if (this.playerDirection === tile.properties.oneway) {
+						// TODO: animate somehow passing through one-way gate
+						return false;
+					}
+					return true;
+				}
+				if (
+					this.isPlayerUsingPower() &&
+					this.getActivePower() === "SpiritCard"
+				) {
+					return false;
+				}
+				if (this.player.data.get("isPlantCardGrappleActive")) {
+					return false;
+				}
+				return true;
 			}
-			if (this.player.data.get("isPlantCardGrappleActive")) {
-				return false;
-			}
-			return true;
-		});
+		);
 		this.physics.add.collider(
 			this.stuffLayer,
 			this.enemyManager.enemies,
