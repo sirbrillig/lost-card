@@ -1183,6 +1183,90 @@ export class IceAttack<AllStates extends string>
 	update(): void {}
 }
 
+export class StickyPoison<AllStates extends string>
+	implements Behavior<AllStates, Phaser.GameObjects.Sprite>
+{
+	#nextState: AllStates;
+	#poisonHitDelay = 2000;
+	#speed = 300;
+	#isStuck = false;
+	name: AllStates;
+
+	constructor(
+		name: AllStates,
+		nextState: AllStates,
+		options?: {
+			poisonHitDelay: number;
+		}
+	) {
+		this.name = name;
+		this.#nextState = nextState;
+		this.#poisonHitDelay = options?.poisonHitDelay
+			? options.poisonHitDelay
+			: this.#poisonHitDelay;
+	}
+
+	init(
+		sprite: Phaser.GameObjects.Sprite,
+		stateMachine: BehaviorMachineInterface<AllStates>,
+		enemyManager: EnemyManager
+	): void {
+		if (!sprite.body || !isDynamicSprite(sprite) || !enemyManager.player.body) {
+			throw new Error("Could not update monster");
+		}
+
+		this.#isStuck = true;
+
+		sprite.scene.time.addEvent({
+			repeat: 5,
+			delay: this.#poisonHitDelay,
+			callback: () => {
+				if (this.#isStuck) {
+					MainEvents.emit(Events.EnemyHitPlayer, true);
+					return;
+				}
+				stateMachine.popState();
+				stateMachine.pushState(this.#nextState);
+			},
+		});
+		sprite.once(Events.MonsterDying, () => {
+			this.#isStuck = false;
+		});
+		MainEvents.once(Events.LeavingRoom, () => {
+			this.#isStuck = false;
+		});
+	}
+
+	update(
+		sprite: Phaser.GameObjects.Sprite,
+		_stateMachine: BehaviorMachineInterface<AllStates>,
+		enemyManager: EnemyManager
+	): void {
+		if (!sprite.body || !isDynamicSprite(sprite) || !enemyManager.player.body) {
+			throw new Error("Could not update monster");
+		}
+
+		const distance = Phaser.Math.Distance.BetweenPoints(
+			sprite.body.center,
+			enemyManager.player.body.center
+		);
+
+		// If you reach the target, stop.
+		if (distance < 10) {
+			sprite.body.stop();
+			return;
+		}
+
+		if (this.#isStuck) {
+			sprite.scene.physics.moveToObject(
+				sprite,
+				enemyManager.player,
+				this.#speed
+			);
+		}
+	}
+}
+
 export class Poof<AllStates extends string>
 	implements Behavior<AllStates, Phaser.GameObjects.Sprite>
 {

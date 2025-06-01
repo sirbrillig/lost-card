@@ -13,6 +13,7 @@ import { SkyBlob } from "../monsters/SkyBlob";
 import { Slime } from "../monsters/Slime";
 import { Spike } from "../monsters/Spike";
 import { Flower } from "../monsters/Flower";
+import { PoisonShroom } from "../monsters/PoisonShroom";
 import { Snakey } from "../monsters/Snakey";
 import { PlantBug } from "../monsters/PlantBug";
 import { IceMonster } from "../monsters/IceMonster";
@@ -440,6 +441,9 @@ export class Game extends Scene {
 					return false;
 				}
 				if (enemy.data?.get(DataKeys.Stunned)) {
+					return false;
+				}
+				if (enemy.data?.get(DataKeys.IsHarmless)) {
 					return false;
 				}
 				return true;
@@ -2854,6 +2858,16 @@ export class Game extends Scene {
 				}
 				case "Flower": {
 					const monster = new Flower(this, this.enemyManager, point.x, point.y);
+					this.addEnemyToEnemyManager(monster, point);
+					break;
+				}
+				case "PoisonShroom": {
+					const monster = new PoisonShroom(
+						this,
+						this.enemyManager,
+						point.x,
+						point.y
+					);
 					this.addEnemyToEnemyManager(monster, point);
 					break;
 				}
