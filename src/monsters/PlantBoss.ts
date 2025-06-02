@@ -1,12 +1,20 @@
-import { DataKeys } from "../lib/shared";
+import {
+	DataKeys,
+	hasXandY,
+	hasWidthAndHeight,
+	doRectanglesOverlap,
+	getTilesInRoom,
+} from "../lib/shared";
 import { EnemyManager } from "../lib/EnemyManager";
 import {
 	WaitForActive,
 	Roar,
 	RandomlyWalk,
 	SeekingVine,
+	SpawnEnemies,
 	TeleportToPlatform,
 } from "../lib/behaviors";
+import { Flower } from "./Flower";
 import { BaseMonster } from "./BaseMonster";
 
 type AllStates =
@@ -16,12 +24,16 @@ type AllStates =
 	| "attack1"
 	| "attack2"
 	| "attack3"
+	| "summon"
 	| "teleport";
 
 export class PlantBoss extends BaseMonster<AllStates> {
 	hitPoints: number = 12;
 	isBoss = true;
 	primaryColor = 0x97a21a;
+	enemyManager: EnemyManager;
+	currentSide: "left" | "right" = "left";
+	monsters: Phaser.Physics.Arcade.Sprite[] = [];
 
 	constructor(
 		scene: Phaser.Scene,
@@ -30,6 +42,7 @@ export class PlantBoss extends BaseMonster<AllStates> {
 		y: number
 	) {
 		super(scene, enemyManager, x, y, "bosses1", 0);
+		this.enemyManager = enemyManager;
 
 		if (!this.body) {
 			throw new Error("Could not create monster");
@@ -96,6 +109,54 @@ export class PlantBoss extends BaseMonster<AllStates> {
 
 	constructNewBehaviorFor(state: AllStates) {
 		const vineSpeed = 50;
+		const createMonster = () => {
+			if (!this.body) {
+				throw new Error("monster is invalid");
+			}
+			const enemyArea = this.enemyManager.map.findObject(
+				"MetaObjects",
+				(obj) =>
+					obj.name ===
+					(this.currentSide === "left"
+						? "PlantBossRightSide"
+						: "PlantBossLeftSide")
+			);
+			if (!enemyArea || !this.enemyManager.activeRoom) {
+				throw new Error("cannot find summon area");
+			}
+			if (!hasXandY(enemyArea) || !hasWidthAndHeight(enemyArea)) {
+				throw new Error("cannot find summon area");
+			}
+			// Choose tile at random within area
+			const tiles = getTilesInRoom(
+				this.enemyManager.map,
+				this.enemyManager.activeRoom
+			).filter((tile) => {
+				if (
+					!doRectanglesOverlap(
+						{
+							x: tile.pixelX,
+							y: tile.pixelY,
+							width: tile.width,
+							height: tile.height,
+						},
+						enemyArea
+					)
+				) {
+					return false;
+				}
+				return true;
+			});
+			if (tiles.length < 1) {
+				throw new Error("No tiles in room to summon to");
+			}
+			const targetTile = tiles[Phaser.Math.Between(0, tiles.length - 1)];
+			const x = targetTile.pixelX + targetTile.width / 2;
+			const y = targetTile.pixelY + targetTile.height / 2;
+			const monster = new Flower(this.scene, this.enemyManager, x, y);
+			this.monsters.push(monster);
+			return monster;
+		};
 		switch (state) {
 			case "initial":
 				return new WaitForActive(state, "roar1");
@@ -114,7 +175,17 @@ export class PlantBoss extends BaseMonster<AllStates> {
 			case "attack3":
 				return new SeekingVine(state, "teleport", vineSpeed * 3, 2000);
 			case "teleport":
-				return new TeleportToPlatform(state, "walk", 2500);
+				this.monsters.forEach((monster) => monster.destroy());
+				this.currentSide = this.currentSide === "left" ? "right" : "left";
+				return new TeleportToPlatform(state, "summon", 4000);
+			case "summon":
+				return new SpawnEnemies(state, "walk", {
+					enemiesToSpawn: 5,
+					// We will handle the max ourselves so we set it really high (we
+					// could probably use spawnedEnemyCount directly instead).
+					maxSpawnedEnemies: 1000,
+					createMonster,
+				});
 		}
 	}
 

@@ -2664,9 +2664,9 @@
                  "rotation":0,
                  "type":"",
                  "visible":true,
-                 "width":14.8769494978196,
-                 "x":1665.27632418634,
-                 "y":2112.15954052329
+                 "width":14.8769,
+                 "x":1665.28,
+                 "y":2112.16
                 }, 
                 {
                  "gid":1662,
@@ -4427,6 +4427,28 @@
                  "width":143.35,
                  "x":1392.02,
                  "y":256.172
+                }, 
+                {
+                 "height":192,
+                 "id":1123,
+                 "name":"PlantBossLeftSide",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":128,
+                 "x":912,
+                 "y":2864
+                }, 
+                {
+                 "height":192,
+                 "id":1124,
+                 "name":"PlantBossRightSide",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":128,
+                 "x":1056,
+                 "y":2864
                 }],
          "opacity":1,
          "properties":[
@@ -7275,8 +7297,8 @@
                  "type":"",
                  "visible":true,
                  "width":0,
-                 "x":804.942418426104,
-                 "y":2524.59213051823
+                 "x":804.942,
+                 "y":2524.59
                 }, 
                 {
                  "height":0,
@@ -7299,8 +7321,8 @@
                  "type":"",
                  "visible":true,
                  "width":0,
-                 "x":1092.08814470316,
-                 "y":2770.6024197328
+                 "x":1092.09,
+                 "y":2770.6
                 }, 
                 {
                  "height":0,
@@ -7311,7 +7333,7 @@
                  "type":"",
                  "visible":true,
                  "width":0,
-                 "x":1028.942,
+                 "x":1028.94,
                  "y":2668.59
                 }, 
                 {
@@ -7323,8 +7345,8 @@
                  "type":"",
                  "visible":true,
                  "width":0,
-                 "x":1092.52320635267,
-                 "y":2640.38759296019
+                 "x":1092.52,
+                 "y":2640.39
                 }, 
                 {
                  "height":0,
@@ -7359,8 +7381,8 @@
                  "type":"",
                  "visible":true,
                  "width":0,
-                 "x":1017.50381469882,
-                 "y":2769.25545464092
+                 "x":1017.5,
+                 "y":2769.26
                 }, 
                 {
                  "height":0,
@@ -7371,8 +7393,8 @@
                  "type":"",
                  "visible":true,
                  "width":0,
-                 "x":1433.63489089541,
-                 "y":2520.46157261099
+                 "x":1433.63,
+                 "y":2520.46
                 }, 
                 {
                  "height":0,
@@ -7384,7 +7406,31 @@
                  "visible":true,
                  "width":0,
                  "x":1432.13,
-                 "y":2400.26894657637
+                 "y":2400.27
+                }, 
+                {
+                 "height":0,
+                 "id":1121,
+                 "name":"PoisonShroom",
+                 "point":true,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":1478.16748609349,
+                 "y":2826.30488923587
+                }, 
+                {
+                 "height":0,
+                 "id":1122,
+                 "name":"PoisonShroom",
+                 "point":true,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":1562.4333199961,
+                 "y":2842.79283692788
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -15149,7 +15195,7 @@
          "y":0
         }],
  "nextlayerid":20,
- "nextobjectid":1121,
+ "nextobjectid":1125,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.1",

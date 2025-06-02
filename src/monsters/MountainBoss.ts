@@ -31,6 +31,7 @@ export class MountainBoss extends BaseMonster<AllStates> {
 		y: number
 	) {
 		super(scene, enemyManager, x, y, "bosses1", 48);
+		this.enemyManager = enemyManager;
 
 		if (!this.body) {
 			throw new Error("Could not create monster");
