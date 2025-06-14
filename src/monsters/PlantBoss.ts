@@ -31,7 +31,7 @@ type AllStates =
 	| "teleport";
 
 export class PlantBoss extends BaseMonster<AllStates> {
-	hitPoints: number = 12;
+	hitPoints: number = 16;
 	isBoss = true;
 	primaryColor = 0x97a21a;
 	enemyManager: EnemyManager;
