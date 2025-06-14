@@ -7,6 +7,7 @@ import {
 } from "../lib/shared";
 import { EnemyManager } from "../lib/EnemyManager";
 import {
+	Poof,
 	WaitForActive,
 	Roar,
 	RandomlyWalk,
@@ -21,6 +22,7 @@ type AllStates =
 	| "initial"
 	| "roar1"
 	| "walk"
+	| "poof"
 	| "attack1"
 	| "attack2"
 	| "attack3"
@@ -108,7 +110,8 @@ export class PlantBoss extends BaseMonster<AllStates> {
 	}
 
 	constructNewBehaviorFor(state: AllStates) {
-		const vineSpeed = 50;
+		const vineSpeed = 90;
+		const previousMonsterPositions: Phaser.Tilemaps.Tile[] = [];
 		const createMonster = () => {
 			if (!this.body) {
 				throw new Error("monster is invalid");
@@ -150,7 +153,11 @@ export class PlantBoss extends BaseMonster<AllStates> {
 			if (tiles.length < 1) {
 				throw new Error("No tiles in room to summon to");
 			}
-			const targetTile = tiles[Phaser.Math.Between(0, tiles.length - 1)];
+			let targetTile: Phaser.Tilemaps.Tile;
+			do {
+				targetTile = tiles[Phaser.Math.Between(0, tiles.length - 1)];
+			} while (previousMonsterPositions.includes(targetTile));
+			previousMonsterPositions.push(targetTile);
 			const x = targetTile.pixelX + targetTile.width / 2;
 			const y = targetTile.pixelY + targetTile.height / 2;
 			const monster = new Flower(this.scene, this.enemyManager, x, y);
@@ -173,14 +180,17 @@ export class PlantBoss extends BaseMonster<AllStates> {
 			case "attack2":
 				return new SeekingVine(state, "attack3", vineSpeed, 900);
 			case "attack3":
-				return new SeekingVine(state, "teleport", vineSpeed * 3, 2000);
+				return new SeekingVine(state, "teleport", vineSpeed * 2, 1000);
 			case "teleport":
 				this.monsters.forEach((monster) => monster.destroy());
 				this.currentSide = this.currentSide === "left" ? "right" : "left";
-				return new TeleportToPlatform(state, "summon", 4000);
+				return new TeleportToPlatform(state, "poof", 2000);
+			case "poof":
+				return new Poof(state, "summon", { particleLifeSpan: 1500 });
 			case "summon":
+				previousMonsterPositions.length = 0;
 				return new SpawnEnemies(state, "walk", {
-					enemiesToSpawn: 5,
+					enemiesToSpawn: 6,
 					// We will handle the max ourselves so we set it really high (we
 					// could probably use spawnedEnemyCount directly instead).
 					maxSpawnedEnemies: 1000,

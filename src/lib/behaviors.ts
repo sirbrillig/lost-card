@@ -1272,18 +1272,22 @@ export class Poof<AllStates extends string>
 {
 	#nextState: AllStates;
 	#postAttackTime = 1000;
+	#particleLifeSpan = 800;
 	name: AllStates;
 
 	constructor(
 		name: AllStates,
 		nextState: AllStates,
 		options?: {
-			postAttackTime: number;
+			postAttackTime?: number;
+			particleLifeSpan?: number;
 		}
 	) {
 		this.name = name;
 		this.#nextState = nextState;
 		this.#postAttackTime = options?.postAttackTime ?? this.#postAttackTime;
+		this.#particleLifeSpan =
+			options?.particleLifeSpan ?? this.#particleLifeSpan;
 	}
 
 	init(
@@ -1319,7 +1323,7 @@ export class Poof<AllStates extends string>
 			"monsters2",
 			{
 				frame: [75, 76, 77],
-				lifespan: 800,
+				lifespan: this.#particleLifeSpan,
 				speed: { min: 15, max: 55 },
 				scale: { start: 1, end: 0.4 },
 				emitting: false,
