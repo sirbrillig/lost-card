@@ -2167,7 +2167,9 @@ export class Game extends Scene {
 	}
 
 	pickUpPotionVial() {
-		this.restorePlayerPotions();
+		this.setPotionCount(
+			Math.min(this.getPotionCount() + 1, this.getPotionTotalCount())
+		);
 		this.appearSound.play();
 	}
 
