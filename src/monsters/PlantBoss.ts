@@ -22,7 +22,8 @@ type AllStates =
 	| "initial"
 	| "roar1"
 	| "walk"
-	| "poof"
+	| "poof1"
+	| "poof2"
 	| "attack1"
 	| "attack2"
 	| "attack3"
@@ -184,8 +185,10 @@ export class PlantBoss extends BaseMonster<AllStates> {
 			case "teleport":
 				this.monsters.forEach((monster) => monster.destroy());
 				this.currentSide = this.currentSide === "left" ? "right" : "left";
-				return new TeleportToPlatform(state, "poof", 2000);
-			case "poof":
+				return new TeleportToPlatform(state, "poof1", 2000);
+			case "poof1":
+				return new Poof(state, "poof2", { particleLifeSpan: 1500 });
+			case "poof2":
 				return new Poof(state, "summon", { particleLifeSpan: 1500 });
 			case "summon":
 				previousMonsterPositions.length = 0;
