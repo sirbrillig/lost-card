@@ -2625,6 +2625,7 @@ export class Game extends Scene {
 			showOnStart: true,
 			hideOnComplete: true,
 			yoyo: true,
+			repeat: config.plantCardAnimationRepeat,
 		});
 		anims.create({
 			key: "ice-power-right",
@@ -3595,6 +3596,35 @@ export class Game extends Scene {
 		});
 	}
 
+	makePlantCardTrail(rad: number, flip: boolean): void {
+		const trailImages: Phaser.GameObjects.Image[] = [];
+		const addTrail = () => {
+			const trailImage = this.add.image(
+				this.power.x,
+				this.power.y,
+				"plant-power"
+			);
+			trailImage.setRotation(rad);
+			trailImages.push(trailImage);
+			this.power.setFlipX(flip);
+		};
+		addTrail();
+		const trailCreator = this.time.addEvent({
+			delay: config.plantCardTrailAddDelay,
+			callback: () => {
+				addTrail();
+			},
+			loop: true,
+		});
+		this.time.addEvent({
+			delay: config.plantCardTrailTime,
+			callback: () => {
+				trailCreator.destroy();
+				trailImages.map((image) => image.destroy());
+			},
+		});
+	}
+
 	playPowerAnimation(): void {
 		this.lastPowerAt = this.time.now;
 		this.power.setVelocity(0);
@@ -3605,6 +3635,7 @@ export class Game extends Scene {
 				switch (this.getActivePower()) {
 					case "PlantCard":
 						this.power.setRotation(Phaser.Math.DegToRad(90));
+						this.makePlantCardTrail(Phaser.Math.DegToRad(90), true);
 						this.power.setVelocity(0, -config.plantCardVelocity);
 						this.power.anims.play("plant-power-right", true);
 						this.power.setFlipX(true);
@@ -3639,6 +3670,7 @@ export class Game extends Scene {
 				this.power.setRotation(Phaser.Math.DegToRad(0));
 				switch (this.getActivePower()) {
 					case "PlantCard":
+						this.makePlantCardTrail(Phaser.Math.DegToRad(0), false);
 						this.power.setVelocity(config.plantCardVelocity, 0);
 						this.power.anims.play("plant-power-right", true);
 						break;
@@ -3668,6 +3700,7 @@ export class Game extends Scene {
 				switch (this.getActivePower()) {
 					case "PlantCard":
 						this.power.setRotation(Phaser.Math.DegToRad(90));
+						this.makePlantCardTrail(Phaser.Math.DegToRad(90), false);
 						this.power.setVelocity(0, config.plantCardVelocity);
 						this.power.anims.play("plant-power-right", true);
 						break;
@@ -3699,6 +3732,7 @@ export class Game extends Scene {
 				this.power.setRotation(Phaser.Math.DegToRad(0));
 				switch (this.getActivePower()) {
 					case "PlantCard":
+						this.makePlantCardTrail(Phaser.Math.DegToRad(0), true);
 						this.power.setVelocity(-config.plantCardVelocity, 0);
 						this.power.anims.play("plant-power-right", true);
 						this.power.setFlipX(true);
