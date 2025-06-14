@@ -139,14 +139,6 @@ export class Roar<AllStates extends string>
 			emitter.destroy();
 		});
 
-		sprite.scene.anims.create({
-			key: "orange_boom",
-			frames: sprite.anims.generateFrameNumbers("orange_boom"),
-			frameRate: 24,
-			repeat: -1,
-			showOnStart: true,
-			hideOnComplete: true,
-		});
 		const effect = sprite.scene.add.sprite(
 			sprite.body.center.x,
 			sprite.body.center.y,
