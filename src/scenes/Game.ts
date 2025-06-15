@@ -1520,9 +1520,39 @@ export class Game extends Scene {
 
 		// The plant card moves you next to the target, over any land obstacle
 		this.player.data.set("isPlantCardGrappleActive", true);
-		this.physics.moveToObject(this.player, tile, config.plantCardVelocity);
 		this.power.anims.pause();
 		this.power.body.stop();
+		this.movePlayerTowardTileWithPlantCard(tile.body.center);
+	}
+
+	movePlayerTowardTileWithPlantCard(tile: { x: number; y: number }): void {
+		const velocity = createVelocityForDirection(
+			config.plantCardVelocity,
+			this.playerDirection
+		);
+		this.player.body.setVelocity(velocity.x, velocity.y);
+		let lastDistance = Phaser.Math.Distance.BetweenPoints(
+			tile,
+			this.player.body.center
+		);
+		const stopEvent = this.time.addEvent({
+			delay: 50,
+			callback: () => {
+				const distance = Phaser.Math.Distance.BetweenPoints(
+					tile,
+					this.player.body.center
+				);
+				if (distance < 20 || distance > lastDistance) {
+					this.player.body.stop();
+					this.player.data.set("isPlantCardGrappleActive", false);
+					this.power.anims.stop();
+					this.power.visible = false;
+					stopEvent?.destroy();
+				}
+				lastDistance = distance;
+			},
+			repeat: -1,
+		});
 	}
 
 	checkForWindCardHitTile(
