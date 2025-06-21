@@ -599,31 +599,41 @@ export function getRegionFromRoomName(name: string): Region {
 
 export function getDoorDestinationCoordinates(
 	destinationTile: Phaser.Types.Tilemaps.TiledObject,
+	/**
+	 * The direction of the target door's *entrance*, so you will come out in the
+	 * opposite direction of this.
+	 */
 	destinationDirection: SpriteDirection
 ): [number, number] {
 	if (destinationTile.x == undefined || destinationTile.y === undefined) {
 		throw new Error("Destination tile has no position");
 	}
+	if (
+		destinationTile.width == undefined ||
+		destinationTile.height === undefined
+	) {
+		throw new Error("Destination tile has no size");
+	}
 	// If the player enters a door, teleport them just past the corresponding
-	// door. That way they won't trigger the door on the other side and end up
-	// in a loop.
+	// door in the opposite direction of the target door. That way they won't
+	// trigger the door on the other side and end up in a loop.
 	const destinationX = (() => {
 		if (destinationDirection === SpriteLeft) {
-			return destinationTile.x - 24;
+			return destinationTile.x + destinationTile.width / 2;
 		}
 		if (destinationDirection === SpriteRight) {
-			return destinationTile.x + 24;
+			return destinationTile.x - destinationTile.width / 2;
 		}
 		return destinationTile.x;
 	})();
 	const destinationY = (() => {
 		if (destinationDirection === SpriteUp) {
-			return destinationTile.y - 34;
+			return destinationTile.y;
 		}
 		if (destinationDirection === SpriteDown) {
-			return destinationTile.y + 10;
+			return destinationTile.y - destinationTile.height / 2;
 		}
-		return destinationTile.y - 12;
+		return destinationTile.y - 4 - destinationTile.height / 2;
 	})();
 	return [destinationX, destinationY];
 }

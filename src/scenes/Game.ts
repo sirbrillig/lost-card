@@ -1084,6 +1084,7 @@ export class Game extends Scene {
 	createDoors() {
 		this.createdDoors = createSpritesFromObjectLayer(this.map, "Doors", {
 			getTilesetKeyByName: this.getTilesetKeyByName.bind(this),
+			callback: this.recordObjectIdOnSprite.bind(this),
 		}).map((item) => {
 			item.body.pushable = false;
 			item.body.setSize(item.body.width + 1, item.body.height + 1);
@@ -1301,12 +1302,12 @@ export class Game extends Scene {
 			throw new Error("Hit door without destination id");
 		}
 
-		const destinationDirection = door.data.get("doordirection");
-		if (destinationDirection === undefined) {
+		const doorDirection = door.data.get("doordirection");
+		if (doorDirection === undefined) {
 			throw new Error("Door has no destination direction");
 		}
 
-		if (this.playerDirection !== destinationDirection) {
+		if (this.playerDirection !== doorDirection) {
 			return;
 		}
 
@@ -1316,6 +1317,13 @@ export class Game extends Scene {
 		);
 		if (!destinationTile) {
 			throw new Error("Hit door without destination tile");
+		}
+		const destinationDoor = this.createdDoors.find((door) => {
+			return destinationTile.id === door.data.get(DataKeys.ItemObjectId);
+		});
+		const destinationDirection = destinationDoor?.data.get("doordirection");
+		if (destinationDirection === undefined) {
+			throw new Error("Hit door without destination direction");
 		}
 
 		// if the player enters a door, teleport them just past the corresponding door
