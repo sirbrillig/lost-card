@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.1" orientation="orthogonal" renderorder="right-down" width="200" height="200" tilewidth="16" tileheight="16" infinite="0" nextlayerid="20" nextobjectid="1141">
+<map version="1.10" tiledversion="1.11.1" orientation="orthogonal" renderorder="right-down" width="200" height="200" tilewidth="16" tileheight="16" infinite="0" nextlayerid="20" nextobjectid="1151">
  <editorsettings>
   <export target="public/assets/lost-card-map.json" format="json"/>
  </editorsettings>
@@ -962,6 +962,7 @@
   <tile id="190">
    <properties>
     <property name="collides" type="bool" value="true"/>
+    <property name="deadly" type="bool" value="false"/>
    </properties>
   </tile>
   <tile id="191">
@@ -1802,6 +1803,7 @@
   <tile id="358">
    <properties>
     <property name="collides" type="bool" value="true"/>
+    <property name="deadly" type="bool" value="false"/>
    </properties>
   </tile>
   <tile id="359">
@@ -8897,9 +8899,6 @@
   <object id="597" name="PlantSpitter" x="1010.28" y="1951.19">
    <point/>
   </object>
-  <object id="599" name="PlantBug" x="1399.11" y="2096.9">
-   <point/>
-  </object>
   <object id="601" name="PlantBug" x="1095.82" y="2115.89">
    <point/>
   </object>
@@ -9581,14 +9580,23 @@
   <object id="357" gid="2301" x="1744.92" y="2367.78" width="16" height="16"/>
   <object id="358" gid="2301" x="1789.6" y="2306.41" width="16" height="16"/>
   <object id="411" gid="2301" x="1424" y="2240" width="16" height="16"/>
+  <object id="1148" gid="2301" x="1408" y="2208" width="16" height="16"/>
   <object id="412" gid="2301" x="1488" y="2288" width="16" height="16"/>
-  <object id="413" gid="2301" x="1343.59" y="2240.83" width="16" height="16"/>
-  <object id="414" gid="2301" x="1393.08" y="2287.32" width="16" height="16"/>
+  <object id="413" gid="2301" x="1360" y="2224" width="16" height="16"/>
+  <object id="1147" gid="2301" x="1312" y="2192" width="16" height="16"/>
+  <object id="414" gid="2301" x="1440" y="2320" width="16" height="16"/>
+  <object id="1149" gid="2301" x="1392" y="2304" width="16" height="16"/>
   <object id="415" gid="2301" x="1263.62" y="2239.83" width="16" height="16"/>
-  <object id="416" gid="2301" x="1327.6" y="2288.82" width="16" height="16"/>
-  <object id="417" gid="2301" x="1166.15" y="2239.83" width="16" height="16"/>
-  <object id="418" gid="2301" x="1232.13" y="2304.31" width="16" height="16"/>
+  <object id="1144" gid="2301" x="1232" y="2208" width="16" height="16"/>
+  <object id="1145" gid="2301" x="1216" y="2320" width="16" height="16"/>
+  <object id="416" gid="2301" x="1344" y="2304" width="16" height="16"/>
+  <object id="1146" gid="2301" x="1328" y="2304" width="16" height="16"/>
+  <object id="417" gid="2301" x="1168" y="2320" width="16" height="16"/>
+  <object id="418" gid="2301" x="1280" y="2320" width="16" height="16"/>
   <object id="419" gid="2301" x="1007.7" y="2240.83" width="16" height="16"/>
+  <object id="1141" gid="2301" x="1056" y="2224" width="16" height="16"/>
+  <object id="1142" gid="2301" x="1152" y="2240" width="16" height="16"/>
+  <object id="1143" gid="2301" x="1136" y="2192" width="16" height="16"/>
   <object id="420" gid="2301" x="1071.18" y="2320.81" width="16" height="16"/>
   <object id="470" gid="2176" x="2848" y="2384" width="16" height="16"/>
   <object id="471" gid="2176" x="2944" y="2384" width="16" height="16"/>
@@ -9647,6 +9655,7 @@
   <object id="1137" gid="2301" x="1408" y="2064" width="16" height="16"/>
   <object id="1138" gid="2301" x="1488" y="2080" width="16" height="16"/>
   <object id="699" gid="2301" x="1184.63" y="2094.89" width="16" height="16"/>
+  <object id="1150" gid="2301" x="1056" y="2128" width="16" height="16"/>
   <object id="701" gid="2301" x="976.978" y="1968.8" width="16" height="16"/>
   <object id="709" gid="2301" x="1006.88" y="2882.69" width="16" height="16"/>
   <object id="710" gid="2301" x="1003.89" y="3071.51" width="16" height="16"/>

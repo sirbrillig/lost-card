@@ -6337,18 +6337,6 @@
                 }, 
                 {
                  "height":0,
-                 "id":599,
-                 "name":"PlantBug",
-                 "point":true,
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":0,
-                 "x":1399.11,
-                 "y":2096.9
-                }, 
-                {
-                 "height":0,
                  "id":601,
                  "name":"PlantBug",
                  "point":true,
@@ -11439,6 +11427,39 @@
                 {
                  "gid":2301,
                  "height":16,
+                 "id":1148,
+                 "name":"",
+                 "properties":[
+                        {
+                         "name":"affectedByPlantCard",
+                         "type":"bool",
+                         "value":true
+                        }, 
+                        {
+                         "name":"affectedByWindCard",
+                         "type":"bool",
+                         "value":false
+                        }, 
+                        {
+                         "name":"msAfterApproach",
+                         "type":"int",
+                         "value":1
+                        }, 
+                        {
+                         "name":"previewBeforeAppear",
+                         "type":"int",
+                         "value":0
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":16,
+                 "x":1408,
+                 "y":2208
+                }, 
+                {
+                 "gid":2301,
+                 "height":16,
                  "id":412,
                  "name":"",
                  "properties":[
@@ -11499,8 +11520,41 @@
                  "type":"",
                  "visible":true,
                  "width":16,
-                 "x":1343.59,
-                 "y":2240.83
+                 "x":1360,
+                 "y":2224
+                }, 
+                {
+                 "gid":2301,
+                 "height":16,
+                 "id":1147,
+                 "name":"",
+                 "properties":[
+                        {
+                         "name":"affectedByPlantCard",
+                         "type":"bool",
+                         "value":true
+                        }, 
+                        {
+                         "name":"affectedByWindCard",
+                         "type":"bool",
+                         "value":false
+                        }, 
+                        {
+                         "name":"msAfterApproach",
+                         "type":"int",
+                         "value":1
+                        }, 
+                        {
+                         "name":"previewBeforeAppear",
+                         "type":"int",
+                         "value":0
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":16,
+                 "x":1312,
+                 "y":2192
                 }, 
                 {
                  "gid":2301,
@@ -11532,8 +11586,41 @@
                  "type":"",
                  "visible":true,
                  "width":16,
-                 "x":1393.08,
-                 "y":2287.32
+                 "x":1440,
+                 "y":2320
+                }, 
+                {
+                 "gid":2301,
+                 "height":16,
+                 "id":1149,
+                 "name":"",
+                 "properties":[
+                        {
+                         "name":"affectedByPlantCard",
+                         "type":"bool",
+                         "value":true
+                        }, 
+                        {
+                         "name":"affectedByWindCard",
+                         "type":"bool",
+                         "value":false
+                        }, 
+                        {
+                         "name":"msAfterApproach",
+                         "type":"int",
+                         "value":1
+                        }, 
+                        {
+                         "name":"previewBeforeAppear",
+                         "type":"int",
+                         "value":0
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":16,
+                 "x":1392,
+                 "y":2304
                 }, 
                 {
                  "gid":2301,
@@ -11571,6 +11658,72 @@
                 {
                  "gid":2301,
                  "height":16,
+                 "id":1144,
+                 "name":"",
+                 "properties":[
+                        {
+                         "name":"affectedByPlantCard",
+                         "type":"bool",
+                         "value":true
+                        }, 
+                        {
+                         "name":"affectedByWindCard",
+                         "type":"bool",
+                         "value":false
+                        }, 
+                        {
+                         "name":"msAfterApproach",
+                         "type":"int",
+                         "value":1
+                        }, 
+                        {
+                         "name":"previewBeforeAppear",
+                         "type":"int",
+                         "value":0
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":16,
+                 "x":1232,
+                 "y":2208
+                }, 
+                {
+                 "gid":2301,
+                 "height":16,
+                 "id":1145,
+                 "name":"",
+                 "properties":[
+                        {
+                         "name":"affectedByPlantCard",
+                         "type":"bool",
+                         "value":true
+                        }, 
+                        {
+                         "name":"affectedByWindCard",
+                         "type":"bool",
+                         "value":false
+                        }, 
+                        {
+                         "name":"msAfterApproach",
+                         "type":"int",
+                         "value":1
+                        }, 
+                        {
+                         "name":"previewBeforeAppear",
+                         "type":"int",
+                         "value":0
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":16,
+                 "x":1216,
+                 "y":2320
+                }, 
+                {
+                 "gid":2301,
+                 "height":16,
                  "id":416,
                  "name":"",
                  "properties":[
@@ -11598,8 +11751,41 @@
                  "type":"",
                  "visible":true,
                  "width":16,
-                 "x":1327.6,
-                 "y":2288.82
+                 "x":1344,
+                 "y":2304
+                }, 
+                {
+                 "gid":2301,
+                 "height":16,
+                 "id":1146,
+                 "name":"",
+                 "properties":[
+                        {
+                         "name":"affectedByPlantCard",
+                         "type":"bool",
+                         "value":true
+                        }, 
+                        {
+                         "name":"affectedByWindCard",
+                         "type":"bool",
+                         "value":false
+                        }, 
+                        {
+                         "name":"msAfterApproach",
+                         "type":"int",
+                         "value":1
+                        }, 
+                        {
+                         "name":"previewBeforeAppear",
+                         "type":"int",
+                         "value":0
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":16,
+                 "x":1328,
+                 "y":2304
                 }, 
                 {
                  "gid":2301,
@@ -11631,8 +11817,8 @@
                  "type":"",
                  "visible":true,
                  "width":16,
-                 "x":1166.15,
-                 "y":2239.83
+                 "x":1168,
+                 "y":2320
                 }, 
                 {
                  "gid":2301,
@@ -11664,8 +11850,8 @@
                  "type":"",
                  "visible":true,
                  "width":16,
-                 "x":1232.13,
-                 "y":2304.31
+                 "x":1280,
+                 "y":2320
                 }, 
                 {
                  "gid":2301,
@@ -11699,6 +11885,105 @@
                  "width":16,
                  "x":1007.7,
                  "y":2240.83
+                }, 
+                {
+                 "gid":2301,
+                 "height":16,
+                 "id":1141,
+                 "name":"",
+                 "properties":[
+                        {
+                         "name":"affectedByPlantCard",
+                         "type":"bool",
+                         "value":true
+                        }, 
+                        {
+                         "name":"affectedByWindCard",
+                         "type":"bool",
+                         "value":false
+                        }, 
+                        {
+                         "name":"msAfterApproach",
+                         "type":"int",
+                         "value":1
+                        }, 
+                        {
+                         "name":"previewBeforeAppear",
+                         "type":"int",
+                         "value":0
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":16,
+                 "x":1056,
+                 "y":2224
+                }, 
+                {
+                 "gid":2301,
+                 "height":16,
+                 "id":1142,
+                 "name":"",
+                 "properties":[
+                        {
+                         "name":"affectedByPlantCard",
+                         "type":"bool",
+                         "value":true
+                        }, 
+                        {
+                         "name":"affectedByWindCard",
+                         "type":"bool",
+                         "value":false
+                        }, 
+                        {
+                         "name":"msAfterApproach",
+                         "type":"int",
+                         "value":1
+                        }, 
+                        {
+                         "name":"previewBeforeAppear",
+                         "type":"int",
+                         "value":0
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":16,
+                 "x":1152,
+                 "y":2240
+                }, 
+                {
+                 "gid":2301,
+                 "height":16,
+                 "id":1143,
+                 "name":"",
+                 "properties":[
+                        {
+                         "name":"affectedByPlantCard",
+                         "type":"bool",
+                         "value":true
+                        }, 
+                        {
+                         "name":"affectedByWindCard",
+                         "type":"bool",
+                         "value":false
+                        }, 
+                        {
+                         "name":"msAfterApproach",
+                         "type":"int",
+                         "value":1
+                        }, 
+                        {
+                         "name":"previewBeforeAppear",
+                         "type":"int",
+                         "value":0
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":16,
+                 "x":1136,
+                 "y":2192
                 }, 
                 {
                  "gid":2301,
@@ -13194,6 +13479,39 @@
                 {
                  "gid":2301,
                  "height":16,
+                 "id":1150,
+                 "name":"",
+                 "properties":[
+                        {
+                         "name":"affectedByPlantCard",
+                         "type":"bool",
+                         "value":true
+                        }, 
+                        {
+                         "name":"affectedByWindCard",
+                         "type":"bool",
+                         "value":false
+                        }, 
+                        {
+                         "name":"msAfterApproach",
+                         "type":"int",
+                         "value":1
+                        }, 
+                        {
+                         "name":"previewBeforeAppear",
+                         "type":"int",
+                         "value":0
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":16,
+                 "x":1056,
+                 "y":2128
+                }, 
+                {
+                 "gid":2301,
+                 "height":16,
                  "id":701,
                  "name":"",
                  "properties":[
@@ -13738,7 +14056,8 @@
                  "width":17,
                  "x":1853.02,
                  "y":980.517
-                }, 
+                },
+            
                 {
                  "gid":2944,
                  "height":21,
@@ -13858,8 +14177,7 @@
                  "width":17,
                  "x":1832.11,
                  "y":1002.2
-                },
-            
+                }, 
                 {
                  "gid":2999,
                  "height":21,
@@ -15427,7 +15745,7 @@
          "y":0
         }],
  "nextlayerid":20,
- "nextobjectid":1141,
+ "nextobjectid":1151,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.1",
@@ -17182,6 +17500,11 @@
                          "name":"collides",
                          "type":"bool",
                          "value":true
+                        }, 
+                        {
+                         "name":"deadly",
+                         "type":"bool",
+                         "value":false
                         }]
                 }, 
                 {
@@ -18695,6 +19018,11 @@
                          "name":"collides",
                          "type":"bool",
                          "value":true
+                        }, 
+                        {
+                         "name":"deadly",
+                         "type":"bool",
+                         "value":false
                         }]
                 }, 
                 {
