@@ -11460,39 +11460,6 @@
                 {
                  "gid":2301,
                  "height":16,
-                 "id":412,
-                 "name":"",
-                 "properties":[
-                        {
-                         "name":"affectedByPlantCard",
-                         "type":"bool",
-                         "value":true
-                        }, 
-                        {
-                         "name":"affectedByWindCard",
-                         "type":"bool",
-                         "value":false
-                        }, 
-                        {
-                         "name":"msAfterApproach",
-                         "type":"int",
-                         "value":1
-                        }, 
-                        {
-                         "name":"previewBeforeAppear",
-                         "type":"int",
-                         "value":0
-                        }],
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":16,
-                 "x":1488,
-                 "y":2288
-                }, 
-                {
-                 "gid":2301,
-                 "height":16,
                  "id":413,
                  "name":"",
                  "properties":[
@@ -11520,7 +11487,7 @@
                  "type":"",
                  "visible":true,
                  "width":16,
-                 "x":1360,
+                 "x":1344,
                  "y":2224
                 }, 
                 {
@@ -11620,7 +11587,7 @@
                  "visible":true,
                  "width":16,
                  "x":1392,
-                 "y":2304
+                 "y":2288
                 }, 
                 {
                  "gid":2301,
@@ -11719,7 +11686,7 @@
                  "visible":true,
                  "width":16,
                  "x":1216,
-                 "y":2320
+                 "y":2304
                 }, 
                 {
                  "gid":2301,
@@ -11751,8 +11718,8 @@
                  "type":"",
                  "visible":true,
                  "width":16,
-                 "x":1344,
-                 "y":2304
+                 "x":1360,
+                 "y":2256
                 }, 
                 {
                  "gid":2301,
@@ -11786,39 +11753,6 @@
                  "width":16,
                  "x":1328,
                  "y":2304
-                }, 
-                {
-                 "gid":2301,
-                 "height":16,
-                 "id":417,
-                 "name":"",
-                 "properties":[
-                        {
-                         "name":"affectedByPlantCard",
-                         "type":"bool",
-                         "value":true
-                        }, 
-                        {
-                         "name":"affectedByWindCard",
-                         "type":"bool",
-                         "value":false
-                        }, 
-                        {
-                         "name":"msAfterApproach",
-                         "type":"int",
-                         "value":1
-                        }, 
-                        {
-                         "name":"previewBeforeAppear",
-                         "type":"int",
-                         "value":0
-                        }],
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":16,
-                 "x":1168,
-                 "y":2320
                 }, 
                 {
                  "gid":2301,
@@ -11889,39 +11823,6 @@
                 {
                  "gid":2301,
                  "height":16,
-                 "id":1141,
-                 "name":"",
-                 "properties":[
-                        {
-                         "name":"affectedByPlantCard",
-                         "type":"bool",
-                         "value":true
-                        }, 
-                        {
-                         "name":"affectedByWindCard",
-                         "type":"bool",
-                         "value":false
-                        }, 
-                        {
-                         "name":"msAfterApproach",
-                         "type":"int",
-                         "value":1
-                        }, 
-                        {
-                         "name":"previewBeforeAppear",
-                         "type":"int",
-                         "value":0
-                        }],
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":16,
-                 "x":1056,
-                 "y":2224
-                }, 
-                {
-                 "gid":2301,
-                 "height":16,
                  "id":1142,
                  "name":"",
                  "properties":[
@@ -11949,41 +11850,8 @@
                  "type":"",
                  "visible":true,
                  "width":16,
-                 "x":1152,
-                 "y":2240
-                }, 
-                {
-                 "gid":2301,
-                 "height":16,
-                 "id":1143,
-                 "name":"",
-                 "properties":[
-                        {
-                         "name":"affectedByPlantCard",
-                         "type":"bool",
-                         "value":true
-                        }, 
-                        {
-                         "name":"affectedByWindCard",
-                         "type":"bool",
-                         "value":false
-                        }, 
-                        {
-                         "name":"msAfterApproach",
-                         "type":"int",
-                         "value":1
-                        }, 
-                        {
-                         "name":"previewBeforeAppear",
-                         "type":"int",
-                         "value":0
-                        }],
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":16,
-                 "x":1136,
-                 "y":2192
+                 "x":1168,
+                 "y":2208
                 }, 
                 {
                  "gid":2301,
@@ -14056,8 +13924,7 @@
                  "width":17,
                  "x":1853.02,
                  "y":980.517
-                },
-            
+                }, 
                 {
                  "gid":2944,
                  "height":21,
@@ -14105,7 +13972,8 @@
                  "width":17,
                  "x":1851.81,
                  "y":1002.51
-                }, 
+                },
+            
                 {
                  "gid":2992,
                  "height":21,
