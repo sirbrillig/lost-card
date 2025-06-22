@@ -84,6 +84,7 @@ import {
 	savePlayerPositionToRegistry,
 	getPlayerCoordinates,
 	getSavedDataPlayerPosition,
+	isSpriteInsideSolidTile,
 } from "../lib/shared";
 
 export class Game extends Scene {
@@ -224,14 +225,21 @@ export class Game extends Scene {
 
 		this.landLayer = this.createTileLayer("Background", tilesetTile, 0);
 		this.hiddenRoomLayer = this.createTileLayer("HiddenRooms", tilesetTile, 0);
+
+		// Handle tiles that hurt the player
 		this.physics.add.collider(
 			this.landLayer,
 			this.player,
 			(_, tile) => {
-				if (!isTileWithPropertiesObject(tile) || !tile.properties.hurts) {
+				if (!isTileWithPropertiesObject(tile)) {
 					return;
 				}
-				this.enemyHitPlayer();
+				if (tile.properties.hurts) {
+					this.enemyHitPlayer();
+				}
+				if (tile.properties.deadly) {
+					this.enemyHitPlayer({ damage: 10 });
+				}
 			},
 			(_, tile) => {
 				if (
@@ -259,10 +267,15 @@ export class Game extends Scene {
 			this.hiddenRoomLayer,
 			this.player,
 			(_, tile) => {
-				if (!isTileWithPropertiesObject(tile) || !tile.properties.hurts) {
+				if (!isTileWithPropertiesObject(tile)) {
 					return;
 				}
-				this.enemyHitPlayer();
+				if (tile.properties.hurts) {
+					this.enemyHitPlayer();
+				}
+				if (tile.properties.deadly) {
+					this.enemyHitPlayer({ damage: 10 });
+				}
 			},
 			(_, tile) => {
 				if (
@@ -286,6 +299,7 @@ export class Game extends Scene {
 				return true;
 			}
 		);
+
 		this.physics.add.collider(
 			this.hiddenRoomLayer,
 			this.enemyManager.enemies,
@@ -1141,13 +1155,6 @@ export class Game extends Scene {
 		return layer;
 	}
 
-	setTileLayerCollisions(
-		layer: Phaser.Types.Physics.Arcade.ArcadeColliderType,
-		sprite: Phaser.Types.Physics.Arcade.ArcadeColliderType
-	) {
-		this.physics.add.collider(sprite, layer);
-	}
-
 	setUpCamera(): void {
 		this.cameras.main.setBackgroundColor("black");
 
@@ -1556,6 +1563,10 @@ export class Game extends Scene {
 					this.power.anims.stop();
 					this.power.visible = false;
 					stopEvent?.destroy();
+
+					if (isSpriteInsideSolidTile(this.player, this.landLayer)) {
+						this.enemyHitPlayer({ damage: 10 });
+					}
 				}
 				lastDistance = distance;
 			},
@@ -3361,7 +3372,7 @@ export class Game extends Scene {
 		vibrate(this, 2, 300);
 	}
 
-	enemyHitPlayer(): void {
+	enemyHitPlayer(args?: { damage?: number }): void {
 		if (
 			this.isPlayerBeingHit() ||
 			this.isPlayerInvincible() ||
@@ -3373,7 +3384,7 @@ export class Game extends Scene {
 
 		this.isPlayerBeingHitInvincible = true;
 		this.enemyCollider.active = false;
-		this.setPlayerHitPoints(this.getPlayerHitPoints() - 1);
+		this.setPlayerHitPoints(this.getPlayerHitPoints() - (args?.damage ?? 1));
 		this.heartCardTimer?.remove();
 		this.heartCardTimer = undefined;
 

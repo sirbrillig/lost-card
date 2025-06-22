@@ -1125,3 +1125,21 @@ export function knockBack(
 			break;
 	}
 }
+
+export function isSpriteInsideSolidTile(
+	sprite: { width: number; height: number; x: number; y: number },
+	tileLayer: Phaser.Tilemaps.TilemapLayer
+) {
+	const x = sprite.x - sprite.width / 2;
+	const y = sprite.y - sprite.height / 2;
+
+	const tiles = tileLayer.getTilesWithinWorldXY(
+		x,
+		y,
+		sprite.width,
+		sprite.height,
+		{ isColliding: true }
+	);
+
+	return tiles.length > 0;
+}
