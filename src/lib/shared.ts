@@ -1127,19 +1127,14 @@ export function knockBack(
 }
 
 export function isSpriteInsideSolidTile(
-	sprite: { width: number; height: number; x: number; y: number },
+	sprite: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody,
 	tileLayer: Phaser.Tilemaps.TilemapLayer
 ) {
-	const x = sprite.x - sprite.width / 2;
-	const y = sprite.y - sprite.height / 2;
-
-	const tiles = tileLayer.getTilesWithinWorldXY(
-		x,
-		y,
-		sprite.width,
-		sprite.height,
-		{ isColliding: true }
-	);
+	const x = sprite.body.center.x;
+	const y = sprite.body.center.y;
+	const tiles = tileLayer.getTilesWithinWorldXY(x, y, 2, 2, {
+		isColliding: true,
+	});
 
 	return tiles.length > 0;
 }

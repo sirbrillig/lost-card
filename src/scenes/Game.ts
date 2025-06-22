@@ -1541,6 +1541,10 @@ export class Game extends Scene {
 	}
 
 	movePlayerTowardTileWithPlantCard(tile: { x: number; y: number }): void {
+		const lastSafePosition = new Phaser.Math.Vector2(
+			this.player.x,
+			this.player.y
+		);
 		const velocity = createVelocityForDirection(
 			config.plantCardVelocity,
 			this.playerDirection
@@ -1550,22 +1554,33 @@ export class Game extends Scene {
 			tile,
 			this.player.body.center
 		);
+		let isMoving = true;
 		const stopEvent = this.time.addEvent({
 			delay: 50,
 			callback: () => {
+				if (!isMoving) {
+					return;
+				}
 				const distance = Phaser.Math.Distance.BetweenPoints(
 					tile,
 					this.player.body.center
 				);
-				if (distance < 20 || distance > lastDistance) {
+				if (
+					distance < 10 ||
+					distance > lastDistance ||
+					distance === lastDistance
+				) {
 					this.player.body.stop();
 					this.player.data.set("isPlantCardGrappleActive", false);
 					this.power.anims.stop();
 					this.power.visible = false;
 					stopEvent?.destroy();
+					isMoving = false;
 
+					// If the player ends up inside a wall, hurt them and expel them.
 					if (isSpriteInsideSolidTile(this.player, this.landLayer)) {
-						this.enemyHitPlayer({ damage: 10 });
+						this.enemyHitPlayer();
+						this.player.setPosition(lastSafePosition.x, lastSafePosition.y);
 					}
 				}
 				lastDistance = distance;
