@@ -102,11 +102,15 @@ export class FireGiant extends BaseMonster<AllStates> {
 			tileDistances.push(distance);
 		});
 		tileDistances.sort(function (a, b) {
-			return a - b;
+			return b - a;
 		});
-		const targetTileDistance = tileDistances[count - 1];
+		// Pick one every pair
+		const targetTileDistance = tileDistances[count * 2 - 1];
 		const targetTile = tilesByDistance[targetTileDistance];
-		return { x: targetTile.pixelX, y: targetTile.pixelY };
+		return {
+			x: targetTile.pixelX + targetTile.width / 2,
+			y: targetTile.pixelY + targetTile.height / 2,
+		};
 	}
 
 	prepareSelfDestructingEnemy(
