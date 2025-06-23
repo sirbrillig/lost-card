@@ -101,9 +101,24 @@ export class FireGiant extends BaseMonster<AllStates> {
 			tilesByDistance[distance] = tile;
 			tileDistances.push(distance);
 		});
-		tileDistances.sort();
+		tileDistances.sort(function (a, b) {
+			return a - b;
+		});
 		const targetTileDistance = tileDistances[count - 1];
-		return tilesByDistance[targetTileDistance];
+		const targetTile = tilesByDistance[targetTileDistance];
+		return { x: targetTile.pixelX, y: targetTile.pixelY };
+	}
+
+	prepareSelfDestructingEnemy(
+		enemy: Phaser.GameObjects.Sprite
+	): Phaser.GameObjects.Sprite {
+		this.scene.time.addEvent({
+			delay: 3000,
+			callback: () => {
+				enemy.destroy();
+			},
+		});
+		return enemy;
 	}
 
 	constructNewBehaviorFor(state: string) {
@@ -134,7 +149,7 @@ export class FireGiant extends BaseMonster<AllStates> {
 							point.y
 						);
 						blorp.maxWaitTime = 1;
-						return blorp;
+						return this.prepareSelfDestructingEnemy(blorp);
 					},
 				});
 			case "lava2":
@@ -149,7 +164,7 @@ export class FireGiant extends BaseMonster<AllStates> {
 							point.y
 						);
 						blorp.maxWaitTime = 1;
-						return blorp;
+						return this.prepareSelfDestructingEnemy(blorp);
 					},
 				});
 			case "lava3":
@@ -164,7 +179,7 @@ export class FireGiant extends BaseMonster<AllStates> {
 							point.y
 						);
 						blorp.maxWaitTime = 1;
-						return blorp;
+						return this.prepareSelfDestructingEnemy(blorp);
 					},
 				});
 			case "lava4":
@@ -179,7 +194,7 @@ export class FireGiant extends BaseMonster<AllStates> {
 							point.y
 						);
 						blorp.maxWaitTime = 1;
-						return blorp;
+						return this.prepareSelfDestructingEnemy(blorp);
 					},
 				});
 		}
