@@ -1,22 +1,27 @@
+import { WaitForActive, RangedFireBall, SpawnEnemies } from "../lib/behaviors";
 import {
-	RandomlyWalk,
-	TeleportToPlatform,
-	WalkWithFire,
-} from "../lib/behaviors";
-import { DataKeys } from "../lib/shared";
+	DataKeys,
+	getTilesInRoom,
+	isTileWithPropertiesObject,
+} from "../lib/shared";
 import { EnemyManager } from "../lib/EnemyManager";
+import { LavaBlorp } from "./LavaBlorp";
 import { BaseMonster } from "./BaseMonster";
 
 type AllStates =
-	| "randomwalk1"
-	| "randomwalk2"
-	| "teleport1"
-	| "teleport2"
-	| "walkwithfire";
+	| "wait"
+	| "fireball1"
+	| "fireball2"
+	| "wait2"
+	| "lava1"
+	| "lava2"
+	| "lava3"
+	| "lava4";
 
 export class FireGiant extends BaseMonster<AllStates> {
 	hitPoints: number = 8;
 	primaryColor = 0xb80000;
+	#enemyManager;
 
 	constructor(
 		scene: Phaser.Scene,
@@ -27,6 +32,7 @@ export class FireGiant extends BaseMonster<AllStates> {
 		super(scene, enemyManager, x, y, "monsters1", 57);
 		this.data.set(DataKeys.Pushable, false);
 		this.setScale(2);
+		this.#enemyManager = enemyManager;
 	}
 
 	initSprites() {
@@ -69,47 +75,112 @@ export class FireGiant extends BaseMonster<AllStates> {
 	}
 
 	getInitialState(): AllStates {
-		return "randomwalk1";
+		return "wait";
 	}
 
-	chooseAttack(): AllStates {
-		const number = Phaser.Math.Between(1, 3);
-		switch (number) {
-			case 1:
-				return "teleport1";
-			case 2:
-				return "walkwithfire";
-			default:
-				return "teleport1";
+	getSpawnPoint(count: 1 | 2 | 3 | 4): { x: number; y: number } {
+		if (!this.#enemyManager.activeRoom) {
+			throw new Error("No active room");
 		}
+		const tiles = getTilesInRoom(
+			this.#enemyManager.map,
+			this.#enemyManager.activeRoom
+		).filter((tile) => {
+			if (isTileWithPropertiesObject(tile) && tile.properties.isLava) {
+				return true;
+			}
+			return false;
+		});
+		if (tiles.length < 1) {
+			throw new Error("No tiles in room to summon to");
+		}
+		const tilesByDistance: Record<number, Phaser.Tilemaps.Tile> = {};
+		const tileDistances: number[] = [];
+		tiles.forEach((tile) => {
+			const distance = Phaser.Math.Distance.BetweenPoints(tile, this);
+			tilesByDistance[distance] = tile;
+			tileDistances.push(distance);
+		});
+		tileDistances.sort();
+		const targetTileDistance = tileDistances[count - 1];
+		return tilesByDistance[targetTileDistance];
 	}
 
 	constructNewBehaviorFor(state: string) {
-		const speed = 110;
-		const minWalkTime = 1000;
-		const maxWalkTime = 1500;
 		switch (state) {
-			case "randomwalk1":
-				return new RandomlyWalk(state, "teleport1", {
-					speed,
-					minWalkTime,
-					maxWalkTime,
+			case "wait":
+				return new WaitForActive(state, "fireball1", {
+					distance: 1,
+					maxWaitTime: 2000,
 				});
-			case "teleport1":
-				return new TeleportToPlatform(state, "randomwalk2", 2000);
-			case "randomwalk2":
-				return new RandomlyWalk(state, "teleport2", {
-					speed,
-					minWalkTime,
-					maxWalkTime,
+			case "fireball1":
+				return new RangedFireBall(state, "fireball2", { hitsWalls: true });
+			case "fireball2":
+				return new RangedFireBall(state, "wait2", { hitsWalls: true });
+			case "wait2":
+				return new WaitForActive(state, "lava1", {
+					distance: 1,
+					maxWaitTime: 2000,
 				});
-			case "teleport2":
-				return new TeleportToPlatform(state, this.chooseAttack(), 2000);
-			case "walkwithfire":
-				return new WalkWithFire(state, "teleport1", {
-					speed: 50,
-					endAfter: 2000,
-					rotateDistance: 40,
+			case "lava1":
+				return new SpawnEnemies(state, "lava2", {
+					enemiesToSpawn: 1,
+					createMonster: () => {
+						const point = this.getSpawnPoint(1);
+						const blorp = new LavaBlorp(
+							this.scene,
+							this.#enemyManager,
+							point.x,
+							point.y
+						);
+						blorp.maxWaitTime = 1;
+						return blorp;
+					},
+				});
+			case "lava2":
+				return new SpawnEnemies(state, "lava3", {
+					enemiesToSpawn: 1,
+					createMonster: () => {
+						const point = this.getSpawnPoint(2);
+						const blorp = new LavaBlorp(
+							this.scene,
+							this.#enemyManager,
+							point.x,
+							point.y
+						);
+						blorp.maxWaitTime = 1;
+						return blorp;
+					},
+				});
+			case "lava3":
+				return new SpawnEnemies(state, "lava4", {
+					enemiesToSpawn: 1,
+					createMonster: () => {
+						const point = this.getSpawnPoint(3);
+						const blorp = new LavaBlorp(
+							this.scene,
+							this.#enemyManager,
+							point.x,
+							point.y
+						);
+						blorp.maxWaitTime = 1;
+						return blorp;
+					},
+				});
+			case "lava4":
+				return new SpawnEnemies(state, "wait", {
+					enemiesToSpawn: 1,
+					createMonster: () => {
+						const point = this.getSpawnPoint(4);
+						const blorp = new LavaBlorp(
+							this.scene,
+							this.#enemyManager,
+							point.x,
+							point.y
+						);
+						blorp.maxWaitTime = 1;
+						return blorp;
+					},
 				});
 		}
 	}

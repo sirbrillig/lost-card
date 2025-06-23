@@ -7,7 +7,7 @@ type AllStates = "wait" | "lava-bubble" | "lava-explode";
 
 export class LavaBlorp extends BaseMonster<AllStates> {
 	hitPoints = 2;
-	#maxWaitTime = 100;
+	maxWaitTime = 100;
 
 	constructor(
 		scene: Phaser.Scene,
@@ -15,10 +15,10 @@ export class LavaBlorp extends BaseMonster<AllStates> {
 		x: number,
 		y: number
 	) {
-		super(scene, enemyManager, x, y, "light_lantern", 11);
+		super(scene, enemyManager, x, y, "light-lantern", 11);
 		this.data.set(DataKeys.Pushable, false);
 		this.data.set(DataKeys.IsHarmless, true);
-		this.#maxWaitTime = Phaser.Math.Between(900, 3500);
+		this.maxWaitTime = Phaser.Math.Between(900, 3500);
 	}
 
 	isHittable(): boolean {
@@ -55,7 +55,7 @@ export class LavaBlorp extends BaseMonster<AllStates> {
 				return new WaitForActive(state, "lava-bubble", {
 					// Never activate; just use maxWaitTime
 					distance: 1,
-					maxWaitTime: this.#maxWaitTime,
+					maxWaitTime: this.maxWaitTime,
 					waitAnimationKey: "lava-idle",
 				});
 			case "lava-bubble":
