@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.1" orientation="orthogonal" renderorder="right-down" width="200" height="200" tilewidth="16" tileheight="16" infinite="0" nextlayerid="20" nextobjectid="1162">
+<map version="1.10" tiledversion="1.11.1" orientation="orthogonal" renderorder="right-down" width="200" height="200" tilewidth="16" tileheight="16" infinite="0" nextlayerid="20" nextobjectid="1165">
  <editorsettings>
   <export target="public/assets/lost-card-map.json" format="json"/>
  </editorsettings>
@@ -9017,7 +9017,7 @@
   <object id="736" name="FinalBoss" x="1936.24" y="548.559">
    <point/>
   </object>
-  <object id="889" name="FireGiant" x="3047.63" y="2301.51">
+  <object id="889" name="FireGiant" x="3048.14" y="2275.6">
    <point/>
   </object>
   <object id="910" name="Skeleton" x="2773.64" y="1724.14">
@@ -9218,7 +9218,13 @@
   <object id="1160" name="LavaBlorp" x="3161.61" y="2298.28">
    <point/>
   </object>
+  <object id="1163" name="LavaBlorp" x="3127.57" y="2298.28">
+   <point/>
+  </object>
   <object id="1161" name="LavaBlorp" x="3143.88" y="2410">
+   <point/>
+  </object>
+  <object id="1164" name="LavaBlorp" x="3175.89" y="2409.24">
    <point/>
   </object>
   <object id="1159" name="LavaBlorp" x="3159.84" y="2136.61">
@@ -9326,6 +9332,7 @@
   <object id="1065" gid="2717" x="816" y="2592" width="16" height="16"/>
   <object id="402" gid="2717" x="977.248" y="2140.71" width="16" height="16"/>
   <object id="448" gid="2717" x="2849.14" y="1950.83" width="16" height="16"/>
+  <object id="1162" gid="2717" x="3168" y="2352" width="16" height="16"/>
   <object id="801" gid="2717" x="2368" y="1872" width="16" height="16"/>
   <object id="893" gid="2717" x="2208.09" y="1680.76" width="16" height="16"/>
   <object id="449" gid="2717" x="2896.53" y="2304.3" width="16" height="16"/>
