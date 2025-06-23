@@ -23,7 +23,7 @@ export class Debug extends Scene {
 			{ name: "IK", x: 100, y: 100, room: "IK1" },
 			{ name: "PK", x: 100, y: 100, room: "PKVillage" },
 			{ name: "CK", x: 100, y: 100, room: "CKMaze" },
-			{ name: "FK", x: 100, y: 100, room: "FKHall" },
+			{ name: "FK", x: 12, y: 12, room: "FKHall" },
 			{ name: "SK", x: 100, y: 100, room: "SKTunnel" },
 		];
 	}

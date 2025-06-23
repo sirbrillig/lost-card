@@ -4,6 +4,7 @@ import { config } from "../lib/config";
 import { MainEvents } from "../lib/MainEvents";
 import { EnemyManager } from "../lib/EnemyManager";
 import { MountainMonster } from "../monsters/MountainMonster";
+import { LavaBlorp } from "../monsters/LavaBlorp";
 import { Ghost } from "../monsters/Ghost";
 import { BlackOrb } from "../monsters/BlackOrb";
 import { FinalBoss } from "../monsters/FinalBoss";
@@ -2856,6 +2857,16 @@ export class Game extends Scene {
 			switch (enemyType) {
 				case "MountainMonster": {
 					const monster = new MountainMonster(
+						this,
+						this.enemyManager,
+						point.x,
+						point.y
+					);
+					this.addEnemyToEnemyManager(monster, point);
+					break;
+				}
+				case "LavaBlorp": {
+					const monster = new LavaBlorp(
 						this,
 						this.enemyManager,
 						point.x,

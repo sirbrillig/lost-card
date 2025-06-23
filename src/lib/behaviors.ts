@@ -25,6 +25,7 @@ export class WaitForActive<AllStates extends string>
 	implements Behavior<AllStates, Phaser.GameObjects.Sprite>
 {
 	#distanceToActivate: number = 100;
+	#waitAnimationKey: string | undefined = undefined;
 	#maxWaitTime: number | undefined;
 	#nextState: AllStates;
 	name: AllStates;
@@ -35,6 +36,7 @@ export class WaitForActive<AllStates extends string>
 		config?: {
 			distance?: number;
 			maxWaitTime?: number | undefined;
+			waitAnimationKey?: string | undefined;
 		}
 	) {
 		this.name = name;
@@ -44,6 +46,9 @@ export class WaitForActive<AllStates extends string>
 		}
 		if (config?.maxWaitTime) {
 			this.#maxWaitTime = config.maxWaitTime;
+		}
+		if (config?.waitAnimationKey) {
+			this.#waitAnimationKey = config.waitAnimationKey;
 		}
 	}
 
@@ -56,10 +61,15 @@ export class WaitForActive<AllStates extends string>
 		}
 		sprite.body.stop();
 
+		if (this.#waitAnimationKey) {
+			sprite.anims.play(this.#waitAnimationKey, true);
+		}
+
 		if (this.#maxWaitTime) {
 			sprite.scene?.time.addEvent({
 				delay: this.#maxWaitTime,
 				callback: () => {
+					sprite?.anims?.stop();
 					stateMachine.popState();
 					stateMachine.pushState(this.#nextState);
 				},
@@ -1318,6 +1328,92 @@ export class Poof<AllStates extends string>
 				lifespan: this.#particleLifeSpan,
 				speed: { min: 15, max: 55 },
 				scale: { start: 1, end: 0.4 },
+				emitting: false,
+				deathZone: { source: deathZoneDetector, killOnEnter: true },
+			}
+		);
+		emitter.explode(20);
+		emitter.once(Phaser.GameObjects.Particles.Events.COMPLETE, () => {
+			emitter?.destroy();
+		});
+		sprite.once(Events.MonsterDying, () => {
+			emitter?.destroy?.();
+		});
+		MainEvents.once(Events.LeavingRoom, () => {
+			emitter?.destroy?.();
+		});
+
+		sprite.scene.time.addEvent({
+			delay: this.#postAttackTime,
+			callback: () => {
+				stateMachine.popState();
+				stateMachine.pushState(this.#nextState);
+			},
+		});
+	}
+
+	update(): void {}
+}
+
+export class LavaExplode<AllStates extends string>
+	implements Behavior<AllStates, Phaser.GameObjects.Sprite>
+{
+	#nextState: AllStates;
+	#postAttackTime = 1500;
+	#particleLifeSpan = 300;
+	name: AllStates;
+
+	constructor(
+		name: AllStates,
+		nextState: AllStates,
+		options?: {
+			postAttackTime?: number;
+			particleLifeSpan?: number;
+		}
+	) {
+		this.name = name;
+		this.#nextState = nextState;
+		this.#postAttackTime = options?.postAttackTime ?? this.#postAttackTime;
+		this.#particleLifeSpan =
+			options?.particleLifeSpan ?? this.#particleLifeSpan;
+	}
+
+	init(
+		sprite: Phaser.GameObjects.Sprite,
+		stateMachine: BehaviorMachineInterface<AllStates>,
+		enemyManager: EnemyManager
+	): void {
+		if (!sprite.body || !isDynamicSprite(sprite)) {
+			throw new Error("Could not update monster");
+		}
+
+		const deathZoneDetector = {
+			contains: (x: number, y: number) => {
+				// Particle coordinates are global but that was changed around 3.85 to
+				// make them local instead (see
+				// https://github.com/phaserjs/phaser/issues/6371). If we ever upgrade
+				// Phaser, we will need the following adjustments for the emitter
+				// position.
+				// x += sprite.body.x;
+				// y += sprite.body.y;
+
+				// If a particle hits the player, then trigger an effect.
+				const didHit = enemyManager.player.body?.hitTest(x, y) ?? false;
+				if (didHit) {
+					MainEvents.emit(Events.EnemyHitPlayer, true);
+				}
+				return didHit;
+			},
+		};
+		const emitter = sprite.scene.add.particles(
+			sprite.body.center.x,
+			sprite.body.center.y - 5,
+			"fire-power",
+			{
+				frame: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+				lifespan: this.#particleLifeSpan,
+				speed: { min: 30, max: 90 },
+				scale: { start: 0.8, end: 0.2 },
 				emitting: false,
 				deathZone: { source: deathZoneDetector, killOnEnter: true },
 			}
