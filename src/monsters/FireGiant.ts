@@ -3,6 +3,7 @@ import {
 	RangedFireBall,
 	SpawnEnemies,
 	LavaExplode,
+	PowerUp,
 } from "../lib/behaviors";
 import {
 	DataKeys,
@@ -18,6 +19,7 @@ type AllStates =
 	| "fireball1"
 	| "fireball2"
 	| "wait2"
+	| "powerup"
 	| "lava-self"
 	| "lava1"
 	| "lava2"
@@ -132,8 +134,11 @@ export class FireGiant extends BaseMonster<AllStates> {
 	}
 
 	updateAfterHit() {
-		this.nextState = "lava-self";
-		this.goToNextState();
+		this.nextState = "powerup";
+	}
+
+	isHittable(): boolean {
+		return this.stateMachine.getCurrentState() !== "powerup";
 	}
 
 	constructNewBehaviorFor(state: string) {
@@ -151,12 +156,20 @@ export class FireGiant extends BaseMonster<AllStates> {
 				this.nextState = "wait2";
 				return new RangedFireBall(state, { hitsWalls: true });
 			case "wait2":
-				this.nextState = "lava-self";
+				this.nextState = "powerup";
 				return new WaitForActive(state, {
 					distance: 1,
 					maxWaitTime: 1000,
 				});
+			case "powerup":
+				this.data.set(DataKeys.Hittable, false);
+				this.nextState = "lava-self";
+				return new PowerUp(state, {
+					scale: 2,
+					chargeTime: 2400,
+				});
 			case "lava-self":
+				this.data.set(DataKeys.Hittable, true);
 				this.nextState = "lava1";
 				return new LavaExplode(state, {
 					postAttackTime: 3500,
