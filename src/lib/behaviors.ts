@@ -1392,14 +1392,18 @@ export class LavaExplode<AllStates extends string>
 
 		// The invisible circle will be the hitbox and the emitter will be just the
 		// visual.
-		const circle = sprite.scene.add.circle(
+		const circle = sprite.scene.add.zone(
 			sprite.body.center.x,
 			sprite.body.center.y,
-			this.#hitboxRadius,
-			0xff0000,
-			0.0
+			2,
+			2
 		);
 		sprite.scene.physics.add.existing(circle);
+		if (!circle.body || !("setCircle" in circle.body)) {
+			throw new Error("Could not create circle");
+		}
+		circle.body.setCircle(this.#hitboxRadius);
+		circle.body.setOffset(-this.#hitboxRadius, -this.#hitboxRadius);
 		sprite.scene.physics.add.overlap(enemyManager.player, circle, () => {
 			MainEvents.emit(Events.EnemyHitPlayer, true);
 			circle?.destroy();
