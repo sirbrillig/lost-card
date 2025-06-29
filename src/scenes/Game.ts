@@ -50,6 +50,7 @@ import {
 	getDoorDestinationCoordinates,
 	getItemTouchingPlayer,
 	getItemsInRoom,
+	getTilesInRoom,
 	getRooms,
 	createVelocityForDirection,
 	isPointInRoom,
@@ -128,6 +129,7 @@ export class Game extends Scene {
 	isPlayerAppearingInvincible: boolean = false;
 	isPlayerBeingHitInvincible: boolean = false;
 	heartCardTimer: Phaser.Time.TimerEvent | undefined;
+	cachedTilesInRoom: Phaser.Tilemaps.Tile[] | undefined;
 
 	keyLeft: Phaser.Input.Keyboard.Key;
 	keyDown: Phaser.Input.Keyboard.Key;
@@ -929,6 +931,7 @@ export class Game extends Scene {
 		this.freezeSound.play();
 		const iceTileFrame = 284;
 		this.enemyManager.map.removeTile(tile, iceTileFrame);
+		tile.properties.isIce = true;
 		this.time.addEvent({
 			delay: config.iceMeltTime,
 			callback: () => this.meltFrozenTile(tile),
@@ -1207,6 +1210,8 @@ export class Game extends Scene {
 		this.createEnemiesInRoom();
 
 		this.closeGatePillars();
+
+		this.cacheTilesInRoom();
 
 		this.recordRoomVisit(room.name);
 	}
@@ -3601,6 +3606,34 @@ export class Game extends Scene {
 		return this.player.data.get("confusedPlayer") === true;
 	}
 
+	cacheTilesInRoom(): void {
+		if (!this.enemyManager.activeRoom) {
+			this.cachedTilesInRoom = [];
+			return;
+		}
+		this.cachedTilesInRoom = getTilesInRoom(
+			this.enemyManager.map,
+			this.enemyManager.activeRoom
+		);
+	}
+
+	getCachedTilesInRoom(): Phaser.Tilemaps.Tile[] {
+		return this.cachedTilesInRoom ?? [];
+	}
+
+	isPlayerOnIce(): boolean {
+		if (!this.enemyManager.activeRoom) {
+			return false;
+		}
+		const iceTiles = this.getCachedTilesInRoom().filter((tile) => {
+			return isTileWithPropertiesObject(tile) && tile.properties.isIce;
+		});
+		if (iceTiles.length < 2) {
+			return false;
+		}
+		return this.physics.overlapTiles(this.player, iceTiles);
+	}
+
 	isPlayerBeingHit(): boolean {
 		return this.player.data?.get("playerGotHit");
 	}
@@ -3922,7 +3955,10 @@ export class Game extends Scene {
 			return;
 		}
 
-		this.player.body.setVelocity(0);
+		// First stop any current movement.
+		if (!this.isPlayerOnIce()) {
+			this.player.body.setVelocity(0);
+		}
 
 		// Set velocity based on key press
 		let isLeft = this.isPressingLeft();

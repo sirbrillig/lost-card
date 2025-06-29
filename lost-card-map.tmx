@@ -1228,6 +1228,7 @@
   <tile id="243">
    <properties>
     <property name="collides" type="bool" value="false"/>
+    <property name="isIce" type="bool" value="true"/>
    </properties>
   </tile>
   <tile id="244">
@@ -1428,16 +1429,19 @@
   <tile id="283">
    <properties>
     <property name="collides" type="bool" value="false"/>
+    <property name="isIce" type="bool" value="true"/>
    </properties>
   </tile>
   <tile id="284">
    <properties>
     <property name="collides" type="bool" value="false"/>
+    <property name="isIce" type="bool" value="true"/>
    </properties>
   </tile>
   <tile id="285">
    <properties>
     <property name="collides" type="bool" value="false"/>
+    <property name="isIce" type="bool" value="true"/>
    </properties>
   </tile>
   <tile id="286">
@@ -1638,6 +1642,7 @@
   <tile id="325">
    <properties>
     <property name="collides" type="bool" value="false"/>
+    <property name="isIce" type="bool" value="true"/>
    </properties>
   </tile>
   <tile id="326">

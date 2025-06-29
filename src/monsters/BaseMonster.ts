@@ -64,10 +64,10 @@ export class BaseMonster<AllStates extends string> extends Phaser.Physics.Arcade
 		this.setCollideWorldBounds(true);
 		this.setPushable(false);
 		this.setDataEnabled();
-		this.data.set(DataKeys.MonsterPosition, new Phaser.Math.Vector2(x, y));
-		this.data.set(DataKeys.Hittable, true);
-		this.data.set(DataKeys.Pushable, true);
-		this.data.set(DataKeys.Freezable, true);
+		this.data?.set(DataKeys.MonsterPosition, new Phaser.Math.Vector2(x, y));
+		this.data?.set(DataKeys.Hittable, true);
+		this.data?.set(DataKeys.Pushable, true);
+		this.data?.set(DataKeys.Freezable, true);
 		this.on(Events.MonsterHit, (damage: number) => this.hit(damage));
 		this.on(Events.MonsterStun, this.setStunned);
 		this.on(Events.MonsterKillRequest, this.kill);
@@ -275,7 +275,7 @@ export class BaseMonster<AllStates extends string> extends Phaser.Physics.Arcade
 		if (!this.body || !isDynamicSprite(this)) {
 			throw new Error("Could not update monster");
 		}
-		if (this.data.get(DataKeys.Pushable) === true) {
+		if (this.data?.get(DataKeys.Pushable) === true) {
 			this.setStunned(true);
 			knockBack(
 				this.scene,
@@ -485,7 +485,7 @@ export class BaseMonster<AllStates extends string> extends Phaser.Physics.Arcade
 
 	setStunned(setting: boolean) {
 		this.isStunned = setting;
-		this.data.set(DataKeys.Stunned, setting);
+		this.data?.set(DataKeys.Stunned, setting);
 		this.setVelocity(0);
 	}
 

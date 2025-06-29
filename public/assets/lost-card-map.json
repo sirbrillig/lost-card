@@ -18553,6 +18553,11 @@
                          "name":"collides",
                          "type":"bool",
                          "value":false
+                        }, 
+                        {
+                         "name":"isIce",
+                         "type":"bool",
+                         "value":true
                         }]
                 }, 
                 {
@@ -18913,6 +18918,11 @@
                          "name":"collides",
                          "type":"bool",
                          "value":false
+                        }, 
+                        {
+                         "name":"isIce",
+                         "type":"bool",
+                         "value":true
                         }]
                 }, 
                 {
@@ -18922,6 +18932,11 @@
                          "name":"collides",
                          "type":"bool",
                          "value":false
+                        }, 
+                        {
+                         "name":"isIce",
+                         "type":"bool",
+                         "value":true
                         }]
                 }, 
                 {
@@ -18931,6 +18946,11 @@
                          "name":"collides",
                          "type":"bool",
                          "value":false
+                        }, 
+                        {
+                         "name":"isIce",
+                         "type":"bool",
+                         "value":true
                         }]
                 }, 
                 {
@@ -19291,6 +19311,11 @@
                          "name":"collides",
                          "type":"bool",
                          "value":false
+                        }, 
+                        {
+                         "name":"isIce",
+                         "type":"bool",
+                         "value":true
                         }]
                 }, 
                 {
