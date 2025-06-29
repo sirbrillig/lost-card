@@ -1361,6 +1361,7 @@ export class LavaExplode<AllStates extends string>
 	#nextState: AllStates;
 	#postAttackTime = 1500;
 	#particleLifeSpan = 300;
+	#hitboxRadius = 25;
 	name: AllStates;
 
 	constructor(
@@ -1369,6 +1370,7 @@ export class LavaExplode<AllStates extends string>
 		options?: {
 			postAttackTime?: number;
 			particleLifeSpan?: number;
+			hitboxRadius?: number;
 		}
 	) {
 		this.name = name;
@@ -1376,6 +1378,7 @@ export class LavaExplode<AllStates extends string>
 		this.#postAttackTime = options?.postAttackTime ?? this.#postAttackTime;
 		this.#particleLifeSpan =
 			options?.particleLifeSpan ?? this.#particleLifeSpan;
+		this.#hitboxRadius = options?.hitboxRadius ?? this.#hitboxRadius;
 	}
 
 	init(
@@ -1387,24 +1390,21 @@ export class LavaExplode<AllStates extends string>
 			throw new Error("Could not update monster");
 		}
 
-		const deathZoneDetector = {
-			contains: (x: number, y: number) => {
-				// Particle coordinates are global but that was changed around 3.85 to
-				// make them local instead (see
-				// https://github.com/phaserjs/phaser/issues/6371). If we ever upgrade
-				// Phaser, we will need the following adjustments for the emitter
-				// position.
-				// x += sprite.body.x;
-				// y += sprite.body.y;
+		// The invisible circle will be the hitbox and the emitter will be just the
+		// visual.
+		const circle = sprite.scene.add.circle(
+			sprite.body.center.x,
+			sprite.body.center.y,
+			this.#hitboxRadius,
+			0xff0000,
+			0.0
+		);
+		sprite.scene.physics.add.existing(circle);
+		sprite.scene.physics.add.overlap(enemyManager.player, circle, () => {
+			MainEvents.emit(Events.EnemyHitPlayer, true);
+			circle?.destroy();
+		});
 
-				// If a particle hits the player, then trigger an effect.
-				const didHit = enemyManager.player.body?.hitTest(x, y) ?? false;
-				if (didHit) {
-					MainEvents.emit(Events.EnemyHitPlayer, true);
-				}
-				return didHit;
-			},
-		};
 		const emitter = sprite.scene.add.particles(
 			sprite.body.center.x,
 			sprite.body.center.y - 5,
@@ -1415,17 +1415,19 @@ export class LavaExplode<AllStates extends string>
 				speed: { min: 30, max: 90 },
 				scale: { start: 0.8, end: 0.2 },
 				emitting: false,
-				deathZone: { source: deathZoneDetector, killOnEnter: true },
 			}
 		);
 		emitter.explode(20);
 		emitter.once(Phaser.GameObjects.Particles.Events.COMPLETE, () => {
+			circle?.destroy();
 			emitter?.destroy();
 		});
 		sprite.once(Events.MonsterDying, () => {
+			circle?.destroy();
 			emitter?.destroy?.();
 		});
 		MainEvents.once(Events.LeavingRoom, () => {
+			circle?.destroy();
 			emitter?.destroy?.();
 		});
 
