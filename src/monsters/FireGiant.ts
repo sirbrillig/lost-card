@@ -113,15 +113,13 @@ export class FireGiant extends BaseMonster<AllStates> {
 		};
 	}
 
-	prepareSelfDestructingEnemy(
-		enemy: Phaser.GameObjects.Sprite
-	): Phaser.GameObjects.Sprite {
-		this.scene.time.addEvent({
-			delay: 3000,
-			callback: () => {
-				enemy.destroy();
-			},
-		});
+	prepareSelfDestructingEnemy(enemy: LavaBlorp): Phaser.GameObjects.Sprite {
+		enemy.timeBeforeBubble = 1;
+		enemy.updateAfterBehavior = (key: string) => {
+			if (key === "lava-explode") {
+				enemy?.destroy();
+			}
+		};
 		return enemy;
 	}
 
@@ -152,7 +150,6 @@ export class FireGiant extends BaseMonster<AllStates> {
 							point.x,
 							point.y
 						);
-						blorp.maxWaitTime = 1;
 						return this.prepareSelfDestructingEnemy(blorp);
 					},
 				});
@@ -167,7 +164,6 @@ export class FireGiant extends BaseMonster<AllStates> {
 							point.x,
 							point.y
 						);
-						blorp.maxWaitTime = 1;
 						return this.prepareSelfDestructingEnemy(blorp);
 					},
 				});
@@ -182,7 +178,6 @@ export class FireGiant extends BaseMonster<AllStates> {
 							point.x,
 							point.y
 						);
-						blorp.maxWaitTime = 1;
 						return this.prepareSelfDestructingEnemy(blorp);
 					},
 				});
@@ -197,7 +192,6 @@ export class FireGiant extends BaseMonster<AllStates> {
 							point.x,
 							point.y
 						);
-						blorp.maxWaitTime = 1;
 						return this.prepareSelfDestructingEnemy(blorp);
 					},
 				});
