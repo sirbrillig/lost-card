@@ -18,6 +18,7 @@ export class LavaBlorp extends BaseMonster<AllStates> {
 		super(scene, enemyManager, x, y, "light-lantern", 11);
 		this.data.set(DataKeys.Pushable, false);
 		this.data.set(DataKeys.IsHarmless, true);
+		this.data.set(DataKeys.Hittable, false);
 		this.maxWaitTime = Phaser.Math.Between(900, 3500);
 	}
 
