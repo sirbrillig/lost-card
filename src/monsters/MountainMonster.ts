@@ -62,9 +62,11 @@ export class MountainMonster extends BaseMonster<AllStates> {
 	constructNewBehaviorFor(state: string) {
 		switch (state) {
 			case "randomwalk1":
-				return new RandomlyWalk(state, "randomwalk2");
+				this.nextState = "randomwalk2";
+				return new RandomlyWalk(state);
 			case "randomwalk2":
-				return new RandomlyWalk(state, "randomwalk1");
+				this.nextState = "randomwalk1";
+				return new RandomlyWalk(state);
 		}
 	}
 }

@@ -131,31 +131,42 @@ export class FireGiant extends BaseMonster<AllStates> {
 		return enemy;
 	}
 
+	updateAfterHit() {
+		this.nextState = "lava-self";
+		this.goToNextState();
+	}
+
 	constructNewBehaviorFor(state: string) {
 		switch (state) {
 			case "wait":
-				return new WaitForActive(state, "fireball1", {
+				this.nextState = "fireball1";
+				return new WaitForActive(state, {
 					distance: 1,
 					maxWaitTime: 2000,
 				});
 			case "fireball1":
-				return new RangedFireBall(state, "fireball2", { hitsWalls: true });
+				this.nextState = "fireball2";
+				return new RangedFireBall(state, { hitsWalls: true });
 			case "fireball2":
-				return new RangedFireBall(state, "wait2", { hitsWalls: true });
+				this.nextState = "wait2";
+				return new RangedFireBall(state, { hitsWalls: true });
 			case "wait2":
-				return new WaitForActive(state, "lava-self", {
+				this.nextState = "lava-self";
+				return new WaitForActive(state, {
 					distance: 1,
 					maxWaitTime: 1000,
 				});
 			case "lava-self":
-				return new LavaExplode(state, "lava1", {
+				this.nextState = "lava1";
+				return new LavaExplode(state, {
 					postAttackTime: 3500,
 					particleLifeSpan: 900,
 					hitboxRadius: 40,
 					isConstant: true,
 				});
 			case "lava1":
-				return new SpawnEnemies(state, "lava2", {
+				this.nextState = "lava2";
+				return new SpawnEnemies(state, {
 					enemiesToSpawn: 1,
 					createMonster: () => {
 						const point = this.getSpawnPoint(1);
@@ -169,7 +180,8 @@ export class FireGiant extends BaseMonster<AllStates> {
 					},
 				});
 			case "lava2":
-				return new SpawnEnemies(state, "lava3", {
+				this.nextState = "lava3";
+				return new SpawnEnemies(state, {
 					enemiesToSpawn: 1,
 					createMonster: () => {
 						const point = this.getSpawnPoint(2);
@@ -183,7 +195,8 @@ export class FireGiant extends BaseMonster<AllStates> {
 					},
 				});
 			case "lava3":
-				return new SpawnEnemies(state, "lava4", {
+				this.nextState = "lava4";
+				return new SpawnEnemies(state, {
 					enemiesToSpawn: 1,
 					createMonster: () => {
 						const point = this.getSpawnPoint(3);
@@ -197,7 +210,8 @@ export class FireGiant extends BaseMonster<AllStates> {
 					},
 				});
 			case "lava4":
-				return new SpawnEnemies(state, "wait", {
+				this.nextState = "wait";
+				return new SpawnEnemies(state, {
 					enemiesToSpawn: 1,
 					createMonster: () => {
 						const point = this.getSpawnPoint(4);

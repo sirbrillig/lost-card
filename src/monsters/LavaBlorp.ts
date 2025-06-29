@@ -54,14 +54,16 @@ export class LavaBlorp extends BaseMonster<AllStates> {
 	constructNewBehaviorFor(state: string) {
 		switch (state) {
 			case "wait":
-				return new WaitForActive(state, "lava-bubble", {
+				this.nextState = "lava-bubble";
+				return new WaitForActive(state, {
 					// Never activate; just use maxWaitTime
 					distance: 1,
 					maxWaitTime: this.timeBeforeBubble,
 					waitAnimationKey: "lava-idle",
 				});
 			case "lava-bubble":
-				return new WaitForActive(state, "lava-explode", {
+				this.nextState = "lava-explode";
+				return new WaitForActive(state, {
 					// Never activate; just use maxWaitTime
 					distance: 1,
 					maxWaitTime: this.timeBeforeExplode,
@@ -69,7 +71,8 @@ export class LavaBlorp extends BaseMonster<AllStates> {
 				});
 			case "lava-explode":
 				this.anims.play("lava-idle", true);
-				return new LavaExplode(state, "wait");
+				this.nextState = "wait";
+				return new LavaExplode(state);
 		}
 	}
 }

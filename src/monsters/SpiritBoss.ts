@@ -125,11 +125,14 @@ export class SpiritBoss extends BaseMonster<AllStates> {
 	constructNewBehaviorFor(state: AllStates) {
 		switch (state) {
 			case "initial":
-				return new WaitForActive(state, "roar1");
+				this.nextState = "roar1";
+				return new WaitForActive(state);
 			case "roar1":
-				return new Roar(state, "spawn");
+				this.nextState = "spawn";
+				return new Roar(state);
 			case "spawn":
-				return new SpawnEnemies(state, "teleport", {
+				this.nextState = "teleport";
+				return new SpawnEnemies(state, {
 					createMonster: () => {
 						const x =
 							this.x +
@@ -147,13 +150,15 @@ export class SpiritBoss extends BaseMonster<AllStates> {
 					},
 				});
 			case "walk":
-				return new RandomlyWalk(state, "teleport", {
+				this.nextState = "teleport";
+				return new RandomlyWalk(state, {
 					speed: 60,
 					minWalkTime: 1000,
 					maxWalkTime: 4000,
 				});
 			case "charge":
-				return new PowerUp(state, "fireball1", {
+				this.nextState = "fireball1";
+				return new PowerUp(state, {
 					scale: 3,
 					chargeTime: 1000,
 				});
@@ -177,29 +182,32 @@ export class SpiritBoss extends BaseMonster<AllStates> {
 				if (!fireballNumber) {
 					throw new Error("Could not determine fireballNumber");
 				}
-				return new RangedFireBall(
-					state,
+				this.nextState =
 					fireballNumber === 16
 						? "attack1"
-						: (`fireball${fireballNumber + 1}` as AllStates),
-					{
-						speed: 115,
-						postAttackTime: fireballNumber === 16 ? 1350 : 0,
-						hitsWalls: true,
-						forceDirectionDegree: (360 / 16) * fireballNumber,
-						colorTint: 0xA4EE00,
-					}
-				);
+						: (`fireball${fireballNumber + 1}` as AllStates);
+				return new RangedFireBall(state, {
+					speed: 115,
+					postAttackTime: fireballNumber === 16 ? 1350 : 0,
+					hitsWalls: true,
+					forceDirectionDegree: (360 / 16) * fireballNumber,
+					colorTint: 0xa4ee00,
+				});
 			case "teleport":
-				return new TeleportToPlatform(state, "charge", 450);
+				this.nextState = "charge";
+				return new TeleportToPlatform(state, 450);
 			case "attack1":
-				return new SlashTowardPlayer(state, "attack2", 180);
+				this.nextState = "attack2";
+				return new SlashTowardPlayer(state, 180);
 			case "attack2":
-				return new SlashTowardPlayer(state, "idle", 180);
+				this.nextState = "idle";
+				return new SlashTowardPlayer(state, 180);
 			case "idle":
-				return new Idle(state, "attack3", "right", 500);
+				this.nextState = "attack3";
+				return new Idle(state, "right", 500);
 			case "attack3":
-				return new SlashTowardPlayer(state, "walk", 180);
+				this.nextState = "walk";
+				return new SlashTowardPlayer(state, 180);
 		}
 	}
 

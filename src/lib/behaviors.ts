@@ -17,7 +17,7 @@ import {
 	vibrate,
 } from "./shared";
 import { EnemyManager } from "./EnemyManager";
-import { Behavior, BehaviorMachineInterface } from "./behavior";
+import { Behavior, BehaviorCompleteCallback } from "./behavior";
 import { MainEvents } from "./MainEvents";
 import { MountainMonster } from "../monsters/MountainMonster";
 
@@ -27,12 +27,10 @@ export class WaitForActive<AllStates extends string>
 	#distanceToActivate: number = 100;
 	#waitAnimationKey: string | undefined = undefined;
 	#maxWaitTime: number | undefined;
-	#nextState: AllStates;
 	name: AllStates;
 
 	constructor(
 		name: AllStates,
-		nextState: AllStates,
 		config?: {
 			distance?: number;
 			maxWaitTime?: number | undefined;
@@ -40,7 +38,6 @@ export class WaitForActive<AllStates extends string>
 		}
 	) {
 		this.name = name;
-		this.#nextState = nextState;
 		if (config?.distance) {
 			this.#distanceToActivate = config.distance;
 		}
@@ -54,7 +51,7 @@ export class WaitForActive<AllStates extends string>
 
 	init(
 		sprite: Phaser.GameObjects.Sprite,
-		stateMachine: BehaviorMachineInterface<AllStates>
+		goToNextState: BehaviorCompleteCallback
 	): void {
 		if (!sprite.body || !isDynamicSprite(sprite)) {
 			throw new Error("Could not update monster");
@@ -70,8 +67,8 @@ export class WaitForActive<AllStates extends string>
 				delay: this.#maxWaitTime,
 				callback: () => {
 					sprite?.anims?.stop();
-					stateMachine.popState();
-					stateMachine.pushState(this.#nextState);
+
+					goToNextState();
 				},
 			});
 		}
@@ -79,7 +76,7 @@ export class WaitForActive<AllStates extends string>
 
 	update(
 		sprite: Phaser.GameObjects.Sprite,
-		stateMachine: BehaviorMachineInterface<AllStates>,
+		goToNextState: BehaviorCompleteCallback,
 		enemyManager: EnemyManager
 	): void {
 		if (!enemyManager.player.body) {
@@ -93,8 +90,7 @@ export class WaitForActive<AllStates extends string>
 			enemyManager.player.body.center
 		);
 		if (distance < this.#distanceToActivate) {
-			stateMachine.popState();
-			stateMachine.pushState(this.#nextState);
+			goToNextState();
 		}
 	}
 }
@@ -102,17 +98,15 @@ export class WaitForActive<AllStates extends string>
 export class Roar<AllStates extends string>
 	implements Behavior<AllStates, Phaser.GameObjects.Sprite>
 {
-	#nextState: AllStates;
 	name: AllStates;
 
-	constructor(name: AllStates, nextState: AllStates) {
+	constructor(name: AllStates) {
 		this.name = name;
-		this.#nextState = nextState;
 	}
 
 	init(
 		sprite: Phaser.GameObjects.Sprite,
-		stateMachine: BehaviorMachineInterface<AllStates>
+		goToNextState: BehaviorCompleteCallback
 	): void {
 		if (!sprite.body || !isDynamicSprite(sprite)) {
 			throw new Error("Could not update monster");
@@ -168,8 +162,8 @@ export class Roar<AllStates extends string>
 			MainEvents.emit(Events.StunPlayer, false);
 			roar.stop();
 			effect?.destroy();
-			stateMachine.popState();
-			stateMachine.pushState(this.#nextState);
+
+			goToNextState();
 		});
 	}
 
@@ -183,7 +177,6 @@ export class Roar<AllStates extends string>
 export class SpawnEnemies<AllStates extends string>
 	implements Behavior<AllStates, Phaser.GameObjects.Sprite>
 {
-	#nextState: AllStates;
 	#maxSpawnedEnemies: number = 18;
 	#enemiesToSpawn: number = 6;
 	#postSpawnTime: number = 1000;
@@ -199,7 +192,6 @@ export class SpawnEnemies<AllStates extends string>
 
 	constructor(
 		name: AllStates,
-		nextState: AllStates,
 		config?: {
 			enemiesToSpawn?: number;
 			maxSpawnedEnemies?: number;
@@ -213,7 +205,6 @@ export class SpawnEnemies<AllStates extends string>
 		}
 	) {
 		this.name = name;
-		this.#nextState = nextState;
 		if (config?.enemiesToSpawn) {
 			this.#enemiesToSpawn = config.enemiesToSpawn;
 		}
@@ -230,7 +221,7 @@ export class SpawnEnemies<AllStates extends string>
 
 	init(
 		sprite: Phaser.GameObjects.Sprite,
-		stateMachine: BehaviorMachineInterface<AllStates>,
+		goToNextState: BehaviorCompleteCallback,
 		enemyManager: EnemyManager
 	): void {
 		if (!sprite.body || !isDynamicSprite(sprite)) {
@@ -251,8 +242,7 @@ export class SpawnEnemies<AllStates extends string>
 		sprite.scene.time.addEvent({
 			delay: this.#postSpawnTime,
 			callback: () => {
-				stateMachine.popState();
-				stateMachine.pushState(this.#nextState);
+				goToNextState();
 			},
 		});
 	}
@@ -297,26 +287,19 @@ export class SpawnEnemies<AllStates extends string>
 export class Nothing<AllStates extends string>
 	implements Behavior<AllStates, Phaser.GameObjects.Sprite>
 {
-	#nextState: AllStates;
 	#animationKey: string;
 	#idleTime: number;
 	name: AllStates;
 
-	constructor(
-		name: AllStates,
-		nextState: AllStates,
-		animationKey: string,
-		idleTime: number
-	) {
+	constructor(name: AllStates, animationKey: string, idleTime: number) {
 		this.name = name;
-		this.#nextState = nextState;
 		this.#animationKey = animationKey;
 		this.#idleTime = idleTime;
 	}
 
 	init(
 		sprite: Phaser.GameObjects.Sprite,
-		stateMachine: BehaviorMachineInterface<AllStates>
+		goToNextState: BehaviorCompleteCallback
 	): void {
 		if (!sprite.body || !isDynamicSprite(sprite)) {
 			throw new Error("Could not update monster");
@@ -325,8 +308,7 @@ export class Nothing<AllStates extends string>
 		sprite.scene.time.addEvent({
 			delay: this.#idleTime,
 			callback: () => {
-				stateMachine.popState();
-				stateMachine.pushState(this.#nextState);
+				goToNextState();
 			},
 		});
 	}
@@ -337,26 +319,19 @@ export class Nothing<AllStates extends string>
 export class Idle<AllStates extends string>
 	implements Behavior<AllStates, Phaser.GameObjects.Sprite>
 {
-	#nextState: AllStates;
 	#animationKey: string;
 	#idleTime: number;
 	name: AllStates;
 
-	constructor(
-		name: AllStates,
-		nextState: AllStates,
-		animationKey: string,
-		idleTime: number
-	) {
+	constructor(name: AllStates, animationKey: string, idleTime: number) {
 		this.name = name;
-		this.#nextState = nextState;
 		this.#animationKey = animationKey;
 		this.#idleTime = idleTime;
 	}
 
 	init(
 		sprite: Phaser.GameObjects.Sprite,
-		stateMachine: BehaviorMachineInterface<AllStates>
+		goToNextState: BehaviorCompleteCallback
 	): void {
 		if (!sprite.body || !isDynamicSprite(sprite)) {
 			throw new Error("Could not update monster");
@@ -366,8 +341,7 @@ export class Idle<AllStates extends string>
 		sprite.scene.time.addEvent({
 			delay: this.#idleTime,
 			callback: () => {
-				stateMachine.popState();
-				stateMachine.pushState(this.#nextState);
+				goToNextState();
 			},
 		});
 	}
@@ -381,13 +355,11 @@ export class RandomlyWalk<AllStates extends string>
 	#enemySpeed = 50;
 	#minWalkTime = 800;
 	#maxWalkTime = 4000;
-	#nextState: AllStates;
 	name: AllStates;
 	#walkSound: Sound;
 
 	constructor(
 		name: AllStates,
-		nextState: AllStates,
 		config?: {
 			speed?: number;
 			minWalkTime?: number;
@@ -396,7 +368,6 @@ export class RandomlyWalk<AllStates extends string>
 		}
 	) {
 		this.name = name;
-		this.#nextState = nextState;
 		if (config?.speed) {
 			this.#enemySpeed = config.speed;
 		}
@@ -413,7 +384,7 @@ export class RandomlyWalk<AllStates extends string>
 
 	init(
 		sprite: Phaser.GameObjects.Sprite,
-		stateMachine: BehaviorMachineInterface<AllStates>
+		goToNextState: BehaviorCompleteCallback
 	): void {
 		if (!isDynamicSprite(sprite)) {
 			throw new Error("invalid sprite");
@@ -439,8 +410,8 @@ export class RandomlyWalk<AllStates extends string>
 			callback: () => {
 				sprite?.body?.setVelocity(0);
 				this.#walkSound.stop();
-				stateMachine.popState();
-				stateMachine.pushState(this.#nextState);
+
+				goToNextState();
 			},
 		});
 	}
@@ -478,12 +449,10 @@ export class LeftRightMarch<AllStates extends string>
 	#minWalkTime = 600;
 	#maxWalkTime = 4000;
 	#moveUpDown = false;
-	#nextState: AllStates;
 	name: AllStates;
 
 	constructor(
 		name: AllStates,
-		nextState: AllStates,
 		config?: {
 			speed?: number;
 			minWalkTime?: number;
@@ -492,7 +461,6 @@ export class LeftRightMarch<AllStates extends string>
 		}
 	) {
 		this.name = name;
-		this.#nextState = nextState;
 		if (config?.speed) {
 			this.#enemySpeed = config.speed;
 		}
@@ -509,7 +477,7 @@ export class LeftRightMarch<AllStates extends string>
 
 	init(
 		sprite: Phaser.GameObjects.Sprite,
-		stateMachine: BehaviorMachineInterface<AllStates>
+		goToNextState: BehaviorCompleteCallback
 	): void {
 		if (!isDynamicSprite(sprite)) {
 			throw new Error("invalid sprite");
@@ -550,8 +518,8 @@ export class LeftRightMarch<AllStates extends string>
 				walkSound.stop();
 				// sprite may have been destroyed before this happens
 				sprite?.body?.setVelocity(0);
-				stateMachine.popState();
-				stateMachine.pushState(this.#nextState);
+
+				goToNextState();
 			},
 		});
 	}
@@ -567,17 +535,15 @@ export class RandomTeleport<AllStates extends string>
 	implements Behavior<AllStates, Phaser.GameObjects.Sprite>
 {
 	#postTeleportDelay = 1000;
-	#nextState: AllStates;
 	name: AllStates;
 
-	constructor(name: AllStates, nextState: AllStates) {
+	constructor(name: AllStates) {
 		this.name = name;
-		this.#nextState = nextState;
 	}
 
 	init(
 		sprite: Phaser.GameObjects.Sprite,
-		stateMachine: BehaviorMachineInterface<AllStates>,
+		goToNextState: BehaviorCompleteCallback,
 		enemyManager: EnemyManager
 	): void {
 		if (!isDynamicSprite(sprite)) {
@@ -624,8 +590,8 @@ export class RandomTeleport<AllStates extends string>
 		});
 		if (tiles.length < 1) {
 			console.warn("No tiles in room to teleport to");
-			stateMachine.popState();
-			stateMachine.pushState(this.#nextState);
+
+			goToNextState();
 		}
 		// Choose tile at random
 		const targetTile = tiles[Phaser.Math.Between(0, tiles.length - 1)];
@@ -654,8 +620,8 @@ export class RandomTeleport<AllStates extends string>
 			callback: () => {
 				effect1?.destroy();
 				effect2?.destroy();
-				stateMachine.popState();
-				stateMachine.pushState(this.#nextState);
+
+				goToNextState();
 			},
 		});
 	}
@@ -667,22 +633,16 @@ export class TeleportToPlatform<AllStates extends string>
 	implements Behavior<AllStates, Phaser.GameObjects.Sprite>
 {
 	#postTeleportDelay = 1500;
-	#nextState: AllStates;
 	name: AllStates;
 
-	constructor(
-		name: AllStates,
-		nextState: AllStates,
-		postTeleportDelay: number
-	) {
+	constructor(name: AllStates, postTeleportDelay: number) {
 		this.name = name;
-		this.#nextState = nextState;
 		this.#postTeleportDelay = postTeleportDelay;
 	}
 
 	init(
 		sprite: Phaser.GameObjects.Sprite,
-		stateMachine: BehaviorMachineInterface<AllStates>,
+		goToNextState: BehaviorCompleteCallback,
 		enemyManager: EnemyManager
 	): void {
 		if (!isDynamicSprite(sprite)) {
@@ -729,8 +689,8 @@ export class TeleportToPlatform<AllStates extends string>
 		});
 		if (tiles.length < 1) {
 			console.warn("Too few platform tiles in room to teleport to");
-			stateMachine.popState();
-			stateMachine.pushState(this.#nextState);
+
+			goToNextState();
 		}
 		// Choose furthest tile
 		let targetTile = tiles[0];
@@ -805,8 +765,8 @@ export class TeleportToPlatform<AllStates extends string>
 			callback: () => {
 				effect1?.destroy();
 				effect2?.destroy();
-				stateMachine.popState();
-				stateMachine.pushState(this.#nextState);
+
+				goToNextState();
 			},
 		});
 	}
@@ -818,17 +778,15 @@ export class TeleportToWater<AllStates extends string>
 	implements Behavior<AllStates, Phaser.GameObjects.Sprite>
 {
 	#postTeleportDelay = 1000;
-	#nextState: AllStates;
 	name: AllStates;
 
-	constructor(name: AllStates, nextState: AllStates) {
+	constructor(name: AllStates) {
 		this.name = name;
-		this.#nextState = nextState;
 	}
 
 	init(
 		sprite: Phaser.GameObjects.Sprite,
-		stateMachine: BehaviorMachineInterface<AllStates>,
+		goToNextState: BehaviorCompleteCallback,
 		enemyManager: EnemyManager
 	): void {
 		if (!isDynamicSprite(sprite)) {
@@ -850,8 +808,8 @@ export class TeleportToWater<AllStates extends string>
 		});
 		if (tiles.length < 1) {
 			console.warn("No water tiles in room to teleport to");
-			stateMachine.popState();
-			stateMachine.pushState(this.#nextState);
+
+			goToNextState();
 		}
 		// Choose tile at random
 		const targetTile = tiles[Phaser.Math.Between(0, tiles.length - 1)];
@@ -864,8 +822,7 @@ export class TeleportToWater<AllStates extends string>
 		sprite.scene.time.addEvent({
 			delay: this.#postTeleportDelay,
 			callback: () => {
-				stateMachine.popState();
-				stateMachine.pushState(this.#nextState);
+				goToNextState();
 			},
 		});
 	}
@@ -876,21 +833,18 @@ export class TeleportToWater<AllStates extends string>
 export class PowerUp<AllStates extends string>
 	implements Behavior<AllStates, Phaser.GameObjects.Sprite>
 {
-	#nextState: AllStates;
 	#chargeTime = 1300;
 	#scale = 1;
 	name: AllStates;
 
 	constructor(
 		name: AllStates,
-		nextState: AllStates,
 		config?: {
 			scale?: number;
 			chargeTime?: number;
 		}
 	) {
 		this.name = name;
-		this.#nextState = nextState;
 		if (config?.scale) {
 			this.#scale = config.scale;
 		}
@@ -901,7 +855,7 @@ export class PowerUp<AllStates extends string>
 
 	init(
 		sprite: Phaser.GameObjects.Sprite,
-		stateMachine: BehaviorMachineInterface<AllStates>
+		goToNextState: BehaviorCompleteCallback
 	): void {
 		if (!sprite.body || !isDynamicSprite(sprite)) {
 			throw new Error("Could not update monster");
@@ -934,16 +888,16 @@ export class PowerUp<AllStates extends string>
 		});
 		MainEvents.once(Events.LeavingRoom, () => {
 			effect?.destroy();
-			stateMachine.popState();
-			stateMachine.pushState(this.#nextState);
+
+			goToNextState();
 		});
 		sprite.scene.time.addEvent({
 			delay: this.#chargeTime,
 			callback: () => {
 				sprite?.scene?.sound.stopByKey("ice-charge");
 				effect?.destroy();
-				stateMachine.popState();
-				stateMachine.pushState(this.#nextState);
+
+				goToNextState();
 			},
 		});
 	}
@@ -954,21 +908,19 @@ export class PowerUp<AllStates extends string>
 export class SlashTowardPlayer<AllStates extends string>
 	implements Behavior<AllStates, Phaser.GameObjects.Sprite>
 {
-	#nextState: AllStates;
 	name: AllStates;
 	#speed = 100;
 	#hitboxSize = 30;
 	#effect: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
 
-	constructor(name: AllStates, nextState: AllStates, speed: number) {
+	constructor(name: AllStates, speed: number) {
 		this.name = name;
-		this.#nextState = nextState;
 		this.#speed = speed;
 	}
 
 	init(
 		sprite: Phaser.GameObjects.Sprite,
-		stateMachine: BehaviorMachineInterface<AllStates>,
+		goToNextState: BehaviorCompleteCallback,
 		enemyManager: EnemyManager
 	): void {
 		if (
@@ -1028,13 +980,13 @@ export class SlashTowardPlayer<AllStates extends string>
 		});
 		MainEvents.once(Events.LeavingRoom, () => {
 			this.#effect?.destroy();
-			stateMachine.popState();
-			stateMachine.pushState(this.#nextState);
+
+			goToNextState();
 		});
 		this.#effect.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
 			this.#effect?.destroy();
-			stateMachine.popState();
-			stateMachine.pushState(this.#nextState);
+
+			goToNextState();
 		});
 	}
 
@@ -1057,17 +1009,15 @@ export class SlashTowardPlayer<AllStates extends string>
 export class BigSwing<AllStates extends string>
 	implements Behavior<AllStates, Phaser.GameObjects.Sprite>
 {
-	#nextState: AllStates;
 	name: AllStates;
 
-	constructor(name: AllStates, nextState: AllStates) {
+	constructor(name: AllStates) {
 		this.name = name;
-		this.#nextState = nextState;
 	}
 
 	init(
 		sprite: Phaser.GameObjects.Sprite,
-		stateMachine: BehaviorMachineInterface<AllStates>,
+		goToNextState: BehaviorCompleteCallback,
 		enemyManager: EnemyManager
 	): void {
 		if (!sprite.body || !isDynamicSprite(sprite)) {
@@ -1103,13 +1053,13 @@ export class BigSwing<AllStates extends string>
 		});
 		MainEvents.once(Events.LeavingRoom, () => {
 			effect?.destroy();
-			stateMachine.popState();
-			stateMachine.pushState(this.#nextState);
+
+			goToNextState();
 		});
 		effect.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
 			effect?.destroy();
-			stateMachine.popState();
-			stateMachine.pushState(this.#nextState);
+
+			goToNextState();
 		});
 	}
 
@@ -1119,18 +1069,16 @@ export class BigSwing<AllStates extends string>
 export class IceAttack<AllStates extends string>
 	implements Behavior<AllStates, Phaser.GameObjects.Sprite>
 {
-	#nextState: AllStates;
 	name: AllStates;
 	#freezePlayerTime = 3000;
 
-	constructor(name: AllStates, nextState: AllStates) {
+	constructor(name: AllStates) {
 		this.name = name;
-		this.#nextState = nextState;
 	}
 
 	init(
 		sprite: Phaser.GameObjects.Sprite,
-		stateMachine: BehaviorMachineInterface<AllStates>,
+		goToNextState: BehaviorCompleteCallback,
 		enemyManager: EnemyManager
 	): void {
 		if (!sprite.body || !isDynamicSprite(sprite)) {
@@ -1172,13 +1120,13 @@ export class IceAttack<AllStates extends string>
 		});
 		MainEvents.once(Events.LeavingRoom, () => {
 			effect?.destroy();
-			stateMachine.popState();
-			stateMachine.pushState(this.#nextState);
+
+			goToNextState();
 		});
 		effect.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
 			effect?.destroy();
-			stateMachine.popState();
-			stateMachine.pushState(this.#nextState);
+
+			goToNextState();
 		});
 	}
 
@@ -1188,7 +1136,6 @@ export class IceAttack<AllStates extends string>
 export class StickyPoison<AllStates extends string>
 	implements Behavior<AllStates, Phaser.GameObjects.Sprite>
 {
-	#nextState: AllStates;
 	#poisonHitDelay = 2000;
 	#speed = 300;
 	#isStuck = false;
@@ -1196,13 +1143,11 @@ export class StickyPoison<AllStates extends string>
 
 	constructor(
 		name: AllStates,
-		nextState: AllStates,
 		options?: {
 			poisonHitDelay: number;
 		}
 	) {
 		this.name = name;
-		this.#nextState = nextState;
 		this.#poisonHitDelay = options?.poisonHitDelay
 			? options.poisonHitDelay
 			: this.#poisonHitDelay;
@@ -1210,7 +1155,7 @@ export class StickyPoison<AllStates extends string>
 
 	init(
 		sprite: Phaser.GameObjects.Sprite,
-		stateMachine: BehaviorMachineInterface<AllStates>,
+		goToNextState: BehaviorCompleteCallback,
 		enemyManager: EnemyManager
 	): void {
 		if (!sprite.body || !isDynamicSprite(sprite) || !enemyManager.player.body) {
@@ -1227,8 +1172,8 @@ export class StickyPoison<AllStates extends string>
 					MainEvents.emit(Events.EnemyHitPlayer, true);
 					return;
 				}
-				stateMachine.popState();
-				stateMachine.pushState(this.#nextState);
+
+				goToNextState();
 			},
 		});
 		sprite.once(Events.MonsterDying, () => {
@@ -1241,7 +1186,7 @@ export class StickyPoison<AllStates extends string>
 
 	update(
 		sprite: Phaser.GameObjects.Sprite,
-		_stateMachine: BehaviorMachineInterface<AllStates>,
+		_goToNextState: BehaviorCompleteCallback,
 		enemyManager: EnemyManager
 	): void {
 		if (!sprite.body || !isDynamicSprite(sprite) || !enemyManager.player.body) {
@@ -1272,21 +1217,18 @@ export class StickyPoison<AllStates extends string>
 export class Poof<AllStates extends string>
 	implements Behavior<AllStates, Phaser.GameObjects.Sprite>
 {
-	#nextState: AllStates;
 	#postAttackTime = 1000;
 	#particleLifeSpan = 800;
 	name: AllStates;
 
 	constructor(
 		name: AllStates,
-		nextState: AllStates,
 		options?: {
 			postAttackTime?: number;
 			particleLifeSpan?: number;
 		}
 	) {
 		this.name = name;
-		this.#nextState = nextState;
 		this.#postAttackTime = options?.postAttackTime ?? this.#postAttackTime;
 		this.#particleLifeSpan =
 			options?.particleLifeSpan ?? this.#particleLifeSpan;
@@ -1294,7 +1236,7 @@ export class Poof<AllStates extends string>
 
 	init(
 		sprite: Phaser.GameObjects.Sprite,
-		stateMachine: BehaviorMachineInterface<AllStates>,
+		goToNextState: BehaviorCompleteCallback,
 		enemyManager: EnemyManager
 	): void {
 		if (!sprite.body || !isDynamicSprite(sprite)) {
@@ -1346,8 +1288,7 @@ export class Poof<AllStates extends string>
 		sprite.scene.time.addEvent({
 			delay: this.#postAttackTime,
 			callback: () => {
-				stateMachine.popState();
-				stateMachine.pushState(this.#nextState);
+				goToNextState();
 			},
 		});
 	}
@@ -1358,7 +1299,6 @@ export class Poof<AllStates extends string>
 export class LavaExplode<AllStates extends string>
 	implements Behavior<AllStates, Phaser.GameObjects.Sprite>
 {
-	#nextState: AllStates;
 	#postAttackTime = 1500;
 	#particleLifeSpan = 300;
 	#hitboxRadius = 25;
@@ -1367,7 +1307,6 @@ export class LavaExplode<AllStates extends string>
 
 	constructor(
 		name: AllStates,
-		nextState: AllStates,
 		options?: {
 			postAttackTime?: number;
 			particleLifeSpan?: number;
@@ -1376,7 +1315,6 @@ export class LavaExplode<AllStates extends string>
 		}
 	) {
 		this.name = name;
-		this.#nextState = nextState;
 		this.#postAttackTime = options?.postAttackTime ?? this.#postAttackTime;
 		this.#particleLifeSpan =
 			options?.particleLifeSpan ?? this.#particleLifeSpan;
@@ -1386,7 +1324,7 @@ export class LavaExplode<AllStates extends string>
 
 	init(
 		sprite: Phaser.GameObjects.Sprite,
-		stateMachine: BehaviorMachineInterface<AllStates>,
+		goToNextState: BehaviorCompleteCallback,
 		enemyManager: EnemyManager
 	): void {
 		if (!sprite.body || !isDynamicSprite(sprite)) {
@@ -1449,8 +1387,7 @@ export class LavaExplode<AllStates extends string>
 			callback: () => {
 				circle?.destroy();
 				emitter?.destroy?.();
-				stateMachine.popState();
-				stateMachine.pushState(this.#nextState);
+				goToNextState();
 			},
 		});
 	}
@@ -1461,27 +1398,20 @@ export class LavaExplode<AllStates extends string>
 export class SeekingVine<AllStates extends string>
 	implements Behavior<AllStates, Phaser.GameObjects.Sprite>
 {
-	#nextState: AllStates;
 	#speed = 50;
 	#postAttackTime = 1000;
 	name: AllStates;
 	#effect: Phaser.GameObjects.Sprite;
 
-	constructor(
-		name: AllStates,
-		nextState: AllStates,
-		speed: number,
-		postAttackTime: number
-	) {
+	constructor(name: AllStates, speed: number, postAttackTime: number) {
 		this.name = name;
-		this.#nextState = nextState;
 		this.#speed = speed;
 		this.#postAttackTime = postAttackTime;
 	}
 
 	init(
 		sprite: Phaser.GameObjects.Sprite,
-		stateMachine: BehaviorMachineInterface<AllStates>,
+		goToNextState: BehaviorCompleteCallback,
 		enemyManager: EnemyManager
 	): void {
 		if (!sprite.body || !isDynamicSprite(sprite)) {
@@ -1507,8 +1437,7 @@ export class SeekingVine<AllStates extends string>
 		sprite.scene.time.addEvent({
 			delay: this.#postAttackTime,
 			callback: () => {
-				stateMachine.popState();
-				stateMachine.pushState(this.#nextState);
+				goToNextState();
 			},
 		});
 	}
@@ -1519,7 +1448,6 @@ export class SeekingVine<AllStates extends string>
 export class SummonCircle<AllStates extends string>
 	implements Behavior<AllStates, Phaser.GameObjects.Sprite>
 {
-	#nextState: AllStates;
 	#speed = 1;
 	name: AllStates;
 	effects: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody[] = [];
@@ -1535,7 +1463,6 @@ export class SummonCircle<AllStates extends string>
 
 	constructor(
 		name: AllStates,
-		nextState: AllStates,
 		config?: {
 			enemiesToSpawn?: number;
 			maxSpawnedEnemies?: number;
@@ -1548,7 +1475,6 @@ export class SummonCircle<AllStates extends string>
 		}
 	) {
 		this.name = name;
-		this.#nextState = nextState;
 		if (config?.createMonster) {
 			this.#createMonster = config.createMonster;
 		}
@@ -1556,7 +1482,7 @@ export class SummonCircle<AllStates extends string>
 
 	init(
 		sprite: Phaser.GameObjects.Sprite,
-		stateMachine: BehaviorMachineInterface<AllStates>,
+		goToNextState: BehaviorCompleteCallback,
 		enemyManager: EnemyManager
 	): void {
 		if (!sprite.body || !isDynamicSprite(sprite)) {
@@ -1607,8 +1533,8 @@ export class SummonCircle<AllStates extends string>
 			delay: 450 * (numberOfEffects + 1),
 			callback: () => {
 				this.#sprite?.data?.set("SummonCircle", { effects: this.effects });
-				stateMachine.popState();
-				stateMachine.pushState(this.#nextState);
+
+				goToNextState();
 			},
 		});
 	}
@@ -1651,7 +1577,6 @@ export class SummonCircle<AllStates extends string>
 export class DashTowardPlayer<AllStates extends string>
 	implements Behavior<AllStates, Phaser.GameObjects.Sprite>
 {
-	#nextState: AllStates;
 	#speed = 90;
 	#postAttackTime = 900;
 	#previousDistance: number;
@@ -1660,7 +1585,6 @@ export class DashTowardPlayer<AllStates extends string>
 
 	constructor(
 		name: AllStates,
-		nextState: AllStates,
 		options?: {
 			speed?: number;
 			postAttackTime?: number;
@@ -1668,7 +1592,6 @@ export class DashTowardPlayer<AllStates extends string>
 		}
 	) {
 		this.name = name;
-		this.#nextState = nextState;
 		this.#speed = options?.speed ?? this.#speed;
 		this.#postAttackTime = options?.postAttackTime ?? this.#postAttackTime;
 		this.#targetPosition = options?.targetPosition;
@@ -1676,7 +1599,7 @@ export class DashTowardPlayer<AllStates extends string>
 
 	init(
 		sprite: Phaser.GameObjects.Sprite,
-		stateMachine: BehaviorMachineInterface<AllStates>,
+		goToNextState: BehaviorCompleteCallback,
 		enemyManager: EnemyManager
 	): void {
 		if (!sprite.body || !isDynamicSprite(sprite)) {
@@ -1695,15 +1618,14 @@ export class DashTowardPlayer<AllStates extends string>
 		sprite.scene.time.addEvent({
 			delay: this.#postAttackTime,
 			callback: () => {
-				stateMachine.popState();
-				stateMachine.pushState(this.#nextState);
+				goToNextState();
 			},
 		});
 	}
 
 	update(
 		sprite: Phaser.GameObjects.Sprite,
-		_: BehaviorMachineInterface<AllStates>,
+		_: BehaviorCompleteCallback,
 		enemyManager: EnemyManager
 	): void {
 		if (!isDynamicSprite(sprite) || !enemyManager.player.body) {
@@ -1735,7 +1657,6 @@ export class DashTowardPlayer<AllStates extends string>
 export class LaserSight<AllStates extends string>
 	implements Behavior<AllStates, Phaser.GameObjects.Sprite>
 {
-	#nextState: AllStates;
 	#speed = 50;
 	#postAttackTime = 1000;
 	#color = 0xff0000;
@@ -1744,7 +1665,6 @@ export class LaserSight<AllStates extends string>
 
 	constructor(
 		name: AllStates,
-		nextState: AllStates,
 		options?: {
 			speed?: number;
 			postAttackTime?: number;
@@ -1753,7 +1673,6 @@ export class LaserSight<AllStates extends string>
 		}
 	) {
 		this.name = name;
-		this.#nextState = nextState;
 		this.#speed = options?.speed ?? this.#speed;
 		this.#postAttackTime = options?.postAttackTime ?? this.#postAttackTime;
 		this.#color = options?.color ?? this.#color;
@@ -1762,7 +1681,7 @@ export class LaserSight<AllStates extends string>
 
 	init(
 		sprite: Phaser.GameObjects.Sprite,
-		stateMachine: BehaviorMachineInterface<AllStates>,
+		goToNextState: BehaviorCompleteCallback,
 		enemyManager: EnemyManager
 	): void {
 		if (!sprite.body || !isDynamicSprite(sprite)) {
@@ -1786,8 +1705,8 @@ export class LaserSight<AllStates extends string>
 			delay: this.#postAttackTime,
 			callback: () => {
 				effect?.destroy();
-				stateMachine.popState();
-				stateMachine.pushState(this.#nextState);
+
+				goToNextState();
 			},
 		});
 		this.#onTarget?.({
@@ -1802,27 +1721,20 @@ export class LaserSight<AllStates extends string>
 export class BlackOrbAttack<AllStates extends string>
 	implements Behavior<AllStates, Phaser.GameObjects.Sprite>
 {
-	#nextState: AllStates;
 	#speed = 50;
 	#postAttackTime = 1000;
 	#maxLifetime = 6000;
 	name: AllStates;
 
-	constructor(
-		name: AllStates,
-		nextState: AllStates,
-		speed: number,
-		postAttackTime: number
-	) {
+	constructor(name: AllStates, speed: number, postAttackTime: number) {
 		this.name = name;
-		this.#nextState = nextState;
 		this.#speed = speed;
 		this.#postAttackTime = postAttackTime;
 	}
 
 	init(
 		sprite: Phaser.GameObjects.Sprite,
-		stateMachine: BehaviorMachineInterface<AllStates>,
+		goToNextState: BehaviorCompleteCallback,
 		enemyManager: EnemyManager
 	): void {
 		if (!sprite.body || !isDynamicSprite(sprite)) {
@@ -1832,13 +1744,11 @@ export class BlackOrbAttack<AllStates extends string>
 			| { effects?: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody[] }
 			| undefined = sprite.data.get("SummonCircle");
 		if (!Array.isArray(circleData?.effects)) {
-			stateMachine.popState();
-			stateMachine.pushState(this.#nextState);
+			goToNextState();
 			return;
 		}
 		if (circleData.effects.length === 0) {
-			stateMachine.popState();
-			stateMachine.pushState(this.#nextState);
+			goToNextState();
 			return;
 		}
 		const enemy = circleData.effects.pop();
@@ -1847,8 +1757,7 @@ export class BlackOrbAttack<AllStates extends string>
 		}
 		sprite.data.set("SummonCircle", circleData);
 		if (!enemy.active) {
-			stateMachine.popState();
-			stateMachine.pushState(this.#nextState);
+			goToNextState();
 			return;
 		}
 
@@ -1865,8 +1774,7 @@ export class BlackOrbAttack<AllStates extends string>
 		sprite.scene.time.addEvent({
 			delay: this.#postAttackTime,
 			callback: () => {
-				stateMachine.popState();
-				stateMachine.pushState(this.#nextState);
+				goToNextState();
 			},
 		});
 
@@ -1884,7 +1792,6 @@ export class BlackOrbAttack<AllStates extends string>
 export class RangedFireBall<AllStates extends string>
 	implements Behavior<AllStates, Phaser.GameObjects.Sprite>
 {
-	#nextState: AllStates;
 	#speed = 50;
 	#postAttackTime = 1000;
 	#hitsWalls = false;
@@ -1894,7 +1801,6 @@ export class RangedFireBall<AllStates extends string>
 
 	constructor(
 		name: AllStates,
-		nextState: AllStates,
 		config?: {
 			speed?: number;
 			postAttackTime?: number;
@@ -1904,7 +1810,6 @@ export class RangedFireBall<AllStates extends string>
 		}
 	) {
 		this.name = name;
-		this.#nextState = nextState;
 		this.#speed = config?.speed ?? this.#speed;
 		this.#postAttackTime = config?.postAttackTime ?? this.#postAttackTime;
 		this.#hitsWalls = config?.hitsWalls ?? this.#hitsWalls;
@@ -1914,7 +1819,7 @@ export class RangedFireBall<AllStates extends string>
 
 	init(
 		sprite: Phaser.GameObjects.Sprite,
-		stateMachine: BehaviorMachineInterface<AllStates>,
+		goToNextState: BehaviorCompleteCallback,
 		enemyManager: EnemyManager
 	): void {
 		if (!sprite.body || !isDynamicSprite(sprite)) {
@@ -2002,8 +1907,7 @@ export class RangedFireBall<AllStates extends string>
 		sprite.scene.time.addEvent({
 			delay: this.#postAttackTime,
 			callback: () => {
-				stateMachine.popState();
-				stateMachine.pushState(this.#nextState);
+				goToNextState();
 			},
 		});
 
@@ -2019,26 +1923,19 @@ export class RangedFireBall<AllStates extends string>
 export class RangedIceBall<AllStates extends string>
 	implements Behavior<AllStates, Phaser.GameObjects.Sprite>
 {
-	#nextState: AllStates;
 	#speed = 50;
 	#postAttackTime = 1000;
 	name: AllStates;
 
-	constructor(
-		name: AllStates,
-		nextState: AllStates,
-		speed: number,
-		postAttackTime: number
-	) {
+	constructor(name: AllStates, speed: number, postAttackTime: number) {
 		this.name = name;
-		this.#nextState = nextState;
 		this.#speed = speed;
 		this.#postAttackTime = postAttackTime;
 	}
 
 	init(
 		sprite: Phaser.GameObjects.Sprite,
-		stateMachine: BehaviorMachineInterface<AllStates>,
+		goToNextState: BehaviorCompleteCallback,
 		enemyManager: EnemyManager
 	): void {
 		if (!sprite.body || !isDynamicSprite(sprite)) {
@@ -2093,8 +1990,7 @@ export class RangedIceBall<AllStates extends string>
 		sprite.scene.time.addEvent({
 			delay: this.#postAttackTime,
 			callback: () => {
-				stateMachine.popState();
-				stateMachine.pushState(this.#nextState);
+				goToNextState();
 			},
 		});
 
@@ -2110,7 +2006,6 @@ export class RangedIceBall<AllStates extends string>
 export class WalkWithFire<AllStates extends string>
 	implements Behavior<AllStates, Phaser.GameObjects.Sprite>
 {
-	#nextState: AllStates;
 	name: AllStates;
 	#effect: Phaser.GameObjects.Sprite;
 	#enemySpeed = 50;
@@ -2119,11 +2014,9 @@ export class WalkWithFire<AllStates extends string>
 
 	constructor(
 		name: AllStates,
-		nextState: AllStates,
 		config?: { speed?: number; endAfter?: number; rotateDistance?: number }
 	) {
 		this.name = name;
-		this.#nextState = nextState;
 		if (config?.speed) {
 			this.#enemySpeed = config.speed;
 		}
@@ -2137,7 +2030,7 @@ export class WalkWithFire<AllStates extends string>
 
 	init(
 		sprite: Phaser.GameObjects.Sprite,
-		stateMachine: BehaviorMachineInterface<AllStates>,
+		goToNextState: BehaviorCompleteCallback,
 		enemyManager: EnemyManager
 	): void {
 		if (!sprite.body || !isDynamicSprite(sprite)) {
@@ -2190,8 +2083,8 @@ export class WalkWithFire<AllStates extends string>
 			walkSound.stop();
 			MainEvents.emit(Events.EnemyHitPlayer, true);
 			this.#effect.destroy();
-			stateMachine.popState();
-			stateMachine.pushState(this.#nextState);
+
+			goToNextState();
 		});
 
 		sprite.once(Events.MonsterDying, () => {
@@ -2201,16 +2094,16 @@ export class WalkWithFire<AllStates extends string>
 		MainEvents.once(Events.LeavingRoom, () => {
 			walkSound.stop();
 			this.#effect?.destroy();
-			stateMachine.popState();
-			stateMachine.pushState(this.#nextState);
+
+			goToNextState();
 		});
 		sprite.scene.time.addEvent({
 			delay: this.#endAfter,
 			callback: () => {
 				walkSound?.stop();
 				this.#effect?.destroy();
-				stateMachine.popState();
-				stateMachine.pushState(this.#nextState);
+
+				goToNextState();
 			},
 		});
 	}
@@ -2246,20 +2139,18 @@ export class WalkWithFire<AllStates extends string>
 export class IceBeam<AllStates extends string>
 	implements Behavior<AllStates, Phaser.GameObjects.Sprite>
 {
-	#nextState: AllStates;
 	iceMeltTime = 4000;
 	attackSpeed = 150;
 	name: AllStates;
 
-	constructor(name: AllStates, nextState: AllStates, attackSpeed: number) {
+	constructor(name: AllStates, attackSpeed: number) {
 		this.name = name;
-		this.#nextState = nextState;
 		this.attackSpeed = attackSpeed;
 	}
 
 	init(
 		sprite: Phaser.GameObjects.Sprite,
-		stateMachine: BehaviorMachineInterface<AllStates>,
+		goToNextState: BehaviorCompleteCallback,
 		enemyManager: EnemyManager
 	): void {
 		if (!sprite.body || !isDynamicSprite(sprite)) {
@@ -2319,8 +2210,8 @@ export class IceBeam<AllStates extends string>
 			sprite.scene?.sound.stopByKey("freeze");
 			MainEvents.emit(Events.EnemyHitPlayer, true);
 			effect.destroy();
-			stateMachine.popState();
-			stateMachine.pushState(this.#nextState);
+
+			goToNextState();
 		});
 
 		sprite.once(Events.MonsterDying, () => {
@@ -2330,14 +2221,14 @@ export class IceBeam<AllStates extends string>
 		MainEvents.once(Events.LeavingRoom, () => {
 			sprite.scene?.sound.stopByKey("freeze");
 			effect?.destroy();
-			stateMachine.popState();
-			stateMachine.pushState(this.#nextState);
+
+			goToNextState();
 		});
 		effect.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
 			sprite.scene?.sound.stopByKey("freeze");
 			effect?.destroy();
-			stateMachine.popState();
-			stateMachine.pushState(this.#nextState);
+
+			goToNextState();
 		});
 	}
 
@@ -2407,7 +2298,6 @@ function getWalkAnimationKeyForDirection(direction: SpriteDirection): string {
 export class SwoopAttack<AllStates extends string>
 	implements Behavior<AllStates, Phaser.GameObjects.Sprite>
 {
-	#nextState: AllStates;
 	name: AllStates;
 	#followTime: number | undefined;
 	#awareDistance: number | undefined;
@@ -2418,7 +2308,6 @@ export class SwoopAttack<AllStates extends string>
 
 	constructor(
 		name: AllStates,
-		nextState: AllStates,
 		config?: {
 			speed?: number;
 			maxSpeed?: number;
@@ -2427,7 +2316,6 @@ export class SwoopAttack<AllStates extends string>
 		}
 	) {
 		this.name = name;
-		this.#nextState = nextState;
 		if (config?.followTime) {
 			this.#followTime = config.followTime;
 		}
@@ -2444,7 +2332,7 @@ export class SwoopAttack<AllStates extends string>
 
 	init(
 		sprite: Phaser.GameObjects.Sprite,
-		stateMachine: BehaviorMachineInterface<AllStates>
+		goToNextState: BehaviorCompleteCallback
 	): void {
 		if (!isDynamicSprite(sprite)) {
 			throw new Error("invalid sprite");
@@ -2461,8 +2349,8 @@ export class SwoopAttack<AllStates extends string>
 				delay: this.#followTime,
 				callback: () => {
 					sprite?.body?.setVelocity(0);
-					stateMachine.popState();
-					stateMachine.pushState(this.#nextState);
+
+					goToNextState();
 				},
 			});
 		}
@@ -2470,7 +2358,7 @@ export class SwoopAttack<AllStates extends string>
 
 	update(
 		sprite: Phaser.GameObjects.Sprite,
-		stateMachine: BehaviorMachineInterface<AllStates>,
+		goToNextState: BehaviorCompleteCallback,
 		enemyManager: EnemyManager
 	): void {
 		if (!isDynamicSprite(sprite)) {
@@ -2490,8 +2378,8 @@ export class SwoopAttack<AllStates extends string>
 		if (this.#awareDistance) {
 			if (distance > this.#awareDistance) {
 				sprite.body.stop();
-				stateMachine.popState();
-				stateMachine.pushState(this.#nextState);
+
+				goToNextState();
 				return;
 			}
 		}
@@ -2536,7 +2424,6 @@ export class SwoopAttack<AllStates extends string>
 export class FollowPlayer<AllStates extends string>
 	implements Behavior<AllStates, Phaser.GameObjects.Sprite>
 {
-	#nextState: AllStates;
 	name: AllStates;
 	#followTime: number | undefined;
 	#awareDistance: number | undefined;
@@ -2544,7 +2431,6 @@ export class FollowPlayer<AllStates extends string>
 
 	constructor(
 		name: AllStates,
-		nextState: AllStates,
 		config?: {
 			speed?: number;
 			followTime?: number;
@@ -2552,7 +2438,6 @@ export class FollowPlayer<AllStates extends string>
 		}
 	) {
 		this.name = name;
-		this.#nextState = nextState;
 		if (config?.followTime) {
 			this.#followTime = config.followTime;
 		}
@@ -2566,7 +2451,7 @@ export class FollowPlayer<AllStates extends string>
 
 	init(
 		sprite: Phaser.GameObjects.Sprite,
-		stateMachine: BehaviorMachineInterface<AllStates>
+		goToNextState: BehaviorCompleteCallback
 	): void {
 		if (!isDynamicSprite(sprite)) {
 			throw new Error("invalid sprite");
@@ -2577,8 +2462,8 @@ export class FollowPlayer<AllStates extends string>
 				delay: this.#followTime,
 				callback: () => {
 					sprite?.body?.setVelocity(0);
-					stateMachine.popState();
-					stateMachine.pushState(this.#nextState);
+
+					goToNextState();
 				},
 			});
 		}
@@ -2586,7 +2471,7 @@ export class FollowPlayer<AllStates extends string>
 
 	update(
 		sprite: Phaser.GameObjects.Sprite,
-		stateMachine: BehaviorMachineInterface<AllStates>,
+		goToNextState: BehaviorCompleteCallback,
 		enemyManager: EnemyManager
 	): void {
 		if (!isDynamicSprite(sprite)) {
@@ -2607,8 +2492,8 @@ export class FollowPlayer<AllStates extends string>
 			if (distance > this.#awareDistance) {
 				sprite.scene?.sound.stopByKey("water-walk");
 				sprite.body.stop();
-				stateMachine.popState();
-				stateMachine.pushState(this.#nextState);
+
+				goToNextState();
 				return;
 			}
 		}
@@ -2785,7 +2670,6 @@ class Seeker extends Phaser.Physics.Arcade.Sprite {
 export class ThrowRocks<AllStates extends string>
 	implements Behavior<AllStates, Phaser.GameObjects.Sprite>
 {
-	#nextState: AllStates;
 	#speed = 500;
 	#delayBeforeEnd = 1000;
 	#delayBetweenRocks = 600;
@@ -2798,7 +2682,6 @@ export class ThrowRocks<AllStates extends string>
 
 	constructor(
 		name: AllStates,
-		nextState: AllStates,
 		config: {
 			speed: number;
 			rockCount: number;
@@ -2807,7 +2690,6 @@ export class ThrowRocks<AllStates extends string>
 		}
 	) {
 		this.name = name;
-		this.#nextState = nextState;
 		this.#speed = config.speed;
 		this.#rockCount = config.rockCount;
 		this.#delayBeforeEnd = config.delayBeforeEnd;
@@ -2816,7 +2698,7 @@ export class ThrowRocks<AllStates extends string>
 
 	init(
 		sprite: Phaser.GameObjects.Sprite,
-		_: BehaviorMachineInterface<AllStates>,
+		_: BehaviorCompleteCallback,
 		enemyManager: EnemyManager
 	): void {
 		if (!sprite.body || !isDynamicSprite(sprite)) {
@@ -2901,7 +2783,7 @@ export class ThrowRocks<AllStates extends string>
 		this.#sprite.scene?.physics.add.collider(this.#enemyManager.enemies, tile);
 	}
 
-	waitAndEnd(stateMachine: BehaviorMachineInterface<AllStates>) {
+	waitAndEnd(goToNextState: BehaviorCompleteCallback) {
 		if (this.#isEnding) {
 			return;
 		}
@@ -2923,18 +2805,18 @@ export class ThrowRocks<AllStates extends string>
 						rock.destroy();
 					});
 				});
-				stateMachine.popState();
-				stateMachine.pushState(this.#nextState);
+
+				goToNextState();
 			},
 		});
 	}
 
 	update(
 		_: Phaser.GameObjects.Sprite,
-		stateMachine: BehaviorMachineInterface<AllStates>
+		goToNextState: BehaviorCompleteCallback
 	): void {
 		if (this.#rockCount === 0) {
-			this.waitAndEnd(stateMachine);
+			this.waitAndEnd(goToNextState);
 		}
 	}
 }

@@ -175,11 +175,14 @@ export class FinalBoss extends BaseMonster<AllStates> {
 		const postOrbTime = 700;
 		switch (state) {
 			case "initial":
-				return new WaitForActive(state, "roar1", { distance: 80 });
+				this.nextState = "roar1";
+				return new WaitForActive(state, { distance: 80 });
 			case "roar1":
-				return new Roar(state, "summoncircle");
+				this.nextState = "summoncircle";
+				return new Roar(state);
 			case "walk":
-				return new RandomlyWalk(state, "attack1", {
+				this.nextState = "attack1";
+				return new RandomlyWalk(state, {
 					speed: 65,
 					minWalkTime: 2000,
 					maxWalkTime: 5000,
@@ -190,7 +193,8 @@ export class FinalBoss extends BaseMonster<AllStates> {
 					}),
 				});
 			case "summoncircle":
-				return new SummonCircle(state, "walk", {
+				this.nextState = "walk";
+				return new SummonCircle(state, {
 					createMonster: () => {
 						if (!this.body) {
 							throw new Error("monster is invalid");
@@ -204,59 +208,80 @@ export class FinalBoss extends BaseMonster<AllStates> {
 					},
 				});
 			case "attack1":
-				return new BlackOrbAttack(state, "attack2", orbSpeed, postOrbTime);
+				this.nextState = "attack2";
+				return new BlackOrbAttack(state, orbSpeed, postOrbTime);
 			case "attack2":
-				return new BlackOrbAttack(state, "attack3", orbSpeed, postOrbTime);
+				this.nextState = "attack3";
+				return new BlackOrbAttack(state, orbSpeed, postOrbTime);
 			case "attack3":
-				return new BlackOrbAttack(state, "attack4", orbSpeed, postOrbTime);
+				this.nextState = "attack4";
+				return new BlackOrbAttack(state, orbSpeed, postOrbTime);
 			case "attack4":
-				return new BlackOrbAttack(state, "attack5", orbSpeed, postOrbTime);
+				this.nextState = "attack5";
+				return new BlackOrbAttack(state, orbSpeed, postOrbTime);
 			case "attack5":
-				return new BlackOrbAttack(state, "attack6", orbSpeed, postOrbTime);
+				this.nextState = "attack6";
+				return new BlackOrbAttack(state, orbSpeed, postOrbTime);
 			case "attack6":
-				return new BlackOrbAttack(state, "freeze", orbSpeed, postOrbTime);
+				this.nextState = "freeze";
+				return new BlackOrbAttack(state, orbSpeed, postOrbTime);
 			case "freeze":
-				return new IceAttack(state, this.chooseAttack1());
+				this.nextState = this.chooseAttack1();
+				return new IceAttack(state);
 			case "teleport":
-				return new TeleportToPlatform(state, this.chooseAttack2(), 300);
+				this.nextState = this.chooseAttack2();
+				return new TeleportToPlatform(state, 300);
 			case "vine1":
-				return new SeekingVine(state, "vine2", 50, 350);
+				this.nextState = "vine2";
+				return new SeekingVine(state, 50, 350);
 			case "vine2":
-				return new SeekingVine(state, "vine3", 50, 350);
+				this.nextState = "vine3";
+				return new SeekingVine(state, 50, 350);
 			case "vine3":
-				return new SeekingVine(state, "summoncircle", 50, 350);
+				this.nextState = "summoncircle";
+				return new SeekingVine(state, 50, 350);
 			case "iceball1":
-				return new RangedIceBall(state, "iceball2", 60, 350);
+				this.nextState = "iceball2";
+				return new RangedIceBall(state, 60, 350);
 			case "iceball2":
-				return new RangedIceBall(state, "iceball3", 60, 350);
+				this.nextState = "iceball3";
+				return new RangedIceBall(state, 60, 350);
 			case "iceball3":
-				return new IceBeam(state, "iceball4", 200);
+				this.nextState = "iceball4";
+				return new IceBeam(state, 200);
 			case "iceball4":
-				return new RangedIceBall(state, "summoncircle", 60, 350);
+				this.nextState = "summoncircle";
+				return new RangedIceBall(state, 60, 350);
 			case "fireball1":
-				return new RangedFireBall(state, "fireball2", {
+				this.nextState = "fireball2";
+				return new RangedFireBall(state, {
 					speed: 180,
 					postAttackTime: 350,
 				});
 			case "fireball2":
-				return new RangedFireBall(state, "fireball3", {
+				this.nextState = "fireball3";
+				return new RangedFireBall(state, {
 					speed: 180,
 					postAttackTime: 350,
 				});
 			case "fireball3":
-				return new RangedFireBall(state, "fireball4", {
+				this.nextState = "fireball4";
+				return new RangedFireBall(state, {
 					speed: 180,
 					postAttackTime: 350,
 				});
 			case "fireball4":
-				return new RangedFireBall(state, "summoncircle", {
+				this.nextState = "summoncircle";
+				return new RangedFireBall(state, {
 					speed: 180,
 					postAttackTime: 350,
 				});
 			case "slash":
-				return new SlashTowardPlayer(state, "summoncircle", 180);
+				this.nextState = "summoncircle";
+				return new SlashTowardPlayer(state, 180);
 			case "rocks":
-				return new ThrowRocks(state, "summoncircle", {
+				this.nextState = "summoncircle";
+				return new ThrowRocks(state, {
 					speed: 500,
 					rockCount: 4,
 					delayBeforeEnd: 1000,

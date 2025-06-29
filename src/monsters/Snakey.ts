@@ -70,11 +70,13 @@ export class Snakey extends BaseMonster<AllStates> {
 	constructNewBehaviorFor(state: string) {
 		switch (state) {
 			case "wait":
-				return new WaitForActive(state, "aim", {
+				this.nextState = "aim";
+				return new WaitForActive(state, {
 					distance: this.awareDistance,
 				});
 			case "aim":
-				return new LaserSight(state, "dash", {
+				this.nextState = "dash";
+				return new LaserSight(state, {
 					color: this.primaryColor,
 					onTarget: (target: { x: number; y: number }) =>
 						(this.#targetPosition = target),
@@ -83,7 +85,8 @@ export class Snakey extends BaseMonster<AllStates> {
 				if (!this.#targetPosition) {
 					throw new Error("No target for some reason");
 				}
-				return new DashTowardPlayer(state, "wait", {
+				this.nextState = "wait";
+				return new DashTowardPlayer(state, {
 					targetPosition: this.#targetPosition,
 					speed: this.speed,
 				});

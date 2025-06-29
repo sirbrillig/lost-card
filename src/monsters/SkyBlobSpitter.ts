@@ -8,7 +8,7 @@ type AllStates = "idle" | "spawn1" | "spawn2" | "spawn3" | "idle2";
 
 export class SkyBlobSpitter extends BaseMonster<AllStates> {
 	hitPoints: number = 6;
-	primaryColor = 0x23A487;
+	primaryColor = 0x23a487;
 	#enemyManager;
 
 	constructor(
@@ -56,10 +56,12 @@ export class SkyBlobSpitter extends BaseMonster<AllStates> {
 		switch (state) {
 			case "idle": {
 				const randomNumber = Phaser.Math.Between(300, 400);
-				return new Idle(state, "spawn1", "appear", randomNumber);
+				this.nextState = "spawn1";
+				return new Idle(state, "appear", randomNumber);
 			}
 			case "spawn1":
-				return new SpawnEnemies(state, "spawn2", {
+				this.nextState = "spawn2";
+				return new SpawnEnemies(state, {
 					enemiesToSpawn: 1,
 					maxSpawnedEnemies: 6,
 					postSpawnTime,
@@ -76,7 +78,8 @@ export class SkyBlobSpitter extends BaseMonster<AllStates> {
 					},
 				});
 			case "spawn2":
-				return new SpawnEnemies(state, "spawn3", {
+				this.nextState = "spawn3";
+				return new SpawnEnemies(state, {
 					enemiesToSpawn: 1,
 					maxSpawnedEnemies: 6,
 					postSpawnTime,
@@ -93,7 +96,8 @@ export class SkyBlobSpitter extends BaseMonster<AllStates> {
 					},
 				});
 			case "spawn3":
-				return new SpawnEnemies(state, "idle2", {
+				this.nextState = "idle2";
+				return new SpawnEnemies(state, {
 					enemiesToSpawn: 1,
 					maxSpawnedEnemies: 6,
 					postSpawnTime,
@@ -111,7 +115,8 @@ export class SkyBlobSpitter extends BaseMonster<AllStates> {
 				});
 			case "idle2": {
 				const randomNumber = Phaser.Math.Between(300, 400);
-				return new Idle(state, "idle", "disappear", randomNumber);
+				this.nextState = "idle";
+				return new Idle(state, "disappear", randomNumber);
 			}
 		}
 	}

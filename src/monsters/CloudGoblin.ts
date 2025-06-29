@@ -63,13 +63,17 @@ export class CloudGoblin extends BaseMonster<AllStates> {
 	constructNewBehaviorFor(state: string) {
 		switch (state) {
 			case "randomwalk1":
-				return new RandomlyWalk(state, "attack", { speed: 25 });
+				this.nextState = "attack";
+				return new RandomlyWalk(state, { speed: 25 });
 			case "randomwalk2":
-				return new RandomlyWalk(state, "randomwalk2", { speed: 100 });
+				this.nextState = "randomwalk2";
+				return new RandomlyWalk(state, { speed: 100 });
 			case "attack":
-				return new BigSwing(state, "randomwalk3");
+				this.nextState = "randomwalk3";
+				return new BigSwing(state);
 			case "randomwalk3":
-				return new RandomlyWalk(state, "randomwalk1", { speed: 100 });
+				this.nextState = "randomwalk1";
+				return new RandomlyWalk(state, { speed: 100 });
 		}
 	}
 }

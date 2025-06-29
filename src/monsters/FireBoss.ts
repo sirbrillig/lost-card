@@ -99,37 +99,45 @@ export class FireBoss extends BaseMonster<AllStates> {
 		const fireSpeed = isBloodied ? 200 : 180;
 		switch (state) {
 			case "initial":
-				return new WaitForActive(state, "roar1");
+				this.nextState = "roar1";
+				return new WaitForActive(state);
 			case "roar1":
-				return new Roar(state, "walk");
+				this.nextState = "walk";
+				return new Roar(state);
 			case "walk":
-				return new RandomlyWalk(state, "attack1", {
+				this.nextState = "attack1";
+				return new RandomlyWalk(state, {
 					speed: 60,
 					minWalkTime: 2000,
 					maxWalkTime: 5000,
 				});
 			case "attack1":
-				return new RangedFireBall(state, "attack2", {
+				this.nextState = "attack2";
+				return new RangedFireBall(state, {
 					speed: fireSpeed,
 					postAttackTime: 350,
 				});
 			case "attack2":
-				return new RangedFireBall(state, "attack3", {
+				this.nextState = "attack3";
+				return new RangedFireBall(state, {
 					speed: fireSpeed,
 					postAttackTime: 350,
 				});
 			case "attack3":
-				return new RangedFireBall(state, "attack4", {
+				this.nextState = "attack4";
+				return new RangedFireBall(state, {
 					speed: fireSpeed,
 					postAttackTime: 350,
 				});
 			case "attack4":
-				return new RangedFireBall(state, "attack5", {
+				this.nextState = "attack5";
+				return new RangedFireBall(state, {
 					speed: fireSpeed,
 					postAttackTime: 350,
 				});
 			case "attack5":
-				return new RangedFireBall(state, "walk", {
+				this.nextState = "walk";
+				return new RangedFireBall(state, {
 					speed: fireSpeed,
 					postAttackTime: 350,
 				});

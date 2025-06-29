@@ -12,6 +12,8 @@ export interface BehaviorMachineInterface<Key extends string> {
 	subscribe(callback: Subscriber): Unsubscribe;
 }
 
+export type BehaviorCompleteCallback = () => void;
+
 export interface Behavior<
 	Key extends string,
 	Sprite extends Phaser.GameObjects.Sprite,
@@ -19,12 +21,12 @@ export interface Behavior<
 	name: Key;
 	init(
 		sprite: Sprite,
-		stateMachine: BehaviorMachineInterface<Key>,
+		goToNextState: BehaviorCompleteCallback,
 		enemyManager: EnemyManager
 	): void;
 	update(
 		sprite: Sprite,
-		stateMachine: BehaviorMachineInterface<Key>,
+		goToNextState: BehaviorCompleteCallback,
 		enemyManager: EnemyManager
 	): void;
 }

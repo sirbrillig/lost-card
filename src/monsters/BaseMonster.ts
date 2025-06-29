@@ -17,6 +17,7 @@ import { config } from "../lib/config";
 export class BaseMonster<AllStates extends string> extends Phaser.Physics.Arcade
 	.Sprite {
 	stateMachine: BehaviorMachineInterface<AllStates>;
+	nextState: AllStates;
 	#currentPlayingState: Behavior<AllStates, BaseMonster<AllStates>> | undefined;
 	#enemyManager: EnemyManager;
 	#isBeingHit: boolean = false;
@@ -40,7 +41,9 @@ export class BaseMonster<AllStates extends string> extends Phaser.Physics.Arcade
 		super(scene, x, y, texture, initialFrame);
 
 		this.#enemyManager = enemyManager;
-		this.stateMachine = new StateMachine(this.getInitialState());
+		const initialState = this.getInitialState();
+		this.nextState = initialState;
+		this.stateMachine = new StateMachine(initialState);
 
 		scene.add.existing(this);
 		scene.physics.add.existing(this);
@@ -112,6 +115,29 @@ export class BaseMonster<AllStates extends string> extends Phaser.Physics.Arcade
 		return true;
 	}
 
+	changeCurrentPlayingState(newState: AllStates): void {
+		this.stateMachine.popState();
+		this.stateMachine.pushState(newState);
+	}
+
+	goToNextState(): void {
+		this.changeCurrentPlayingState(this.nextState);
+	}
+
+	initNewState(state: Behavior<AllStates, BaseMonster<AllStates>> | undefined) {
+		this.#currentPlayingState = state;
+		if (!this.#currentPlayingState) {
+			throw new Error("No state active");
+		}
+		this.#currentPlayingState.init(
+			this,
+			this.goToNextState.bind(this),
+			this.#enemyManager
+		);
+		this.updateAfterBehaviorInit(this.#currentPlayingState.name);
+		this.updateAfterBehavior(this.#currentPlayingState.name);
+	}
+
 	update() {
 		if (!this.body || !isDynamicSprite(this)) {
 			throw new Error("Could not update monster");
@@ -133,29 +159,21 @@ export class BaseMonster<AllStates extends string> extends Phaser.Physics.Arcade
 
 		// Take init actions
 		if (state && state !== this.#currentPlayingState?.name) {
-			this.#currentPlayingState = this.constructNewBehaviorFor(state);
-			if (!this.#currentPlayingState) {
-				throw new Error("No state active");
-			}
-			this.#currentPlayingState.init(
-				this,
-				this.stateMachine,
-				this.#enemyManager
-			);
-			this.updateAfterBehaviorInit(this.#currentPlayingState.name);
-			this.updateAfterBehavior(this.#currentPlayingState.name);
+			this.initNewState(this.constructNewBehaviorFor(state));
 			return;
 		}
 
 		// Take update actions
 		this.#currentPlayingState?.update(
 			this,
-			this.stateMachine,
+			this.goToNextState.bind(this),
 			this.#enemyManager
 		);
 
 		this.updateAfterBehavior(this.#currentPlayingState?.name);
 	}
+
+	updateAfterHit() {}
 
 	updateBeforeBehavior(): void {}
 
@@ -197,6 +215,7 @@ export class BaseMonster<AllStates extends string> extends Phaser.Physics.Arcade
 		}
 
 		this.knockBackForHurtMonster();
+		this.updateAfterHit();
 	}
 
 	playEffectForHurtMonster() {

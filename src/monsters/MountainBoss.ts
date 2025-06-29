@@ -110,29 +110,36 @@ export class MountainBoss extends BaseMonster<AllStates> {
 		};
 		switch (state) {
 			case "initial":
-				return new WaitForActive(state, "roar1");
+				this.nextState = "roar1";
+				return new WaitForActive(state);
 			case "roar1":
-				return new Roar(state, "spawn1");
+				this.nextState = "spawn1";
+				return new Roar(state);
 			case "spawn1":
-				return new SpawnEnemies(state, "spawn2", {
+				this.nextState = "spawn2";
+				return new SpawnEnemies(state, {
 					enemiesToSpawn: 4,
 					maxSpawnedEnemies: 18,
 					createMonster,
 				});
 			case "spawn2":
-				return new SpawnEnemies(state, "leftrightmarch", {
+				this.nextState = "leftrightmarch";
+				return new SpawnEnemies(state, {
 					enemiesToSpawn: 4,
 					maxSpawnedEnemies: 18,
 					createMonster,
 				});
 			case "leftrightmarch":
-				return new LeftRightMarch(state, "preparethrow", {
+				this.nextState = "preparethrow";
+				return new LeftRightMarch(state, {
 					speed: isBloodied ? 100 : 80,
 				});
 			case "preparethrow":
-				return new PowerUp(state, "throwrocks", { scale: 3 });
+				this.nextState = "throwrocks";
+				return new PowerUp(state, { scale: 3 });
 			case "throwrocks":
-				return new ThrowRocks(state, "roar1", {
+				this.nextState = "roar1";
+				return new ThrowRocks(state, {
 					speed: 500,
 					rockCount: isBloodied ? 5 : 3,
 					delayBeforeEnd: 1200,

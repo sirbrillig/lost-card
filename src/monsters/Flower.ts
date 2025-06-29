@@ -70,11 +70,13 @@ export class Flower extends BaseMonster<AllStates> {
 	constructNewBehaviorFor(state: string) {
 		switch (state) {
 			case "wait":
-				return new WaitForActive(state, "burst", {
+				this.nextState = "burst";
+				return new WaitForActive(state, {
 					distance: this.awareDistance,
 				});
 			case "burst":
-				return new Poof(state, "wait");
+				this.nextState = "wait";
+				return new Poof(state);
 		}
 	}
 }

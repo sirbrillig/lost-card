@@ -63,9 +63,11 @@ export class FireMonster extends BaseMonster<AllStates> {
 	constructNewBehaviorFor(state: string) {
 		switch (state) {
 			case "randomwalk1":
-				return new RandomlyWalk(state, "walkwithfire");
+				this.nextState = "walkwithfire";
+				return new RandomlyWalk(state);
 			case "walkwithfire":
-				return new WalkWithFire(state, "randomwalk1");
+				this.nextState = "randomwalk1";
+				return new WalkWithFire(state);
 		}
 	}
 }

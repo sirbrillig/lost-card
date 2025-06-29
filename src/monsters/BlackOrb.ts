@@ -72,9 +72,11 @@ export class BlackOrb extends BaseMonster<AllStates> {
 	constructNewBehaviorFor(state: string) {
 		switch (state) {
 			case "wait1":
-				return new Nothing(state, "wait2", "down", 1000);
+				this.nextState = "wait2";
+				return new Nothing(state, "down", 1000);
 			case "wait2":
-				return new Nothing(state, "wait1", "down", 1000);
+				this.nextState = "wait1";
+				return new Nothing(state, "down", 1000);
 		}
 	}
 }

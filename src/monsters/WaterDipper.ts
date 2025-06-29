@@ -41,11 +41,14 @@ export class WaterDipper extends BaseMonster<AllStates> {
 	constructNewBehaviorFor(state: string) {
 		switch (state) {
 			case "waterteleport":
-				return new TeleportToWater(state, "powerup");
+				this.nextState = "powerup";
+				return new TeleportToWater(state);
 			case "powerup":
-				return new PowerUp(state, "iceball");
+				this.nextState = "iceball";
+				return new PowerUp(state);
 			case "iceball":
-				return new RangedIceBall(state, "waterteleport", 50, 1000);
+				this.nextState = "waterteleport";
+				return new RangedIceBall(state, 50, 1000);
 		}
 	}
 }

@@ -82,11 +82,13 @@ export class GreatGhost extends BaseMonster<AllStates> {
 	constructNewBehaviorFor(state: string) {
 		switch (state) {
 			case "wait":
-				return new WaitForActive(state, "spawn", {
+				this.nextState = "spawn";
+				return new WaitForActive(state, {
 					distance: this.awareDistance,
 				});
 			case "spawn":
-				return new SpawnEnemies(state, "follow", {
+				this.nextState = "follow";
+				return new SpawnEnemies(state, {
 					enemiesToSpawn: 1,
 					maxSpawnedEnemies: 4,
 					createMonster: (_, _2, x: number, y: number) => {
@@ -96,7 +98,8 @@ export class GreatGhost extends BaseMonster<AllStates> {
 					},
 				});
 			case "follow":
-				return new FollowPlayer(state, "spawn", {
+				this.nextState = "spawn";
+				return new FollowPlayer(state, {
 					speed: this.speed,
 					awareDistance: this.awareDistance,
 					followTime: 1000,

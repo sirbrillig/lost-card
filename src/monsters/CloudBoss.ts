@@ -109,32 +109,38 @@ export class CloudBoss extends BaseMonster<AllStates> {
 	constructNewBehaviorFor(state: AllStates) {
 		switch (state) {
 			case "initial":
-				return new WaitForActive(state, "roar1");
+				this.nextState = "roar1";
+				return new WaitForActive(state);
 			case "roar1":
-				return new Roar(state, "attack1");
+				this.nextState = "attack1";
+				return new Roar(state);
 			case "walk":
 				this.body?.stop();
-				return new RandomlyWalk(state, "attack1", {
+				this.nextState = "attack1";
+				return new RandomlyWalk(state, {
 					speed: 30,
 					minWalkTime: 2200,
 					maxWalkTime: 3000,
 				});
 			case "attack1":
-				return new SwoopAttack(state, "attack2", {
+				this.nextState = "attack2";
+				return new SwoopAttack(state, {
 					awareDistance: 600,
 					speed: 250,
 					maxSpeed: 850,
 					followTime: 2000,
 				});
 			case "attack2":
-				return new SwoopAttack(state, "attack3", {
+				this.nextState = "attack3";
+				return new SwoopAttack(state, {
 					awareDistance: 600,
 					speed: 250,
 					maxSpeed: 850,
 					followTime: 2000,
 				});
 			case "attack3":
-				return new SwoopAttack(state, "walk", {
+				this.nextState = "walk";
+				return new SwoopAttack(state, {
 					awareDistance: 600,
 					speed: 250,
 					maxSpeed: 850,

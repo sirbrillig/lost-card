@@ -78,11 +78,13 @@ export class SkyBlob extends BaseMonster<AllStates> {
 	constructNewBehaviorFor(state: string) {
 		switch (state) {
 			case "wait":
-				return new WaitForActive(state, "follow", {
+				this.nextState = "follow";
+				return new WaitForActive(state, {
 					distance: this.awareDistance,
 				});
 			case "follow":
-				return new FollowPlayer(state, "wait", {
+				this.nextState = "wait";
+				return new FollowPlayer(state, {
 					speed: this.speed,
 					awareDistance: this.awareDistance,
 				});

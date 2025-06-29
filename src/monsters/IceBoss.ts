@@ -86,17 +86,22 @@ export class IceBoss extends BaseMonster<AllStates> {
 		const isBloodied = this.hitPoints < 5;
 		switch (state) {
 			case "initial":
-				return new WaitForActive(state, "roar1");
+				this.nextState = "roar1";
+				return new WaitForActive(state);
 			case "roar1":
-				return new Roar(state, "leftrightmarch");
+				this.nextState = "leftrightmarch";
+				return new Roar(state);
 			case "leftrightmarch":
-				return new LeftRightMarch(state, "powerup", {
+				this.nextState = "powerup";
+				return new LeftRightMarch(state, {
 					speed: isBloodied ? 90 : 70,
 				});
 			case "powerup":
-				return new PowerUp(state, "icebeam");
+				this.nextState = "icebeam";
+				return new PowerUp(state);
 			case "icebeam":
-				return new IceBeam(state, "leftrightmarch", isBloodied ? 200 : 150);
+				this.nextState = "leftrightmarch";
+				return new IceBeam(state, isBloodied ? 200 : 150);
 		}
 	}
 

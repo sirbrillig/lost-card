@@ -67,11 +67,13 @@ export class Spike extends BaseMonster<AllStates> {
 	constructNewBehaviorFor(state: string) {
 		switch (state) {
 			case "wait":
-				return new WaitForActive(state, "move", {
+				this.nextState = "move";
+				return new WaitForActive(state, {
 					distance: this.awareDistance,
 				});
 			case "move":
-				return new LeftRightMarch(state, "wait", {
+				this.nextState = "wait";
+				return new LeftRightMarch(state, {
 					speed: this.speed,
 					moveUpDown: true,
 					minWalkTime: 1000,

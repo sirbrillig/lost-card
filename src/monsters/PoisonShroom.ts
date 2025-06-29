@@ -30,11 +30,13 @@ export class PoisonShroom extends BaseMonster<AllStates> {
 	constructNewBehaviorFor(state: string) {
 		switch (state) {
 			case "wait":
-				return new WaitForActive(state, "stickypoison", {
+				this.nextState = "stickypoison";
+				return new WaitForActive(state, {
 					distance: this.awareDistance,
 				});
 			case "stickypoison":
-				return new StickyPoison(state, "wait");
+				this.nextState = "wait";
+				return new StickyPoison(state);
 		}
 	}
 }

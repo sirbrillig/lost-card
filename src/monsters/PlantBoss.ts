@@ -167,32 +167,42 @@ export class PlantBoss extends BaseMonster<AllStates> {
 		};
 		switch (state) {
 			case "initial":
-				return new WaitForActive(state, "roar1");
+				this.nextState = "roar1";
+				return new WaitForActive(state);
 			case "roar1":
-				return new Roar(state, "attack1");
+				this.nextState = "attack1";
+				return new Roar(state);
 			case "walk":
-				return new RandomlyWalk(state, "attack1", {
+				this.nextState = "attack1";
+				return new RandomlyWalk(state, {
 					speed: 75,
 					minWalkTime: 500,
 					maxWalkTime: 3000,
 				});
 			case "attack1":
-				return new SeekingVine(state, "attack2", vineSpeed, 550);
+				this.nextState = "attack2";
+				return new SeekingVine(state, vineSpeed, 550);
 			case "attack2":
-				return new SeekingVine(state, "attack3", vineSpeed, 900);
+				this.nextState = "attack3";
+				return new SeekingVine(state, vineSpeed, 900);
 			case "attack3":
-				return new SeekingVine(state, "teleport", vineSpeed * 2, 1000);
+				this.nextState = "teleport";
+				return new SeekingVine(state, vineSpeed * 2, 1000);
 			case "teleport":
 				this.monsters.forEach((monster) => monster.destroy());
 				this.currentSide = this.currentSide === "left" ? "right" : "left";
-				return new TeleportToPlatform(state, "poof1", 2000);
+				this.nextState = "poof1";
+				return new TeleportToPlatform(state, 2000);
 			case "poof1":
-				return new Poof(state, "poof2", { particleLifeSpan: 1500 });
+				this.nextState = "poof2";
+				return new Poof(state, { particleLifeSpan: 1500 });
 			case "poof2":
-				return new Poof(state, "summon", { particleLifeSpan: 1500 });
+				this.nextState = "summon";
+				return new Poof(state, { particleLifeSpan: 1500 });
 			case "summon":
 				previousMonsterPositions.length = 0;
-				return new SpawnEnemies(state, "walk", {
+				this.nextState = "walk";
+				return new SpawnEnemies(state, {
 					enemiesToSpawn: 6,
 					// We will handle the max ourselves so we set it really high (we
 					// could probably use spawnedEnemyCount directly instead).

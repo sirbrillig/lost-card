@@ -6,7 +6,7 @@ type AllStates = "randomwalk" | "powerup" | "iceattack";
 
 export class IceMonster extends BaseMonster<AllStates> {
 	hitPoints: number = 2;
-	primaryColor: number = 0x39B7E0;
+	primaryColor: number = 0x39b7e0;
 
 	constructor(
 		scene: Phaser.Scene,
@@ -63,11 +63,14 @@ export class IceMonster extends BaseMonster<AllStates> {
 	constructNewBehaviorFor(state: string) {
 		switch (state) {
 			case "randomwalk":
-				return new RandomlyWalk(state, "powerup");
+				this.nextState = "powerup";
+				return new RandomlyWalk(state);
 			case "powerup":
-				return new PowerUp(state, "iceattack");
+				this.nextState = "iceattack";
+				return new PowerUp(state);
 			case "iceattack":
-				return new IceAttack(state, "randomwalk");
+				this.nextState = "randomwalk";
+				return new IceAttack(state);
 		}
 	}
 }
