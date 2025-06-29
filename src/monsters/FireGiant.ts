@@ -1,4 +1,9 @@
-import { WaitForActive, RangedFireBall, SpawnEnemies } from "../lib/behaviors";
+import {
+	WaitForActive,
+	RangedFireBall,
+	SpawnEnemies,
+	LavaExplode,
+} from "../lib/behaviors";
 import {
 	DataKeys,
 	getTilesInRoom,
@@ -13,6 +18,7 @@ type AllStates =
 	| "fireball1"
 	| "fireball2"
 	| "wait2"
+	| "lava-self"
 	| "lava1"
 	| "lava2"
 	| "lava3"
@@ -105,7 +111,8 @@ export class FireGiant extends BaseMonster<AllStates> {
 			return b - a;
 		});
 		// Pick one every pair
-		const targetTileDistance = tileDistances[count * 2 - 1];
+		const targetOfTwo = Phaser.Math.Between(count * 2 - 1, count * 2);
+		const targetTileDistance = tileDistances[targetOfTwo - 1];
 		const targetTile = tilesByDistance[targetTileDistance];
 		return {
 			x: targetTile.pixelX + targetTile.width / 2,
@@ -115,6 +122,7 @@ export class FireGiant extends BaseMonster<AllStates> {
 
 	prepareSelfDestructingEnemy(enemy: LavaBlorp): Phaser.GameObjects.Sprite {
 		enemy.timeBeforeBubble = 1;
+		enemy.timeBeforeExplode = 200;
 		enemy.updateAfterBehavior = (key: string) => {
 			if (key === "lava-explode") {
 				enemy?.destroy();
@@ -135,9 +143,16 @@ export class FireGiant extends BaseMonster<AllStates> {
 			case "fireball2":
 				return new RangedFireBall(state, "wait2", { hitsWalls: true });
 			case "wait2":
-				return new WaitForActive(state, "lava1", {
+				return new WaitForActive(state, "lava-self", {
 					distance: 1,
-					maxWaitTime: 2000,
+					maxWaitTime: 1000,
+				});
+			case "lava-self":
+				return new LavaExplode(state, "lava1", {
+					postAttackTime: 3500,
+					particleLifeSpan: 900,
+					hitboxRadius: 40,
+					isConstant: true,
 				});
 			case "lava1":
 				return new SpawnEnemies(state, "lava2", {

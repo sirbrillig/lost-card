@@ -1362,6 +1362,7 @@ export class LavaExplode<AllStates extends string>
 	#postAttackTime = 1500;
 	#particleLifeSpan = 300;
 	#hitboxRadius = 25;
+	#isConstant = false;
 	name: AllStates;
 
 	constructor(
@@ -1371,6 +1372,7 @@ export class LavaExplode<AllStates extends string>
 			postAttackTime?: number;
 			particleLifeSpan?: number;
 			hitboxRadius?: number;
+			isConstant?: boolean;
 		}
 	) {
 		this.name = name;
@@ -1379,6 +1381,7 @@ export class LavaExplode<AllStates extends string>
 		this.#particleLifeSpan =
 			options?.particleLifeSpan ?? this.#particleLifeSpan;
 		this.#hitboxRadius = options?.hitboxRadius ?? this.#hitboxRadius;
+		this.#isConstant = options?.isConstant ?? this.#isConstant;
 	}
 
 	init(
@@ -1406,7 +1409,9 @@ export class LavaExplode<AllStates extends string>
 		circle.body.setOffset(-this.#hitboxRadius, -this.#hitboxRadius);
 		sprite.scene.physics.add.overlap(enemyManager.player, circle, () => {
 			MainEvents.emit(Events.EnemyHitPlayer, true);
-			circle?.destroy();
+			if (!this.#isConstant) {
+				circle?.destroy();
+			}
 		});
 
 		const emitter = sprite.scene.add.particles(
@@ -1421,7 +1426,11 @@ export class LavaExplode<AllStates extends string>
 				emitting: false,
 			}
 		);
-		emitter.explode(20);
+		if (this.#isConstant) {
+			emitter.start();
+		} else {
+			emitter.explode(20);
+		}
 		emitter.once(Phaser.GameObjects.Particles.Events.COMPLETE, () => {
 			circle?.destroy();
 			emitter?.destroy();
@@ -1438,6 +1447,8 @@ export class LavaExplode<AllStates extends string>
 		sprite.scene.time.addEvent({
 			delay: this.#postAttackTime,
 			callback: () => {
+				circle?.destroy();
+				emitter?.destroy?.();
 				stateMachine.popState();
 				stateMachine.pushState(this.#nextState);
 			},
