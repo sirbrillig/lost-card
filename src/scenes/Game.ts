@@ -18,6 +18,7 @@ import { PoisonShroom } from "../monsters/PoisonShroom";
 import { Snakey } from "../monsters/Snakey";
 import { PlantBug } from "../monsters/PlantBug";
 import { IceMonster } from "../monsters/IceMonster";
+import { IceHopper } from "../monsters/IceHopper";
 import { FireMonster } from "../monsters/FireMonster";
 import { FireGiant } from "../monsters/FireGiant";
 import { FireSpout } from "../monsters/FireSpout";
@@ -2995,6 +2996,16 @@ export class Game extends Scene {
 				}
 				case "IceMonster": {
 					const monster = new IceMonster(
+						this,
+						this.enemyManager,
+						point.x,
+						point.y
+					);
+					this.addEnemyToEnemyManager(monster, point);
+					break;
+				}
+				case "IceHopper": {
+					const monster = new IceHopper(
 						this,
 						this.enemyManager,
 						point.x,

@@ -349,6 +349,128 @@ export class Idle<AllStates extends string>
 	update(): void {}
 }
 
+export class Leap<AllStates extends string>
+	implements Behavior<AllStates, Phaser.GameObjects.Sprite>
+{
+	#speed = 90;
+	#postAttackTime = 900;
+	#previousDistance: number;
+	#targetPosition: { x: number; y: number } | undefined = undefined;
+	#jumpZ: number = 0;
+	#jumpPart: "off" | "start" | "end" = "off";
+	name: AllStates;
+
+	constructor(
+		name: AllStates,
+		options?: {
+			speed?: number;
+			postAttackTime?: number;
+			targetPosition?: { x: number; y: number };
+		}
+	) {
+		this.name = name;
+		this.#speed = options?.speed ?? this.#speed;
+		this.#postAttackTime = options?.postAttackTime ?? this.#postAttackTime;
+		this.#targetPosition = options?.targetPosition;
+	}
+
+	init(
+		sprite: Phaser.GameObjects.Sprite,
+		goToNextState: BehaviorCompleteCallback,
+		enemyManager: EnemyManager
+	): void {
+		if (!sprite.body || !isDynamicSprite(sprite)) {
+			throw new Error("Could not update monster");
+		}
+		this.#jumpPart = "start";
+
+		const target = this.#targetPosition ?? enemyManager.player;
+		const angle = Phaser.Math.Angle.Between(
+			sprite.body.x,
+			sprite.body.y,
+			target.x,
+			target.y
+		);
+		sprite.scene.physics.velocityFromRotation(
+			angle,
+			this.#speed,
+			sprite.body.velocity
+		);
+
+		sprite.scene.physics.add.overlap(enemyManager.player, sprite, () => {
+			MainEvents.emit(Events.EnemyHitPlayer, true);
+		});
+
+		sprite.scene.time.addEvent({
+			delay: this.#postAttackTime,
+			callback: () => {
+				goToNextState();
+			},
+		});
+	}
+
+	update(
+		sprite: Phaser.GameObjects.Sprite,
+		_: BehaviorCompleteCallback,
+		enemyManager: EnemyManager
+	): void {
+		if (!isDynamicSprite(sprite) || !enemyManager.player.body) {
+			throw new Error("Could not update monster");
+		}
+
+		const maxJumpHeight = 10;
+		if (this.#jumpZ >= maxJumpHeight) {
+			this.#jumpPart = "end";
+		}
+		if (this.#jumpPart === "start") {
+			this.#jumpZ += 1;
+		}
+		if (this.#jumpPart === "end") {
+			this.#jumpZ -= 1;
+		}
+		if (this.#jumpZ < 0) {
+			this.#jumpZ = 0;
+		}
+		if (this.#jumpPart !== "off") {
+			// Adjust the visual Y position to be higher than the sprite's body
+			// position to simulate jumping.
+			const newY = sprite.body.position.y - this.#jumpZ;
+			// sprite.y = newY;
+		}
+		if (this.#jumpZ === 0) {
+			this.#jumpPart = "off";
+			// FIXME: reset the visual Y position to where it should be after the
+			// jump. This is hard because the body position is absolute and the Y
+			// position is modified by the camera.
+			const camera = sprite.scene.cameras.main;
+			const screenY =
+				sprite.body.position.y - camera.scrollY + sprite.body.height / 2;
+			// sprite.y = screenY;
+		}
+
+		const distance = Phaser.Math.Distance.BetweenPoints(
+			sprite.body.center,
+			this.#targetPosition ?? enemyManager.player.body.center
+		);
+
+		// If you hit a wall, the direction will change as moveToObject tries to
+		// slide around it. We want to stop in that case so we check to see if the
+		// distance isn't getting closer.
+		if (this.#previousDistance && distance > this.#previousDistance) {
+			sprite.body.stop();
+			return;
+		}
+
+		// If you reach the target, stop.
+		if (distance < 5) {
+			sprite.body.stop();
+			return;
+		}
+
+		this.#previousDistance = distance;
+	}
+}
+
 export class RandomlyWalk<AllStates extends string>
 	implements Behavior<AllStates, Phaser.GameObjects.Sprite>
 {
@@ -1660,6 +1782,7 @@ export class LaserSight<AllStates extends string>
 	#speed = 50;
 	#postAttackTime = 1000;
 	#color = 0xff0000;
+	#isHidden = true;
 	#onTarget: undefined | ((target: { x: number; y: number }) => void);
 	name: AllStates;
 
@@ -1669,6 +1792,7 @@ export class LaserSight<AllStates extends string>
 			speed?: number;
 			postAttackTime?: number;
 			color?: number;
+			isHidden?: boolean;
 			onTarget: undefined | ((target: { x: number; y: number }) => void);
 		}
 	) {
@@ -1676,6 +1800,7 @@ export class LaserSight<AllStates extends string>
 		this.#speed = options?.speed ?? this.#speed;
 		this.#postAttackTime = options?.postAttackTime ?? this.#postAttackTime;
 		this.#color = options?.color ?? this.#color;
+		this.#isHidden = options?.isHidden ?? this.#isHidden;
 		this.#onTarget = options?.onTarget;
 	}
 
@@ -1690,22 +1815,24 @@ export class LaserSight<AllStates extends string>
 		if (!enemyManager.player.body) {
 			throw new Error("Could not update monster");
 		}
-		const effect = sprite.scene.add.line(
-			0,
-			0,
-			sprite.body.x,
-			sprite.body.y,
-			enemyManager.player.body.x,
-			enemyManager.player.body.y,
-			this.#color
-		);
-		effect.setOrigin(0);
-		effect.setLineWidth(2);
+		let effect: Phaser.GameObjects.Line | undefined;
+		if (!this.#isHidden) {
+			effect = sprite.scene.add.line(
+				0,
+				0,
+				sprite.body.x,
+				sprite.body.y,
+				enemyManager.player.body.x,
+				enemyManager.player.body.y,
+				this.#color
+			);
+			effect.setOrigin(0);
+			effect.setLineWidth(2);
+		}
 		sprite.scene.time.addEvent({
 			delay: this.#postAttackTime,
 			callback: () => {
 				effect?.destroy();
-
 				goToNextState();
 			},
 		});
