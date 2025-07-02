@@ -15,6 +15,7 @@ import {
 	getTilesInRoom,
 	createVelocityForDirection,
 	vibrate,
+	jumpToTileWithArc,
 } from "./shared";
 import { EnemyManager } from "./EnemyManager";
 import { Behavior, BehaviorCompleteCallback } from "./behavior";
@@ -354,10 +355,7 @@ export class Leap<AllStates extends string>
 {
 	#speed = 90;
 	#postAttackTime = 900;
-	#previousDistance: number;
 	#targetPosition: { x: number; y: number } | undefined = undefined;
-	#jumpZ: number = 0;
-	#jumpPart: "off" | "start" | "end" = "off";
 	name: AllStates;
 
 	constructor(
@@ -382,20 +380,15 @@ export class Leap<AllStates extends string>
 		if (!sprite.body || !isDynamicSprite(sprite)) {
 			throw new Error("Could not update monster");
 		}
-		this.#jumpPart = "start";
 
 		const target = this.#targetPosition ?? enemyManager.player;
-		const angle = Phaser.Math.Angle.Between(
-			sprite.body.x,
-			sprite.body.y,
-			target.x,
-			target.y
-		);
-		sprite.scene.physics.velocityFromRotation(
-			angle,
-			this.#speed,
-			sprite.body.velocity
-		);
+		jumpToTileWithArc({
+			sprite,
+			targetX: target.x,
+			targetY: target.y,
+			jumpHeight: 20,
+			duration: this.#postAttackTime,
+		});
 
 		sprite.scene.physics.add.overlap(enemyManager.player, sprite, () => {
 			MainEvents.emit(Events.EnemyHitPlayer, true);
@@ -409,66 +402,7 @@ export class Leap<AllStates extends string>
 		});
 	}
 
-	update(
-		sprite: Phaser.GameObjects.Sprite,
-		_: BehaviorCompleteCallback,
-		enemyManager: EnemyManager
-	): void {
-		if (!isDynamicSprite(sprite) || !enemyManager.player.body) {
-			throw new Error("Could not update monster");
-		}
-
-		const maxJumpHeight = 10;
-		if (this.#jumpZ >= maxJumpHeight) {
-			this.#jumpPart = "end";
-		}
-		if (this.#jumpPart === "start") {
-			this.#jumpZ += 1;
-		}
-		if (this.#jumpPart === "end") {
-			this.#jumpZ -= 1;
-		}
-		if (this.#jumpZ < 0) {
-			this.#jumpZ = 0;
-		}
-		if (this.#jumpPart !== "off") {
-			// Adjust the visual Y position to be higher than the sprite's body
-			// position to simulate jumping.
-			const newY = sprite.body.position.y - this.#jumpZ;
-			// sprite.y = newY;
-		}
-		if (this.#jumpZ === 0) {
-			this.#jumpPart = "off";
-			// FIXME: reset the visual Y position to where it should be after the
-			// jump. This is hard because the body position is absolute and the Y
-			// position is modified by the camera.
-			const camera = sprite.scene.cameras.main;
-			const screenY =
-				sprite.body.position.y - camera.scrollY + sprite.body.height / 2;
-			// sprite.y = screenY;
-		}
-
-		const distance = Phaser.Math.Distance.BetweenPoints(
-			sprite.body.center,
-			this.#targetPosition ?? enemyManager.player.body.center
-		);
-
-		// If you hit a wall, the direction will change as moveToObject tries to
-		// slide around it. We want to stop in that case so we check to see if the
-		// distance isn't getting closer.
-		if (this.#previousDistance && distance > this.#previousDistance) {
-			sprite.body.stop();
-			return;
-		}
-
-		// If you reach the target, stop.
-		if (distance < 5) {
-			sprite.body.stop();
-			return;
-		}
-
-		this.#previousDistance = distance;
-	}
+	update(): void {}
 }
 
 export class RandomlyWalk<AllStates extends string>

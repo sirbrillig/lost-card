@@ -1138,3 +1138,40 @@ export function isSpriteInsideSolidTile(
 
 	return tiles.length > 0;
 }
+
+export function jumpToTileWithArc({
+	sprite,
+	targetX,
+	targetY,
+	jumpHeight,
+	duration,
+}: {
+	sprite: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
+	targetX: number;
+	targetY: number;
+	jumpHeight: number;
+	duration: number;
+}) {
+	const startX = sprite.x;
+	const startY = sprite.y;
+
+	// Create the jump tween
+	return sprite.scene.tweens.add({
+		targets: sprite,
+		duration: duration,
+		ease: "Power2",
+		x: targetX,
+		y: targetY,
+		onUpdate: function (tween) {
+			const progress = tween.progress;
+
+			// Linear interpolation for X movement
+			sprite.x = startX + (targetX - startX) * progress;
+
+			// Parabolic arc for Y movement (creates the jump effect)
+			const arcProgress = 4 * progress * (1 - progress); // Parabolic curve
+			sprite.y =
+				startY + (targetY - startY) * progress - jumpHeight * arcProgress;
+		},
+	});
+}
