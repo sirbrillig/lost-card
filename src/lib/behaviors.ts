@@ -17,6 +17,7 @@ import {
 	vibrate,
 	jumpToTileWithArc,
 	createShadowSprite,
+	getLimitedEndPoint,
 } from "./shared";
 import { EnemyManager } from "./EnemyManager";
 import { Behavior, BehaviorCompleteCallback } from "./behavior";
@@ -1730,6 +1731,7 @@ export class LaserSight<AllStates extends string>
 {
 	#speed = 50;
 	#postAttackTime = 1000;
+	#maxLength = 500;
 	#color = 0xff0000;
 	#isHidden = true;
 	#onTarget: undefined | ((target: { x: number; y: number }) => void);
@@ -1742,6 +1744,7 @@ export class LaserSight<AllStates extends string>
 			postAttackTime?: number;
 			color?: number;
 			isHidden?: boolean;
+			maxLength?: number;
 			onTarget: undefined | ((target: { x: number; y: number }) => void);
 		}
 	) {
@@ -1750,6 +1753,7 @@ export class LaserSight<AllStates extends string>
 		this.#postAttackTime = options?.postAttackTime ?? this.#postAttackTime;
 		this.#color = options?.color ?? this.#color;
 		this.#isHidden = options?.isHidden ?? this.#isHidden;
+		this.#maxLength = options?.maxLength ?? this.#maxLength;
 		this.#onTarget = options?.onTarget;
 	}
 
@@ -1765,14 +1769,25 @@ export class LaserSight<AllStates extends string>
 			throw new Error("Could not update monster");
 		}
 		let effect: Phaser.GameObjects.Line | undefined;
+		const originalTarget = {
+			x: enemyManager.player.body.x,
+			y: enemyManager.player.body.y,
+		};
+		const target = getLimitedEndPoint({
+			startX: sprite.body.x,
+			startY: sprite.body.y,
+			endX: originalTarget.x,
+			endY: originalTarget.y,
+			maxLength: this.#maxLength,
+		});
 		if (!this.#isHidden) {
 			effect = sprite.scene.add.line(
 				0,
 				0,
 				sprite.body.x,
 				sprite.body.y,
-				enemyManager.player.body.x,
-				enemyManager.player.body.y,
+				target.x,
+				target.y,
 				this.#color
 			);
 			effect.setOrigin(0);
@@ -1785,10 +1800,7 @@ export class LaserSight<AllStates extends string>
 				goToNextState();
 			},
 		});
-		this.#onTarget?.({
-			x: enemyManager.player.body.x,
-			y: enemyManager.player.body.y,
-		});
+		this.#onTarget?.(target);
 	}
 
 	update(): void {}

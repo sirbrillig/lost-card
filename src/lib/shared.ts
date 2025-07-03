@@ -1243,3 +1243,31 @@ export function createShadowSprite({
 
 	return shadow;
 }
+
+export function getLimitedEndPoint({
+	startX,
+	startY,
+	endX,
+	endY,
+	maxLength,
+}: {
+	startX: number;
+	startY: number;
+	endX: number;
+	endY: number;
+	maxLength: number;
+}) {
+	const dx = endX - startX;
+	const dy = endY - startY;
+	const distance = Math.sqrt(dx * dx + dy * dy);
+
+	if (distance <= maxLength) {
+		return { x: endX, y: endY };
+	} else {
+		const ratio = maxLength / distance;
+		return {
+			x: startX + dx * ratio,
+			y: startY + dy * ratio,
+		};
+	}
+}

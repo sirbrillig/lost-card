@@ -70,11 +70,12 @@ export class IceHopper extends BaseMonster<AllStates> {
 			case "idle":
 				this.nextState = "target";
 				// FIXME: set idle animation based on direction of player
-				return new Idle(state, "down", 1000);
+				return new Idle(state, "down", Phaser.Math.Between(800, 1200));
 			case "target":
 				this.nextState = "leap";
 				return new LaserSight(state, {
 					isHidden: true,
+					maxLength: Phaser.Math.Between(40, 70),
 					onTarget: (target: { x: number; y: number }) =>
 						(this.#targetPosition = target),
 				});
