@@ -5293,7 +5293,7 @@
                 {
                  "height":272,
                  "id":367,
-                 "name":"IKHeart",
+                 "name":"IKSpikeBridge",
                  "rotation":0,
                  "type":"",
                  "visible":true,
@@ -11979,39 +11979,6 @@
                 {
                  "gid":2301,
                  "height":16,
-                 "id":358,
-                 "name":"",
-                 "properties":[
-                        {
-                         "name":"affectedByPlantCard",
-                         "type":"bool",
-                         "value":true
-                        }, 
-                        {
-                         "name":"affectedByWindCard",
-                         "type":"bool",
-                         "value":false
-                        }, 
-                        {
-                         "name":"msAfterApproach",
-                         "type":"int",
-                         "value":1
-                        }, 
-                        {
-                         "name":"previewBeforeAppear",
-                         "type":"int",
-                         "value":0
-                        }],
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":16,
-                 "x":1789.6,
-                 "y":2306.41
-                }, 
-                {
-                 "gid":2301,
-                 "height":16,
                  "id":411,
                  "name":"",
                  "properties":[
@@ -14602,8 +14569,7 @@
                  "width":17,
                  "x":2025.62,
                  "y":1022.54
-                },
-            
+                }, 
                 {
                  "gid":2147486640,
                  "height":21,
@@ -14615,7 +14581,8 @@
                  "width":17,
                  "x":1829.22,
                  "y":1024.2
-                }, 
+                },
+            
                 {
                  "gid":3004,
                  "height":21,

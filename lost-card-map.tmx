@@ -8732,7 +8732,7 @@
   <object id="298" name="MKBeforeBoss" x="1376" y="320" width="176" height="128"/>
   <object id="351" name="IKPower" x="2256" y="2080" width="304" height="288"/>
   <object id="366" name="IKBeforeBoss" x="1904" y="2160" width="144" height="304"/>
-  <object id="367" name="IKHeart" x="1680" y="2160" width="224" height="272"/>
+  <object id="367" name="IKSpikeBridge" x="1680" y="2160" width="224" height="272"/>
   <object id="370" name="IKBoss" x="1664" y="2464" width="464" height="336"/>
   <object id="380" name="PKJungle" x="1152" y="1792" width="384" height="240"/>
   <object id="381" name="PKMiniBoss" x="960" y="1824" width="192" height="208"/>
@@ -9719,7 +9719,6 @@
   </object>
   <object id="355" gid="2301" x="1712.85" y="2238.99" width="16" height="16"/>
   <object id="357" gid="2301" x="1744.92" y="2367.78" width="16" height="16"/>
-  <object id="358" gid="2301" x="1789.6" y="2306.41" width="16" height="16"/>
   <object id="411" gid="2301" x="1424" y="2240" width="16" height="16"/>
   <object id="1148" gid="2301" x="1408" y="2208" width="16" height="16"/>
   <object id="413" gid="2301" x="1344" y="2224" width="16" height="16"/>
