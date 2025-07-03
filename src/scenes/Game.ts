@@ -88,6 +88,7 @@ import {
 	getPlayerCoordinates,
 	getSavedDataPlayerPosition,
 	isSpriteInsideSolidTile,
+	createShadowSprite,
 } from "../lib/shared";
 
 export class Game extends Scene {
@@ -1720,14 +1721,16 @@ export class Game extends Scene {
 		tile: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody,
 		speed: number
 	) {
+		const shadow = createShadowSprite({ scene: this, x: tile.x, y: tile.y });
+
 		tile.setVisible(true);
 		const tileFinalHeight = tile.y;
 		const tileInitialHeight = 70;
 		const tileInitialAlpha = 0.4;
 		let height = tile.y - tileInitialHeight;
-		let alpha = tileInitialAlpha;
-		tile.setAlpha(alpha);
+		tile.setAlpha(tileInitialAlpha);
 		tile.setPosition(tile.x, height);
+
 		this.tweens.add({
 			targets: tile,
 			x: tile.x,
@@ -1735,6 +1738,7 @@ export class Game extends Scene {
 			duration: speed,
 			onComplete: () => {
 				this.showTransientTile(tile);
+				shadow?.destroy();
 			},
 		});
 	}
