@@ -8089,6 +8089,18 @@
                  "width":0,
                  "x":2160,
                  "y":2032
+                }, 
+                {
+                 "height":0,
+                 "id":1227,
+                 "name":"IceHopper",
+                 "point":true,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":2351.9848368181,
+                 "y":2058.06930047977
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -16756,7 +16768,7 @@
          "y":0
         }],
  "nextlayerid":20,
- "nextobjectid":1227,
+ "nextobjectid":1228,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.1",
