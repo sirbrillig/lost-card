@@ -16,6 +16,7 @@ import {
 	createVelocityForDirection,
 	vibrate,
 	jumpToTileWithArc,
+	createShadowSprite,
 } from "./shared";
 import { EnemyManager } from "./EnemyManager";
 import { Behavior, BehaviorCompleteCallback } from "./behavior";
@@ -382,12 +383,18 @@ export class Leap<AllStates extends string>
 		}
 
 		const target = this.#targetPosition ?? enemyManager.player;
+		const shadow = createShadowSprite({
+			scene: sprite.scene,
+			x: sprite.body.center.x,
+			y: sprite.body.center.y,
+		});
 		jumpToTileWithArc({
 			sprite,
 			targetX: target.x,
 			targetY: target.y,
-			jumpHeight: 20,
+			jumpHeight: 30,
 			duration: this.#postAttackTime,
+			shadow,
 		});
 
 		sprite.scene.physics.add.overlap(enemyManager.player, sprite, () => {
@@ -397,6 +404,7 @@ export class Leap<AllStates extends string>
 		sprite.scene.time.addEvent({
 			delay: this.#postAttackTime,
 			callback: () => {
+				shadow?.destroy();
 				goToNextState();
 			},
 		});

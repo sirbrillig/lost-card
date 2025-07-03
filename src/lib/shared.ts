@@ -1145,15 +1145,43 @@ export function jumpToTileWithArc({
 	targetY,
 	jumpHeight,
 	duration,
+	shadow,
 }: {
 	sprite: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
 	targetX: number;
 	targetY: number;
 	jumpHeight: number;
 	duration: number;
+	shadow?: Phaser.GameObjects.Sprite;
 }) {
 	const startX = sprite.x;
 	const startY = sprite.y;
+
+	sprite.scene.tweens.add({
+		targets: sprite,
+		duration: duration,
+		ease: "Power2",
+		x: targetX,
+		y: targetY,
+		onUpdate: function (tween) {
+			const progress = tween.progress;
+
+			// Linear interpolation for X movement
+			sprite.x = startX + (targetX - startX) * progress;
+
+			// Parabolic arc for Y movement (creates the jump effect)
+			const arcProgress = 4 * progress * (1 - progress); // Parabolic curve
+			const currentHeight = jumpHeight * arcProgress;
+
+			sprite.y = startY + (targetY - startY) * progress - currentHeight;
+
+			if (shadow) {
+				// Shadow follows the ground path (no height offset)
+				shadow.x = startX + (targetX - startX) * progress;
+				shadow.y = startY + (targetY - startY) * progress;
+			}
+		},
+	});
 
 	// Create the jump tween
 	return sprite.scene.tweens.add({
@@ -1170,8 +1198,48 @@ export function jumpToTileWithArc({
 
 			// Parabolic arc for Y movement (creates the jump effect)
 			const arcProgress = 4 * progress * (1 - progress); // Parabolic curve
-			sprite.y =
-				startY + (targetY - startY) * progress - jumpHeight * arcProgress;
+			const currentHeight = jumpHeight * arcProgress;
+
+			sprite.y = startY + (targetY - startY) * progress - currentHeight;
+
+			if (shadow) {
+				// Shadow follows the ground path (no height offset)
+				shadow.x = startX + (targetX - startX) * progress;
+				shadow.y = startY + (targetY - startY) * progress;
+			}
 		},
 	});
+}
+
+export function createShadowSprite({
+	scene,
+	x,
+	y,
+}: {
+	scene: Phaser.Scene;
+	x: number;
+	y: number;
+}) {
+	let shadow;
+
+	// Create a simple circular shadow using graphics
+	const shadowGraphics = scene.add.graphics();
+	shadowGraphics.fillStyle(0x000000, 0.6);
+	const shadowWidth = 16;
+	const shadowHeight = 10;
+	shadowGraphics.fillEllipse(
+		shadowWidth / 2,
+		shadowHeight / 2,
+		shadowWidth,
+		shadowHeight
+	);
+	shadowGraphics.generateTexture("dynamicShadow", shadowWidth, shadowHeight);
+	shadowGraphics.destroy();
+
+	shadow = scene.add.sprite(x, y, "dynamicShadow");
+
+	shadow.setTint(0x000000);
+	shadow.setAlpha(0.6);
+
+	return shadow;
 }
