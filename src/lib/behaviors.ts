@@ -388,6 +388,14 @@ export class Leap<AllStates extends string>
 			x: sprite.body.center.x,
 			y: sprite.body.center.y,
 		});
+
+		let harmless = sprite.data.get(DataKeys.IsHarmless);
+		let hittable = sprite.data.get(DataKeys.Hittable);
+		let pushable = sprite.data.get(DataKeys.Pushable);
+		sprite.data.set(DataKeys.IsHarmless, true);
+		sprite.data.set(DataKeys.Hittable, false);
+		sprite.data.set(DataKeys.Pushable, false);
+
 		jumpToTileWithArc({
 			sprite,
 			targetX: target.x,
@@ -397,14 +405,13 @@ export class Leap<AllStates extends string>
 			shadow,
 		});
 
-		sprite.scene.physics.add.overlap(enemyManager.player, sprite, () => {
-			MainEvents.emit(Events.EnemyHitPlayer, true);
-		});
-
 		sprite.scene.time.addEvent({
 			delay: this.#postAttackTime,
 			callback: () => {
 				shadow?.destroy();
+				sprite.data.set(DataKeys.IsHarmless, harmless);
+				sprite.data.set(DataKeys.Hittable, hittable);
+				sprite.data.set(DataKeys.Pushable, pushable);
 				goToNextState();
 			},
 		});
