@@ -89,6 +89,7 @@ import {
 	getSavedDataPlayerPosition,
 	isSpriteInsideSolidTile,
 	createShadowSprite,
+	isSprite,
 } from "../lib/shared";
 
 export class Game extends Scene {
@@ -103,6 +104,8 @@ export class Game extends Scene {
 	attackSprite: Phaser.GameObjects.Sprite;
 	enemyManager: EnemyManager;
 	enemyCollider: Phaser.Physics.Arcade.Collider;
+	maskGraphics: Phaser.GameObjects.Graphics;
+	mask: Phaser.Display.Masks.GeometryMask;
 
 	backgroundMusic: Sound | undefined;
 	attackSound: Sound;
@@ -120,6 +123,7 @@ export class Game extends Scene {
 	plantSound: Sound;
 
 	isGameOver: boolean = false;
+	isMaskActive: boolean = false;
 	hasPlayerMovedSinceAppearing: boolean = false;
 	lastAttackedAt: number = 0;
 	lastPowerAt: number = 0;
@@ -187,6 +191,8 @@ export class Game extends Scene {
 		if (!tilesetTile || !tilesetSprite) {
 			throw new Error("Could not make tileset");
 		}
+
+		this.setUpVisibilityMask();
 
 		const spawnPoint = this.getSpawnPoint();
 		const playerCoordinates = saveData
@@ -536,6 +542,55 @@ export class Game extends Scene {
 		this.recordSecretRoomsTotal();
 	}
 
+	setUpVisibilityMask() {
+		this.maskGraphics = this.add.graphics();
+		this.maskGraphics.setDepth(-1);
+		this.mask = this.maskGraphics.createGeometryMask();
+	}
+
+	getMaskableObjects(): Array<
+		| Phaser.Tilemaps.TilemapLayer
+		| Phaser.Types.Physics.Arcade.SpriteWithDynamicBody
+		| Phaser.Physics.Arcade.Sprite
+		| Phaser.GameObjects.Sprite
+	> {
+		return [
+			this.landLayer,
+			this.stuffLayer,
+			this.hiddenRoomLayer,
+			...this.createdDoors,
+			...this.createdItems,
+			...this.createdTiles,
+			...this.enemyManager.enemies.getChildren().filter(isSprite),
+		];
+	}
+
+	enableMask() {
+		this.isMaskActive = true;
+		this.getMaskableObjects().forEach((obj) => {
+			obj.setMask(this.mask);
+		});
+	}
+
+	disableMask() {
+		this.isMaskActive = false;
+		this.getMaskableObjects().forEach((obj) => {
+			obj.clearMask();
+		});
+	}
+
+	updateVisibilityMask() {
+		if (!this.isMaskActive) {
+			return;
+		}
+		this.maskGraphics.clear();
+		this.maskGraphics.fillCircle(
+			this.player.body.center.x,
+			this.player.body.center.y,
+			30
+		);
+	}
+
 	restartStatusBounce() {
 		this.statusBounce?.destroy();
 		if (!this.statusIcon) {
@@ -878,6 +933,16 @@ export class Game extends Scene {
 			const saveData = loadSavedData();
 			console.log(JSON.stringify(saveData));
 		});
+		this.input.keyboard.on("keydown-EIGHT", () => {
+			if (!isCheatMode) {
+				return;
+			}
+			if (this.isMaskActive) {
+				this.disableMask();
+			} else {
+				this.enableMask();
+			}
+		});
 	}
 
 	usePotion() {
@@ -1215,6 +1280,13 @@ export class Game extends Scene {
 
 		this.cacheTilesInRoom();
 
+		// Reapply mask
+		if (this.isMaskActive) {
+			this.enableMask();
+		} else {
+			this.disableMask();
+		}
+
 		this.recordRoomVisit(room.name);
 	}
 
@@ -1440,6 +1512,7 @@ export class Game extends Scene {
 		this.updatePlayer();
 		this.updateRoom();
 		this.updateGatePillars();
+		this.updateVisibilityMask();
 	}
 
 	updateRoom() {
