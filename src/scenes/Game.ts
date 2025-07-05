@@ -587,7 +587,7 @@ export class Game extends Scene {
 		this.maskGraphics.fillCircle(
 			this.player.body.center.x,
 			this.player.body.center.y,
-			30
+			config.visibilityMaskRadius
 		);
 	}
 

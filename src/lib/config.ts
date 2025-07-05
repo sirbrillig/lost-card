@@ -56,4 +56,5 @@ export const config = {
 	normalSwordDamage: 1,
 	swordCardDamage: 2,
 	maxBossDamageTakenPerHit: 1.2,
+	visibilityMaskRadius: 20,
 };
