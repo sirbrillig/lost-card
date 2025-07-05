@@ -4,6 +4,7 @@ import { config } from "../lib/config";
 import { MainEvents } from "../lib/MainEvents";
 import { EnemyManager } from "../lib/EnemyManager";
 import { MountainMonster } from "../monsters/MountainMonster";
+import { HopPot } from "../monsters/HopPot";
 import { LavaBlorp } from "../monsters/LavaBlorp";
 import { Ghost } from "../monsters/Ghost";
 import { BlackOrb } from "../monsters/BlackOrb";
@@ -1537,7 +1538,6 @@ export class Game extends Scene {
 	updateRoom() {
 		this.checkForPowerHitTiles();
 		this.updateAppearingTiles();
-		this.checkForMountainBossDoorGate();
 	}
 
 	destroyCreatedTile(tile: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody) {
@@ -1552,43 +1552,6 @@ export class Game extends Scene {
 			this.stuffLayer.removeTileAtWorldXY(tile.x, tile.y);
 			tile.destroy();
 		});
-	}
-
-	checkForMountainBossDoorGate() {
-		if (this.enemyManager.activeRoom?.name !== "MKBoss") {
-			return;
-		}
-		const mountainBossActivationArea = this.map.findObject(
-			"MetaObjects",
-			(obj) => obj.name === "MountainBossActivateRocks"
-		);
-		if (!mountainBossActivationArea) {
-			return;
-		}
-		if (
-			doRectanglesOverlap(this.player, {
-				x: mountainBossActivationArea.x ?? 0,
-				y: mountainBossActivationArea.y ?? 0,
-				width: mountainBossActivationArea.width ?? 0,
-				height: mountainBossActivationArea.height ?? 0,
-			})
-		) {
-			const transientTiles = this.enemyManager.activeRoom
-				? getItemsInRoom(this.createdTiles, this.enemyManager.activeRoom)
-				: [];
-
-			// Don't consider tiles which are already visible.
-			const appearingTiles = transientTiles.filter(
-				(tile) => tile.visible === false
-			);
-
-			appearingTiles.forEach((tile) => {
-				if (tile.data.get("manualActivation") !== true) {
-					return;
-				}
-				this.makeAppearingTileAppear(tile);
-			});
-		}
 	}
 
 	checkForPowerHitTiles() {
@@ -2964,6 +2927,11 @@ export class Game extends Scene {
 						point.x,
 						point.y
 					);
+					this.addEnemyToEnemyManager(monster, point);
+					break;
+				}
+				case "HopPot": {
+					const monster = new HopPot(this, this.enemyManager, point.x, point.y);
 					this.addEnemyToEnemyManager(monster, point);
 					break;
 				}
