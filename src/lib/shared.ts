@@ -1,5 +1,6 @@
 import { BaseMonster } from "../monsters/BaseMonster";
 import { MainEvents } from "./MainEvents";
+import { config } from "./config";
 
 export const saveGameKey = "lost-card-save";
 
@@ -50,6 +51,8 @@ export const DataKeys = {
 	ItemObjectId: "objectId",
 	PlayerDirection: "PlayerDirection",
 };
+
+export const DarknessAreaName = "Darkness";
 
 export type Region = "MK" | "IK" | "CK" | "FK" | "PK" | "SK" | "FB";
 
@@ -601,7 +604,8 @@ export function getDoorDestinationCoordinates(
 	destinationTile: Phaser.Types.Tilemaps.TiledObject,
 	/**
 	 * The direction of the target door's *entrance*, so you will come out in the
-	 * opposite direction of this.
+	 * opposite direction of this. So if you are walking up, and pass through a
+	 * door, this will be SpriteDown because the target door's entrance is down.
 	 */
 	destinationDirection: SpriteDirection
 ): [number, number] {
@@ -617,23 +621,34 @@ export function getDoorDestinationCoordinates(
 	// If the player enters a door, teleport them just past the corresponding
 	// door in the opposite direction of the target door. That way they won't
 	// trigger the door on the other side and end up in a loop.
+	//
+	// Note that these positions have to account for the visual illusion that the
+	// room is 3D, so the "up" and "down" are not quite even.
 	const destinationX = (() => {
+		// Player walking right
 		if (destinationDirection === SpriteLeft) {
-			return destinationTile.x + destinationTile.width / 2;
+			return (
+				destinationTile.x + destinationTile.width + config.playerHitBoxWidth
+			);
 		}
+		// Player walking left
 		if (destinationDirection === SpriteRight) {
 			return destinationTile.x - destinationTile.width / 2;
 		}
-		return destinationTile.x;
+		// Player walking up or down
+		return destinationTile.x + destinationTile.width / 2;
 	})();
 	const destinationY = (() => {
+		// Player walking down
 		if (destinationDirection === SpriteUp) {
-			return destinationTile.y;
+			return destinationTile.y + destinationTile.height / 2;
 		}
+		// Player walking up
 		if (destinationDirection === SpriteDown) {
-			return destinationTile.y - destinationTile.height / 2;
+			return destinationTile.y - destinationTile.height * 2;
 		}
-		return destinationTile.y - 4 - destinationTile.height / 2;
+		// Player walking left or right
+		return destinationTile.y - destinationTile.height;
 	})();
 	return [destinationX, destinationY];
 }

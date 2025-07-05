@@ -90,6 +90,7 @@ import {
 	isSpriteInsideSolidTile,
 	createShadowSprite,
 	isSprite,
+	DarknessAreaName,
 } from "../lib/shared";
 
 export class Game extends Scene {
@@ -580,10 +581,10 @@ export class Game extends Scene {
 	}
 
 	updateVisibilityMask() {
+		this.maskGraphics.clear();
 		if (!this.isMaskActive) {
 			return;
 		}
-		this.maskGraphics.clear();
 		this.maskGraphics.fillCircle(
 			this.player.body.center.x,
 			this.player.body.center.y,
@@ -733,7 +734,7 @@ export class Game extends Scene {
 		if (!destinationTile) {
 			throw new Error("Hit door without destination tile");
 		}
-		const destinationDirection = SpriteUp;
+		const destinationDirection = SpriteDown;
 		const [destinationX, destinationY] = getDoorDestinationCoordinates(
 			destinationTile,
 			destinationDirection
@@ -1280,8 +1281,26 @@ export class Game extends Scene {
 
 		this.cacheTilesInRoom();
 
-		// Reapply mask
-		if (this.isMaskActive) {
+		const darkAreas = this.map.filterObjects(
+			"MetaObjects",
+			(obj) => obj.name === DarknessAreaName
+		);
+		const playerPosition = {
+			x: this.player.x + config.playerHitBoxWidth * config.playerOriginX,
+			y: this.player.y + config.playerHitBoxHeight * config.playerOriginY,
+			width: config.playerHitBoxWidth,
+			height: config.playerHitBoxHeight,
+		};
+		if (
+			darkAreas?.some((darkArea) => {
+				return doRectanglesOverlap(playerPosition, {
+					x: darkArea.x ?? 0,
+					y: darkArea.y ?? 0,
+					width: darkArea.width ?? 0,
+					height: darkArea.height ?? 0,
+				});
+			})
+		) {
 			this.enableMask();
 		} else {
 			this.disableMask();
@@ -2832,11 +2851,11 @@ export class Game extends Scene {
 		this.player = this.physics.add.sprite(x, y, "character", "idle-down-0.png");
 		this.player.setDataEnabled();
 		this.player.setDebugBodyColor(0x00ff00);
-		this.player.setSize(7, 10);
-		this.player.setOrigin(0, 0.5);
+		this.player.setSize(config.playerHitBoxWidth, config.playerHitBoxHeight);
+		this.player.setOrigin(config.playerOriginX, config.playerOriginY);
 		this.player.setOffset(
-			this.player.body.offset.x,
-			this.player.body.offset.y + 5
+			this.player.body.offset.x + config.playerHitBoxOffsetX,
+			this.player.body.offset.y + config.playerHitBoxOffsetY
 		);
 		this.player.setDepth(1);
 

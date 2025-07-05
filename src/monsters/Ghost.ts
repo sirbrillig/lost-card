@@ -7,7 +7,7 @@ type AllStates = "wait" | "follow";
 export class Ghost extends BaseMonster<AllStates> {
 	awareDistance: number = 90;
 	speed: number = 18;
-	hitPoints = 4;
+	hitPoints = 3;
 	primaryColor = 0x23A487;
 
 	constructor(
