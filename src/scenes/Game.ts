@@ -4200,9 +4200,14 @@ export class Game extends Scene {
 	updatePlayer(): void {
 		this.updatePlayerTint();
 		this.updatePlayerAlpha();
+
 		savePlayerPositionToRegistry(
 			this.registry,
-			getSavedDataPlayerPosition(this.map, this.player.x, this.player.y)
+			getSavedDataPlayerPosition(
+				this.map,
+				this.player.body.center.x,
+				this.player.body.center.y
+			)
 		);
 
 		this.updateSwordHitbox();
