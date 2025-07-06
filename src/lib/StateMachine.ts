@@ -1,69 +1,27 @@
-export type Subscriber = (event: "init" | "update") => void;
-export type Unsubscribe = () => void;
-
 export interface BehaviorMachineInterface<Key extends string> {
 	getCurrentState(): Key | undefined;
-	pushState(state: Key): void;
-	popState(): void;
+	setCurrentState(state: Key): void;
 	empty(): void;
-	update(): void;
-	subscribe(callback: Subscriber): Unsubscribe;
 }
 
 export class StateMachine<AllStates extends string>
 	implements BehaviorMachineInterface<AllStates>
 {
 	#currentPlayingState: AllStates | undefined;
-	#stateStack: Array<AllStates> = [];
-	#subscribers: Array<Subscriber> = [];
 
 	constructor(initialState: AllStates) {
-		this.pushState(initialState);
+		this.#currentPlayingState = initialState;
 	}
 
-	pushState(state: AllStates): void {
-		this.#stateStack.push(state);
-	}
-
-	popState(): void {
-		this.#stateStack.pop();
+	setCurrentState(state: AllStates): void {
+		this.#currentPlayingState = state;
 	}
 
 	empty() {
 		this.#currentPlayingState = undefined;
-		this.#stateStack = [];
 	}
 
 	getCurrentState(): AllStates | undefined {
-		if (!this.#stateStack[this.#stateStack.length - 1]) {
-			return undefined;
-		}
-		return this.#stateStack[this.#stateStack.length - 1];
-	}
-
-	update() {
-		// Get the current state.
-		const state = this.getCurrentState();
-
-		// If the state has changed since the last update, emit an init event.
-		if (state !== this.#currentPlayingState) {
-			this.#currentPlayingState = state;
-			this.#emit("init");
-			return;
-		}
-
-		// If the state has not changed since the last update, emit an update event.
-		this.#emit("update");
-	}
-
-	#emit(event: "init" | "update"): void {
-		this.#subscribers.forEach((callback) => callback(event));
-	}
-
-	subscribe(callback: Subscriber) {
-		this.#subscribers.push(callback);
-		return () => {
-			this.#subscribers = this.#subscribers.filter((s) => s != callback);
-		};
+		return this.#currentPlayingState;
 	}
 }

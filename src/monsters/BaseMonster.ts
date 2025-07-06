@@ -113,8 +113,7 @@ export class BaseMonster<AllStates extends string> extends Phaser.Physics.Arcade
 	}
 
 	changeCurrentPlayingState(newState: AllStates): void {
-		this.stateMachine.popState();
-		this.stateMachine.pushState(newState);
+		this.stateMachine.setCurrentState(newState);
 	}
 
 	goToNextState(): void {
