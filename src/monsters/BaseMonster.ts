@@ -5,14 +5,11 @@ import {
 	isPointInRoom,
 	knockBack,
 } from "../lib/shared";
-import {
-	BehaviorMachineInterface,
-	Behavior,
-	StateMachine,
-} from "../lib/behavior";
+import { BehaviorMachineInterface, StateMachine } from "../lib/StateMachine";
 import { EnemyManager } from "../lib/EnemyManager";
 import { MainEvents } from "../lib/MainEvents";
 import { config } from "../lib/config";
+import type { Behavior } from "../lib/Behavior";
 
 export class BaseMonster<AllStates extends string> extends Phaser.Physics.Arcade
 	.Sprite {

@@ -1,5 +1,3 @@
-import { EnemyManager } from "./EnemyManager";
-
 export type Subscriber = (event: "init" | "update") => void;
 export type Unsubscribe = () => void;
 
@@ -10,26 +8,6 @@ export interface BehaviorMachineInterface<Key extends string> {
 	empty(): void;
 	update(): void;
 	subscribe(callback: Subscriber): Unsubscribe;
-}
-
-export type BehaviorCompleteCallback = () => void;
-
-export interface Behavior<
-	Key extends string,
-	Sprite extends Phaser.GameObjects.Sprite,
-> {
-	name: Key;
-	init(
-		sprite: Sprite,
-		goToNextState: BehaviorCompleteCallback,
-		enemyManager: EnemyManager
-	): void;
-	update?: (
-		sprite: Sprite,
-		goToNextState: BehaviorCompleteCallback,
-		enemyManager: EnemyManager
-	) => void;
-	cleanUp?: (sprite: Sprite, enemyManager: EnemyManager) => void;
 }
 
 export class StateMachine<AllStates extends string>

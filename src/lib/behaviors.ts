@@ -18,11 +18,10 @@ import {
 	jumpToTileWithArc,
 	createShadowSprite,
 	getLimitedEndPoint,
-	createPromiseTimer,
 } from "./shared";
 import { EnemyManager } from "./EnemyManager";
 import { TeleportSystem } from "./TeleportSystem";
-import { Behavior, BehaviorCompleteCallback } from "./behavior";
+import { Behavior, BehaviorCompleteCallback } from "./Behavior";
 import { MainEvents } from "./MainEvents";
 import { MountainMonster } from "../monsters/MountainMonster";
 
