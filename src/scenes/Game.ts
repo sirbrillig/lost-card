@@ -5,6 +5,7 @@ import { MainEvents } from "../lib/MainEvents";
 import { EnemyManager } from "../lib/EnemyManager";
 import { MountainMonster } from "../monsters/MountainMonster";
 import { HopPot } from "../monsters/HopPot";
+import { RockDigger } from "../monsters/RockDigger";
 import { LavaBlorp } from "../monsters/LavaBlorp";
 import { Ghost } from "../monsters/Ghost";
 import { BlackOrb } from "../monsters/BlackOrb";
@@ -2855,12 +2856,12 @@ export class Game extends Scene {
 		this.setPlayerStunned(true);
 		this.player.setVisible(false);
 		const effect = this.add.sprite(
-			this.player.body.center.x - 4,
+			this.player.body.center.x + this.player.body.width / 2,
 			this.player.body.center.y + this.player.body.height / 2,
 			"white_fire_circle",
 			0
 		);
-		effect.setOrigin(0, 0.5);
+		effect.setOrigin(0.5, 0.5);
 		effect.setDepth(5);
 		effect.anims.play("white_fire_circle", true);
 		effect.anims.chain("appear");
@@ -2933,6 +2934,20 @@ export class Game extends Scene {
 				case "HopPot": {
 					const monster = new HopPot(this, this.enemyManager, point.x, point.y);
 					this.addEnemyToEnemyManager(monster, point);
+					break;
+				}
+				case "RockDigger": {
+					const monster = new RockDigger(
+						this,
+						this.enemyManager,
+						point.x,
+						point.y
+					);
+					this.addEnemyToEnemyManager(monster, point);
+					monster.once("defeated", () => {
+						this.markBossDefeated("RockDigger");
+						this.showAllHiddenItemsInRoom();
+					});
 					break;
 				}
 				case "LavaBlorp": {

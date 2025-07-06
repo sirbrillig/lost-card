@@ -479,10 +479,15 @@ export function getEnemiesInRoom(
 
 export function getTilesInRoom(
 	map: Phaser.Tilemaps.Tilemap,
-	room: Phaser.Types.Tilemaps.TiledObject
+	room: Phaser.Types.Tilemaps.TiledObject,
+	allowedLayers?: string[]
 ) {
 	const tiles: Phaser.Tilemaps.Tile[] = [];
-	map.getTileLayerNames().forEach(
+	let layers = map.getTileLayerNames();
+	if (allowedLayers) {
+		layers = layers.filter((layer) => allowedLayers.includes(layer));
+	}
+	layers.forEach(
 		(layer) =>
 			map
 				.getTilesWithinWorldXY(
@@ -1285,4 +1290,12 @@ export function getLimitedEndPoint({
 			y: startY + dy * ratio,
 		};
 	}
+}
+
+export function createPromiseTimer(scene: Phaser.Scene, delay: number) {
+	return new Promise<void>((resolve) => {
+		scene.time.delayedCall(delay, () => {
+			resolve();
+		});
+	});
 }

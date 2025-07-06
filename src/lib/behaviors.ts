@@ -18,8 +18,10 @@ import {
 	jumpToTileWithArc,
 	createShadowSprite,
 	getLimitedEndPoint,
+	createPromiseTimer,
 } from "./shared";
 import { EnemyManager } from "./EnemyManager";
+import { TeleportSystem } from "./TeleportSystem";
 import { Behavior, BehaviorCompleteCallback } from "./behavior";
 import { MainEvents } from "./MainEvents";
 import { MountainMonster } from "../monsters/MountainMonster";
@@ -410,9 +412,9 @@ export class Leap<AllStates extends string>
 			delay: this.#postAttackTime,
 			callback: () => {
 				shadow?.destroy();
-				sprite.data.set(DataKeys.IsHarmless, harmless);
-				sprite.data.set(DataKeys.Hittable, hittable);
-				sprite.data.set(DataKeys.Pushable, pushable);
+				sprite?.data?.set(DataKeys.IsHarmless, harmless);
+				sprite?.data?.set(DataKeys.Hittable, hittable);
+				sprite?.data?.set(DataKeys.Pushable, pushable);
 				goToNextState();
 			},
 		});
@@ -609,8 +611,15 @@ export class RandomTeleport<AllStates extends string>
 	#postTeleportDelay = 1000;
 	name: AllStates;
 
-	constructor(name: AllStates) {
+	constructor(
+		name: AllStates,
+		config?: {
+			postTeleportDelay?: number;
+		}
+	) {
 		this.name = name;
+		this.#postTeleportDelay =
+			config?.postTeleportDelay ?? this.#postTeleportDelay;
 	}
 
 	init(
@@ -650,30 +659,34 @@ export class RandomTeleport<AllStates extends string>
 			effect1?.destroy();
 		});
 
-		// Get all tiles in room
-		const tiles = getTilesInRoom(
-			enemyManager.map,
-			enemyManager.activeRoom
-		).filter((tile) => {
-			if (isTileWithPropertiesObject(tile) && tile.properties.collides) {
-				return false;
-			}
-			return true;
-		});
-		if (tiles.length < 1) {
-			console.warn("No tiles in room to teleport to");
-
+		const roomObject = enemyManager.activeRoom;
+		if (
+			!roomObject.x ||
+			!roomObject.y ||
+			!roomObject.width ||
+			!roomObject.height
+		) {
+			console.warn("No room to teleport to");
 			goToNextState();
+			return;
 		}
-		// Choose tile at random
-		const targetTile = tiles[Phaser.Math.Between(0, tiles.length - 1)];
-		const x = targetTile.pixelX + targetTile.width / 2;
-		// Move to tile
-		sprite.setPosition(x, targetTile.pixelY);
+
+		const system = new TeleportSystem(sprite.scene);
+		const landLayer = enemyManager.map.getLayer("Background");
+		if (!landLayer) {
+			throw new Error("Could not find bg layer for RandomTeleport");
+		}
+		const stuffLayer = enemyManager.map.getLayer("Stuff");
+		if (!stuffLayer) {
+			throw new Error("Could not find stuff layer for RandomTeleport");
+		}
+		system.teleportWithPhysicsCheck(sprite, roomObject, {
+			collisionLayers: [landLayer.tilemapLayer, stuffLayer.tilemapLayer],
+		});
 
 		const effect2 = sprite.scene.add.sprite(
-			x,
-			targetTile.pixelY,
+			sprite.body.center.x,
+			sprite.body.center.y,
 			"teleport",
 			0
 		);
@@ -1877,6 +1890,145 @@ export class BlackOrbAttack<AllStates extends string>
 	update(): void {}
 }
 
+export class RangedRockBall<AllStates extends string>
+	implements Behavior<AllStates, Phaser.GameObjects.Sprite>
+{
+	#speed = 160;
+	#postAttackTime = 2200;
+	#maxLifetime = 10000;
+	#hitsWalls = true;
+	#forceDirectionDegree: number | undefined = undefined;
+	#colorTint: number | undefined;
+	name: AllStates;
+
+	constructor(
+		name: AllStates,
+		config?: {
+			speed?: number;
+			postAttackTime?: number;
+			hitsWalls?: boolean;
+			forceDirectionDegree?: number;
+			colorTint?: number;
+		}
+	) {
+		this.name = name;
+		this.#speed = config?.speed ?? this.#speed;
+		this.#postAttackTime = config?.postAttackTime ?? this.#postAttackTime;
+		this.#hitsWalls = config?.hitsWalls ?? this.#hitsWalls;
+		this.#forceDirectionDegree = config?.forceDirectionDegree;
+		this.#colorTint = config?.colorTint;
+	}
+
+	init(
+		sprite: Phaser.GameObjects.Sprite,
+		goToNextState: BehaviorCompleteCallback,
+		enemyManager: EnemyManager
+	): void {
+		if (!sprite.body || !isDynamicSprite(sprite)) {
+			throw new Error("Could not update monster");
+		}
+
+		const effect = sprite.scene.add.sprite(
+			sprite.body.center.x,
+			sprite.body.center.y,
+			"dungeon_tiles_sprites",
+			865
+		);
+		sprite.scene.physics.add.existing(effect);
+		effect.setDepth(5);
+		if (!isDynamicSprite(effect)) {
+			throw new Error("Could not update rock ball");
+		}
+		effect.setDisplaySize(effect.body.width * 0.8, effect.body.height * 0.8);
+		effect.body.setSize(effect.body.width * 0.5, effect.body.height * 0.5);
+		if (this.#colorTint) {
+			effect.setTint(this.#colorTint);
+		}
+
+		if (undefined === this.#forceDirectionDegree) {
+			sprite.scene.physics.moveToObject(
+				effect,
+				enemyManager.player,
+				this.#speed
+			);
+		}
+		if (undefined !== this.#forceDirectionDegree) {
+			const velocity = sprite.scene.physics.velocityFromAngle(
+				this.#forceDirectionDegree,
+				1
+			);
+			effect.body.setVelocity(
+				velocity.x * this.#speed,
+				velocity.y * this.#speed
+			);
+		}
+
+		let isDestroyed = false;
+		const onDestroy = () => {
+			if (!effect?.anims || isDestroyed) {
+				return;
+			}
+			isDestroyed = true;
+			sprite.scene?.sound.play("rock-destroy", {
+				loop: false,
+				volume: 0.5,
+			});
+			effect.body.stop();
+			effect.setOrigin(0.6, 0.5);
+			effect.anims?.play("explode", true);
+			sprite.scene?.cameras.main.shake(200, 0.004);
+			vibrate(sprite.scene, 1, 200);
+			effect.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
+				effect?.destroy();
+			});
+		};
+
+		if (this.#hitsWalls) {
+			const landLayer = enemyManager.map.getLayer("Background");
+			if (!landLayer) {
+				throw new Error("Could not find bg layer for RangedRockBall");
+			}
+			const stuffLayer = enemyManager.map.getLayer("Stuff");
+			if (!stuffLayer) {
+				throw new Error("Could not find stuff layer for RangedRockBall");
+			}
+			sprite.scene.physics.add.collider(effect, stuffLayer.tilemapLayer, () => {
+				onDestroy();
+			});
+			sprite.scene.physics.add.collider(effect, landLayer.tilemapLayer, () => {
+				onDestroy();
+			});
+		}
+
+		sprite.scene.physics.add.overlap(enemyManager.player, effect, () => {
+			MainEvents.emit(Events.EnemyHitPlayer, true);
+			onDestroy();
+		});
+
+		sprite.once(Events.MonsterDying, () => {
+			onDestroy();
+		});
+		MainEvents.once(Events.LeavingRoom, () => {
+			onDestroy();
+		});
+
+		sprite.scene.time.addEvent({
+			delay: this.#maxLifetime,
+			callback: () => {
+				onDestroy();
+			},
+		});
+		sprite.scene.time.addEvent({
+			delay: this.#postAttackTime,
+			callback: () => {
+				goToNextState();
+			},
+		});
+	}
+
+	update(): void {}
+}
+
 export class RangedFireBall<AllStates extends string>
 	implements Behavior<AllStates, Phaser.GameObjects.Sprite>
 {
@@ -1967,6 +2119,7 @@ export class RangedFireBall<AllStates extends string>
 		}
 
 		if (this.#hitsWalls) {
+			// FIXME: hit walls in the background too
 			const stuffLayer = enemyManager.map.getLayer("Stuff");
 			if (!stuffLayer) {
 				throw new Error("Could not find stuff layer for RangedFireBall");
