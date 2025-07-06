@@ -121,6 +121,7 @@ export class BaseMonster<AllStates extends string> extends Phaser.Physics.Arcade
 	}
 
 	goToNextState(): void {
+		this.#currentPlayingState?.cleanUp?.(this, this.#enemyManager);
 		this.changeCurrentPlayingState(this.nextState);
 	}
 
@@ -164,7 +165,7 @@ export class BaseMonster<AllStates extends string> extends Phaser.Physics.Arcade
 		}
 
 		// Take update actions
-		this.#currentPlayingState?.update(
+		this.#currentPlayingState?.update?.(
 			this,
 			this.goToNextState.bind(this),
 			this.#enemyManager

@@ -24,11 +24,12 @@ export interface Behavior<
 		goToNextState: BehaviorCompleteCallback,
 		enemyManager: EnemyManager
 	): void;
-	update(
+	update?: (
 		sprite: Sprite,
 		goToNextState: BehaviorCompleteCallback,
 		enemyManager: EnemyManager
-	): void;
+	) => void;
+	cleanUp?: (sprite: Sprite, enemyManager: EnemyManager) => void;
 }
 
 export class StateMachine<AllStates extends string>

@@ -317,8 +317,6 @@ export class Nothing<AllStates extends string>
 			},
 		});
 	}
-
-	update(): void {}
 }
 
 export class Idle<AllStates extends string>
@@ -350,8 +348,6 @@ export class Idle<AllStates extends string>
 			},
 		});
 	}
-
-	update(): void {}
 }
 
 export class Leap<AllStates extends string>
@@ -419,8 +415,6 @@ export class Leap<AllStates extends string>
 			},
 		});
 	}
-
-	update(): void {}
 }
 
 export class RandomlyWalk<AllStates extends string>
@@ -601,8 +595,6 @@ export class LeftRightMarch<AllStates extends string>
 	#getWalkingTime(): number {
 		return Phaser.Math.Between(this.#minWalkTime, this.#maxWalkTime);
 	}
-
-	update() {}
 }
 
 export class RandomTeleport<AllStates extends string>
@@ -710,8 +702,6 @@ export class RandomTeleport<AllStates extends string>
 			},
 		});
 	}
-
-	update() {}
 }
 
 export class TeleportToPlatform<AllStates extends string>
@@ -855,8 +845,6 @@ export class TeleportToPlatform<AllStates extends string>
 			},
 		});
 	}
-
-	update() {}
 }
 
 export class TeleportToWater<AllStates extends string>
@@ -911,8 +899,6 @@ export class TeleportToWater<AllStates extends string>
 			},
 		});
 	}
-
-	update() {}
 }
 
 export class PowerUp<AllStates extends string>
@@ -986,8 +972,6 @@ export class PowerUp<AllStates extends string>
 			},
 		});
 	}
-
-	update(): void {}
 }
 
 export class SlashTowardPlayer<AllStates extends string>
@@ -1147,8 +1131,6 @@ export class BigSwing<AllStates extends string>
 			goToNextState();
 		});
 	}
-
-	update(): void {}
 }
 
 export class IceAttack<AllStates extends string>
@@ -1214,8 +1196,6 @@ export class IceAttack<AllStates extends string>
 			goToNextState();
 		});
 	}
-
-	update(): void {}
 }
 
 export class StickyPoison<AllStates extends string>
@@ -1377,8 +1357,6 @@ export class Poof<AllStates extends string>
 			},
 		});
 	}
-
-	update(): void {}
 }
 
 export class LavaExplode<AllStates extends string>
@@ -1476,8 +1454,6 @@ export class LavaExplode<AllStates extends string>
 			},
 		});
 	}
-
-	update(): void {}
 }
 
 export class SeekingVine<AllStates extends string>
@@ -1526,8 +1502,6 @@ export class SeekingVine<AllStates extends string>
 			},
 		});
 	}
-
-	update(): void {}
 }
 
 export class SummonCircle<AllStates extends string>
@@ -1815,8 +1789,6 @@ export class LaserSight<AllStates extends string>
 		});
 		this.#onTarget?.(target);
 	}
-
-	update(): void {}
 }
 
 export class BlackOrbAttack<AllStates extends string>
@@ -1886,8 +1858,6 @@ export class BlackOrbAttack<AllStates extends string>
 			},
 		});
 	}
-
-	update(): void {}
 }
 
 export class RangedRockBall<AllStates extends string>
@@ -2025,8 +1995,6 @@ export class RangedRockBall<AllStates extends string>
 			},
 		});
 	}
-
-	update(): void {}
 }
 
 export class RangedFireBall<AllStates extends string>
@@ -2157,8 +2125,6 @@ export class RangedFireBall<AllStates extends string>
 			effect?.destroy();
 		});
 	}
-
-	update(): void {}
 }
 
 export class RangedIceBall<AllStates extends string>
@@ -2240,8 +2206,6 @@ export class RangedIceBall<AllStates extends string>
 			effect?.destroy();
 		});
 	}
-
-	update(): void {}
 }
 
 export class WalkWithFire<AllStates extends string>
@@ -2519,8 +2483,6 @@ export class IceBeam<AllStates extends string>
 		}
 		landLayer.tilemapLayer.setCollisionByProperty({ collides: true });
 	}
-
-	update(): void {}
 }
 
 function getWalkAnimationKeyForDirection(direction: SpriteDirection): string {
