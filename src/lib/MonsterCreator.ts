@@ -33,6 +33,7 @@ import { CloudBoss } from "../monsters/CloudBoss";
 import { FireBoss } from "../monsters/FireBoss";
 import {
 	DataKeys,
+	Events,
 	getDataFromRegistry,
 	saveDataToRegistry,
 } from "../lib/shared";
@@ -114,20 +115,6 @@ const monstersThatDoNotRespawn = [
 	"PlantBoss",
 ];
 
-const monstersThatShowHiddenItems = [
-	"RockDigger",
-	"MountainBoss",
-	"FireBoss",
-	"FireGiant",
-	"WaterDipper",
-	"IceBoss",
-	"GreatGhost",
-	"SpiritBoss",
-	"CloudBoss",
-	"PlantBoss",
-	"FinalBoss",
-];
-
 const monstersThatSaveAfterDefeat = [
 	"MountainBoss",
 	"FireBoss",
@@ -140,18 +127,15 @@ const monstersThatSaveAfterDefeat = [
 export class MonsterCreator {
 	#scene: Phaser.Scene;
 	#enemyManager: EnemyManager;
-	#showHiddenItems: () => void;
 	#saveGame: () => void;
 
 	constructor(
 		scene: Phaser.Scene,
 		enemyManager: EnemyManager,
-		showHiddenItems: () => void,
 		saveGame: () => void
 	) {
 		this.#enemyManager = enemyManager;
 		this.#scene = scene;
-		this.#showHiddenItems = showHiddenItems;
 		this.#saveGame = saveGame;
 	}
 
@@ -163,12 +147,9 @@ export class MonsterCreator {
 			location.x,
 			location.y
 		);
-		monster.once("defeated", () => {
+		monster.once(Events.MonsterDefeated, () => {
 			if (monstersThatDoNotRespawn.includes(name)) {
 				this.#rememberMonsterDefeated(name);
-			}
-			if (monstersThatShowHiddenItems.includes(name)) {
-				this.#showHiddenItems();
 			}
 			if (monstersThatSaveAfterDefeat.includes(name)) {
 				this.#saveGame();

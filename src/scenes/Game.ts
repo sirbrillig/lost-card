@@ -62,6 +62,7 @@ import {
 	createShadowSprite,
 	isSprite,
 	DarknessAreaName,
+	getEnemiesInRoom,
 } from "../lib/shared";
 import { MonsterCreator } from "../lib/MonsterCreator";
 
@@ -194,7 +195,6 @@ export class Game extends Scene {
 		this.monsterCreator = new MonsterCreator(
 			this,
 			this.enemyManager,
-			this.showAllHiddenItemsInRoom.bind(this),
 			this.saveGame.bind(this)
 		);
 
@@ -2898,6 +2898,27 @@ export class Game extends Scene {
 			const monster = this.monsterCreator.createMonster(enemyType, {
 				x: point.x,
 				y: point.y,
+			});
+
+			// If this was the last monster in the room, show all hidden items.
+			monster.once(Events.MonsterDefeated, () => {
+				if (!this.enemyManager.activeRoom) {
+					return;
+				}
+				// Note that because of the timing of this event, the destroyed monster will still be in the room when this runs.
+				const enemiesInRoom = getEnemiesInRoom(
+					this.enemyManager.enemies,
+					this.enemyManager.activeRoom
+				);
+				const areAnyMonstersInRoom =
+					enemiesInRoom.filter(
+						(_enemy) =>
+							isEnemy(_enemy) &&
+							_enemy.mapSpawnPointId !== monster.mapSpawnPointId
+					).length > 0;
+				if (!areAnyMonstersInRoom) {
+					this.showAllHiddenItemsInRoom();
+				}
 			});
 			this.addEnemyToEnemyManager(monster, point);
 
