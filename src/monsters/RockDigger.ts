@@ -11,7 +11,7 @@ import { BaseMonster } from "./BaseMonster";
 
 type AllStates = "wait" | "teleport" | "burst" | "throw";
 
-export class RockDigger extends BaseMonster<AllStates> {
+export class RockDigger extends BaseMonster {
 	hitPoints: number = 8;
 
 	constructor(

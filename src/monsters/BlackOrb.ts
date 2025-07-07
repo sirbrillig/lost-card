@@ -4,7 +4,7 @@ import { BaseMonster } from "./BaseMonster";
 
 type AllStates = "wait1" | "wait2";
 
-export class BlackOrb extends BaseMonster<AllStates> {
+export class BlackOrb extends BaseMonster {
 	hitPoints = 1;
 	primaryColor = 0x797b7b;
 

@@ -4,7 +4,7 @@ import { BaseMonster } from "./BaseMonster";
 
 type AllStates = "randomwalk1" | "walkwithfire";
 
-export class FireMonster extends BaseMonster<AllStates> {
+export class FireMonster extends BaseMonster {
 	hitPoints: number = 3;
 	primaryColor = 0xb80000;
 

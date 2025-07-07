@@ -5,7 +5,7 @@ import { BaseMonster } from "./BaseMonster";
 
 type AllStates = "idle1" | "spitfire" | "idle2" | "idle3";
 
-export class FireSpout extends BaseMonster<AllStates> {
+export class FireSpout extends BaseMonster {
 	hitPoints: number = 2;
 	primaryColor = 0xb80000;
 

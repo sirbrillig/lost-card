@@ -5,7 +5,7 @@ import { BaseMonster } from "./BaseMonster";
 
 type AllStates = "wait" | "lava-bubble" | "lava-explode";
 
-export class LavaBlorp extends BaseMonster<AllStates> {
+export class LavaBlorp extends BaseMonster {
 	hitPoints = 2;
 	timeBeforeBubble = 100;
 	timeBeforeExplode = 500;

@@ -30,13 +30,13 @@ type AllStates =
 	| "summon"
 	| "teleport";
 
-export class PlantBoss extends BaseMonster<AllStates> {
+export class PlantBoss extends BaseMonster {
 	hitPoints: number = 16;
 	isBoss = true;
 	primaryColor = 0x97a21a;
 	enemyManager: EnemyManager;
 	currentSide: "left" | "right" = "left";
-	monsters: Phaser.Physics.Arcade.Sprite[] = [];
+	monsters: BaseMonster[] = [];
 
 	constructor(
 		scene: Phaser.Scene,
@@ -214,8 +214,8 @@ export class PlantBoss extends BaseMonster<AllStates> {
 
 	isHittable(): boolean {
 		return (
-			this.stateMachine.getCurrentState() !== "initial" &&
-			!this.stateMachine.getCurrentState()?.includes("roar")
+			this.getCurrentState() !== "initial" &&
+			!this.getCurrentState()?.includes("roar")
 		);
 	}
 }

@@ -4,7 +4,7 @@ import { BaseMonster } from "./BaseMonster";
 
 type AllStates = "idle" | "target" | "leap";
 
-export class IceHopper extends BaseMonster<AllStates> {
+export class IceHopper extends BaseMonster {
 	hitPoints: number = 3;
 	primaryColor: number = 0x39b7e0;
 	#targetPosition: { x: number; y: number };

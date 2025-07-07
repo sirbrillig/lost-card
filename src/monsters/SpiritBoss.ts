@@ -42,7 +42,7 @@ type AllStates =
 	| "attack2"
 	| "attack3";
 
-export class SpiritBoss extends BaseMonster<AllStates> {
+export class SpiritBoss extends BaseMonster {
 	hitPoints: number = 10;
 	primaryColor = 0x23a487;
 	isBoss = true;
@@ -213,8 +213,8 @@ export class SpiritBoss extends BaseMonster<AllStates> {
 
 	isHittable(): boolean {
 		return (
-			this.stateMachine.getCurrentState() !== "initial" &&
-			!this.stateMachine.getCurrentState()?.includes("roar")
+			this.getCurrentState() !== "initial" &&
+			!this.getCurrentState()?.includes("roar")
 		);
 	}
 }

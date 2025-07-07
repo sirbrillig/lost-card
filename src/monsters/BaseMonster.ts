@@ -5,17 +5,15 @@ import {
 	isPointInRoom,
 	knockBack,
 } from "../lib/shared";
-import { BehaviorMachineInterface, StateMachine } from "../lib/StateMachine";
 import { EnemyManager } from "../lib/EnemyManager";
 import { MainEvents } from "../lib/MainEvents";
 import { config } from "../lib/config";
 import type { Behavior } from "../lib/Behavior";
 
-export class BaseMonster<AllStates extends string> extends Phaser.Physics.Arcade
-	.Sprite {
-	stateMachine: BehaviorMachineInterface<AllStates>;
-	nextState: AllStates;
-	#currentPlayingState: Behavior<AllStates, BaseMonster<AllStates>> | undefined;
+export class BaseMonster extends Phaser.Physics.Arcade.Sprite {
+	nextState: string;
+	#currentState: string | undefined;
+	#currentActiveBehavior: Behavior | undefined;
 	#enemyManager: EnemyManager;
 	#isBeingHit: boolean = false;
 	#freeTimeAfterHit: number = 600;
@@ -40,7 +38,6 @@ export class BaseMonster<AllStates extends string> extends Phaser.Physics.Arcade
 		this.#enemyManager = enemyManager;
 		const initialState = this.getInitialState();
 		this.nextState = initialState;
-		this.stateMachine = new StateMachine(initialState);
 
 		scene.add.existing(this);
 		scene.physics.add.existing(this);
@@ -92,7 +89,7 @@ export class BaseMonster<AllStates extends string> extends Phaser.Physics.Arcade
 		);
 	}
 
-	getInitialState(): AllStates {
+	getInitialState(): string {
 		throw new Error("getInitialState must be overridden");
 	}
 
@@ -100,9 +97,7 @@ export class BaseMonster<AllStates extends string> extends Phaser.Physics.Arcade
 		throw new Error("initSprites must be overridden");
 	}
 
-	constructNewBehaviorFor(
-		_: string
-	): Behavior<AllStates, BaseMonster<AllStates>> | undefined {
+	constructNewBehaviorFor(_: string): Behavior | undefined {
 		throw new Error("constructNewBehaviorFor must be overridden");
 	}
 
@@ -112,27 +107,31 @@ export class BaseMonster<AllStates extends string> extends Phaser.Physics.Arcade
 		return true;
 	}
 
-	changeCurrentPlayingState(newState: AllStates): void {
-		this.stateMachine.setCurrentState(newState);
+	#changeCurrentPlayingState(newState: string): void {
+		this.#currentState = newState;
+	}
+
+	getCurrentState(): string | undefined {
+		return this.#currentState;
 	}
 
 	goToNextState(): void {
-		this.#currentPlayingState?.cleanUp?.(this, this.#enemyManager);
-		this.changeCurrentPlayingState(this.nextState);
+		this.#currentActiveBehavior?.cleanUp?.(this, this.#enemyManager);
+		this.#changeCurrentPlayingState(this.nextState);
 	}
 
-	initNewState(state: Behavior<AllStates, BaseMonster<AllStates>> | undefined) {
-		this.#currentPlayingState = state;
-		if (!this.#currentPlayingState) {
+	initNewState(state: Behavior | undefined) {
+		this.#currentActiveBehavior = state;
+		if (!this.#currentActiveBehavior) {
 			throw new Error("No state active");
 		}
-		this.#currentPlayingState.init(
+		this.#currentActiveBehavior.init(
 			this,
 			this.goToNextState.bind(this),
 			this.#enemyManager
 		);
-		this.updateAfterBehaviorInit(this.#currentPlayingState.name);
-		this.updateAfterBehavior(this.#currentPlayingState.name);
+		this.updateAfterBehaviorInit(this.#currentActiveBehavior.name);
+		this.updateAfterBehavior(this.#currentActiveBehavior.name);
 	}
 
 	update() {
@@ -152,22 +151,25 @@ export class BaseMonster<AllStates extends string> extends Phaser.Physics.Arcade
 			return;
 		}
 
-		const state = this.stateMachine.getCurrentState();
+		const state = this.#currentState;
+		if (!state && this.nextState) {
+			this.goToNextState();
+		}
 
 		// Take init actions
-		if (state && state !== this.#currentPlayingState?.name) {
+		if (state && state !== this.#currentActiveBehavior?.name) {
 			this.initNewState(this.constructNewBehaviorFor(state));
 			return;
 		}
 
 		// Take update actions
-		this.#currentPlayingState?.update?.(
+		this.#currentActiveBehavior?.update?.(
 			this,
 			this.goToNextState.bind(this),
 			this.#enemyManager
 		);
 
-		this.updateAfterBehavior(this.#currentPlayingState?.name);
+		this.updateAfterBehavior(this.#currentActiveBehavior?.name);
 	}
 
 	updateAfterHit() {}
@@ -497,7 +499,7 @@ export class BaseMonster<AllStates extends string> extends Phaser.Physics.Arcade
 
 		this.body.stop();
 		this.anims.stop();
-		this.stateMachine.empty();
+		this.#currentState = undefined;
 		this.setStunned(true);
 		this.emit(Events.MonsterDying);
 

@@ -4,7 +4,7 @@ import { BaseMonster } from "./BaseMonster";
 
 type AllStates = "randomwalk1" | "randomwalk2" | "randomwalk3" | "attack";
 
-export class CloudGoblin extends BaseMonster<AllStates> {
+export class CloudGoblin extends BaseMonster {
 	hitPoints: number = 3;
 	primaryColor = 0xd0693b;
 

@@ -18,7 +18,7 @@ type AllStates =
 	| "attack4"
 	| "attack5";
 
-export class FireBoss extends BaseMonster<AllStates> {
+export class FireBoss extends BaseMonster {
 	hitPoints: number = 10;
 	primaryColor = 0xb80000;
 	isBoss = true;
@@ -146,8 +146,8 @@ export class FireBoss extends BaseMonster<AllStates> {
 
 	isHittable(): boolean {
 		return (
-			this.stateMachine.getCurrentState() !== "initial" &&
-			!this.stateMachine.getCurrentState()?.includes("roar")
+			this.getCurrentState() !== "initial" &&
+			!this.getCurrentState()?.includes("roar")
 		);
 	}
 }

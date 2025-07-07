@@ -5,7 +5,7 @@ import { BaseMonster } from "./BaseMonster";
 
 type AllStates = "wait" | "stickypoison";
 
-export class PoisonShroom extends BaseMonster<AllStates> {
+export class PoisonShroom extends BaseMonster {
 	awareDistance: number = 28;
 	hitPoints = 2;
 	primaryColor = 0x34c24c;

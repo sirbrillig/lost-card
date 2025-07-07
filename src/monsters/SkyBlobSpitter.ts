@@ -6,7 +6,7 @@ import { SkyBlob } from "./SkyBlob";
 
 type AllStates = "idle" | "spawn1" | "spawn2" | "spawn3" | "idle2";
 
-export class SkyBlobSpitter extends BaseMonster<AllStates> {
+export class SkyBlobSpitter extends BaseMonster {
 	hitPoints: number = 6;
 	primaryColor = 0x23a487;
 	#enemyManager;

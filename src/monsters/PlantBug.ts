@@ -4,7 +4,7 @@ import { BaseMonster } from "./BaseMonster";
 
 type AllStates = "wait" | "follow";
 
-export class PlantBug extends BaseMonster<AllStates> {
+export class PlantBug extends BaseMonster {
 	awareDistance: number = 90;
 	speed: number = 50;
 	hitPoints = 2;

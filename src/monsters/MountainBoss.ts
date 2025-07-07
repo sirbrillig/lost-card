@@ -19,7 +19,7 @@ type AllStates =
 	| "leftrightmarch"
 	| "throwrocks";
 
-export class MountainBoss extends BaseMonster<AllStates> {
+export class MountainBoss extends BaseMonster {
 	hitPoints: number = 14;
 	isBoss = true;
 	enemyManager: EnemyManager;
@@ -160,8 +160,8 @@ export class MountainBoss extends BaseMonster<AllStates> {
 
 	isHittable(): boolean {
 		return (
-			this.stateMachine.getCurrentState() !== "initial" &&
-			!this.stateMachine.getCurrentState()?.includes("roar")
+			this.getCurrentState() !== "initial" &&
+			!this.getCurrentState()?.includes("roar")
 		);
 	}
 }

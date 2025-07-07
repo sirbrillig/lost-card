@@ -17,7 +17,7 @@ type AllStates =
 	| "attack2"
 	| "attack3";
 
-export class CloudBoss extends BaseMonster<AllStates> {
+export class CloudBoss extends BaseMonster {
 	hitPoints: number = 8;
 	primaryColor = 0xe38d2f;
 	isBoss = true;
@@ -151,8 +151,8 @@ export class CloudBoss extends BaseMonster<AllStates> {
 
 	isHittable(): boolean {
 		return (
-			this.stateMachine.getCurrentState() !== "initial" &&
-			!this.stateMachine.getCurrentState()?.includes("roar")
+			this.getCurrentState() !== "initial" &&
+			!this.getCurrentState()?.includes("roar")
 		);
 	}
 }

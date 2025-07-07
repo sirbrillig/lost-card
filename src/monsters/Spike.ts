@@ -5,7 +5,7 @@ import { BaseMonster } from "./BaseMonster";
 
 type AllStates = "wait" | "move";
 
-export class Spike extends BaseMonster<AllStates> {
+export class Spike extends BaseMonster {
 	awareDistance: number = 60;
 	speed: number = 74;
 	hitPoints = 4;

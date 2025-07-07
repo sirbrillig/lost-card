@@ -11,7 +11,7 @@ import { BaseMonster } from "./BaseMonster";
 
 type AllStates = "initial" | "roar1" | "leftrightmarch" | "powerup" | "icebeam";
 
-export class IceBoss extends BaseMonster<AllStates> {
+export class IceBoss extends BaseMonster {
 	hitPoints: number = 10;
 	primaryColor: number = 0x39b7e0;
 	isBoss = true;
@@ -107,8 +107,8 @@ export class IceBoss extends BaseMonster<AllStates> {
 
 	isHittable(): boolean {
 		return (
-			this.stateMachine.getCurrentState() !== "initial" &&
-			!this.stateMachine.getCurrentState()?.includes("roar")
+			this.getCurrentState() !== "initial" &&
+			!this.getCurrentState()?.includes("roar")
 		);
 	}
 }

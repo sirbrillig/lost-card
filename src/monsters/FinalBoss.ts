@@ -49,7 +49,7 @@ type AllStates =
 	| "attack5"
 	| "attack6";
 
-export class FinalBoss extends BaseMonster<AllStates> {
+export class FinalBoss extends BaseMonster {
 	hitPoints: number = 26;
 	enemyManager: EnemyManager;
 	primaryColor = 0xb80000;
@@ -316,8 +316,8 @@ export class FinalBoss extends BaseMonster<AllStates> {
 
 	isHittable(): boolean {
 		return (
-			this.stateMachine.getCurrentState() !== "initial" &&
-			!this.stateMachine.getCurrentState()?.includes("roar")
+			this.getCurrentState() !== "initial" &&
+			!this.getCurrentState()?.includes("roar")
 		);
 	}
 }

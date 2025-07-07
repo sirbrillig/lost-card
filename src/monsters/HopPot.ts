@@ -4,7 +4,7 @@ import { BaseMonster } from "./BaseMonster";
 
 type AllStates = "idle" | "target" | "leap";
 
-export class HopPot extends BaseMonster<AllStates> {
+export class HopPot extends BaseMonster {
 	hitPoints: number = 2;
 	#targetPosition: { x: number; y: number };
 

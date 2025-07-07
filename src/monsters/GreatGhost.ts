@@ -5,7 +5,7 @@ import { Ghost } from "./Ghost";
 
 type AllStates = "wait" | "follow" | "spawn";
 
-export class GreatGhost extends BaseMonster<AllStates> {
+export class GreatGhost extends BaseMonster {
 	awareDistance: number = 200;
 	speed: number = 15;
 	hitPoints = 6;

@@ -5,7 +5,7 @@ import { BaseMonster } from "./BaseMonster";
 
 type AllStates = "wait" | "follow";
 
-export class SkyBlob extends BaseMonster<AllStates> {
+export class SkyBlob extends BaseMonster {
 	awareDistance: number = 90;
 	speed: number = 60;
 	hitPoints = 2;

@@ -6,7 +6,7 @@ import { BaseMonster } from "./BaseMonster";
 
 type AllStates = "waterteleport" | "powerup" | "iceball";
 
-export class WaterDipper extends BaseMonster<AllStates> {
+export class WaterDipper extends BaseMonster {
 	hitPoints: number = 8;
 	primaryColor: number = 0x39b7e0;
 

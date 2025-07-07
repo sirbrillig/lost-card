@@ -50,7 +50,8 @@ export const DataKeys = {
 	SwordAttackActive: "attackActive",
 	ItemObjectId: "objectId",
 	PlayerDirection: "PlayerDirection",
-};
+	DefeatedMonsters: "DefeatedBosses",
+} as const;
 
 export const DarknessAreaName = "Darkness";
 
@@ -973,8 +974,8 @@ export function getSavedDataPlayerPosition(
 
 export function isEnemy(
 	sprite: Phaser.GameObjects.Sprite
-): sprite is BaseMonster<"test"> {
-	const test = sprite as BaseMonster<"test">;
+): sprite is BaseMonster {
+	const test = sprite as BaseMonster;
 	return "hitPoints" in test;
 }
 

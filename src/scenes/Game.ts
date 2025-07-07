@@ -3,37 +3,6 @@ import { soundKeys, musicKeys } from "../lib/sound";
 import { config } from "../lib/config";
 import { MainEvents } from "../lib/MainEvents";
 import { EnemyManager } from "../lib/EnemyManager";
-import { MountainMonster } from "../monsters/MountainMonster";
-import { HopPot } from "../monsters/HopPot";
-import { RockDigger } from "../monsters/RockDigger";
-import { LavaBlorp } from "../monsters/LavaBlorp";
-import { Ghost } from "../monsters/Ghost";
-import { BlackOrb } from "../monsters/BlackOrb";
-import { FinalBoss } from "../monsters/FinalBoss";
-import { Skeleton } from "../monsters/Skeleton";
-import { CloudGoblin } from "../monsters/CloudGoblin";
-import { SkyBlob } from "../monsters/SkyBlob";
-import { Slime } from "../monsters/Slime";
-import { Spike } from "../monsters/Spike";
-import { Flower } from "../monsters/Flower";
-import { PoisonShroom } from "../monsters/PoisonShroom";
-import { Snakey } from "../monsters/Snakey";
-import { PlantBug } from "../monsters/PlantBug";
-import { IceMonster } from "../monsters/IceMonster";
-import { IceHopper } from "../monsters/IceHopper";
-import { FireMonster } from "../monsters/FireMonster";
-import { FireGiant } from "../monsters/FireGiant";
-import { FireSpout } from "../monsters/FireSpout";
-import { WaterDipper } from "../monsters/WaterDipper";
-import { GreatGhost } from "../monsters/GreatGhost";
-import { MountainBoss } from "../monsters/MountainBoss";
-import { PlantSpitter } from "../monsters/PlantSpitter";
-import { SkyBlobSpitter } from "../monsters/SkyBlobSpitter";
-import { IceBoss } from "../monsters/IceBoss";
-import { PlantBoss } from "../monsters/PlantBoss";
-import { SpiritBoss } from "../monsters/SpiritBoss";
-import { CloudBoss } from "../monsters/CloudBoss";
-import { FireBoss } from "../monsters/FireBoss";
 import { BaseMonster } from "../monsters/BaseMonster";
 import {
 	Auras,
@@ -94,6 +63,7 @@ import {
 	isSprite,
 	DarknessAreaName,
 } from "../lib/shared";
+import { MonsterCreator } from "../lib/MonsterCreator";
 
 export class Game extends Scene {
 	debugGraphic: Phaser.GameObjects.Graphics | undefined;
@@ -106,6 +76,7 @@ export class Game extends Scene {
 	statusBounce: Phaser.Tweens.Tween | undefined;
 	attackSprite: Phaser.GameObjects.Sprite;
 	enemyManager: EnemyManager;
+	monsterCreator: MonsterCreator;
 	enemyCollider: Phaser.Physics.Arcade.Collider;
 	maskGraphics: Phaser.GameObjects.Graphics;
 	mask: Phaser.Display.Masks.GeometryMask;
@@ -219,6 +190,12 @@ export class Game extends Scene {
 			this.player,
 			this.sword,
 			this.map
+		);
+		this.monsterCreator = new MonsterCreator(
+			this,
+			this.enemyManager,
+			this.showAllHiddenItemsInRoom.bind(this),
+			this.saveGame.bind(this)
 		);
 
 		MainEvents.on(
@@ -2887,10 +2864,7 @@ export class Game extends Scene {
 		});
 	}
 
-	addEnemyToEnemyManager<T extends string, M extends BaseMonster<T>>(
-		monster: M,
-		point: { id: number }
-	) {
+	addEnemyToEnemyManager(monster: BaseMonster, point: { id: number }) {
 		monster.mapSpawnPointId = point.id;
 		this.enemyManager.enemies.add(monster);
 		monster.once(Events.MonsterDefeated, () => {
@@ -2917,321 +2891,15 @@ export class Game extends Scene {
 			}
 
 			const enemyType = point.name;
-			if (this.wasBossDefeated(enemyType)) {
+
+			if (!this.monsterCreator.shouldMonsterRespawn(enemyType)) {
 				return;
 			}
-			switch (enemyType) {
-				case "MountainMonster": {
-					const monster = new MountainMonster(
-						this,
-						this.enemyManager,
-						point.x,
-						point.y
-					);
-					this.addEnemyToEnemyManager(monster, point);
-					break;
-				}
-				case "HopPot": {
-					const monster = new HopPot(this, this.enemyManager, point.x, point.y);
-					this.addEnemyToEnemyManager(monster, point);
-					break;
-				}
-				case "RockDigger": {
-					const monster = new RockDigger(
-						this,
-						this.enemyManager,
-						point.x,
-						point.y
-					);
-					this.addEnemyToEnemyManager(monster, point);
-					monster.once("defeated", () => {
-						this.markBossDefeated("RockDigger");
-						this.showAllHiddenItemsInRoom();
-					});
-					break;
-				}
-				case "LavaBlorp": {
-					const monster = new LavaBlorp(
-						this,
-						this.enemyManager,
-						point.x,
-						point.y
-					);
-					this.addEnemyToEnemyManager(monster, point);
-					break;
-				}
-				case "Skeleton": {
-					const monster = new Skeleton(
-						this,
-						this.enemyManager,
-						point.x,
-						point.y
-					);
-					this.addEnemyToEnemyManager(monster, point);
-					break;
-				}
-				case "Ghost": {
-					const monster = new Ghost(this, this.enemyManager, point.x, point.y);
-					this.addEnemyToEnemyManager(monster, point);
-					break;
-				}
-				case "BlackOrb": {
-					const monster = new BlackOrb(
-						this,
-						this.enemyManager,
-						point.x,
-						point.y
-					);
-					this.addEnemyToEnemyManager(monster, point);
-					break;
-				}
-				case "GreatGhost": {
-					const monster = new GreatGhost(
-						this,
-						this.enemyManager,
-						point.x,
-						point.y
-					);
-					this.addEnemyToEnemyManager(monster, point);
-					monster.once("defeated", () => {
-						this.markBossDefeated("GreatGhost");
-						this.showAllHiddenItemsInRoom();
-					});
-					break;
-				}
-				case "SkyBlob": {
-					const monster = new SkyBlob(
-						this,
-						this.enemyManager,
-						point.x,
-						point.y
-					);
-					this.addEnemyToEnemyManager(monster, point);
-					break;
-				}
-				case "Slime": {
-					const monster = new Slime(this, this.enemyManager, point.x, point.y);
-					this.addEnemyToEnemyManager(monster, point);
-					break;
-				}
-				case "Spike": {
-					const monster = new Spike(this, this.enemyManager, point.x, point.y);
-					this.addEnemyToEnemyManager(monster, point);
-					break;
-				}
-				case "Flower": {
-					const monster = new Flower(this, this.enemyManager, point.x, point.y);
-					this.addEnemyToEnemyManager(monster, point);
-					break;
-				}
-				case "PoisonShroom": {
-					const monster = new PoisonShroom(
-						this,
-						this.enemyManager,
-						point.x,
-						point.y
-					);
-					this.addEnemyToEnemyManager(monster, point);
-					break;
-				}
-				case "Snakey": {
-					const monster = new Snakey(this, this.enemyManager, point.x, point.y);
-					this.addEnemyToEnemyManager(monster, point);
-					break;
-				}
-				case "CloudGoblin": {
-					const monster = new CloudGoblin(
-						this,
-						this.enemyManager,
-						point.x,
-						point.y
-					);
-					this.addEnemyToEnemyManager(monster, point);
-					break;
-				}
-				case "PlantBug": {
-					const monster = new PlantBug(
-						this,
-						this.enemyManager,
-						point.x,
-						point.y
-					);
-					this.addEnemyToEnemyManager(monster, point);
-					break;
-				}
-				case "WaterDipper": {
-					const monster = new WaterDipper(
-						this,
-						this.enemyManager,
-						point.x,
-						point.y
-					);
-					monster.once(Events.MonsterDefeated, () => {
-						this.markBossDefeated("WaterDipper");
-						this.showAllHiddenItemsInRoom();
-					});
-					this.addEnemyToEnemyManager(monster, point);
-					break;
-				}
-				case "IceMonster": {
-					const monster = new IceMonster(
-						this,
-						this.enemyManager,
-						point.x,
-						point.y
-					);
-					this.addEnemyToEnemyManager(monster, point);
-					break;
-				}
-				case "IceHopper": {
-					const monster = new IceHopper(
-						this,
-						this.enemyManager,
-						point.x,
-						point.y
-					);
-					this.addEnemyToEnemyManager(monster, point);
-					break;
-				}
-				case "FireSpout": {
-					const monster = new FireSpout(
-						this,
-						this.enemyManager,
-						point.x,
-						point.y
-					);
-					this.addEnemyToEnemyManager(monster, point);
-					break;
-				}
-				case "SkyBlobSpitter": {
-					const monster = new SkyBlobSpitter(
-						this,
-						this.enemyManager,
-						point.x,
-						point.y
-					);
-					monster.once(Events.MonsterDefeated, () => {
-						this.markBossDefeated("SkyBlobSpitter");
-						this.showAllHiddenItemsInRoom();
-					});
-					this.addEnemyToEnemyManager(monster, point);
-					break;
-				}
-				case "PlantSpitter": {
-					const monster = new PlantSpitter(
-						this,
-						this.enemyManager,
-						point.x,
-						point.y
-					);
-					this.addEnemyToEnemyManager(monster, point);
-					break;
-				}
-				case "FireGiant": {
-					const monster = new FireGiant(
-						this,
-						this.enemyManager,
-						point.x,
-						point.y
-					);
-					monster.once(Events.MonsterDefeated, () => {
-						this.markBossDefeated("FireGiant");
-						this.showAllHiddenItemsInRoom();
-					});
-					this.addEnemyToEnemyManager(monster, point);
-					break;
-				}
-				case "FireMonster": {
-					const monster = new FireMonster(
-						this,
-						this.enemyManager,
-						point.x,
-						point.y
-					);
-					this.addEnemyToEnemyManager(monster, point);
-					break;
-				}
-				case "MountainBoss": {
-					const boss = new MountainBoss(
-						this,
-						this.enemyManager,
-						point.x,
-						point.y
-					);
-					boss.once(Events.MonsterDefeated, () => {
-						this.markBossDefeated("MountainBoss");
-						this.showAllHiddenItemsInRoom();
-						this.saveGame();
-					});
-					this.addEnemyToEnemyManager(boss, point);
-					break;
-				}
-				case "IceBoss": {
-					const boss = new IceBoss(this, this.enemyManager, point.x, point.y);
-					boss.once(Events.MonsterDefeated, () => {
-						this.markBossDefeated("IceBoss");
-						this.showAllHiddenItemsInRoom();
-						this.saveGame();
-					});
-					this.addEnemyToEnemyManager(boss, point);
-					break;
-				}
-				case "CloudBoss": {
-					const boss = new CloudBoss(this, this.enemyManager, point.x, point.y);
-					boss.once(Events.MonsterDefeated, () => {
-						this.markBossDefeated("CloudBoss");
-						this.showAllHiddenItemsInRoom();
-						this.saveGame();
-					});
-					this.addEnemyToEnemyManager(boss, point);
-					break;
-				}
-				case "SpiritBoss": {
-					const boss = new SpiritBoss(
-						this,
-						this.enemyManager,
-						point.x,
-						point.y
-					);
-					boss.once(Events.MonsterDefeated, () => {
-						this.markBossDefeated("SpiritBoss");
-						this.showAllHiddenItemsInRoom();
-						this.saveGame();
-					});
-					this.addEnemyToEnemyManager(boss, point);
-					break;
-				}
-				case "PlantBoss": {
-					const boss = new PlantBoss(this, this.enemyManager, point.x, point.y);
-					boss.once(Events.MonsterDefeated, () => {
-						this.markBossDefeated("PlantBoss");
-						this.showAllHiddenItemsInRoom();
-						this.saveGame();
-					});
-					this.addEnemyToEnemyManager(boss, point);
-					break;
-				}
-				case "FireBoss": {
-					const boss = new FireBoss(this, this.enemyManager, point.x, point.y);
-					boss.once(Events.MonsterDefeated, () => {
-						this.markBossDefeated("FireBoss");
-						this.showAllHiddenItemsInRoom();
-						this.saveGame();
-					});
-					this.addEnemyToEnemyManager(boss, point);
-					break;
-				}
-				case "FinalBoss": {
-					const boss = new FinalBoss(this, this.enemyManager, point.x, point.y);
-					this.addEnemyToEnemyManager(boss, point);
-					boss.once(Events.MonsterDefeated, () => {
-						this.showAllHiddenItemsInRoom();
-					});
-					break;
-				}
-				default:
-					throw new Error(`Unknown enemy type "${enemyType}"`);
-			}
+			const monster = this.monsterCreator.createMonster(enemyType, {
+				x: point.x,
+				y: point.y,
+			});
+			this.addEnemyToEnemyManager(monster, point);
 
 			this.spawnPoints = this.spawnPoints.filter((pointB) => pointB !== point);
 		});
@@ -3258,17 +2926,6 @@ export class Game extends Scene {
 				potionVial?.destroy();
 			},
 		});
-	}
-
-	wasBossDefeated(name: string) {
-		const defeated = getDataFromRegistry(this.registry, "DefeatedBosses") ?? [];
-		return defeated.includes(name);
-	}
-
-	markBossDefeated(name: string) {
-		const defeated = getDataFromRegistry(this.registry, "DefeatedBosses") ?? [];
-		defeated.push(name);
-		saveDataToRegistry(this.registry, "DefeatedBosses", defeated);
 	}
 
 	playerHitEnemy(

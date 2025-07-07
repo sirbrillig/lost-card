@@ -4,7 +4,7 @@ import { BaseMonster } from "./BaseMonster";
 
 type AllStates = "wait" | "aim" | "dash";
 
-export class Snakey extends BaseMonster<AllStates> {
+export class Snakey extends BaseMonster {
 	awareDistance: number = 80;
 	speed: number = 120;
 	hitPoints = 3;

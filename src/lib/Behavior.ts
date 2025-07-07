@@ -2,20 +2,20 @@ import { EnemyManager } from "./EnemyManager";
 
 export type BehaviorCompleteCallback = () => void;
 
-export interface Behavior<
-	Key extends string,
-	Sprite extends Phaser.GameObjects.Sprite,
-> {
-	name: Key;
+export interface Behavior {
+	name: string;
 	init(
-		sprite: Sprite,
+		sprite: Phaser.GameObjects.Sprite,
 		goToNextState: BehaviorCompleteCallback,
 		enemyManager: EnemyManager
 	): void;
 	update?: (
-		sprite: Sprite,
+		sprite: Phaser.GameObjects.Sprite,
 		goToNextState: BehaviorCompleteCallback,
 		enemyManager: EnemyManager
 	) => void;
-	cleanUp?: (sprite: Sprite, enemyManager: EnemyManager) => void;
+	cleanUp?: (
+		sprite: Phaser.GameObjects.Sprite,
+		enemyManager: EnemyManager
+	) => void;
 }

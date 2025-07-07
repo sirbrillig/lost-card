@@ -5,7 +5,7 @@ import { BaseMonster } from "./BaseMonster";
 
 type AllStates = "wait" | "follow";
 
-export class Slime extends BaseMonster<AllStates> {
+export class Slime extends BaseMonster {
 	awareDistance: number = 70;
 	speed: number = 40;
 	hitPoints = 1;

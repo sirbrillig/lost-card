@@ -6,7 +6,7 @@ import { BaseMonster } from "./BaseMonster";
 
 type AllStates = "randomwalk1" | "randomwalk2";
 
-export class Skeleton extends BaseMonster<AllStates> {
+export class Skeleton extends BaseMonster {
 	hitPoints = 1;
 	#originalHitPoints = 1;
 	primaryColor = 0x23a487;

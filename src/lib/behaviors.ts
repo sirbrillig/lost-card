@@ -25,16 +25,14 @@ import { Behavior, BehaviorCompleteCallback } from "./Behavior";
 import { MainEvents } from "./MainEvents";
 import { MountainMonster } from "../monsters/MountainMonster";
 
-export class WaitForActive<AllStates extends string>
-	implements Behavior<AllStates, Phaser.GameObjects.Sprite>
-{
+export class WaitForActive implements Behavior {
 	#distanceToActivate: number = 100;
 	#waitAnimationKey: string | undefined = undefined;
 	#maxWaitTime: number | undefined;
-	name: AllStates;
+	name: string;
 
 	constructor(
-		name: AllStates,
+		name: string,
 		config?: {
 			distance?: number;
 			maxWaitTime?: number | undefined;
@@ -99,12 +97,10 @@ export class WaitForActive<AllStates extends string>
 	}
 }
 
-export class Roar<AllStates extends string>
-	implements Behavior<AllStates, Phaser.GameObjects.Sprite>
-{
-	name: AllStates;
+export class Roar implements Behavior {
+	name: string;
 
-	constructor(name: AllStates) {
+	constructor(name: string) {
 		this.name = name;
 	}
 
@@ -178,9 +174,7 @@ export class Roar<AllStates extends string>
 	}
 }
 
-export class SpawnEnemies<AllStates extends string>
-	implements Behavior<AllStates, Phaser.GameObjects.Sprite>
-{
+export class SpawnEnemies implements Behavior {
 	#maxSpawnedEnemies: number = 18;
 	#enemiesToSpawn: number = 6;
 	#postSpawnTime: number = 1000;
@@ -192,10 +186,10 @@ export class SpawnEnemies<AllStates extends string>
 	) => Phaser.GameObjects.Sprite = (scene, enemyManager, x, y) => {
 		return new MountainMonster(scene, enemyManager, x, y);
 	};
-	name: AllStates;
+	name: string;
 
 	constructor(
-		name: AllStates,
+		name: string,
 		config?: {
 			enemiesToSpawn?: number;
 			maxSpawnedEnemies?: number;
@@ -288,14 +282,12 @@ export class SpawnEnemies<AllStates extends string>
 	}
 }
 
-export class Nothing<AllStates extends string>
-	implements Behavior<AllStates, Phaser.GameObjects.Sprite>
-{
+export class Nothing implements Behavior {
 	#animationKey: string;
 	#idleTime: number;
-	name: AllStates;
+	name: string;
 
-	constructor(name: AllStates, animationKey: string, idleTime: number) {
+	constructor(name: string, animationKey: string, idleTime: number) {
 		this.name = name;
 		this.#animationKey = animationKey;
 		this.#idleTime = idleTime;
@@ -318,14 +310,12 @@ export class Nothing<AllStates extends string>
 	}
 }
 
-export class Idle<AllStates extends string>
-	implements Behavior<AllStates, Phaser.GameObjects.Sprite>
-{
+export class Idle implements Behavior {
 	#animationKey: string;
 	#idleTime: number;
-	name: AllStates;
+	name: string;
 
-	constructor(name: AllStates, animationKey: string, idleTime: number) {
+	constructor(name: string, animationKey: string, idleTime: number) {
 		this.name = name;
 		this.#animationKey = animationKey;
 		this.#idleTime = idleTime;
@@ -349,16 +339,14 @@ export class Idle<AllStates extends string>
 	}
 }
 
-export class Leap<AllStates extends string>
-	implements Behavior<AllStates, Phaser.GameObjects.Sprite>
-{
+export class Leap implements Behavior {
 	#speed = 90;
 	#postAttackTime = 900;
 	#targetPosition: { x: number; y: number } | undefined = undefined;
-	name: AllStates;
+	name: string;
 
 	constructor(
-		name: AllStates,
+		name: string,
 		options?: {
 			speed?: number;
 			postAttackTime?: number;
@@ -416,17 +404,15 @@ export class Leap<AllStates extends string>
 	}
 }
 
-export class RandomlyWalk<AllStates extends string>
-	implements Behavior<AllStates, Phaser.GameObjects.Sprite>
-{
+export class RandomlyWalk implements Behavior {
 	#enemySpeed = 50;
 	#minWalkTime = 800;
 	#maxWalkTime = 4000;
-	name: AllStates;
+	name: string;
 	#walkSound: Sound;
 
 	constructor(
-		name: AllStates,
+		name: string,
 		config?: {
 			speed?: number;
 			minWalkTime?: number;
@@ -509,17 +495,15 @@ export class RandomlyWalk<AllStates extends string>
 	}
 }
 
-export class LeftRightMarch<AllStates extends string>
-	implements Behavior<AllStates, Phaser.GameObjects.Sprite>
-{
+export class LeftRightMarch implements Behavior {
 	#enemySpeed = 70;
 	#minWalkTime = 600;
 	#maxWalkTime = 4000;
 	#moveUpDown = false;
-	name: AllStates;
+	name: string;
 
 	constructor(
-		name: AllStates,
+		name: string,
 		config?: {
 			speed?: number;
 			minWalkTime?: number;
@@ -596,14 +580,12 @@ export class LeftRightMarch<AllStates extends string>
 	}
 }
 
-export class RandomTeleport<AllStates extends string>
-	implements Behavior<AllStates, Phaser.GameObjects.Sprite>
-{
+export class RandomTeleport implements Behavior {
 	#postTeleportDelay = 1000;
-	name: AllStates;
+	name: string;
 
 	constructor(
-		name: AllStates,
+		name: string,
 		config?: {
 			postTeleportDelay?: number;
 		}
@@ -703,13 +685,11 @@ export class RandomTeleport<AllStates extends string>
 	}
 }
 
-export class TeleportToPlatform<AllStates extends string>
-	implements Behavior<AllStates, Phaser.GameObjects.Sprite>
-{
+export class TeleportToPlatform implements Behavior {
 	#postTeleportDelay = 1500;
-	name: AllStates;
+	name: string;
 
-	constructor(name: AllStates, postTeleportDelay: number) {
+	constructor(name: string, postTeleportDelay: number) {
 		this.name = name;
 		this.#postTeleportDelay = postTeleportDelay;
 	}
@@ -846,13 +826,11 @@ export class TeleportToPlatform<AllStates extends string>
 	}
 }
 
-export class TeleportToWater<AllStates extends string>
-	implements Behavior<AllStates, Phaser.GameObjects.Sprite>
-{
+export class TeleportToWater implements Behavior {
 	#postTeleportDelay = 1000;
-	name: AllStates;
+	name: string;
 
-	constructor(name: AllStates) {
+	constructor(name: string) {
 		this.name = name;
 	}
 
@@ -900,15 +878,13 @@ export class TeleportToWater<AllStates extends string>
 	}
 }
 
-export class PowerUp<AllStates extends string>
-	implements Behavior<AllStates, Phaser.GameObjects.Sprite>
-{
+export class PowerUp implements Behavior {
 	#chargeTime = 1300;
 	#scale = 1;
-	name: AllStates;
+	name: string;
 
 	constructor(
-		name: AllStates,
+		name: string,
 		config?: {
 			scale?: number;
 			chargeTime?: number;
@@ -973,15 +949,13 @@ export class PowerUp<AllStates extends string>
 	}
 }
 
-export class SlashTowardPlayer<AllStates extends string>
-	implements Behavior<AllStates, Phaser.GameObjects.Sprite>
-{
-	name: AllStates;
+export class SlashTowardPlayer implements Behavior {
+	name: string;
 	#speed = 100;
 	#hitboxSize = 30;
 	#effect: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
 
-	constructor(name: AllStates, speed: number) {
+	constructor(name: string, speed: number) {
 		this.name = name;
 		this.#speed = speed;
 	}
@@ -1074,12 +1048,10 @@ export class SlashTowardPlayer<AllStates extends string>
 	}
 }
 
-export class BigSwing<AllStates extends string>
-	implements Behavior<AllStates, Phaser.GameObjects.Sprite>
-{
-	name: AllStates;
+export class BigSwing implements Behavior {
+	name: string;
 
-	constructor(name: AllStates) {
+	constructor(name: string) {
 		this.name = name;
 	}
 
@@ -1132,13 +1104,11 @@ export class BigSwing<AllStates extends string>
 	}
 }
 
-export class IceAttack<AllStates extends string>
-	implements Behavior<AllStates, Phaser.GameObjects.Sprite>
-{
-	name: AllStates;
+export class IceAttack implements Behavior {
+	name: string;
 	#freezePlayerTime = 3000;
 
-	constructor(name: AllStates) {
+	constructor(name: string) {
 		this.name = name;
 	}
 
@@ -1197,16 +1167,14 @@ export class IceAttack<AllStates extends string>
 	}
 }
 
-export class StickyPoison<AllStates extends string>
-	implements Behavior<AllStates, Phaser.GameObjects.Sprite>
-{
+export class StickyPoison implements Behavior {
 	#poisonHitDelay = 2000;
 	#speed = 300;
 	#isStuck = false;
-	name: AllStates;
+	name: string;
 
 	constructor(
-		name: AllStates,
+		name: string,
 		options?: {
 			poisonHitDelay: number;
 		}
@@ -1278,15 +1246,13 @@ export class StickyPoison<AllStates extends string>
 	}
 }
 
-export class Poof<AllStates extends string>
-	implements Behavior<AllStates, Phaser.GameObjects.Sprite>
-{
+export class Poof implements Behavior {
 	#postAttackTime = 1000;
 	#particleLifeSpan = 800;
-	name: AllStates;
+	name: string;
 
 	constructor(
-		name: AllStates,
+		name: string,
 		options?: {
 			postAttackTime?: number;
 			particleLifeSpan?: number;
@@ -1358,17 +1324,15 @@ export class Poof<AllStates extends string>
 	}
 }
 
-export class LavaExplode<AllStates extends string>
-	implements Behavior<AllStates, Phaser.GameObjects.Sprite>
-{
+export class LavaExplode implements Behavior {
 	#postAttackTime = 1500;
 	#particleLifeSpan = 300;
 	#hitboxRadius = 25;
 	#isConstant = false;
-	name: AllStates;
+	name: string;
 
 	constructor(
-		name: AllStates,
+		name: string,
 		options?: {
 			postAttackTime?: number;
 			particleLifeSpan?: number;
@@ -1455,15 +1419,13 @@ export class LavaExplode<AllStates extends string>
 	}
 }
 
-export class SeekingVine<AllStates extends string>
-	implements Behavior<AllStates, Phaser.GameObjects.Sprite>
-{
+export class SeekingVine implements Behavior {
 	#speed = 50;
 	#postAttackTime = 1000;
-	name: AllStates;
+	name: string;
 	#effect: Phaser.GameObjects.Sprite;
 
-	constructor(name: AllStates, speed: number, postAttackTime: number) {
+	constructor(name: string, speed: number, postAttackTime: number) {
 		this.name = name;
 		this.#speed = speed;
 		this.#postAttackTime = postAttackTime;
@@ -1503,11 +1465,9 @@ export class SeekingVine<AllStates extends string>
 	}
 }
 
-export class SummonCircle<AllStates extends string>
-	implements Behavior<AllStates, Phaser.GameObjects.Sprite>
-{
+export class SummonCircle implements Behavior {
 	#speed = 1;
-	name: AllStates;
+	name: string;
 	effects: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody[] = [];
 	#sprite: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
 	#createMonster: (
@@ -1520,7 +1480,7 @@ export class SummonCircle<AllStates extends string>
 	};
 
 	constructor(
-		name: AllStates,
+		name: string,
 		config?: {
 			enemiesToSpawn?: number;
 			maxSpawnedEnemies?: number;
@@ -1632,17 +1592,15 @@ export class SummonCircle<AllStates extends string>
 	}
 }
 
-export class DashTowardPlayer<AllStates extends string>
-	implements Behavior<AllStates, Phaser.GameObjects.Sprite>
-{
+export class DashTowardPlayer implements Behavior {
 	#speed = 90;
 	#postAttackTime = 900;
 	#previousDistance: number;
 	#targetPosition: { x: number; y: number } | undefined = undefined;
-	name: AllStates;
+	name: string;
 
 	constructor(
-		name: AllStates,
+		name: string,
 		options?: {
 			speed?: number;
 			postAttackTime?: number;
@@ -1712,19 +1670,17 @@ export class DashTowardPlayer<AllStates extends string>
 	}
 }
 
-export class LaserSight<AllStates extends string>
-	implements Behavior<AllStates, Phaser.GameObjects.Sprite>
-{
+export class LaserSight implements Behavior {
 	#speed = 50;
 	#postAttackTime = 1000;
 	#maxLength = 500;
 	#color = 0xff0000;
 	#isHidden = true;
 	#onTarget: undefined | ((target: { x: number; y: number }) => void);
-	name: AllStates;
+	name: string;
 
 	constructor(
-		name: AllStates,
+		name: string,
 		options?: {
 			speed?: number;
 			postAttackTime?: number;
@@ -1790,15 +1746,13 @@ export class LaserSight<AllStates extends string>
 	}
 }
 
-export class BlackOrbAttack<AllStates extends string>
-	implements Behavior<AllStates, Phaser.GameObjects.Sprite>
-{
+export class BlackOrbAttack implements Behavior {
 	#speed = 50;
 	#postAttackTime = 1000;
 	#maxLifetime = 6000;
-	name: AllStates;
+	name: string;
 
-	constructor(name: AllStates, speed: number, postAttackTime: number) {
+	constructor(name: string, speed: number, postAttackTime: number) {
 		this.name = name;
 		this.#speed = speed;
 		this.#postAttackTime = postAttackTime;
@@ -1859,19 +1813,17 @@ export class BlackOrbAttack<AllStates extends string>
 	}
 }
 
-export class RangedRockBall<AllStates extends string>
-	implements Behavior<AllStates, Phaser.GameObjects.Sprite>
-{
+export class RangedRockBall implements Behavior {
 	#speed = 160;
 	#postAttackTime = 2200;
 	#maxLifetime = 10000;
 	#hitsWalls = true;
 	#forceDirectionDegree: number | undefined = undefined;
 	#colorTint: number | undefined;
-	name: AllStates;
+	name: string;
 
 	constructor(
-		name: AllStates,
+		name: string,
 		config?: {
 			speed?: number;
 			postAttackTime?: number;
@@ -1996,18 +1948,16 @@ export class RangedRockBall<AllStates extends string>
 	}
 }
 
-export class RangedFireBall<AllStates extends string>
-	implements Behavior<AllStates, Phaser.GameObjects.Sprite>
-{
+export class RangedFireBall implements Behavior {
 	#speed = 50;
 	#postAttackTime = 1000;
 	#hitsWalls = false;
 	#forceDirectionDegree: number | undefined = undefined;
 	#colorTint: number | undefined;
-	name: AllStates;
+	name: string;
 
 	constructor(
-		name: AllStates,
+		name: string,
 		config?: {
 			speed?: number;
 			postAttackTime?: number;
@@ -2126,14 +2076,12 @@ export class RangedFireBall<AllStates extends string>
 	}
 }
 
-export class RangedIceBall<AllStates extends string>
-	implements Behavior<AllStates, Phaser.GameObjects.Sprite>
-{
+export class RangedIceBall implements Behavior {
 	#speed = 50;
 	#postAttackTime = 1000;
-	name: AllStates;
+	name: string;
 
-	constructor(name: AllStates, speed: number, postAttackTime: number) {
+	constructor(name: string, speed: number, postAttackTime: number) {
 		this.name = name;
 		this.#speed = speed;
 		this.#postAttackTime = postAttackTime;
@@ -2207,17 +2155,15 @@ export class RangedIceBall<AllStates extends string>
 	}
 }
 
-export class WalkWithFire<AllStates extends string>
-	implements Behavior<AllStates, Phaser.GameObjects.Sprite>
-{
-	name: AllStates;
+export class WalkWithFire implements Behavior {
+	name: string;
 	#effect: Phaser.GameObjects.Sprite;
 	#enemySpeed = 50;
 	#endAfter = 1000;
 	#rotateDistance = 25;
 
 	constructor(
-		name: AllStates,
+		name: string,
 		config?: { speed?: number; endAfter?: number; rotateDistance?: number }
 	) {
 		this.name = name;
@@ -2340,14 +2286,12 @@ export class WalkWithFire<AllStates extends string>
 	}
 }
 
-export class IceBeam<AllStates extends string>
-	implements Behavior<AllStates, Phaser.GameObjects.Sprite>
-{
+export class IceBeam implements Behavior {
 	iceMeltTime = 4000;
 	attackSpeed = 150;
-	name: AllStates;
+	name: string;
 
-	constructor(name: AllStates, attackSpeed: number) {
+	constructor(name: string, attackSpeed: number) {
 		this.name = name;
 		this.attackSpeed = attackSpeed;
 	}
@@ -2497,10 +2441,8 @@ function getWalkAnimationKeyForDirection(direction: SpriteDirection): string {
 	}
 }
 
-export class SwoopAttack<AllStates extends string>
-	implements Behavior<AllStates, Phaser.GameObjects.Sprite>
-{
-	name: AllStates;
+export class SwoopAttack implements Behavior {
+	name: string;
 	#followTime: number | undefined;
 	#awareDistance: number | undefined;
 	#speed: number = 10;
@@ -2509,7 +2451,7 @@ export class SwoopAttack<AllStates extends string>
 	walkSound: Sound;
 
 	constructor(
-		name: AllStates,
+		name: string,
 		config?: {
 			speed?: number;
 			maxSpeed?: number;
@@ -2623,16 +2565,14 @@ export class SwoopAttack<AllStates extends string>
 	}
 }
 
-export class FollowPlayer<AllStates extends string>
-	implements Behavior<AllStates, Phaser.GameObjects.Sprite>
-{
-	name: AllStates;
+export class FollowPlayer implements Behavior {
+	name: string;
 	#followTime: number | undefined;
 	#awareDistance: number | undefined;
 	#speed: number = 30;
 
 	constructor(
-		name: AllStates,
+		name: string,
 		config?: {
 			speed?: number;
 			followTime?: number;
@@ -2869,9 +2809,7 @@ class Seeker extends Phaser.Physics.Arcade.Sprite {
 	}
 }
 
-export class ThrowRocks<AllStates extends string>
-	implements Behavior<AllStates, Phaser.GameObjects.Sprite>
-{
+export class ThrowRocks implements Behavior {
 	#speed = 500;
 	#delayBeforeEnd = 1000;
 	#delayBetweenRocks = 600;
@@ -2880,10 +2818,10 @@ export class ThrowRocks<AllStates extends string>
 	#sprite: Phaser.GameObjects.Sprite;
 	#rocksCreated: Phaser.GameObjects.Sprite[] = [];
 	#enemyManager: EnemyManager;
-	name: AllStates;
+	name: string;
 
 	constructor(
-		name: AllStates,
+		name: string,
 		config: {
 			speed: number;
 			rockCount: number;

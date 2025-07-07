@@ -5,7 +5,7 @@ import { BaseMonster } from "./BaseMonster";
 
 type AllStates = "wait" | "burst";
 
-export class Flower extends BaseMonster<AllStates> {
+export class Flower extends BaseMonster {
 	awareDistance: number = 60;
 	hitPoints = 3;
 	primaryColor = 0x34c24c;

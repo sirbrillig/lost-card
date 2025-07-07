@@ -4,7 +4,7 @@ import { BaseMonster } from "./BaseMonster";
 
 type AllStates = "randomwalk1" | "randomwalk2";
 
-export class MountainMonster extends BaseMonster<AllStates> {
+export class MountainMonster extends BaseMonster {
 	hitPoints = 2;
 
 	constructor(

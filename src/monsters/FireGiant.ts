@@ -26,7 +26,7 @@ type AllStates =
 	| "lava3"
 	| "lava4";
 
-export class FireGiant extends BaseMonster<AllStates> {
+export class FireGiant extends BaseMonster {
 	hitPoints: number = 8;
 	primaryColor = 0xb80000;
 	#enemyManager;
@@ -138,7 +138,7 @@ export class FireGiant extends BaseMonster<AllStates> {
 	}
 
 	isHittable(): boolean {
-		return this.stateMachine.getCurrentState() !== "powerup";
+		return this.getCurrentState() !== "powerup";
 	}
 
 	constructNewBehaviorFor(state: string) {
