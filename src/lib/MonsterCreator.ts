@@ -36,6 +36,7 @@ import {
 	Events,
 	getDataFromRegistry,
 	saveDataToRegistry,
+	type MapMonsterProperties,
 } from "../lib/shared";
 
 type MonsterConstructor = new (
@@ -102,19 +103,6 @@ MonsterRegistry.register("CloudBoss", CloudBoss);
 MonsterRegistry.register("SpiritBoss", SpiritBoss);
 MonsterRegistry.register("FireBoss", FireBoss);
 
-const monstersThatDoNotRespawn = [
-	"RockDigger",
-	"MountainBoss",
-	"FireBoss",
-	"FireGiant",
-	"WaterDipper",
-	"IceBoss",
-	"GreatGhost",
-	"SpiritBoss",
-	"CloudBoss",
-	"PlantBoss",
-];
-
 const monstersThatSaveAfterDefeat = [
 	"MountainBoss",
 	"FireBoss",
@@ -139,7 +127,11 @@ export class MonsterCreator {
 		this.#saveGame = saveGame;
 	}
 
-	createMonster(name: string, location: { x: number; y: number }) {
+	createMonster(
+		name: string,
+		location: { x: number; y: number },
+		properties: MapMonsterProperties | undefined
+	) {
 		const monster = MonsterRegistry.createMonster(
 			name,
 			this.#scene,
@@ -147,8 +139,11 @@ export class MonsterCreator {
 			location.x,
 			location.y
 		);
+		if (properties?.doNotRespawn) {
+			monster.doNotRespawn = properties.doNotRespawn;
+		}
 		monster.once(Events.MonsterDefeated, () => {
-			if (monstersThatDoNotRespawn.includes(name)) {
+			if (monster.doNotRespawn) {
 				this.#rememberMonsterDefeated(name);
 			}
 			if (monstersThatSaveAfterDefeat.includes(name)) {

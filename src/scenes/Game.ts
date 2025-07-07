@@ -63,6 +63,7 @@ import {
 	isSprite,
 	DarknessAreaName,
 	getEnemiesInRoom,
+	getPropertiesFromPoint,
 } from "../lib/shared";
 import { MonsterCreator } from "../lib/MonsterCreator";
 
@@ -2895,10 +2896,14 @@ export class Game extends Scene {
 			if (!this.monsterCreator.shouldMonsterRespawn(enemyType)) {
 				return;
 			}
-			const monster = this.monsterCreator.createMonster(enemyType, {
-				x: point.x,
-				y: point.y,
-			});
+			const monster = this.monsterCreator.createMonster(
+				enemyType,
+				{
+					x: point.x,
+					y: point.y,
+				},
+				getPropertiesFromPoint(point)
+			);
 
 			// If this was the last monster in the room, show all hidden items.
 			monster.once(Events.MonsterDefeated, () => {

@@ -1300,3 +1300,28 @@ export function createPromiseTimer(scene: Phaser.Scene, delay: number) {
 		});
 	});
 }
+
+export interface MapMonsterProperties {
+	doNotRespawn?: boolean;
+}
+
+export interface TiledObjectProperty {
+	name: string;
+	type: "bool" | "string" | "number";
+	value: string | boolean | number;
+}
+
+export function getPropertiesFromPoint(
+	point: Phaser.Types.Tilemaps.TiledObject
+): MapMonsterProperties {
+	if (!point.properties) {
+		return {};
+	}
+	const result: MapMonsterProperties = {};
+	point.properties.forEach((property: TiledObjectProperty) => {
+		if (property.name === "doNotRespawn") {
+			result.doNotRespawn = Boolean(property.value);
+		}
+	});
+	return result;
+}

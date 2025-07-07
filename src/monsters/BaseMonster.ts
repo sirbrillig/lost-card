@@ -24,6 +24,7 @@ export class BaseMonster extends Phaser.Physics.Arcade.Sprite {
 	hitPoints: number = 1;
 	primaryColor: number = 0xc7a486;
 	isBoss: boolean = false;
+	doNotRespawn: boolean = false;
 
 	constructor(
 		scene: Phaser.Scene,

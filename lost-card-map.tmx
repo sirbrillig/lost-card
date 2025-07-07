@@ -9343,6 +9343,9 @@
    <point/>
   </object>
   <object id="1267" name="RockDigger" x="1263.16" y="495.552">
+   <properties>
+    <property name="doNotRespawn" type="bool" value="true"/>
+   </properties>
    <point/>
   </object>
   <object id="1277" name="HopPot" x="1222.78" y="649.497">
