@@ -6375,6 +6375,11 @@
                  "point":true,
                  "properties":[
                         {
+                         "name":"doNotRespawn",
+                         "type":"bool",
+                         "value":true
+                        }, 
+                        {
                          "name":"isBoss",
                          "type":"bool",
                          "value":true
@@ -6726,6 +6731,12 @@
                  "id":350,
                  "name":"WaterDipper",
                  "point":true,
+                 "properties":[
+                        {
+                         "name":"doNotRespawn",
+                         "type":"bool",
+                         "value":true
+                        }],
                  "rotation":0,
                  "type":"",
                  "visible":true,
@@ -6738,6 +6749,12 @@
                  "id":372,
                  "name":"IceBoss",
                  "point":true,
+                 "properties":[
+                        {
+                         "name":"doNotRespawn",
+                         "type":"bool",
+                         "value":true
+                        }],
                  "rotation":0,
                  "type":"",
                  "visible":true,
@@ -6906,6 +6923,12 @@
                  "id":584,
                  "name":"FireBoss",
                  "point":true,
+                 "properties":[
+                        {
+                         "name":"doNotRespawn",
+                         "type":"bool",
+                         "value":true
+                        }],
                  "rotation":0,
                  "type":"",
                  "visible":true,
@@ -6978,6 +7001,12 @@
                  "id":596,
                  "name":"PlantSpitter",
                  "point":true,
+                 "properties":[
+                        {
+                         "name":"doNotRespawn",
+                         "type":"bool",
+                         "value":true
+                        }],
                  "rotation":0,
                  "type":"",
                  "visible":true,
@@ -6990,6 +7019,12 @@
                  "id":597,
                  "name":"PlantSpitter",
                  "point":true,
+                 "properties":[
+                        {
+                         "name":"doNotRespawn",
+                         "type":"bool",
+                         "value":true
+                        }],
                  "rotation":0,
                  "type":"",
                  "visible":true,
@@ -7026,6 +7061,12 @@
                  "id":603,
                  "name":"PlantSpitter",
                  "point":true,
+                 "properties":[
+                        {
+                         "name":"doNotRespawn",
+                         "type":"bool",
+                         "value":true
+                        }],
                  "rotation":0,
                  "type":"",
                  "visible":true,
@@ -7038,6 +7079,12 @@
                  "id":613,
                  "name":"PlantBoss",
                  "point":true,
+                 "properties":[
+                        {
+                         "name":"doNotRespawn",
+                         "type":"bool",
+                         "value":true
+                        }],
                  "rotation":0,
                  "type":"",
                  "visible":true,
@@ -7158,6 +7205,12 @@
                  "id":645,
                  "name":"SkyBlobSpitter",
                  "point":true,
+                 "properties":[
+                        {
+                         "name":"doNotRespawn",
+                         "type":"bool",
+                         "value":true
+                        }],
                  "rotation":0,
                  "type":"",
                  "visible":true,
@@ -7206,6 +7259,12 @@
                  "id":666,
                  "name":"CloudBoss",
                  "point":true,
+                 "properties":[
+                        {
+                         "name":"doNotRespawn",
+                         "type":"bool",
+                         "value":true
+                        }],
                  "rotation":0,
                  "type":"",
                  "visible":true,
@@ -7266,6 +7325,12 @@
                  "id":680,
                  "name":"GreatGhost",
                  "point":true,
+                 "properties":[
+                        {
+                         "name":"doNotRespawn",
+                         "type":"bool",
+                         "value":true
+                        }],
                  "rotation":0,
                  "type":"",
                  "visible":true,
@@ -7278,6 +7343,12 @@
                  "id":681,
                  "name":"SpiritBoss",
                  "point":true,
+                 "properties":[
+                        {
+                         "name":"doNotRespawn",
+                         "type":"bool",
+                         "value":true
+                        }],
                  "rotation":0,
                  "type":"",
                  "visible":true,
@@ -7386,6 +7457,12 @@
                  "id":889,
                  "name":"FireGiant",
                  "point":true,
+                 "properties":[
+                        {
+                         "name":"doNotRespawn",
+                         "type":"bool",
+                         "value":true
+                        }],
                  "rotation":0,
                  "type":"",
                  "visible":true,

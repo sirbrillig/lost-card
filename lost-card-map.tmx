@@ -8865,6 +8865,7 @@
   </object>
   <object id="47" name="MountainBoss" x="1463.38" y="173.435">
    <properties>
+    <property name="doNotRespawn" type="bool" value="true"/>
     <property name="isBoss" type="bool" value="true"/>
     <property name="isMonster" type="bool" value="true"/>
    </properties>
@@ -8967,9 +8968,15 @@
    <point/>
   </object>
   <object id="350" name="WaterDipper" x="2432" y="2176">
+   <properties>
+    <property name="doNotRespawn" type="bool" value="true"/>
+   </properties>
    <point/>
   </object>
   <object id="372" name="IceBoss" x="1928.69" y="2725.99">
+   <properties>
+    <property name="doNotRespawn" type="bool" value="true"/>
+   </properties>
    <point/>
   </object>
   <object id="562" name="FireMonster" x="2632.61" y="1847.13">
@@ -9012,6 +9019,9 @@
    <point/>
   </object>
   <object id="584" name="FireBoss" x="2729.36" y="2609.73">
+   <properties>
+    <property name="doNotRespawn" type="bool" value="true"/>
+   </properties>
    <point/>
   </object>
   <object id="585" name="PlantBug" x="1479.29" y="1833.68">
@@ -9030,9 +9040,15 @@
    <point/>
   </object>
   <object id="596" name="PlantSpitter" x="1120.18" y="1878.51">
+   <properties>
+    <property name="doNotRespawn" type="bool" value="true"/>
+   </properties>
    <point/>
   </object>
   <object id="597" name="PlantSpitter" x="1010.28" y="1951.19">
+   <properties>
+    <property name="doNotRespawn" type="bool" value="true"/>
+   </properties>
    <point/>
   </object>
   <object id="601" name="PlantBug" x="1095.82" y="2115.89">
@@ -9042,9 +9058,15 @@
    <point/>
   </object>
   <object id="603" name="PlantSpitter" x="991.227" y="1878.09">
+   <properties>
+    <property name="doNotRespawn" type="bool" value="true"/>
+   </properties>
    <point/>
   </object>
   <object id="613" name="PlantBoss" x="989.274" y="2919.89">
+   <properties>
+    <property name="doNotRespawn" type="bool" value="true"/>
+   </properties>
    <point/>
   </object>
   <object id="631" name="CloudGoblin" x="950.807" y="1512.01">
@@ -9075,6 +9097,9 @@
    <point/>
   </object>
   <object id="645" name="SkyBlobSpitter" x="785.261" y="1524.23">
+   <properties>
+    <property name="doNotRespawn" type="bool" value="true"/>
+   </properties>
    <point/>
   </object>
   <object id="654" name="SkyBlob" x="467.819" y="1838.69">
@@ -9087,6 +9112,9 @@
    <point/>
   </object>
   <object id="666" name="CloudBoss" x="550.65" y="1308.43">
+   <properties>
+    <property name="doNotRespawn" type="bool" value="true"/>
+   </properties>
    <point/>
   </object>
   <object id="676" name="Ghost" x="2300.62" y="1448.84">
@@ -9102,9 +9130,15 @@
    <point/>
   </object>
   <object id="680" name="GreatGhost" x="2855.35" y="873">
+   <properties>
+    <property name="doNotRespawn" type="bool" value="true"/>
+   </properties>
    <point/>
   </object>
   <object id="681" name="SpiritBoss" x="2555.13" y="1471.62">
+   <properties>
+    <property name="doNotRespawn" type="bool" value="true"/>
+   </properties>
    <point/>
   </object>
   <object id="682" name="Ghost" x="2170.85" y="1702.51">
@@ -9132,6 +9166,9 @@
    <point/>
   </object>
   <object id="889" name="FireGiant" x="3048.65" y="2286.27">
+   <properties>
+    <property name="doNotRespawn" type="bool" value="true"/>
+   </properties>
    <point/>
   </object>
   <object id="910" name="Skeleton" x="2773.64" y="1724.14">
