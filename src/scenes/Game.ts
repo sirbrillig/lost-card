@@ -171,9 +171,16 @@ export class Game extends Scene {
 		this.setUpVisibilityMask();
 
 		const spawnPoint = this.getSpawnPoint();
-		const playerCoordinates = saveData
-			? getPlayerCoordinates(saveData, this.map)
-			: undefined;
+		const tempSpawnPoint = this.getTempSpawnPoint();
+		const playerCoordinates = (() => {
+			if (tempSpawnPoint) {
+				return tempSpawnPoint;
+			}
+			if (saveData) {
+				return getPlayerCoordinates(saveData, this.map);
+			}
+			return spawnPoint;
+		})();
 		this.createPlayer(
 			playerCoordinates?.x ?? spawnPoint.x,
 			playerCoordinates?.y ?? spawnPoint.y
@@ -2761,18 +2768,31 @@ export class Game extends Scene {
 		});
 	}
 
+	getTempSpawnPoint(): undefined | { x: number; y: number } {
+		const tempSpawnPoint = this.map.findObject(
+			"MetaObjects",
+			(obj) => obj.name === MapMetaKeys.TempStartPoint
+		);
+		if (!tempSpawnPoint?.x || !tempSpawnPoint.y) {
+			return undefined;
+		}
+		return {
+			x: tempSpawnPoint?.x,
+			y: tempSpawnPoint?.y,
+		};
+	}
+
 	getSpawnPoint(): { x: number; y: number } {
 		const spawnPoint = this.map.findObject(
 			"MetaObjects",
-			(obj) => obj.name === "Start Point"
+			(obj) => obj.name === MapMetaKeys.StartPoint
 		);
-		const tempSpawnPoint = this.map.findObject(
-			"MetaObjects",
-			(obj) => obj.name === "Temp Start"
-		);
+		if (!spawnPoint?.x || !spawnPoint.y) {
+			throw new Error("No spawn point found on map");
+		}
 		return {
-			x: tempSpawnPoint?.x ?? spawnPoint?.x ?? 400,
-			y: tempSpawnPoint?.y ?? spawnPoint?.y ?? 350,
+			x: spawnPoint?.x,
+			y: spawnPoint?.y,
 		};
 	}
 
