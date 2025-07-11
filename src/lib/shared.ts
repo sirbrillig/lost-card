@@ -53,7 +53,11 @@ export const DataKeys = {
 	DefeatedMonsters: "DefeatedBosses",
 } as const;
 
-export const DarknessAreaName = "Darkness";
+export const MapMetaKeys = {
+	StartPoint: "Start Point",
+	TempStartPoint: "Temp Start",
+	DarknessAreaName: "Darkness",
+} as const;
 
 export type Region = "MK" | "IK" | "CK" | "FK" | "PK" | "SK" | "FB";
 
@@ -326,6 +330,33 @@ export function doRectanglesOverlap(
 		isValueInRange(b.y, a.y, a.y + a.height);
 
 	return xOverlap && yOverlap;
+}
+
+export function isPlayerInArea(
+	player: { x: number; y: number },
+	area: { x?: number; y?: number; width?: number; height?: number }
+): boolean {
+	const playerPosition = {
+		x: player.x + config.playerHitBoxWidth * config.playerOriginX,
+		y: player.y + config.playerHitBoxHeight * config.playerOriginY,
+		width: config.playerHitBoxWidth,
+		height: config.playerHitBoxHeight,
+	};
+	return doRectanglesOverlap(playerPosition, {
+		x: area.x ?? 0,
+		y: area.y ?? 0,
+		width: area.width ?? 0,
+		height: area.height ?? 0,
+	});
+}
+
+export function isPlayerInMetaArea(
+	map: Phaser.Tilemaps.Tilemap,
+	player: { x: number; y: number },
+	metaKey: (typeof MapMetaKeys)[keyof typeof MapMetaKeys]
+): boolean {
+	const areas = map.filterObjects("MetaObjects", (obj) => obj.name === metaKey);
+	return areas?.some((area) => isPlayerInArea(player, area)) ?? false;
 }
 
 function isValueInRange(value: number, min: number, max: number): boolean {

@@ -43,7 +43,6 @@ import {
 	hasXandY,
 	getButtonNames,
 	vibrate,
-	doRectanglesOverlap,
 	auraOrder,
 	isAuraActive,
 	getAuraDescription,
@@ -61,9 +60,10 @@ import {
 	isSpriteInsideSolidTile,
 	createShadowSprite,
 	isSprite,
-	DarknessAreaName,
+	MapMetaKeys,
 	getEnemiesInRoom,
 	getPropertiesFromPoint,
+	isPlayerInMetaArea,
 } from "../lib/shared";
 import { MonsterCreator } from "../lib/MonsterCreator";
 
@@ -1261,32 +1261,19 @@ export class Game extends Scene {
 
 		this.cacheTilesInRoom();
 
-		const darkAreas = this.map.filterObjects(
-			"MetaObjects",
-			(obj) => obj.name === DarknessAreaName
-		);
-		const playerPosition = {
-			x: this.player.x + config.playerHitBoxWidth * config.playerOriginX,
-			y: this.player.y + config.playerHitBoxHeight * config.playerOriginY,
-			width: config.playerHitBoxWidth,
-			height: config.playerHitBoxHeight,
-		};
+		this.toggleLightsInRoom();
+
+		this.recordRoomVisit(room.name);
+	}
+
+	toggleLightsInRoom() {
 		if (
-			darkAreas?.some((darkArea) => {
-				return doRectanglesOverlap(playerPosition, {
-					x: darkArea.x ?? 0,
-					y: darkArea.y ?? 0,
-					width: darkArea.width ?? 0,
-					height: darkArea.height ?? 0,
-				});
-			})
+			isPlayerInMetaArea(this.map, this.player, MapMetaKeys.DarknessAreaName)
 		) {
 			this.enableMask();
 		} else {
 			this.disableMask();
 		}
-
-		this.recordRoomVisit(room.name);
 	}
 
 	recordRoomVisit(roomName: string) {
