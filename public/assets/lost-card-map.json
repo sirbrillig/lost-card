@@ -5164,6 +5164,138 @@
                  "width":112,
                  "x":2800,
                  "y":960
+                }, 
+                {
+                 "height":128,
+                 "id":1293,
+                 "name":"LockAllDoors",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":224,
+                 "x":1152,
+                 "y":304
+                }, 
+                {
+                 "height":224,
+                 "id":1294,
+                 "name":"LockAllDoors",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":176,
+                 "x":1376,
+                 "y":96
+                }, 
+                {
+                 "height":128,
+                 "id":1295,
+                 "name":"LockAllDoors",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":272,
+                 "x":2720,
+                 "y":832
+                }, 
+                {
+                 "height":224,
+                 "id":1296,
+                 "name":"LockAllDoors",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":336,
+                 "x":2384,
+                 "y":1360
+                }, 
+                {
+                 "height":272,
+                 "id":1297,
+                 "name":"LockAllDoors",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":112,
+                 "x":2992,
+                 "y":2240
+                }, 
+                {
+                 "height":272,
+                 "id":1298,
+                 "name":"LockAllDoors",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":304,
+                 "x":2624,
+                 "y":2448
+                }, 
+                {
+                 "height":288,
+                 "id":1299,
+                 "name":"LockAllDoors",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":304,
+                 "x":2256,
+                 "y":2080
+                }, 
+                {
+                 "height":336,
+                 "id":1300,
+                 "name":"LockAllDoors",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":464,
+                 "x":1664,
+                 "y":2464
+                }, 
+                {
+                 "height":336,
+                 "id":1301,
+                 "name":"LockAllDoors",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":448,
+                 "x":816,
+                 "y":2800
+                }, 
+                {
+                 "height":208,
+                 "id":1302,
+                 "name":"LockAllDoors",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":192,
+                 "x":960,
+                 "y":1824
+                }, 
+                {
+                 "height":208,
+                 "id":1303,
+                 "name":"LockAllDoors",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":272,
+                 "x":640,
+                 "y":1440
+                }, 
+                {
+                 "height":320,
+                 "id":1304,
+                 "name":"LockAllDoors",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":496,
+                 "x":320,
+                 "y":1104
                 }],
          "opacity":1,
          "properties":[
@@ -8421,8 +8553,8 @@
                  "type":"",
                  "visible":true,
                  "width":0,
-                 "x":1352.60781554611,
-                 "y":490.371061484629
+                 "x":1352.61,
+                 "y":490.371
                 }, 
                 {
                  "height":0,
@@ -8433,8 +8565,8 @@
                  "type":"",
                  "visible":true,
                  "width":0,
-                 "x":1191.64405648588,
-                 "y":487.871686328418
+                 "x":1191.64,
+                 "y":487.872
                 }, 
                 {
                  "height":0,
@@ -8445,8 +8577,8 @@
                  "type":"",
                  "visible":true,
                  "width":0,
-                 "x":1256.3312505207,
-                 "y":490.755311172207
+                 "x":1256.33,
+                 "y":490.755
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -8498,8 +8630,8 @@
                  "type":"",
                  "visible":true,
                  "width":16,
-                 "x":1254.85353285812,
-                 "y":394.779672981154
+                 "x":1254.85,
+                 "y":394.78
                 }, 
                 {
                  "gid":2872,
@@ -17765,7 +17897,7 @@
          "y":0
         }],
  "nextlayerid":20,
- "nextobjectid":1293,
+ "nextobjectid":1305,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.1",
