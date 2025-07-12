@@ -61,9 +61,10 @@ import {
 	createShadowSprite,
 	isSprite,
 	MapMetaKeys,
-	getEnemiesInRoom,
 	getPropertiesFromPoint,
 	isPlayerInMetaArea,
+	getDoorsInRoom,
+	areMonstersInRoom,
 } from "../lib/shared";
 import { MonsterCreator } from "../lib/MonsterCreator";
 
@@ -1270,7 +1271,18 @@ export class Game extends Scene {
 
 		this.toggleLightsInRoom();
 
+		this.maybeLockDoors();
+
 		this.recordRoomVisit(room.name);
+	}
+
+	maybeLockDoors() {
+		if (
+			isPlayerInMetaArea(this.map, this.player, MapMetaKeys.DoorLockAreaName) &&
+			areMonstersInRoom(this.enemyManager)
+		) {
+			this.lockDoorsInRoom();
+		}
 	}
 
 	toggleLightsInRoom() {
@@ -1281,6 +1293,43 @@ export class Game extends Scene {
 		} else {
 			this.disableMask();
 		}
+	}
+
+	lockDoorsInRoom() {
+		if (!this.enemyManager.activeRoom) {
+			return;
+		}
+		// Find all doors in room
+		const doorsInRoom = getDoorsInRoom(
+			this.createdDoors,
+			this.enemyManager.activeRoom
+		);
+		doorsInRoom.forEach((door) => {
+			// Replace each door sprite with appropriate angle locked sprite
+			door.setFrame(parseInt(door.frame.name) + 1);
+			// Mark each door as locked
+			door.data.set(DataKeys.LockedDoor, true);
+		});
+	}
+
+	unlockDoorsInRoom() {
+		if (!this.enemyManager.activeRoom) {
+			return;
+		}
+		// Find all doors in room
+		const doorsInRoom = getDoorsInRoom(
+			this.createdDoors,
+			this.enemyManager.activeRoom
+		);
+		doorsInRoom.forEach((door) => {
+			if (!door.data.get(DataKeys.LockedDoor)) {
+				return;
+			}
+			// Replace each door sprite with appropriate angle unlocked sprite
+			door.setFrame(parseInt(door.frame.name) - 1);
+			// Mark each door as unlocked
+			door.data.set(DataKeys.LockedDoor, false);
+		});
 	}
 
 	recordRoomVisit(roomName: string) {
@@ -1391,6 +1440,10 @@ export class Game extends Scene {
 			return;
 		}
 
+		this.player.body.stop();
+		if (door.data.get(DataKeys.LockedDoor)) {
+			return;
+		}
 		const destinationTile = this.map.findObject(
 			"Doors",
 			(obj: unknown) => getObjectId(obj) === destinationId
@@ -2914,22 +2967,14 @@ export class Game extends Scene {
 
 			// If this was the last monster in the room, show all hidden items.
 			monster.once(Events.MonsterDefeated, () => {
-				if (!this.enemyManager.activeRoom) {
-					return;
-				}
-				// Note that because of the timing of this event, the destroyed monster will still be in the room when this runs.
-				const enemiesInRoom = getEnemiesInRoom(
-					this.enemyManager.enemies,
-					this.enemyManager.activeRoom
-				);
-				const areAnyMonstersInRoom =
-					enemiesInRoom.filter(
-						(_enemy) =>
-							isEnemy(_enemy) &&
-							_enemy.mapSpawnPointId !== monster.mapSpawnPointId
-					).length > 0;
+				// Note that because of the timing of this event, the destroyed monster
+				// will still be in the room when this runs.
+				const areAnyMonstersInRoom = areMonstersInRoom(this.enemyManager, [
+					monster,
+				]);
 				if (!areAnyMonstersInRoom) {
 					this.showAllHiddenItemsInRoom();
+					this.unlockDoorsInRoom();
 				}
 			});
 			this.addEnemyToEnemyManager(monster, point);

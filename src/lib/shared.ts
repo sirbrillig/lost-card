@@ -1,4 +1,5 @@
 import { BaseMonster } from "../monsters/BaseMonster";
+import { EnemyManager } from "../lib/EnemyManager";
 import { MainEvents } from "./MainEvents";
 import { config } from "./config";
 
@@ -51,12 +52,14 @@ export const DataKeys = {
 	ItemObjectId: "objectId",
 	PlayerDirection: "PlayerDirection",
 	DefeatedMonsters: "DefeatedBosses",
+	LockedDoor: "LockedDoor",
 } as const;
 
 export const MapMetaKeys = {
 	StartPoint: "Start Point",
 	TempStartPoint: "Temp Start",
 	DarknessAreaName: "Darkness",
+	DoorLockAreaName: "LockAllDoors",
 } as const;
 
 export type Region = "MK" | "IK" | "CK" | "FK" | "PK" | "SK" | "FB";
@@ -470,6 +473,15 @@ export function getRoomForPoint(
 		throw new Error(`No room found for position ${x},${y}`);
 	}
 	return room;
+}
+
+export function getDoorsInRoom(
+	doors: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody[],
+	room: Phaser.Types.Tilemaps.TiledObject
+) {
+	return doors.filter((door) => {
+		return isPointInRoom(door.x, door.y, room);
+	});
 }
 
 export function getItemsInRoom(
@@ -1355,4 +1367,27 @@ export function getPropertiesFromPoint(
 		}
 	});
 	return result;
+}
+
+export function areMonstersInRoom(
+	enemyManager: EnemyManager,
+	ignoreMonsters?: BaseMonster[]
+): boolean {
+	if (!enemyManager.activeRoom) {
+		return false;
+	}
+	const enemiesInRoom = getEnemiesInRoom(
+		enemyManager.enemies,
+		enemyManager.activeRoom
+	);
+	return (
+		enemiesInRoom.filter(
+			(_enemy) =>
+				isEnemy(_enemy) &&
+				!ignoreMonsters?.some(
+					(ignoreMonster) =>
+						ignoreMonster.mapSpawnPointId === _enemy.mapSpawnPointId
+				)
+		).length > 0
+	);
 }
