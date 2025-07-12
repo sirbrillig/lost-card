@@ -65,6 +65,7 @@ import {
 	isPlayerInMetaArea,
 	getDoorsInRoom,
 	areMonstersInRoom,
+	LockableDoorSpriteIndices,
 } from "../lib/shared";
 import { MonsterCreator } from "../lib/MonsterCreator";
 
@@ -1305,8 +1306,12 @@ export class Game extends Scene {
 			this.enemyManager.activeRoom
 		);
 		doorsInRoom.forEach((door) => {
+			const currentFrame = parseInt(door.frame.name);
+			if (!LockableDoorSpriteIndices.includes(currentFrame)) {
+				return;
+			}
 			// Replace each door sprite with appropriate angle locked sprite
-			door.setFrame(parseInt(door.frame.name) + 1);
+			door.setFrame(currentFrame + 1);
 			// Mark each door as locked
 			door.data.set(DataKeys.LockedDoor, true);
 		});

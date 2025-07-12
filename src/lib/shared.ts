@@ -62,6 +62,12 @@ export const MapMetaKeys = {
 	DoorLockAreaName: "LockAllDoors",
 } as const;
 
+export const LockableDoorSpriteIndices = [
+	990, 1031, 1072, 1113, 995, 1036, 1077, 1118, 1000, 1041, 1082, 1123, 1005,
+	1046, 1087, 1128, 1159, 1200, 1241, 1282, 1164, 1205, 1246, 1287, 1169, 1210,
+	1251, 1292, 1215, 1256, 1297, 1338,
+];
+
 export type Region = "MK" | "IK" | "CK" | "FK" | "PK" | "SK" | "FB";
 
 export type Auras =
