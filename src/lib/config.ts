@@ -57,7 +57,7 @@ export const config = {
 	swordCardDamage: 2,
 	maxBossDamageTakenPerHit: 1.2,
 	visibilityMaskRadius: 26,
-	playerHitBoxWidth: 7,
+	playerHitBoxWidth: 8,
 	playerHitBoxHeight: 10,
 	playerHitBoxOffsetX: 0,
 	playerHitBoxOffsetY: 5, // Move hitbox closer to feet

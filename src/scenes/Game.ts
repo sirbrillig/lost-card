@@ -2858,12 +2858,7 @@ export class Game extends Scene {
 		this.player = this.physics.add.sprite(x, y, "character", "idle-down-0.png");
 		this.player.setDataEnabled();
 		this.player.setDebugBodyColor(0x00ff00);
-		this.player.setSize(config.playerHitBoxWidth, config.playerHitBoxHeight);
-		this.player.setOrigin(config.playerOriginX, config.playerOriginY);
-		this.player.setOffset(
-			this.player.body.offset.x + config.playerHitBoxOffsetX,
-			this.player.body.offset.y + config.playerHitBoxOffsetY
-		);
+		this.resetPlayerHitBox();
 		this.player.setDepth(1);
 
 		this.restorePlayerHitPoints();
@@ -3845,6 +3840,7 @@ export class Game extends Scene {
 			this.walkSound.stop();
 			this.setPlayerIdleFrame();
 		}
+		this.resetPlayerHitBox();
 	}
 
 	playWalkSound() {
@@ -3969,5 +3965,17 @@ export class Game extends Scene {
 				this.player.anims.play("idle-down", true);
 				return;
 		}
+	}
+
+	resetPlayerHitBox() {
+		this.player.body.setSize(
+			config.playerHitBoxWidth,
+			config.playerHitBoxHeight
+		);
+		this.player.setOrigin(config.playerOriginX, config.playerOriginY);
+		this.player.body.setOffset(
+			this.player.body.offset.x + config.playerHitBoxOffsetX,
+			this.player.body.offset.y + config.playerHitBoxOffsetY
+		);
 	}
 }
