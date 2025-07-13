@@ -2079,10 +2079,13 @@ export class Game extends Scene {
 					this.pickUpSword();
 					break;
 				case "PotionBottle":
-					this.pickUpPotion();
+					this.pickUpPotionBottle();
 					break;
 				case "PotionVial":
 					this.pickUpPotionVial();
+					break;
+				case "FullPotion":
+					this.pickUpFullPotion();
 					break;
 				case "CrownCard":
 					this.cameras.main.fadeOut(
@@ -2327,6 +2330,11 @@ export class Game extends Scene {
 		this.setPotionCount(this.getPotionTotalCount());
 	}
 
+	pickUpFullPotion() {
+		this.setPotionCount(this.getPotionTotalCount());
+		this.appearSound.play();
+	}
+
 	pickUpPotionVial() {
 		this.setPotionCount(
 			Math.min(this.getPotionCount() + 1, this.getPotionTotalCount())
@@ -2334,7 +2342,7 @@ export class Game extends Scene {
 		this.appearSound.play();
 	}
 
-	pickUpPotion() {
+	pickUpPotionBottle() {
 		this.appearSound.play();
 		this.appearSound.on(Phaser.Sound.Events.COMPLETE, () => {
 			this.stopSoundEffects();

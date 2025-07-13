@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.1" orientation="orthogonal" renderorder="right-down" width="200" height="200" tilewidth="16" tileheight="16" infinite="0" nextlayerid="20" nextobjectid="1305">
+<map version="1.10" tiledversion="1.11.1" orientation="orthogonal" renderorder="right-down" width="200" height="200" tilewidth="16" tileheight="16" infinite="0" nextlayerid="20" nextobjectid="1306">
  <editorsettings>
   <export target="public/assets/lost-card-map.json" format="json"/>
  </editorsettings>
@@ -9443,11 +9443,10 @@
     <property name="hidden" type="bool" value="true"/>
    </properties>
   </object>
-  <object id="374" name="PotionVial" gid="2823" x="1470.52" y="381.114" width="16" height="16"/>
+  <object id="374" name="FullPotion" gid="2792" x="1470.52" y="381.114" width="16" height="16"/>
   <object id="578" name="PotionBottle" gid="2791" x="1297.71" y="975.803" width="16" height="16"/>
   <object id="376" name="PotionBottle" gid="2791" x="1796.15" y="2401.62" width="16" height="16"/>
-  <object id="378" name="PotionVial" gid="2823" x="2000.84" y="1870.13" width="16" height="16"/>
-  <object id="1211" name="PotionVial" gid="2823" x="2224" y="1936" width="16" height="16"/>
+  <object id="1211" name="FullPotion" gid="2792" x="2224" y="1936" width="16" height="16"/>
   <object id="403" name="PlantCard" gid="2878" x="1048.6" y="1882.21" width="16" height="16"/>
   <object id="407" name="PotionBottle" gid="2791" x="1584.1" y="1839.14" width="16" height="16"/>
   <object id="472" name="FireCard" gid="2871" x="3040" y="2336" width="16" height="16">
@@ -9495,18 +9494,20 @@
     <property name="hidden" type="bool" value="true"/>
    </properties>
   </object>
-  <object id="576" name="PotionVial" gid="2823" x="2928.74" y="2301.73" width="16" height="16"/>
-  <object id="577" name="PotionVial" gid="2823" x="2879.41" y="1806.09" width="16" height="16"/>
-  <object id="641" name="PotionBottle" gid="2791" x="845.678" y="2030.97" width="16" height="16"/>
-  <object id="657" name="PotionVial" gid="2823" x="464" y="1504" width="16" height="16"/>
-  <object id="659" name="PotionVial" gid="2823" x="1050.1" y="1858.35" width="16" height="16"/>
-  <object id="660" name="PotionVial" gid="2823" x="912" y="2736" width="16" height="16"/>
-  <object id="661" name="PotionVial" gid="2823" x="1616" y="1664" width="16" height="16"/>
-  <object id="662" name="PotionVial" gid="2823" x="1984" y="2432" width="16" height="16"/>
-  <object id="663" name="PotionVial" gid="2823" x="2656" y="1648" width="16" height="16"/>
+  <object id="576" name="FullPotion" gid="2792" x="2928.74" y="2301.73" width="16" height="16"/>
+  <object id="577" name="FullPotion" gid="2792" x="2879.41" y="1806.09" width="16" height="16"/>
+  <object id="657" name="FullPotion" gid="2792" x="464" y="1504" width="16" height="16"/>
+  <object id="659" name="FullPotion" gid="2792" x="1050.1" y="1858.35" width="16" height="16">
+   <properties>
+    <property name="hidden" type="bool" value="true"/>
+   </properties>
+  </object>
+  <object id="660" name="FullPotion" gid="2792" x="912" y="2736" width="16" height="16"/>
+  <object id="662" name="FullPotion" gid="2792" x="1984" y="2432" width="16" height="16"/>
+  <object id="663" name="FullPotion" gid="2792" x="2656" y="1648" width="16" height="16"/>
   <object id="726" name="Heart" gid="2818" x="3120.01" y="1904.81" width="16" height="16"/>
-  <object id="731" name="Heart" gid="2818" x="828.172" y="2030.08" width="16" height="16"/>
-  <object id="789" name="PotionVial" gid="2823" x="1928.72" y="840.199" width="16" height="16"/>
+  <object id="731" name="Heart" gid="2818" x="848" y="2016" width="16" height="16"/>
+  <object id="789" name="FullPotion" gid="2792" x="1928.72" y="840.199" width="16" height="16"/>
   <object id="807" name="HeartCard" gid="2870" x="1712" y="2064" width="16" height="16"/>
   <object id="810" name="SwordCard" gid="2882" x="1728" y="1872" width="16" height="16"/>
   <object id="827" name="SunCard" gid="2877" x="560" y="1552" width="16" height="16"/>
@@ -9520,7 +9521,7 @@
   <object id="874" name="MountainCard" gid="2879" x="1640.84" y="1432.1" width="16" height="16"/>
   <object id="964" name="PotionBottle" gid="2791" x="2304" y="1152" width="16" height="16"/>
   <object id="1029" name="PotionBottle" gid="2791" x="1424" y="2768" width="16" height="16"/>
-  <object id="1172" name="PotionVial" gid="2823" x="3152" y="2512" width="16" height="16"/>
+  <object id="1172" name="FullPotion" gid="2792" x="3152" y="2512" width="16" height="16"/>
   <object id="1194" name="Heart" gid="2818" x="2168.35" y="2300.91" width="16" height="16"/>
  </objectgroup>
  <objectgroup id="11" name="SavePoints">
