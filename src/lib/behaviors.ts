@@ -344,9 +344,10 @@ export class Idle implements Behavior {
 	}
 }
 
-export class Leap implements Behavior {
+export class Burrow implements Behavior {
 	#speed = 90;
 	#postAttackTime = 900;
+	#hitsOnAppear: boolean = false;
 	#targetPosition: { x: number; y: number } | undefined = undefined;
 	name: string;
 
@@ -355,12 +356,100 @@ export class Leap implements Behavior {
 		options?: {
 			speed?: number;
 			postAttackTime?: number;
+			hitsOnAppear?: boolean;
 			targetPosition?: { x: number; y: number };
 		}
 	) {
 		this.name = name;
 		this.#speed = options?.speed ?? this.#speed;
 		this.#postAttackTime = options?.postAttackTime ?? this.#postAttackTime;
+		this.#hitsOnAppear = options?.hitsOnAppear ?? this.#hitsOnAppear;
+		this.#targetPosition = options?.targetPosition;
+	}
+
+	init(
+		sprite: Phaser.GameObjects.Sprite,
+		goToNextState: BehaviorCompleteCallback,
+		enemyManager: EnemyManager
+	): void {
+		if (!sprite.body || !isDynamicSprite(sprite)) {
+			throw new Error("Could not update monster");
+		}
+
+		const target = this.#targetPosition ?? {
+			x: enemyManager.player.x,
+			y: enemyManager.player.y,
+		};
+		const shadow = createShadowSprite({
+			scene: sprite.scene,
+			x: sprite.body.center.x,
+			y: sprite.body.center.y,
+		});
+
+		let harmless = sprite.data.get(DataKeys.IsHarmless);
+		let hittable = sprite.data.get(DataKeys.Hittable);
+		let pushable = sprite.data.get(DataKeys.Pushable);
+		sprite.data.set(DataKeys.IsHarmless, true);
+		sprite.data.set(DataKeys.Hittable, false);
+		sprite.data.set(DataKeys.Pushable, false);
+
+		const startX = sprite.x;
+		const startY = sprite.y;
+		sprite.setVisible(false);
+		sprite.scene.tweens.add({
+			targets: sprite,
+			duration: 600,
+			x: target.x,
+			y: target.y,
+			onUpdate: (tween) => {
+				const progress = tween.progress;
+				// Have shadow follow sprite
+				shadow.x = startX + (target.x - startX) * progress;
+				shadow.y = startY + (target.y - startY) * progress;
+			},
+			onComplete: () => {
+				sprite.scene.time.addEvent({
+					delay: this.#postAttackTime,
+					callback: () => {
+						sprite?.setVisible(true);
+						if (this.#hitsOnAppear) {
+							sprite?.scene.physics.add.overlap(
+								enemyManager.player,
+								shadow,
+								() => {
+									MainEvents.emit(Events.EnemyHitPlayer, true);
+								}
+							);
+						}
+						shadow?.destroy();
+						sprite?.data?.set(DataKeys.IsHarmless, harmless);
+						sprite?.data?.set(DataKeys.Hittable, hittable);
+						sprite?.data?.set(DataKeys.Pushable, pushable);
+						goToNextState();
+					},
+				});
+			},
+		});
+	}
+}
+
+export class Leap implements Behavior {
+	#jumpTime = 900;
+	#jumpHeight = 30;
+	#targetPosition: { x: number; y: number } | undefined = undefined;
+	name: string;
+
+	constructor(
+		name: string,
+		options?: {
+			jumpTime?: number;
+			jumpHeight?: number;
+			targetPosition?: { x: number; y: number };
+		}
+	) {
+		this.name = name;
+		this.#jumpTime = options?.jumpTime ?? this.#jumpTime;
+		this.#jumpHeight = options?.jumpHeight ?? this.#jumpHeight;
 		this.#targetPosition = options?.targetPosition;
 	}
 
@@ -391,13 +480,13 @@ export class Leap implements Behavior {
 			sprite,
 			targetX: target.x,
 			targetY: target.y,
-			jumpHeight: 30,
-			duration: this.#postAttackTime,
+			jumpHeight: this.#jumpHeight,
+			duration: this.#jumpTime,
 			shadow,
 		});
 
 		sprite.scene.time.addEvent({
-			delay: this.#postAttackTime,
+			delay: this.#jumpTime,
 			callback: () => {
 				shadow?.destroy();
 				sprite?.data?.set(DataKeys.IsHarmless, harmless);
@@ -2041,7 +2130,7 @@ export class RangedFireBall implements Behavior {
 		}
 
 		if (this.#hitsWalls) {
-			// FIXME: hit walls in the background too
+			// FIXME: hit walls in the background too, but not pits, water, or lava
 			const stuffLayer = enemyManager.map.getLayer("Stuff");
 			if (!stuffLayer) {
 				throw new Error("Could not find stuff layer for RangedFireBall");

@@ -1,15 +1,14 @@
 import {
 	WaitForActive,
-	RandomTeleport,
-	LavaExplode,
+	Burrow,
 	RangedRockBall,
+	Leap,
+	Idle,
 } from "../lib/behaviors";
 import { DataKeys } from "../lib/shared";
 import { EnemyManager } from "../lib/EnemyManager";
 import { isTileWithPropertiesObject } from "../lib/shared";
 import { BaseMonster } from "./BaseMonster";
-
-type AllStates = "wait" | "teleport" | "burst" | "throw";
 
 export class RockDigger extends BaseMonster {
 	hitPoints: number = 8;
@@ -48,28 +47,49 @@ export class RockDigger extends BaseMonster {
 		});
 	}
 
-	getInitialState(): AllStates {
-		return "teleport";
+	getInitialState() {
+		return "wait";
 	}
 
 	constructNewBehaviorFor(state: string) {
 		switch (state) {
 			case "wait":
-				this.nextState = "teleport";
+				this.nextState = "dive";
 				return new WaitForActive(state, { distance: 60 });
+			case "dive": {
+				this.nextState = "teleport";
+				const targetPosition = this.body?.center
+					? { x: this.body.center.x, y: this.body.center.y }
+					: { x: 0, y: 0 };
+				return new Leap(state, {
+					jumpTime: 900,
+					jumpHeight: 30,
+					targetPosition,
+				});
+			}
 			case "teleport":
 				this.nextState = "burst";
-				// FIXME: teleport with digging animation
-				// FIXME: show preview of creature before making it visible
-				return new RandomTeleport(state, {
-					postTeleportDelay: 200,
+				return new Burrow(state, {
+					postAttackTime: 700,
+					hitsOnAppear: true,
 				});
-			case "burst":
+			case "burst": {
 				this.nextState = "throw";
-				return new LavaExplode(state);
+				const targetPosition = this.body?.center
+					? { x: this.body.center.x, y: this.body.center.y }
+					: { x: 0, y: 0 };
+				return new Leap(state, {
+					jumpTime: 850,
+					jumpHeight: 50,
+					targetPosition,
+				});
+			}
 			case "throw":
-				this.nextState = "teleport";
+				this.nextState = "idle";
 				return new RangedRockBall(state);
+			case "idle":
+				this.nextState = "dive";
+				return new Idle(state, "down", 400);
 		}
 	}
 }
