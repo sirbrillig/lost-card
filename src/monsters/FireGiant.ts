@@ -13,18 +13,7 @@ import {
 import { EnemyManager } from "../lib/EnemyManager";
 import { LavaBlorp } from "./LavaBlorp";
 import { BaseMonster } from "./BaseMonster";
-
-type AllStates =
-	| "wait"
-	| "fireball1"
-	| "fireball2"
-	| "wait2"
-	| "powerup"
-	| "lava-self"
-	| "lava1"
-	| "lava2"
-	| "lava3"
-	| "lava4";
+import { getMap, getActiveRoom } from "../lib/components";
 
 export class FireGiant extends BaseMonster {
 	hitPoints: number = 8;
@@ -82,18 +71,17 @@ export class FireGiant extends BaseMonster {
 		});
 	}
 
-	getInitialState(): AllStates {
+	getInitialState() {
 		return "wait";
 	}
 
 	getSpawnPoint(count: 1 | 2 | 3 | 4): { x: number; y: number } {
-		if (!this.#enemyManager.activeRoom) {
+		const activeRoom = getActiveRoom();
+		if (!activeRoom) {
 			throw new Error("No active room");
 		}
-		const tiles = getTilesInRoom(
-			this.#enemyManager.map,
-			this.#enemyManager.activeRoom
-		).filter((tile) => {
+		const map = getMap();
+		const tiles = getTilesInRoom(map, activeRoom).filter((tile) => {
 			if (isTileWithPropertiesObject(tile) && tile.properties.isLava) {
 				return true;
 			}

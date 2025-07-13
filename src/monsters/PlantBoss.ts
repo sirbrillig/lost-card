@@ -17,18 +17,7 @@ import {
 } from "../lib/behaviors";
 import { Flower } from "./Flower";
 import { BaseMonster } from "./BaseMonster";
-
-type AllStates =
-	| "initial"
-	| "roar1"
-	| "walk"
-	| "poof1"
-	| "poof2"
-	| "attack1"
-	| "attack2"
-	| "attack3"
-	| "summon"
-	| "teleport";
+import { getMap, getActiveRoom } from "../lib/components";
 
 export class PlantBoss extends BaseMonster {
 	hitPoints: number = 16;
@@ -57,7 +46,7 @@ export class PlantBoss extends BaseMonster {
 		this.data.set(DataKeys.Freezable, false);
 	}
 
-	getInitialState(): AllStates {
+	getInitialState() {
 		return "initial";
 	}
 
@@ -110,14 +99,17 @@ export class PlantBoss extends BaseMonster {
 		});
 	}
 
-	constructNewBehaviorFor(state: AllStates) {
+	constructNewBehaviorFor(state: string) {
 		const vineSpeed = 90;
 		const previousMonsterPositions: Phaser.Tilemaps.Tile[] = [];
 		const createMonster = () => {
 			if (!this.body) {
 				throw new Error("monster is invalid");
 			}
-			const enemyArea = this.enemyManager.map.findObject(
+
+			const map = getMap();
+			const activeRoom = getActiveRoom();
+			const enemyArea = map.findObject(
 				"MetaObjects",
 				(obj) =>
 					obj.name ===
@@ -125,17 +117,14 @@ export class PlantBoss extends BaseMonster {
 						? "PlantBossRightSide"
 						: "PlantBossLeftSide")
 			);
-			if (!enemyArea || !this.enemyManager.activeRoom) {
+			if (!enemyArea || !activeRoom) {
 				throw new Error("cannot find summon area");
 			}
 			if (!hasXandY(enemyArea) || !hasWidthAndHeight(enemyArea)) {
 				throw new Error("cannot find summon area");
 			}
 			// Choose tile at random within area
-			const tiles = getTilesInRoom(
-				this.enemyManager.map,
-				this.enemyManager.activeRoom
-			).filter((tile) => {
+			const tiles = getTilesInRoom(map, activeRoom).filter((tile) => {
 				if (
 					!doRectanglesOverlap(
 						{

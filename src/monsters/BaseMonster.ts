@@ -8,7 +8,7 @@ import {
 import { EnemyManager } from "../lib/EnemyManager";
 import { MainEvents } from "../lib/MainEvents";
 import { config } from "../lib/config";
-import { getPlayerOrThrow } from "../lib/components";
+import { getPlayerOrThrow, getActiveRoom } from "../lib/components";
 import type { Behavior } from "../lib/Behavior";
 
 export class BaseMonster extends Phaser.Physics.Arcade.Sprite {
@@ -81,14 +81,11 @@ export class BaseMonster extends Phaser.Physics.Arcade.Sprite {
 	}
 
 	isInActiveRoom(): boolean {
-		if (!this.#enemyManager?.activeRoom || !this.body) {
+		const activeRoom = getActiveRoom();
+		if (!activeRoom || !this.body) {
 			return false;
 		}
-		return isPointInRoom(
-			this.body.center.x,
-			this.body.center.y,
-			this.#enemyManager.activeRoom
-		);
+		return isPointInRoom(this.body.center.x, this.body.center.y, activeRoom);
 	}
 
 	getInitialState(): string {

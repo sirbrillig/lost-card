@@ -1,5 +1,4 @@
 import { Scene } from "phaser";
-import { EnemyManager } from "../lib/EnemyManager";
 import {
 	getEquippedAuras,
 	getIconForPower,
@@ -18,6 +17,7 @@ import {
 	getPlayerCoordinates,
 } from "../lib/shared";
 import { config } from "../lib/config";
+import { getMap } from "../lib/components";
 
 const topPadding = 35;
 const auraTopPadding = 35;
@@ -66,23 +66,17 @@ class Aura {
 	}
 }
 
-export interface GameMapData {
-	enemyManager: EnemyManager;
-}
-
 export class GameMap extends Scene {
 	auras: Aura[] = [];
 	selectedAura: number = 0;
 	auraDescription: Phaser.GameObjects.BitmapText | undefined;
 	selector: Phaser.GameObjects.Image;
-	enemyManager: EnemyManager;
 
 	constructor() {
 		super("GameMap");
 	}
 
-	create(data: GameMapData) {
-		this.enemyManager = data.enemyManager;
+	create() {
 		this.add
 			.nineslice(
 				this.cameras.main.x,
@@ -257,7 +251,8 @@ export class GameMap extends Scene {
 	}
 
 	drawVisitedRooms(mapScale: number, mapOffset: { x: number; y: number }) {
-		const allRooms = getRooms(this.enemyManager.map);
+		const map = getMap();
+		const allRooms = getRooms(map);
 		const visitedRooms = getRoomsVisited(this.registry);
 		const roomBorderColor = 0xffffff;
 		allRooms.forEach((room) => {
@@ -310,7 +305,7 @@ export class GameMap extends Scene {
 				playerRoomY,
 				playerActiveRoom,
 			},
-			this.enemyManager.map
+			getMap()
 		);
 		if (!playerCoordinates?.x || !playerCoordinates.y) {
 			return;

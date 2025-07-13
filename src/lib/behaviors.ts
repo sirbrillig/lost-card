@@ -28,6 +28,8 @@ import {
 	SpriteComponent,
 	getPlayerOrThrow,
 	getSpriteOrThrow,
+	getMap,
+	getActiveRoom,
 } from "../lib/components";
 
 export class WaitForActive implements Behavior {
@@ -696,13 +698,13 @@ export class RandomTeleport implements Behavior {
 
 	init(
 		sprite: Phaser.GameObjects.Sprite,
-		goToNextState: BehaviorCompleteCallback,
-		enemyManager: EnemyManager
+		goToNextState: BehaviorCompleteCallback
 	): void {
 		if (!isDynamicSprite(sprite)) {
 			throw new Error("invalid sprite");
 		}
-		if (!enemyManager.activeRoom) {
+		const activeRoom = getActiveRoom();
+		if (!activeRoom) {
 			throw new Error("Cannot create monster outside of room");
 		}
 		sprite.body.setVelocity(0);
@@ -731,7 +733,7 @@ export class RandomTeleport implements Behavior {
 			effect1?.destroy();
 		});
 
-		const roomObject = enemyManager.activeRoom;
+		const roomObject = activeRoom;
 		if (
 			!roomObject.x ||
 			!roomObject.y ||
@@ -744,11 +746,11 @@ export class RandomTeleport implements Behavior {
 		}
 
 		const system = new TeleportSystem(sprite.scene);
-		const landLayer = enemyManager.map.getLayer("Background");
+		const landLayer = getMap().getLayer("Background");
 		if (!landLayer) {
 			throw new Error("Could not find bg layer for RandomTeleport");
 		}
-		const stuffLayer = enemyManager.map.getLayer("Stuff");
+		const stuffLayer = getMap().getLayer("Stuff");
 		if (!stuffLayer) {
 			throw new Error("Could not find stuff layer for RandomTeleport");
 		}
@@ -795,13 +797,13 @@ export class TeleportToPlatform implements Behavior {
 
 	init(
 		sprite: Phaser.GameObjects.Sprite,
-		goToNextState: BehaviorCompleteCallback,
-		enemyManager: EnemyManager
+		goToNextState: BehaviorCompleteCallback
 	): void {
 		if (!isDynamicSprite(sprite)) {
 			throw new Error("invalid sprite");
 		}
-		if (!enemyManager.activeRoom) {
+		const activeRoom = getActiveRoom();
+		if (!activeRoom) {
 			throw new Error("Cannot create monster outside of room");
 		}
 		sprite.body.setVelocity(0);
@@ -831,10 +833,7 @@ export class TeleportToPlatform implements Behavior {
 		});
 
 		// Get all platform tiles in room
-		const tiles = getTilesInRoom(
-			enemyManager.map,
-			enemyManager.activeRoom
-		).filter((tile) => {
+		const tiles = getTilesInRoom(getMap(), activeRoom).filter((tile) => {
 			if (isTileWithPropertiesObject(tile) && tile.properties.isPlatform) {
 				return true;
 			}
@@ -935,21 +934,18 @@ export class TeleportToWater implements Behavior {
 
 	init(
 		sprite: Phaser.GameObjects.Sprite,
-		goToNextState: BehaviorCompleteCallback,
-		enemyManager: EnemyManager
+		goToNextState: BehaviorCompleteCallback
 	): void {
 		if (!isDynamicSprite(sprite)) {
 			throw new Error("invalid sprite");
 		}
-		if (!enemyManager.activeRoom) {
+		const activeRoom = getActiveRoom();
+		if (!activeRoom) {
 			throw new Error("Cannot create monster outside of room");
 		}
 		sprite.body.setVelocity(0);
 		// Get all water tiles in room
-		const tiles = getTilesInRoom(
-			enemyManager.map,
-			enemyManager.activeRoom
-		).filter((tile) => {
+		const tiles = getTilesInRoom(getMap(), activeRoom).filter((tile) => {
 			if (isTileWithPropertiesObject(tile) && tile.properties.isWater) {
 				return true;
 			}
@@ -1928,8 +1924,7 @@ export class RangedRockBall implements Behavior {
 
 	init(
 		sprite: Phaser.GameObjects.Sprite,
-		goToNextState: BehaviorCompleteCallback,
-		enemyManager: EnemyManager
+		goToNextState: BehaviorCompleteCallback
 	): void {
 		if (!sprite.body || !isDynamicSprite(sprite)) {
 			throw new Error("Could not update monster");
@@ -1988,11 +1983,11 @@ export class RangedRockBall implements Behavior {
 		};
 
 		if (this.#hitsWalls) {
-			const landLayer = enemyManager.map.getLayer("Background");
+			const landLayer = getMap().getLayer("Background");
 			if (!landLayer) {
 				throw new Error("Could not find bg layer for RangedRockBall");
 			}
-			const stuffLayer = enemyManager.map.getLayer("Stuff");
+			const stuffLayer = getMap().getLayer("Stuff");
 			if (!stuffLayer) {
 				throw new Error("Could not find stuff layer for RangedRockBall");
 			}
@@ -2060,8 +2055,7 @@ export class RangedFireBall implements Behavior {
 
 	init(
 		sprite: Phaser.GameObjects.Sprite,
-		goToNextState: BehaviorCompleteCallback,
-		enemyManager: EnemyManager
+		goToNextState: BehaviorCompleteCallback
 	): void {
 		if (!sprite.body || !isDynamicSprite(sprite)) {
 			throw new Error("Could not update monster");
@@ -2118,7 +2112,7 @@ export class RangedFireBall implements Behavior {
 
 		if (this.#hitsWalls) {
 			// FIXME: hit walls in the background too, but not pits, water, or lava
-			const stuffLayer = enemyManager.map.getLayer("Stuff");
+			const stuffLayer = getMap().getLayer("Stuff");
 			if (!stuffLayer) {
 				throw new Error("Could not find stuff layer for RangedFireBall");
 			}
@@ -2417,7 +2411,7 @@ export class IceBeam implements Behavior {
 		const player = getPlayerOrThrow();
 		sprite.scene.physics.moveToObject(effect, player, this.attackSpeed);
 
-		const landLayer = enemyManager.map.getLayer("Background");
+		const landLayer = getMap().getLayer("Background");
 		if (!landLayer) {
 			throw new Error("Could not find land layer for ice beam");
 		}
@@ -2468,7 +2462,7 @@ export class IceBeam implements Behavior {
 		}
 		sprite.scene.sound.play("freeze");
 		const iceTileFrame = 284;
-		enemyManager.map.removeTile(tile, iceTileFrame);
+		getMap().removeTile(tile, iceTileFrame);
 		sprite.scene.time.addEvent({
 			delay: this.iceMeltTime,
 			callback: () => this.meltFrozenTile(tile, sprite, enemyManager),
@@ -2497,9 +2491,9 @@ export class IceBeam implements Behavior {
 			return;
 		}
 
-		enemyManager.map.removeTile(tile);
-		enemyManager.map.putTileAt(tile, tile.x, tile.y, true, tile.layer.name);
-		const landLayer = enemyManager.map.getLayer("Background");
+		getMap().removeTile(tile);
+		getMap().putTileAt(tile, tile.x, tile.y, true, tile.layer.name);
+		const landLayer = getMap().getLayer("Background");
 		if (!landLayer) {
 			throw new Error("Could not find land layer for ice beam");
 		}

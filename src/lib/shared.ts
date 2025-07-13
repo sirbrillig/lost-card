@@ -2,6 +2,7 @@ import { BaseMonster } from "../monsters/BaseMonster";
 import { EnemyManager } from "../lib/EnemyManager";
 import { MainEvents } from "./MainEvents";
 import { config } from "./config";
+import { getActiveRoom } from "./components";
 
 export const saveGameKey = "lost-card-save";
 
@@ -1379,13 +1380,11 @@ export function areMonstersInRoom(
 	enemyManager: EnemyManager,
 	ignoreMonsters?: BaseMonster[]
 ): boolean {
-	if (!enemyManager.activeRoom) {
+	const activeRoom = getActiveRoom();
+	if (!activeRoom) {
 		return false;
 	}
-	const enemiesInRoom = getEnemiesInRoom(
-		enemyManager.enemies,
-		enemyManager.activeRoom
-	);
+	const enemiesInRoom = getEnemiesInRoom(enemyManager.enemies, activeRoom);
 	return (
 		enemiesInRoom.filter(
 			(_enemy) =>

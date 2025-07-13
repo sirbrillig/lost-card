@@ -70,6 +70,10 @@ import {
 import { MonsterCreator } from "../lib/MonsterCreator";
 import {
 	SpriteComponent,
+	MapComponent,
+	getMap,
+	setActiveRoom,
+	getActiveRoom,
 	getPlayerOrThrow,
 	getSpriteOrThrow,
 } from "../lib/components";
@@ -131,7 +135,6 @@ export class Game extends Scene {
 	keyR: Phaser.Input.Keyboard.Key;
 	keyP: Phaser.Input.Keyboard.Key;
 
-	map: Phaser.Tilemaps.Tilemap;
 	landLayer: Phaser.Tilemaps.TilemapLayer;
 	hiddenRoomLayer: Phaser.Tilemaps.TilemapLayer;
 	aboveLayer: Phaser.Tilemaps.TilemapLayer;
@@ -160,12 +163,10 @@ export class Game extends Scene {
 		this.isGameOver = false;
 
 		this.cameras.main.fadeIn(config.sceneStartFadeTime);
-		this.map = this.make.tilemap({ key: "map" });
-		const tilesetTile = this.map.addTilesetImage(
-			"Dungeon_Tiles",
-			"dungeon_tiles"
-		);
-		const tilesetSprite = this.map.addTilesetImage(
+		const map = this.make.tilemap({ key: "map" });
+		MapComponent.set("map", map);
+		const tilesetTile = map.addTilesetImage("Dungeon_Tiles", "dungeon_tiles");
+		const tilesetSprite = map.addTilesetImage(
 			"Dungeon_Tiles_Sprites",
 			"dungeon_tiles_sprites"
 		);
@@ -182,7 +183,7 @@ export class Game extends Scene {
 				return tempSpawnPoint;
 			}
 			if (saveData) {
-				return getPlayerCoordinates(saveData, this.map);
+				return getPlayerCoordinates(saveData, map);
 			}
 			return spawnPoint;
 		})();
@@ -200,7 +201,7 @@ export class Game extends Scene {
 		this.attackSprite.setDepth(4);
 		this.attackSprite.setVisible(false);
 
-		this.enemyManager = new EnemyManager(this, this.map);
+		this.enemyManager = new EnemyManager(this);
 		this.monsterCreator = new MonsterCreator(
 			this,
 			this.enemyManager,
@@ -624,7 +625,7 @@ export class Game extends Scene {
 	}
 
 	recordSecretRoomsTotal() {
-		const secretRoomsCount = getRooms(this.map).filter((room) =>
+		const secretRoomsCount = getRooms(getMap()).filter((room) =>
 			room.name.includes("Secret")
 		).length;
 		saveDataToRegistry(this.registry, "SecretRoomsTotal", secretRoomsCount);
@@ -717,7 +718,7 @@ export class Game extends Scene {
 		}
 
 		this.sound.stopAll();
-		const destinationTile = this.map.findObject(
+		const destinationTile = getMap().findObject(
 			"FinalDoor",
 			(obj: unknown) => getObjectId(obj) === config.finalBossDoorInside
 		);
@@ -989,7 +990,7 @@ export class Game extends Scene {
 		}
 		this.freezeSound.play();
 		const iceTileFrame = 284;
-		this.enemyManager.map.removeTile(tile, iceTileFrame);
+		getMap().removeTile(tile, iceTileFrame);
 		tile.properties.isIce = true;
 		this.time.addEvent({
 			delay: config.iceMeltTime,
@@ -1011,20 +1012,12 @@ export class Game extends Scene {
 			return;
 		}
 
-		this.enemyManager.map.removeTile(tile);
-		this.enemyManager.map.putTileAt(
-			tile,
-			tile.x,
-			tile.y,
-			true,
-			tile.layer.name
-		);
-		if (
-			this.enemyManager.activeRoom &&
-			!isPointInRoom(tile.x, tile.y, this.enemyManager.activeRoom)
-		) {
+		getMap().removeTile(tile);
+		getMap().putTileAt(tile, tile.x, tile.y, true, tile.layer.name);
+		const activeRoom = getActiveRoom();
+		if (activeRoom && !isPointInRoom(tile.x, tile.y, activeRoom)) {
 			hideAllRoomsExcept(
-				this.map,
+				getMap(),
 				this.enemyManager.enemies,
 				[
 					...this.createdItems,
@@ -1033,7 +1026,7 @@ export class Game extends Scene {
 					...this.createdFinalDoors,
 					...this.createdSavePoints,
 				],
-				this.enemyManager.activeRoom,
+				activeRoom,
 				this.spawnPoints
 			);
 		}
@@ -1134,7 +1127,7 @@ export class Game extends Scene {
 
 	createSavePoints() {
 		this.createdSavePoints = createSpritesFromObjectLayer(
-			this.map,
+			getMap(),
 			"SavePoints",
 			{
 				getTilesetKeyByName: this.getTilesetKeyByName.bind(this),
@@ -1147,7 +1140,7 @@ export class Game extends Scene {
 
 	createFinalDoors() {
 		this.createdFinalDoors = createSpritesFromObjectLayer(
-			this.map,
+			getMap(),
 			"FinalDoor",
 			{
 				getTilesetKeyByName: this.getTilesetKeyByName.bind(this),
@@ -1159,7 +1152,7 @@ export class Game extends Scene {
 	}
 
 	createDoors() {
-		this.createdDoors = createSpritesFromObjectLayer(this.map, "Doors", {
+		this.createdDoors = createSpritesFromObjectLayer(getMap(), "Doors", {
 			getTilesetKeyByName: this.getTilesetKeyByName.bind(this),
 			callback: this.recordObjectIdOnSprite.bind(this),
 		}).map((item) => {
@@ -1170,7 +1163,7 @@ export class Game extends Scene {
 	}
 
 	createAppearingTiles() {
-		this.createdTiles = createSpritesFromObjectLayer(this.map, "Transients", {
+		this.createdTiles = createSpritesFromObjectLayer(getMap(), "Transients", {
 			getTilesetKeyByName: this.getTilesetKeyByName.bind(this),
 		}).map((sprite) => {
 			sprite.body.setSize(sprite.body.width * 0.75, sprite.body.height * 0.75);
@@ -1179,7 +1172,7 @@ export class Game extends Scene {
 	}
 
 	createItems() {
-		this.createdItems = createSpritesFromObjectLayer(this.map, "Items", {
+		this.createdItems = createSpritesFromObjectLayer(getMap(), "Items", {
 			filterCallback: this.shouldCreateLayerObject.bind(this),
 			callback: this.recordObjectIdOnSprite.bind(this),
 			getTilesetKeyByName: this.getTilesetKeyByName.bind(this),
@@ -1209,7 +1202,7 @@ export class Game extends Scene {
 		tileset: Phaser.Tilemaps.Tileset,
 		depth: number
 	): Phaser.Tilemaps.TilemapLayer {
-		const layer = this.map.createLayer(layerName, tileset, 0, 0);
+		const layer = getMap().createLayer(layerName, tileset, 0, 0);
 		if (!layer) {
 			throw new Error(`Could not open tileset layers for '${layerName}'`);
 		}
@@ -1226,7 +1219,7 @@ export class Game extends Scene {
 		const tileHeight = 16;
 		const player = getPlayerOrThrow();
 		const room = getRoomForPoint(
-			this.map,
+			getMap(),
 			player.x + tileWidth,
 			player.y + tileHeight
 		);
@@ -1252,10 +1245,10 @@ export class Game extends Scene {
 		const player = getPlayerOrThrow();
 		camera.startFollow(player);
 
-		this.enemyManager.activeRoom = room;
+		setActiveRoom(room);
 		this.enteredRoomAt = this.time.now;
 		hideAllRoomsExcept(
-			this.map,
+			getMap(),
 			this.enemyManager.enemies,
 			[
 				...this.createdItems,
@@ -1284,7 +1277,7 @@ export class Game extends Scene {
 	maybeLockDoors() {
 		const player = getPlayerOrThrow();
 		if (
-			isPlayerInMetaArea(this.map, player, MapMetaKeys.DoorLockAreaName) &&
+			isPlayerInMetaArea(getMap(), player, MapMetaKeys.DoorLockAreaName) &&
 			areMonstersInRoom(this.enemyManager)
 		) {
 			this.lockDoorsInRoom();
@@ -1293,7 +1286,7 @@ export class Game extends Scene {
 
 	toggleLightsInRoom() {
 		const player = getPlayerOrThrow();
-		if (isPlayerInMetaArea(this.map, player, MapMetaKeys.DarknessAreaName)) {
+		if (isPlayerInMetaArea(getMap(), player, MapMetaKeys.DarknessAreaName)) {
 			this.enableMask();
 		} else {
 			this.disableMask();
@@ -1301,14 +1294,12 @@ export class Game extends Scene {
 	}
 
 	lockDoorsInRoom() {
-		if (!this.enemyManager.activeRoom) {
+		const activeRoom = getActiveRoom();
+		if (!activeRoom) {
 			return;
 		}
 		// Find all doors in room
-		const doorsInRoom = getDoorsInRoom(
-			this.createdDoors,
-			this.enemyManager.activeRoom
-		);
+		const doorsInRoom = getDoorsInRoom(this.createdDoors, activeRoom);
 		doorsInRoom.forEach((door) => {
 			const currentFrame = parseInt(door.frame.name);
 			if (!LockableDoorSpriteIndices.includes(currentFrame)) {
@@ -1322,14 +1313,12 @@ export class Game extends Scene {
 	}
 
 	unlockDoorsInRoom() {
-		if (!this.enemyManager.activeRoom) {
+		const activeRoom = getActiveRoom();
+		if (!activeRoom) {
 			return;
 		}
 		// Find all doors in room
-		const doorsInRoom = getDoorsInRoom(
-			this.createdDoors,
-			this.enemyManager.activeRoom
-		);
+		const doorsInRoom = getDoorsInRoom(this.createdDoors, activeRoom);
 		doorsInRoom.forEach((door) => {
 			if (!door.data.get(DataKeys.LockedDoor)) {
 				return;
@@ -1455,7 +1444,7 @@ export class Game extends Scene {
 		if (door.data.get(DataKeys.LockedDoor)) {
 			return;
 		}
-		const destinationTile = this.map.findObject(
+		const destinationTile = getMap().findObject(
 			"Doors",
 			(obj: unknown) => getObjectId(obj) === destinationId
 		);
@@ -1476,13 +1465,14 @@ export class Game extends Scene {
 			destinationDirection
 		);
 
-		const room = getRoomForPoint(this.map, destinationX, destinationY);
-		if (room.name === this.enemyManager.activeRoom?.name) {
+		const room = getRoomForPoint(getMap(), destinationX, destinationY);
+		if (room.name === getActiveRoom()?.name) {
 			return;
 		}
 
-		const previousRegion = this.enemyManager.activeRoom
-			? getRegionFromRoomName(this.enemyManager.activeRoom.name)
+		const activeRoom = getActiveRoom();
+		const previousRegion = activeRoom
+			? getRegionFromRoomName(activeRoom.name)
 			: undefined;
 		const newRegion = getRegionFromRoomName(room.name);
 		const isRegionTransition = previousRegion !== newRegion;
@@ -1521,11 +1511,11 @@ export class Game extends Scene {
 	respawnRegion(region: Region) {
 		this.enemyManager.enemies.clear(true, true);
 		this.spawnPoints =
-			this.map.filterObjects("Creatures", (point) => {
+			getMap().filterObjects("Creatures", (point) => {
 				if (!hasXandY(point)) {
 					return false;
 				}
-				return isPointInRegion(this.map, point.x, point.y, region);
+				return isPointInRegion(getMap(), point.x, point.y, region);
 			}) ?? [];
 	}
 
@@ -1792,8 +1782,9 @@ export class Game extends Scene {
 	}
 
 	updateAppearingTiles() {
-		const transientTiles = this.enemyManager.activeRoom
-			? getItemsInRoom(this.createdTiles, this.enemyManager.activeRoom)
+		const activeRoom = getActiveRoom();
+		const transientTiles = activeRoom
+			? getItemsInRoom(this.createdTiles, activeRoom)
 			: [];
 
 		// Don't consider tiles which are already visible.
@@ -1972,10 +1963,11 @@ export class Game extends Scene {
 
 		this.createdTiles.push(tile);
 
-		if (this.enemyManager.activeRoom) {
+		const activeRoom = getActiveRoom();
+		if (activeRoom) {
 			// Just in case the tile was created outside the current room.
 			hideAllRoomsExcept(
-				this.map,
+				getMap(),
 				this.enemyManager.enemies,
 				[
 					...this.createdItems,
@@ -1984,7 +1976,7 @@ export class Game extends Scene {
 					...this.createdFinalDoors,
 					...this.createdSavePoints,
 				],
-				this.enemyManager.activeRoom,
+				activeRoom,
 				this.spawnPoints
 			);
 		}
@@ -2006,11 +1998,12 @@ export class Game extends Scene {
 	}
 
 	getAllHiddenItemsInRoom(): Phaser.Types.Physics.Arcade.SpriteWithDynamicBody[] {
+		const activeRoom = getActiveRoom();
 		return this.createdItems.filter((item) => {
-			if (!this.enemyManager.activeRoom) {
+			if (!activeRoom) {
 				return false;
 			}
-			if (!isPointInRoom(item.x, item.y, this.enemyManager.activeRoom)) {
+			if (!isPointInRoom(item.x, item.y, activeRoom)) {
 				return false;
 			}
 			if (!item.data.get("hidden")) {
@@ -2165,7 +2158,7 @@ export class Game extends Scene {
 	findItemObjectMatchingCreatedItem(
 		item: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody
 	) {
-		return this.map.findObject("Items", (obj) => {
+		return getMap().findObject("Items", (obj) => {
 			if (!hasId(obj)) {
 				return false;
 			}
@@ -2407,7 +2400,7 @@ export class Game extends Scene {
 	movePlayerToPoint(x: number, y: number) {
 		const player = getPlayerOrThrow();
 		player.setPosition(x, y);
-		const room = getRoomForPoint(this.map, player.x, player.y);
+		const room = getRoomForPoint(getMap(), player.x, player.y);
 		this.moveCameraToRoom(room);
 	}
 
@@ -2852,7 +2845,7 @@ export class Game extends Scene {
 	}
 
 	getTempSpawnPoint(): undefined | { x: number; y: number } {
-		const tempSpawnPoint = this.map.findObject(
+		const tempSpawnPoint = getMap().findObject(
 			"MetaObjects",
 			(obj) => obj.name === MapMetaKeys.TempStartPoint
 		);
@@ -2866,7 +2859,7 @@ export class Game extends Scene {
 	}
 
 	getSpawnPoint(): { x: number; y: number } {
-		const spawnPoint = this.map.findObject(
+		const spawnPoint = getMap().findObject(
 			"MetaObjects",
 			(obj) => obj.name === MapMetaKeys.StartPoint
 		);
@@ -2957,19 +2950,12 @@ export class Game extends Scene {
 	}
 
 	createEnemiesInRoom() {
+		const activeRoom = getActiveRoom();
 		this.spawnPoints.forEach((point) => {
-			if (
-				point.x === undefined ||
-				point.y === undefined ||
-				!this.enemyManager.activeRoom
-			) {
+			if (point.x === undefined || point.y === undefined || !activeRoom) {
 				return;
 			}
-			const isEnemyInRoom = isPointInRoom(
-				point.x,
-				point.y,
-				this.enemyManager.activeRoom
-			);
+			const isEnemyInRoom = isPointInRoom(point.x, point.y, activeRoom);
 			if (!isEnemyInRoom) {
 				return;
 			}
@@ -3467,14 +3453,12 @@ export class Game extends Scene {
 	}
 
 	cacheTilesInRoom(): void {
-		if (!this.enemyManager.activeRoom) {
+		const activeRoom = getActiveRoom();
+		if (!activeRoom) {
 			this.cachedTilesInRoom = [];
 			return;
 		}
-		this.cachedTilesInRoom = getTilesInRoom(
-			this.enemyManager.map,
-			this.enemyManager.activeRoom
-		);
+		this.cachedTilesInRoom = getTilesInRoom(getMap(), activeRoom);
 	}
 
 	getCachedTilesInRoom(): Phaser.Tilemaps.Tile[] {
@@ -3482,7 +3466,7 @@ export class Game extends Scene {
 	}
 
 	isPlayerOnIce(): boolean {
-		if (!this.enemyManager.activeRoom) {
+		if (!getActiveRoom()) {
 			return false;
 		}
 		const iceTiles = this.getCachedTilesInRoom().filter((tile) => {
@@ -3968,7 +3952,7 @@ export class Game extends Scene {
 		savePlayerPositionToRegistry(
 			this.registry,
 			getSavedDataPlayerPosition(
-				this.map,
+				getMap(),
 				player.body.center.x,
 				player.body.center.y
 			)
