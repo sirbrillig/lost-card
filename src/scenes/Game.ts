@@ -68,11 +68,11 @@ import {
 	LockableDoorSpriteIndices,
 } from "../lib/shared";
 import { MonsterCreator } from "../lib/MonsterCreator";
+import { SpriteComponent, getPlayerOrThrow } from "../lib/components";
 
 export class Game extends Scene {
 	debugGraphic: Phaser.GameObjects.Graphics | undefined;
 	layerDebugGraphic: Phaser.GameObjects.Graphics | undefined;
-	player: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
 	sword: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
 	power: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
 	healEffect: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody | undefined;
@@ -187,21 +187,17 @@ export class Game extends Scene {
 			playerCoordinates?.x ?? spawnPoint.x,
 			playerCoordinates?.y ?? spawnPoint.y
 		);
+		const player = getPlayerOrThrow();
 		this.attackSprite = this.add.sprite(
-			this.player.body.center.x,
-			this.player.body.center.y,
+			player.body.center.x,
+			player.body.center.y,
 			"character",
 			"sword-up-0.png"
 		);
 		this.attackSprite.setDepth(4);
 		this.attackSprite.setVisible(false);
 
-		this.enemyManager = new EnemyManager(
-			this,
-			this.player,
-			this.sword,
-			this.map
-		);
+		this.enemyManager = new EnemyManager(this, this.sword, this.map);
 		this.monsterCreator = new MonsterCreator(
 			this,
 			this.enemyManager,
@@ -230,7 +226,7 @@ export class Game extends Scene {
 		// Handle tiles that hurt the player
 		this.physics.add.collider(
 			this.landLayer,
-			this.player,
+			player,
 			(_, tile) => {
 				if (!isTileWithPropertiesObject(tile)) {
 					return;
@@ -258,7 +254,7 @@ export class Game extends Scene {
 				) {
 					return false;
 				}
-				if (this.player.data.get("isPlantCardGrappleActive")) {
+				if (player.data.get("isPlantCardGrappleActive")) {
 					return false;
 				}
 				return true;
@@ -266,7 +262,7 @@ export class Game extends Scene {
 		);
 		this.physics.add.collider(
 			this.hiddenRoomLayer,
-			this.player,
+			player,
 			(_, tile) => {
 				if (!isTileWithPropertiesObject(tile)) {
 					return;
@@ -294,7 +290,7 @@ export class Game extends Scene {
 				) {
 					return false;
 				}
-				if (this.player.data.get("isPlantCardGrappleActive")) {
+				if (player.data.get("isPlantCardGrappleActive")) {
 					return false;
 				}
 				return true;
@@ -333,11 +329,11 @@ export class Game extends Scene {
 		);
 		this.aboveLayer = this.createTileLayer("Above", tilesetTile, 10);
 		this.stuffLayer = this.createTileLayer("Stuff", tilesetTile, 0);
-		this.physics.add.collider(this.stuffLayer, this.player, undefined, () => {
+		this.physics.add.collider(this.stuffLayer, player, undefined, () => {
 			if (this.isPlayerUsingPower() && this.getActivePower() === "SpiritCard") {
 				return false;
 			}
-			if (this.player.data.get("isPlantCardGrappleActive")) {
+			if (player.data.get("isPlantCardGrappleActive")) {
 				return false;
 			}
 			return true;
@@ -364,7 +360,7 @@ export class Game extends Scene {
 		this.createItems();
 		this.createSavePoints();
 
-		this.physics.add.collider(this.createdFinalDoors, this.player, (tile) => {
+		this.physics.add.collider(this.createdFinalDoors, player, (tile) => {
 			this.checkFinalDoor(tile);
 		});
 
@@ -384,7 +380,7 @@ export class Game extends Scene {
 
 		let isSaving = false;
 		this.physics.add.collider(
-			this.player,
+			player,
 			this.createdSavePoints,
 			(_, savePoint) => {
 				if (!isDynamicSprite(savePoint)) {
@@ -419,7 +415,7 @@ export class Game extends Scene {
 		);
 
 		this.enemyCollider = this.physics.add.collider(
-			this.player,
+			player,
 			this.enemyManager.enemies,
 			(player, enemy) => {
 				if (!isDynamicSprite(player) || !isDynamicSprite(enemy)) {
@@ -574,9 +570,10 @@ export class Game extends Scene {
 		if (!this.isMaskActive) {
 			return;
 		}
+		const player = getPlayerOrThrow();
 		this.maskGraphics.fillCircle(
-			this.player.body.center.x,
-			this.player.body.center.y,
+			player.body.center.x,
+			player.body.center.y,
 			config.visibilityMaskRadius
 		);
 	}
@@ -602,9 +599,10 @@ export class Game extends Scene {
 		}
 		this.setPlayerConfused(true);
 		this.statusIcon?.destroy();
+		const player = getPlayerOrThrow();
 		const statusIcon = this.add.sprite(
-			this.player.body.center.x + 1,
-			this.player.body.center.y - 1,
+			player.body.center.x + 1,
+			player.body.center.y - 1,
 			"status-icons",
 			3
 		);
@@ -953,9 +951,10 @@ export class Game extends Scene {
 		if (this.healEffect) {
 			this.healEffect.destroy();
 		}
+		const player = getPlayerOrThrow();
 		const healEffect = this.add.sprite(
-			this.player.body.center.x + 1,
-			this.player.body.center.y - 1,
+			player.body.center.x + 1,
+			player.body.center.y - 1,
 			"icons3",
 			2
 		);
@@ -999,7 +998,8 @@ export class Game extends Scene {
 		if (!isTileWithPropertiesObject(tile) || !tile.properties.isWater) {
 			return;
 		}
-		if (this.physics.overlapTiles(this.player, [tile])) {
+		const player = getPlayerOrThrow();
+		if (this.physics.overlapTiles(player, [tile])) {
 			// Do not melt the tile we stand on.
 			this.time.addEvent({
 				delay: config.iceMeltTime,
@@ -1045,7 +1045,8 @@ export class Game extends Scene {
 	}
 
 	activateAttack() {
-		this.player.body.setVelocity(0);
+		const player = getPlayerOrThrow();
+		player.body.setVelocity(0);
 		this.sword.data.set(DataKeys.SwordAttackActive, true);
 		this.updateSwordHitbox();
 
@@ -1057,11 +1058,8 @@ export class Game extends Scene {
 		// sprite for the attack animation and leave the player and its hitbox
 		// alone.
 		this.attackSprite.setVisible(true);
-		this.attackSprite.setPosition(
-			this.player.body.center.x,
-			this.player.body.center.y
-		);
-		this.player.setVisible(false);
+		this.attackSprite.setPosition(player.body.center.x, player.body.center.y);
+		player.setVisible(false);
 		switch (this.playerDirection) {
 			case SpriteUp:
 				this.attackSprite.play("up-attack", true);
@@ -1082,14 +1080,15 @@ export class Game extends Scene {
 		this.attackSprite.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
 			this.sword.data.set(DataKeys.SwordAttackActive, false);
 			this.attackSprite.setVisible(false);
-			this.player.setVisible(true);
+			player.setVisible(true);
 			this.lastAttackedAt = this.time.now;
 		});
 	}
 
 	activatePower() {
-		this.player.body.setVelocity(0);
-		this.player.anims.stop();
+		const player = getPlayerOrThrow();
+		player.body.setVelocity(0);
+		player.anims.stop();
 		this.setPlayerIdleFrame();
 		this.updateSwordHitbox();
 		this.playPowerAnimation();
@@ -1222,10 +1221,11 @@ export class Game extends Scene {
 		// Focus the camera on the room that the player currently is in.
 		const tileWidth = 16;
 		const tileHeight = 16;
+		const player = getPlayerOrThrow();
 		const room = getRoomForPoint(
 			this.map,
-			this.player.x + tileWidth,
-			this.player.y + tileHeight
+			player.x + tileWidth,
+			player.y + tileHeight
 		);
 		this.playMusicForRegion(getRegionFromRoomName(room.name));
 		this.respawnRegion(getRegionFromRoomName(room.name));
@@ -1246,7 +1246,8 @@ export class Game extends Scene {
 		}
 		this.physics.world.setBounds(room.x, room.y, room.width, room.height);
 
-		camera.startFollow(this.player);
+		const player = getPlayerOrThrow();
+		camera.startFollow(player);
 
 		this.enemyManager.activeRoom = room;
 		this.enteredRoomAt = this.time.now;
@@ -1278,8 +1279,9 @@ export class Game extends Scene {
 	}
 
 	maybeLockDoors() {
+		const player = getPlayerOrThrow();
 		if (
-			isPlayerInMetaArea(this.map, this.player, MapMetaKeys.DoorLockAreaName) &&
+			isPlayerInMetaArea(this.map, player, MapMetaKeys.DoorLockAreaName) &&
 			areMonstersInRoom(this.enemyManager)
 		) {
 			this.lockDoorsInRoom();
@@ -1287,9 +1289,8 @@ export class Game extends Scene {
 	}
 
 	toggleLightsInRoom() {
-		if (
-			isPlayerInMetaArea(this.map, this.player, MapMetaKeys.DarknessAreaName)
-		) {
+		const player = getPlayerOrThrow();
+		if (isPlayerInMetaArea(this.map, player, MapMetaKeys.DarknessAreaName)) {
 			this.enableMask();
 		} else {
 			this.disableMask();
@@ -1389,9 +1390,10 @@ export class Game extends Scene {
 			return;
 		}
 		const gatePosition = new Phaser.Math.Vector2(gatePillar.x, gatePillar.y);
+		const player = getPlayerOrThrow();
 		const distance = Phaser.Math.Distance.BetweenPoints(
 			gatePosition,
-			this.player.body.center
+			player.body.center
 		);
 		let gateAwareDistance = config.gateAwareDistance;
 		if (gatePillar.data?.get("gateAwareDistance")) {
@@ -1445,7 +1447,8 @@ export class Game extends Scene {
 			return;
 		}
 
-		this.player.body.stop();
+		const player = getPlayerOrThrow();
+		player.body.stop();
 		if (door.data.get(DataKeys.LockedDoor)) {
 			return;
 		}
@@ -1526,8 +1529,9 @@ export class Game extends Scene {
 	checkForGameOver() {
 		if (this.getPlayerHitPoints() <= 0 && !this.isGameOver) {
 			this.setPlayerHiddenInvincible(true);
-			this.player.stop();
-			this.player.body.setVelocity(0);
+			const player = getPlayerOrThrow();
+			player.stop();
+			player.body.setVelocity(0);
 			this.enemyCollider.active = false;
 			this.time.addEvent({
 				delay: config.preGameOverTime,
@@ -1545,9 +1549,10 @@ export class Game extends Scene {
 				return;
 			}
 			if (enemy.data.get("isPlantCardGrappleActive")) {
+				const player = getPlayerOrThrow();
 				const distance = Phaser.Math.Distance.BetweenPoints(
 					enemy.body.center,
-					this.player.body.center
+					player.body.center
 				);
 				if (distance < 30) {
 					enemy.emit(Events.MonsterStun, false);
@@ -1620,33 +1625,32 @@ export class Game extends Scene {
 		if (!isAffectedByPower) {
 			return;
 		}
+		const player = getPlayerOrThrow();
 		if (
-			this.player.data.get("isPlantCardGrappleActive") ||
+			player.data.get("isPlantCardGrappleActive") ||
 			this.power.anims.isPaused
 		) {
 			return;
 		}
 
 		// The plant card moves you next to the target, over any land obstacle
-		this.player.data.set("isPlantCardGrappleActive", true);
+		player.data.set("isPlantCardGrappleActive", true);
 		this.power.anims.pause();
 		this.power.body.stop();
 		this.movePlayerTowardTileWithPlantCard(tile.body.center);
 	}
 
 	movePlayerTowardTileWithPlantCard(tile: { x: number; y: number }): void {
-		const lastSafePosition = new Phaser.Math.Vector2(
-			this.player.x,
-			this.player.y
-		);
+		const player = getPlayerOrThrow();
+		const lastSafePosition = new Phaser.Math.Vector2(player.x, player.y);
 		const velocity = createVelocityForDirection(
 			config.plantCardVelocity,
 			this.playerDirection
 		);
-		this.player.body.setVelocity(velocity.x, velocity.y);
+		player.body.setVelocity(velocity.x, velocity.y);
 		let lastDistance = Phaser.Math.Distance.BetweenPoints(
 			tile,
-			this.player.body.center
+			player.body.center
 		);
 		let isMoving = true;
 		const stopEvent = this.time.addEvent({
@@ -1657,24 +1661,24 @@ export class Game extends Scene {
 				}
 				const distance = Phaser.Math.Distance.BetweenPoints(
 					tile,
-					this.player.body.center
+					player.body.center
 				);
 				if (
 					distance < 10 ||
 					distance > lastDistance ||
 					distance === lastDistance
 				) {
-					this.player.body.stop();
-					this.player.data.set("isPlantCardGrappleActive", false);
+					player.body.stop();
+					player.data.set("isPlantCardGrappleActive", false);
 					this.power.anims.stop();
 					this.power.visible = false;
 					stopEvent?.destroy();
 					isMoving = false;
 
 					// If the player ends up inside a wall, hurt them and expel them.
-					if (isSpriteInsideSolidTile(this.player, this.landLayer)) {
+					if (isSpriteInsideSolidTile(player, this.landLayer)) {
 						this.enemyHitPlayer();
-						this.player.setPosition(lastSafePosition.x, lastSafePosition.y);
+						player.setPosition(lastSafePosition.x, lastSafePosition.y);
 					}
 				}
 				lastDistance = distance;
@@ -1749,9 +1753,10 @@ export class Game extends Scene {
 		}
 
 		const tilePosition = new Phaser.Math.Vector2(tile.body.x, tile.body.y);
+		const player = getPlayerOrThrow();
 		const playerPosition = new Phaser.Math.Vector2(
-			this.player.body.center.x,
-			this.player.body.center.y
+			player.body.center.x,
+			player.body.center.y
 		);
 		const distanceToActivate: number =
 			this.data.get("distanceToActivate") ?? config.distanceToActivateTransient;
@@ -1880,13 +1885,14 @@ export class Game extends Scene {
 		tile.setAlpha(1);
 		tile.data.set("hidden", false);
 		tile.body.pushable = false;
+		const player = getPlayerOrThrow();
 		this.physics.add.collider(
-			this.player,
+			player,
 			tile,
 			() => {
-				if (this.player.data.get("isPlantCardGrappleActive")) {
+				if (player.data.get("isPlantCardGrappleActive")) {
 					// In case we were being pulled by the PlantCard
-					this.player.data.set("isPlantCardGrappleActive", false);
+					player.data.set("isPlantCardGrappleActive", false);
 					this.power.anims.stop();
 					this.power.visible = false;
 				}
@@ -1957,7 +1963,7 @@ export class Game extends Scene {
 			}
 		});
 
-		if (this.physics.overlap(this.player, tile)) {
+		if (this.physics.overlap(player, tile)) {
 			this.enemyHitPlayer();
 		}
 
@@ -2065,14 +2071,16 @@ export class Game extends Scene {
 	}
 
 	maybeChangeRoom() {
-		const touchingDoor = getItemTouchingPlayer(this.createdDoors, this.player);
+		const player = getPlayerOrThrow();
+		const touchingDoor = getItemTouchingPlayer(this.createdDoors, player);
 		if (touchingDoor) {
 			this.handleCollideDoor(touchingDoor);
 		}
 	}
 
 	maybePickUpItem() {
-		const touchingItem = getItemTouchingPlayer(this.createdItems, this.player);
+		const player = getPlayerOrThrow();
+		const touchingItem = getItemTouchingPlayer(this.createdItems, player);
 		if (touchingItem && touchingItem.active) {
 			switch (touchingItem.name) {
 				case "Sword":
@@ -2239,7 +2247,8 @@ export class Game extends Scene {
 
 	setPlayerDirection(direction: SpriteDirection) {
 		this.playerDirection = direction;
-		this.player.data.set(DataKeys.PlayerDirection, direction);
+		const player = getPlayerOrThrow();
+		player.data.set(DataKeys.PlayerDirection, direction);
 	}
 
 	playCardAnimation(card: Powers) {
@@ -2370,7 +2379,8 @@ export class Game extends Scene {
 
 	pickUpSword() {
 		this.equipSword();
-		this.player.anims.play("down-attack", true);
+		const player = getPlayerOrThrow();
+		player.anims.play("down-attack", true);
 		this.attackSound.play();
 		this.attackSound.on(Phaser.Sound.Events.COMPLETE, () => {
 			this.stopSoundEffects();
@@ -2392,8 +2402,9 @@ export class Game extends Scene {
 	}
 
 	movePlayerToPoint(x: number, y: number) {
-		this.player.setPosition(x, y);
-		const room = getRoomForPoint(this.map, this.player.x, this.player.y);
+		const player = getPlayerOrThrow();
+		player.setPosition(x, y);
+		const room = getRoomForPoint(this.map, player.x, player.y);
 		this.moveCameraToRoom(room);
 	}
 
@@ -2436,8 +2447,9 @@ export class Game extends Scene {
 		this.sword.body.setSize(width, height);
 
 		const [xOffset, yOffset] = this.getSwordOffset();
-		this.sword.x = this.player.body.center.x + xOffset;
-		this.sword.y = this.player.body.center.y + yOffset;
+		const player = getPlayerOrThrow();
+		this.sword.x = player.body.center.x + xOffset;
+		this.sword.y = player.body.center.y + yOffset;
 	}
 
 	getPowerOffset() {
@@ -2465,22 +2477,23 @@ export class Game extends Scene {
 		return [xOffset, yOffset];
 	}
 
-	getSwordOffset() {
+	getSwordOffset(): [number, number] {
+		const player = getPlayerOrThrow();
 		const xOffset = (() => {
 			if (this.playerDirection === SpriteLeft) {
-				return -this.player.body.height;
+				return -player.body.height;
 			}
 			if (this.playerDirection === SpriteRight) {
-				return this.player.body.height;
+				return player.body.height;
 			}
 			return 0;
 		})();
 		const yOffset = (() => {
 			if (this.playerDirection === SpriteUp) {
-				return -this.player.body.height;
+				return -player.body.height;
 			}
 			if (this.playerDirection === SpriteDown) {
-				return this.player.body.height;
+				return player.body.height;
 			}
 			return 0;
 		})();
@@ -2530,8 +2543,9 @@ export class Game extends Scene {
 		this.power.body.setSize(width, height);
 
 		const [xOffset, yOffset] = this.getPowerOffset();
-		this.power.x = this.player.body.center.x + xOffset;
-		this.power.y = this.player.body.center.y + yOffset;
+		const player = getPlayerOrThrow();
+		this.power.x = player.body.center.x + xOffset;
+		this.power.y = player.body.center.y + yOffset;
 	}
 
 	// This will be true once the player starts their attack flow. However, there
@@ -2863,47 +2877,44 @@ export class Game extends Scene {
 	}
 
 	createPlayer(x: number, y: number): void {
-		this.player = this.physics.add.sprite(x, y, "character", "idle-down-0.png");
-		this.player.setDataEnabled();
-		this.player.setDebugBodyColor(0x00ff00);
-		this.resetPlayerHitBox();
-		this.player.setDepth(1);
+		const player = this.physics.add.sprite(
+			x,
+			y,
+			"character",
+			"idle-down-0.png"
+		);
+		player.setDataEnabled();
+		player.setDebugBodyColor(0x00ff00);
+		player.setDepth(1);
 
 		this.restorePlayerHitPoints();
 
-		this.sword = this.physics.add.sprite(
-			this.player.x,
-			this.player.y,
-			"wind-power",
-			4
-		);
+		this.sword = this.physics.add.sprite(player.x, player.y, "wind-power", 4);
 		this.sword.setDataEnabled();
 		this.sword.setDebugBodyColor(0x00fff0);
 		this.sword.setDepth(4);
 		this.sword.setPushable(false);
 
-		this.power = this.physics.add.sprite(
-			this.player.x,
-			this.player.y,
-			"wind-power",
-			4
-		);
+		this.power = this.physics.add.sprite(player.x, player.y, "wind-power", 4);
 		this.power.setDebugBodyColor(0x00fff0);
 		this.power.setDepth(4);
 
+		SpriteComponent.set("player", player);
 		this.updateSwordHitbox();
 
-		this.player.setCollideWorldBounds(true);
+		player.setCollideWorldBounds(true);
+		this.resetPlayerHitBox();
 		this.makePlayerAppear();
 	}
 
 	makePlayerAppear() {
 		this.isPlayerAppearingInvincible = true;
 		this.setPlayerStunned(true);
-		this.player.setVisible(false);
+		const player = getPlayerOrThrow();
+		player.setVisible(false);
 		const effect = this.add.sprite(
-			this.player.body.center.x + this.player.body.width / 2,
-			this.player.body.center.y + this.player.body.height / 2,
+			player.body.center.x + player.body.width / 2,
+			player.body.center.y + player.body.height / 2,
 			"white_fire_circle",
 			0
 		);
@@ -2917,7 +2928,7 @@ export class Game extends Scene {
 			const progress = effect.anims.getProgress();
 			if (name === "appear" && progress > 0.8) {
 				this.setPlayerStunned(false);
-				this.player.setVisible(true);
+				player.setVisible(true);
 				// The player will remain invincible until they move. See finishPlayerAppear()
 			}
 		});
@@ -2996,7 +3007,8 @@ export class Game extends Scene {
 
 	addPotionVialAt(x: number, y: number) {
 		const potionVial = this.physics.add.sprite(x, y, "icons4", 34);
-		this.physics.add.overlap(this.player, potionVial, () => {
+		const player = getPlayerOrThrow();
+		this.physics.add.overlap(player, potionVial, () => {
 			this.pickUpPotionVial();
 			potionVial.destroy();
 		});
@@ -3102,7 +3114,8 @@ export class Game extends Scene {
 		enemy.body.stop();
 		enemy.data.set("isPlantCardGrappleActive", true);
 
-		this.physics.moveToObject(enemy, this.player, config.plantCardVelocity);
+		const player = getPlayerOrThrow();
+		this.physics.moveToObject(enemy, player, config.plantCardVelocity);
 		this.power.body.stop();
 	}
 
@@ -3119,9 +3132,10 @@ export class Game extends Scene {
 
 		// Knock the player back a bit when they hit an enemy.
 		if (!isAuraActive(this.registry, "MountainCard")) {
+			const player = getPlayerOrThrow();
 			knockBack(
 				this,
-				this.player.body,
+				player.body,
 				config.postHitEnemyKnockback,
 				config.playerKnockBackSpeed,
 				invertSpriteDirection(this.playerDirection),
@@ -3135,7 +3149,8 @@ export class Game extends Scene {
 			return;
 		}
 		this.isGameOver = true;
-		this.tweens.add({ targets: this.player, duration: 800, alpha: 0 });
+		const player = getPlayerOrThrow();
+		this.tweens.add({ targets: player, duration: 800, alpha: 0 });
 		this.sound.stopAll();
 		this.cameras.main.fadeOut(1000, 0, 0, 0, (_: unknown, progress: number) => {
 			if (progress === 1) {
@@ -3156,9 +3171,10 @@ export class Game extends Scene {
 	}
 
 	playEffectForHurtPlayer() {
+		const player = getPlayerOrThrow();
 		const effect = this.add.sprite(
-			this.player.body.center.x,
-			this.player.body.center.y - 5,
+			player.body.center.x,
+			player.body.center.y - 5,
 			"player-hit",
 			2
 		);
@@ -3170,10 +3186,7 @@ export class Game extends Scene {
 		});
 		MainEvents.on(Events.PlayerPositionChanged, () => {
 			if (effect?.active) {
-				effect.setPosition(
-					this.player.body.center.x,
-					this.player.body.center.y - 5
-				);
+				effect.setPosition(player.body.center.x, player.body.center.y - 5);
 			}
 		});
 	}
@@ -3205,9 +3218,10 @@ export class Game extends Scene {
 	}
 
 	showParticlesForHurtPlayer() {
+		const player = getPlayerOrThrow();
 		const emitter = this.add.particles(
-			this.player.body.center.x,
-			this.player.body.center.y - 5,
+			player.body.center.x,
+			player.body.center.y - 5,
 			"player-hit",
 			{
 				frame: 1,
@@ -3281,9 +3295,10 @@ export class Game extends Scene {
 		if (!isAuraActive(this.registry, "MountainCard")) {
 			this.setPlayerStunned(true);
 			this.isPlayerBeingKnockedBack = true;
+			const player = getPlayerOrThrow();
 			knockBack(
 				this,
-				this.player.body,
+				player.body,
 				config.postHitPlayerKnockback,
 				config.playerKnockBackSpeed,
 				invertSpriteDirection(this.playerDirection),
@@ -3385,28 +3400,32 @@ export class Game extends Scene {
 	}
 
 	setPlayerFrozen(setting: boolean) {
-		this.player.data?.set("freezePlayer", setting);
+		const player = getPlayerOrThrow();
+		player.data?.set("freezePlayer", setting);
 		if (setting === true) {
 			this.freezeSound.play();
-			this.player.body.stop();
-			this.player.stop();
+			player.body.stop();
+			player.stop();
 		}
 	}
 
 	setPlayerStunned(setting: boolean) {
-		this.player.data?.set("stunPlayer", setting);
-		this.player.body.setVelocity(0);
+		const player = getPlayerOrThrow();
+		player.data?.set("stunPlayer", setting);
+		player.body.setVelocity(0);
 	}
 
 	setPlayerConfused(setting: boolean) {
-		this.player.data?.set("confusedPlayer", setting);
+		const player = getPlayerOrThrow();
+		player.data?.set("confusedPlayer", setting);
 	}
 
 	// Same as setPlayerInvincible but there will be no visual cue. Useful for
 	// times when the player should just not be able to take damage like a "got
 	// powerup" period.
 	setPlayerHiddenInvincible(setting: boolean) {
-		this.player.data?.set("invinciblePlayerHidden", setting);
+		const player = getPlayerOrThrow();
+		player.data?.set("invinciblePlayerHidden", setting);
 	}
 
 	isPlayerInvincible(): boolean {
@@ -3424,19 +3443,23 @@ export class Game extends Scene {
 	}
 
 	isPlayerHiddenInvincible(): boolean {
-		return this.player.data?.get("invinciblePlayerHidden");
+		const player = getPlayerOrThrow();
+		return player.data?.get("invinciblePlayerHidden");
 	}
 
 	isPlayerFrozen(): boolean {
-		return this.player.data.get("freezePlayer") === true;
+		const player = getPlayerOrThrow();
+		return player.data.get("freezePlayer") === true;
 	}
 
 	isPlayerStunned(): boolean {
-		return this.player.data.get("stunPlayer") === true;
+		const player = getPlayerOrThrow();
+		return player.data.get("stunPlayer") === true;
 	}
 
 	isPlayerConfused(): boolean {
-		return this.player.data.get("confusedPlayer") === true;
+		const player = getPlayerOrThrow();
+		return player.data.get("confusedPlayer") === true;
 	}
 
 	cacheTilesInRoom(): void {
@@ -3464,15 +3487,18 @@ export class Game extends Scene {
 		if (iceTiles.length < 2) {
 			return false;
 		}
-		return this.physics.overlapTiles(this.player, iceTiles);
+		const player = getPlayerOrThrow();
+		return this.physics.overlapTiles(player, iceTiles);
 	}
 
 	isPlayerBeingHit(): boolean {
-		return this.player.data?.get("playerGotHit");
+		const player = getPlayerOrThrow();
+		return player.data?.get("playerGotHit");
 	}
 
 	setPlayerBeingHit(setting: boolean): void {
-		this.player.data?.set("playerGotHit", setting);
+		const player = getPlayerOrThrow();
+		player.data?.set("playerGotHit", setting);
 	}
 
 	isPlayerUsingPower(): boolean {
@@ -3571,6 +3597,7 @@ export class Game extends Scene {
 		this.power.setVelocity(0);
 		this.power.setFlipX(false);
 		this.power.setAlpha(1);
+		const player = getPlayerOrThrow();
 		switch (this.playerDirection) {
 			case SpriteUp:
 				switch (this.getActivePower()) {
@@ -3583,8 +3610,8 @@ export class Game extends Scene {
 						break;
 					case "CloudCard":
 						this.power.anims.play("cloud-power", true);
-						this.player.setVelocity(0, -config.cloudCardSpeed);
-						this.player.anims.play("up-walk");
+						player.setVelocity(0, -config.cloudCardSpeed);
+						player.anims.play("up-walk");
 						break;
 					case "SpiritCard":
 						this.playSpiritPowerAnimation();
@@ -3617,9 +3644,9 @@ export class Game extends Scene {
 						break;
 					case "CloudCard":
 						this.power.anims.play("cloud-power", true);
-						this.player.setVelocity(config.cloudCardSpeed, 0);
-						this.player.anims.play("left-walk");
-						this.player.setFlipX(true);
+						player.setVelocity(config.cloudCardSpeed, 0);
+						player.anims.play("left-walk");
+						player.setFlipX(true);
 						break;
 					case "SpiritCard":
 						this.playSpiritPowerAnimation();
@@ -3647,8 +3674,8 @@ export class Game extends Scene {
 						break;
 					case "CloudCard":
 						this.power.anims.play("cloud-power", true);
-						this.player.setVelocity(0, config.cloudCardSpeed);
-						this.player.anims.play("down-walk");
+						player.setVelocity(0, config.cloudCardSpeed);
+						player.anims.play("down-walk");
 						break;
 					case "SpiritCard":
 						this.playSpiritPowerAnimation();
@@ -3680,8 +3707,8 @@ export class Game extends Scene {
 						break;
 					case "CloudCard":
 						this.power.anims.play("cloud-power", true);
-						this.player.setVelocity(-config.cloudCardSpeed, 0);
-						this.player.anims.play("left-walk");
+						player.setVelocity(-config.cloudCardSpeed, 0);
+						player.anims.play("left-walk");
 						break;
 					case "SpiritCard":
 						this.playSpiritPowerAnimation();
@@ -3783,6 +3810,7 @@ export class Game extends Scene {
 	}
 
 	updatePlayerMovement(): void {
+		const player = getPlayerOrThrow();
 		if (!this.canPlayerMove()) {
 			this.walkSound.stop();
 			return;
@@ -3790,7 +3818,7 @@ export class Game extends Scene {
 
 		// First stop any current movement.
 		if (!this.isPlayerOnIce()) {
-			this.player.body.setVelocity(0);
+			player.body.setVelocity(0);
 		}
 
 		// Set velocity based on key press
@@ -3805,42 +3833,42 @@ export class Game extends Scene {
 			isDown = this.isPressingLeft();
 		}
 		if (isLeft) {
-			this.player.body.setVelocityX(-this.getPlayerSpeed());
+			player.body.setVelocityX(-this.getPlayerSpeed());
 			this.setPlayerDirection(SpriteLeft);
 		} else if (isRight) {
-			this.player.body.setVelocityX(this.getPlayerSpeed());
+			player.body.setVelocityX(this.getPlayerSpeed());
 			this.setPlayerDirection(SpriteRight);
 		}
 		if (isUp) {
-			this.player.body.setVelocityY(-this.getPlayerSpeed());
+			player.body.setVelocityY(-this.getPlayerSpeed());
 			this.setPlayerDirection(SpriteUp);
 		} else if (isDown) {
-			this.player.body.setVelocityY(this.getPlayerSpeed());
+			player.body.setVelocityY(this.getPlayerSpeed());
 			this.setPlayerDirection(SpriteDown);
 		}
 
-		this.player.body.velocity.normalize().scale(this.getPlayerSpeed());
+		player.body.velocity.normalize().scale(this.getPlayerSpeed());
 
 		// Set animation based on direction (if multiple, just pick one)
 		if (isLeft) {
-			this.player.setFlipX(false);
-			this.player.anims.play("left-walk", true);
+			player.setFlipX(false);
+			player.anims.play("left-walk", true);
 			this.playWalkSound();
 			this.finishPlayerAppear();
 			MainEvents.emit(Events.PlayerMoved);
 		} else if (isRight) {
-			this.player.setFlipX(true);
-			this.player.anims.play("left-walk", true);
+			player.setFlipX(true);
+			player.anims.play("left-walk", true);
 			this.playWalkSound();
 			this.finishPlayerAppear();
 			MainEvents.emit(Events.PlayerMoved);
 		} else if (isUp) {
-			this.player.anims.play("up-walk", true);
+			player.anims.play("up-walk", true);
 			this.playWalkSound();
 			this.finishPlayerAppear();
 			MainEvents.emit(Events.PlayerMoved);
 		} else if (isDown) {
-			this.player.anims.play("down-walk", true);
+			player.anims.play("down-walk", true);
 			this.playWalkSound();
 			this.finishPlayerAppear();
 			MainEvents.emit(Events.PlayerMoved);
@@ -3859,37 +3887,40 @@ export class Game extends Scene {
 	}
 
 	updatePlayerTint() {
+		const player = getPlayerOrThrow();
 		if (this.getPlayerHitPoints() === 0) {
-			this.player.setTint(0xff0000);
+			player.setTint(0xff0000);
 			return;
 		}
 		if (this.isPlayerBeingHit()) {
-			this.player.setTint(0xff8587);
+			player.setTint(0xff8587);
 			return;
 		}
 		if (this.isPlayerFrozen()) {
-			this.player.setTint(0x0000ff);
+			player.setTint(0x0000ff);
 			return;
 		}
-		this.player.clearTint();
+		player.clearTint();
 	}
 
 	updatePlayerAlpha() {
+		const player = getPlayerOrThrow();
 		if (this.isGameOver) {
 			return;
 		}
 		if (this.isPlayerInvincible()) {
-			this.player.setAlpha(0.5);
+			player.setAlpha(0.5);
 		} else {
-			this.player.clearAlpha();
+			player.clearAlpha();
 		}
 	}
 
 	updateHealEffectPosition() {
+		const player = getPlayerOrThrow();
 		if (this.healEffect) {
 			this.healEffect.setPosition(
-				this.player.body.center.x + 1,
-				this.player.body.center.y - 1
+				player.body.center.x + 1,
+				player.body.center.y - 1
 			);
 		}
 	}
@@ -3911,12 +3942,13 @@ export class Game extends Scene {
 	}
 
 	updateStatusIcon() {
+		const player = getPlayerOrThrow();
 		if (this.statusIcon) {
-			const newX = this.player.body.center.x - config.statusIconOffsetX;
+			const newX = player.body.center.x - config.statusIconOffsetX;
 			if (newX !== this.statusIcon.x) {
 				this.statusIcon.x = newX;
 			}
-			const newY = this.player.body.center.y - config.statusIconOffsetY;
+			const newY = player.body.center.y - config.statusIconOffsetY;
 			if (newY !== this.statusIcon.y) {
 				this.statusIcon.y = newY;
 			}
@@ -3927,13 +3959,14 @@ export class Game extends Scene {
 	updatePlayer(): void {
 		this.updatePlayerTint();
 		this.updatePlayerAlpha();
+		const player = getPlayerOrThrow();
 
 		savePlayerPositionToRegistry(
 			this.registry,
 			getSavedDataPlayerPosition(
 				this.map,
-				this.player.body.center.x,
-				this.player.body.center.y
+				player.body.center.x,
+				player.body.center.y
 			)
 		);
 
@@ -3945,7 +3978,7 @@ export class Game extends Scene {
 
 		// Keep in mind that the player may be moving unintentionally (eg: via knockback).
 		const isMoving =
-			this.player.body.velocity.x !== 0 || this.player.body.velocity.y !== 0;
+			player.body.velocity.x !== 0 || player.body.velocity.y !== 0;
 		if (isMoving) {
 			// This differs from PlayerMoved because this is any movement and PlayerMoved is intentional movement.
 			MainEvents.emit(Events.PlayerPositionChanged);
@@ -3956,34 +3989,33 @@ export class Game extends Scene {
 	}
 
 	setPlayerIdleFrame() {
+		const player = getPlayerOrThrow();
 		// If the player stops moving, stop animations and reset the image to an idle frame in the correct direction.
-		this.player.setFlipX(false);
+		player.setFlipX(false);
 		switch (this.playerDirection) {
 			case SpriteLeft:
-				this.player.anims.play("idle-left", true);
+				player.anims.play("idle-left", true);
 				return;
 			case SpriteRight:
-				this.player.setFlipX(true);
-				this.player.anims.play("idle-left", true);
+				player.setFlipX(true);
+				player.anims.play("idle-left", true);
 				return;
 			case SpriteUp:
-				this.player.anims.play("idle-up", true);
+				player.anims.play("idle-up", true);
 				return;
 			case SpriteDown:
-				this.player.anims.play("idle-down", true);
+				player.anims.play("idle-down", true);
 				return;
 		}
 	}
 
 	resetPlayerHitBox() {
-		this.player.body.setSize(
-			config.playerHitBoxWidth,
-			config.playerHitBoxHeight
-		);
-		this.player.setOrigin(config.playerOriginX, config.playerOriginY);
-		this.player.body.setOffset(
-			this.player.body.offset.x + config.playerHitBoxOffsetX,
-			this.player.body.offset.y + config.playerHitBoxOffsetY
+		const player = getPlayerOrThrow();
+		player.body.setSize(config.playerHitBoxWidth, config.playerHitBoxHeight);
+		player.setOrigin(config.playerOriginX, config.playerOriginY);
+		player.body.setOffset(
+			player.body.offset.x + config.playerHitBoxOffsetX,
+			player.body.offset.y + config.playerHitBoxOffsetY
 		);
 	}
 }

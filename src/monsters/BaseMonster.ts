@@ -8,6 +8,7 @@ import {
 import { EnemyManager } from "../lib/EnemyManager";
 import { MainEvents } from "../lib/MainEvents";
 import { config } from "../lib/config";
+import { getPlayerOrThrow } from "../lib/components";
 import type { Behavior } from "../lib/Behavior";
 
 export class BaseMonster extends Phaser.Physics.Arcade.Sprite {
@@ -277,12 +278,13 @@ export class BaseMonster extends Phaser.Physics.Arcade.Sprite {
 		}
 		if (this.data?.get(DataKeys.Pushable) === true) {
 			this.setStunned(true);
+			const player = getPlayerOrThrow();
 			knockBack(
 				this.scene,
 				this.body,
 				config.enemyKnockbackTime,
 				config.enemyKnockBackSpeed,
-				this.#enemyManager.player.data.get(DataKeys.PlayerDirection),
+				player.data.get(DataKeys.PlayerDirection),
 				() => {
 					this.setStunned(false);
 				}

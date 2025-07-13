@@ -24,6 +24,7 @@ import { TeleportSystem } from "./TeleportSystem";
 import { Behavior, BehaviorCompleteCallback } from "./Behavior";
 import { MainEvents } from "./MainEvents";
 import { MountainMonster } from "../monsters/MountainMonster";
+import { SpriteComponent, getPlayerOrThrow } from "../lib/components";
 
 export class WaitForActive implements Behavior {
 	#distanceToActivate: number = 100;
@@ -82,10 +83,10 @@ export class WaitForActive implements Behavior {
 
 	update(
 		sprite: Phaser.GameObjects.Sprite,
-		goToNextState: BehaviorCompleteCallback,
-		enemyManager: EnemyManager
+		goToNextState: BehaviorCompleteCallback
 	): void {
-		if (!enemyManager.player.body) {
+		const player = SpriteComponent.get("player");
+		if (!player) {
 			return;
 		}
 		if (!isDynamicSprite(sprite)) {
@@ -93,7 +94,7 @@ export class WaitForActive implements Behavior {
 		}
 		const distance = Phaser.Math.Distance.BetweenPoints(
 			sprite.body.center,
-			enemyManager.player.body.center
+			player.body.center
 		);
 		if (distance < this.#distanceToActivate) {
 			this.#hasEnded = true;
@@ -369,16 +370,16 @@ export class Burrow implements Behavior {
 
 	init(
 		sprite: Phaser.GameObjects.Sprite,
-		goToNextState: BehaviorCompleteCallback,
-		enemyManager: EnemyManager
+		goToNextState: BehaviorCompleteCallback
 	): void {
 		if (!sprite.body || !isDynamicSprite(sprite)) {
 			throw new Error("Could not update monster");
 		}
 
+		const player = getPlayerOrThrow();
 		const target = this.#targetPosition ?? {
-			x: enemyManager.player.x,
-			y: enemyManager.player.y,
+			x: player.x,
+			y: player.y,
 		};
 		const shadow = createShadowSprite({
 			scene: sprite.scene,
@@ -413,13 +414,13 @@ export class Burrow implements Behavior {
 					callback: () => {
 						sprite?.setVisible(true);
 						if (this.#hitsOnAppear) {
-							sprite?.scene.physics.add.overlap(
-								enemyManager.player,
-								shadow,
-								() => {
-									MainEvents.emit(Events.EnemyHitPlayer, true);
-								}
-							);
+							const player = SpriteComponent.get("player");
+							if (!player) {
+								return;
+							}
+							sprite?.scene.physics.add.overlap(player, shadow, () => {
+								MainEvents.emit(Events.EnemyHitPlayer, true);
+							});
 						}
 						shadow?.destroy();
 						sprite?.data?.set(DataKeys.IsHarmless, harmless);
@@ -455,14 +456,14 @@ export class Leap implements Behavior {
 
 	init(
 		sprite: Phaser.GameObjects.Sprite,
-		goToNextState: BehaviorCompleteCallback,
-		enemyManager: EnemyManager
+		goToNextState: BehaviorCompleteCallback
 	): void {
 		if (!sprite.body || !isDynamicSprite(sprite)) {
 			throw new Error("Could not update monster");
 		}
 
-		const target = this.#targetPosition ?? enemyManager.player;
+		const player = getPlayerOrThrow();
+		const target = this.#targetPosition ?? player;
 		const shadow = createShadowSprite({
 			scene: sprite.scene,
 			x: sprite.body.center.x,
@@ -1056,21 +1057,17 @@ export class SlashTowardPlayer implements Behavior {
 
 	init(
 		sprite: Phaser.GameObjects.Sprite,
-		goToNextState: BehaviorCompleteCallback,
-		enemyManager: EnemyManager
+		goToNextState: BehaviorCompleteCallback
 	): void {
-		if (
-			!sprite.body ||
-			!isDynamicSprite(sprite) ||
-			!isDynamicSprite(enemyManager.player)
-		) {
+		const player = getPlayerOrThrow();
+		if (!sprite.body || !isDynamicSprite(sprite) || !isDynamicSprite(player)) {
 			throw new Error("Could not update monster");
 		}
 
 		sprite.scene.physics.moveTo(
 			sprite,
-			enemyManager.player.body.center.x,
-			enemyManager.player.body.center.y,
+			player.body.center.x,
+			player.body.center.y,
 			this.#speed
 		);
 		// FIXME: change this to be the facing direction instead of the moving direction (eg: if you hit a wall you will stop moving but will continue facing)
@@ -1107,7 +1104,7 @@ export class SlashTowardPlayer implements Behavior {
 		this.#effect.anims.play("slash-effect", true);
 		sprite.scene.sound.play("attack");
 
-		sprite.scene.physics.add.overlap(enemyManager.player, this.#effect, () => {
+		sprite.scene.physics.add.overlap(player, this.#effect, () => {
 			MainEvents.emit(Events.EnemyHitPlayer, true);
 		});
 
@@ -1151,8 +1148,7 @@ export class BigSwing implements Behavior {
 
 	init(
 		sprite: Phaser.GameObjects.Sprite,
-		goToNextState: BehaviorCompleteCallback,
-		enemyManager: EnemyManager
+		goToNextState: BehaviorCompleteCallback
 	): void {
 		if (!sprite.body || !isDynamicSprite(sprite)) {
 			throw new Error("Could not update monster");
@@ -1178,7 +1174,8 @@ export class BigSwing implements Behavior {
 		effect.anims.play("slash-effect", true);
 		sprite.scene.sound.play("attack");
 
-		sprite.scene.physics.add.overlap(enemyManager.player, effect, () => {
+		const player = getPlayerOrThrow();
+		sprite.scene.physics.add.overlap(player, effect, () => {
 			MainEvents.emit(Events.EnemyHitPlayer, true);
 		});
 
@@ -1208,8 +1205,7 @@ export class IceAttack implements Behavior {
 
 	init(
 		sprite: Phaser.GameObjects.Sprite,
-		goToNextState: BehaviorCompleteCallback,
-		enemyManager: EnemyManager
+		goToNextState: BehaviorCompleteCallback
 	): void {
 		if (!sprite.body || !isDynamicSprite(sprite)) {
 			throw new Error("Could not update monster");
@@ -1235,7 +1231,8 @@ export class IceAttack implements Behavior {
 		effect.anims.play("ice_attack", true);
 		sprite.scene.sound.play("ice");
 
-		sprite.scene.physics.add.overlap(enemyManager.player, effect, () => {
+		const player = getPlayerOrThrow();
+		sprite.scene.physics.add.overlap(player, effect, () => {
 			MainEvents.emit(Events.FreezePlayer, true);
 			sprite?.scene?.time.addEvent({
 				delay: this.#freezePlayerTime,
@@ -1281,10 +1278,10 @@ export class StickyPoison implements Behavior {
 
 	init(
 		sprite: Phaser.GameObjects.Sprite,
-		goToNextState: BehaviorCompleteCallback,
-		enemyManager: EnemyManager
+		goToNextState: BehaviorCompleteCallback
 	): void {
-		if (!sprite.body || !isDynamicSprite(sprite) || !enemyManager.player.body) {
+		const player = getPlayerOrThrow();
+		if (!sprite.body || !isDynamicSprite(sprite) || !player.body) {
 			throw new Error("Could not update monster");
 		}
 
@@ -1312,16 +1309,16 @@ export class StickyPoison implements Behavior {
 
 	update(
 		sprite: Phaser.GameObjects.Sprite,
-		_goToNextState: BehaviorCompleteCallback,
-		enemyManager: EnemyManager
+		_goToNextState: BehaviorCompleteCallback
 	): void {
-		if (!sprite.body || !isDynamicSprite(sprite) || !enemyManager.player.body) {
+		const player = getPlayerOrThrow();
+		if (!sprite.body || !isDynamicSprite(sprite) || !player.body) {
 			throw new Error("Could not update monster");
 		}
 
 		const distance = Phaser.Math.Distance.BetweenPoints(
 			sprite.body.center,
-			enemyManager.player.body.center
+			player.body.center
 		);
 
 		// If you reach the target, stop.
@@ -1331,11 +1328,7 @@ export class StickyPoison implements Behavior {
 		}
 
 		if (this.#isStuck) {
-			sprite.scene.physics.moveToObject(
-				sprite,
-				enemyManager.player,
-				this.#speed
-			);
+			sprite.scene.physics.moveToObject(sprite, player, this.#speed);
 		}
 	}
 }
@@ -1360,8 +1353,7 @@ export class Poof implements Behavior {
 
 	init(
 		sprite: Phaser.GameObjects.Sprite,
-		goToNextState: BehaviorCompleteCallback,
-		enemyManager: EnemyManager
+		goToNextState: BehaviorCompleteCallback
 	): void {
 		if (!sprite.body || !isDynamicSprite(sprite)) {
 			throw new Error("Could not update monster");
@@ -1378,7 +1370,8 @@ export class Poof implements Behavior {
 				// y += sprite.body.y;
 
 				// If a particle hits the player, then trigger an effect.
-				const didHit = enemyManager.player.body?.hitTest(x, y) ?? false;
+				const player = getPlayerOrThrow();
+				const didHit = player.body?.hitTest(x, y) ?? false;
 				if (didHit) {
 					MainEvents.emit(Events.ConfusePlayer, true);
 				}
@@ -1444,8 +1437,7 @@ export class LavaExplode implements Behavior {
 
 	init(
 		sprite: Phaser.GameObjects.Sprite,
-		goToNextState: BehaviorCompleteCallback,
-		enemyManager: EnemyManager
+		goToNextState: BehaviorCompleteCallback
 	): void {
 		if (!sprite.body || !isDynamicSprite(sprite)) {
 			throw new Error("Could not update monster");
@@ -1465,7 +1457,8 @@ export class LavaExplode implements Behavior {
 		}
 		circle.body.setCircle(this.#hitboxRadius);
 		circle.body.setOffset(-this.#hitboxRadius, -this.#hitboxRadius);
-		sprite.scene.physics.add.overlap(enemyManager.player, circle, () => {
+		const player = getPlayerOrThrow();
+		sprite.scene.physics.add.overlap(player, circle, () => {
 			MainEvents.emit(Events.EnemyHitPlayer, true);
 			if (!this.#isConstant) {
 				circle?.destroy();
@@ -1709,19 +1702,19 @@ export class DashTowardPlayer implements Behavior {
 
 	init(
 		sprite: Phaser.GameObjects.Sprite,
-		goToNextState: BehaviorCompleteCallback,
-		enemyManager: EnemyManager
+		goToNextState: BehaviorCompleteCallback
 	): void {
 		if (!sprite.body || !isDynamicSprite(sprite)) {
 			throw new Error("Could not update monster");
 		}
+		const player = getPlayerOrThrow();
 		sprite.scene.physics.moveToObject(
 			sprite,
-			this.#targetPosition ?? enemyManager.player,
+			this.#targetPosition ?? player,
 			this.#speed
 		);
 
-		sprite.scene.physics.add.overlap(enemyManager.player, sprite, () => {
+		sprite.scene.physics.add.overlap(player, sprite, () => {
 			MainEvents.emit(Events.EnemyHitPlayer, true);
 		});
 
@@ -1733,17 +1726,14 @@ export class DashTowardPlayer implements Behavior {
 		});
 	}
 
-	update(
-		sprite: Phaser.GameObjects.Sprite,
-		_: BehaviorCompleteCallback,
-		enemyManager: EnemyManager
-	): void {
-		if (!isDynamicSprite(sprite) || !enemyManager.player.body) {
+	update(sprite: Phaser.GameObjects.Sprite, _: BehaviorCompleteCallback): void {
+		const player = getPlayerOrThrow();
+		if (!isDynamicSprite(sprite) || !player.body) {
 			throw new Error("Could not update monster");
 		}
 		const distance = Phaser.Math.Distance.BetweenPoints(
 			sprite.body.center,
-			this.#targetPosition ?? enemyManager.player.body.center
+			this.#targetPosition ?? player.body.center
 		);
 
 		// If you hit a wall, the direction will change as moveToObject tries to
@@ -1795,19 +1785,19 @@ export class LaserSight implements Behavior {
 
 	init(
 		sprite: Phaser.GameObjects.Sprite,
-		goToNextState: BehaviorCompleteCallback,
-		enemyManager: EnemyManager
+		goToNextState: BehaviorCompleteCallback
 	): void {
+		const player = getPlayerOrThrow();
 		if (!sprite.body || !isDynamicSprite(sprite)) {
 			throw new Error("Could not update monster");
 		}
-		if (!enemyManager.player.body) {
+		if (!player.body) {
 			throw new Error("Could not update monster");
 		}
 		let effect: Phaser.GameObjects.Line | undefined;
 		const originalTarget = {
-			x: enemyManager.player.body.x,
-			y: enemyManager.player.body.y,
+			x: player.body.x,
+			y: player.body.y,
 		};
 		const target = getLimitedEndPoint({
 			startX: sprite.body.x,
@@ -1854,9 +1844,9 @@ export class BlackOrbAttack implements Behavior {
 
 	init(
 		sprite: Phaser.GameObjects.Sprite,
-		goToNextState: BehaviorCompleteCallback,
-		enemyManager: EnemyManager
+		goToNextState: BehaviorCompleteCallback
 	): void {
+		const player = getPlayerOrThrow();
 		if (!sprite.body || !isDynamicSprite(sprite)) {
 			throw new Error("Could not update monster");
 		}
@@ -1881,9 +1871,9 @@ export class BlackOrbAttack implements Behavior {
 			return;
 		}
 
-		sprite.scene.physics.moveToObject(enemy, enemyManager.player, this.#speed);
+		sprite.scene.physics.moveToObject(enemy, player, this.#speed);
 
-		sprite.scene.physics.add.overlap(enemyManager.player, enemy, () => {
+		sprite.scene.physics.add.overlap(player, enemy, () => {
 			MainEvents.emit(Events.EnemyHitPlayer, true);
 			enemy.emit(Events.MonsterKillRequest);
 		});
@@ -1961,11 +1951,8 @@ export class RangedRockBall implements Behavior {
 		}
 
 		if (undefined === this.#forceDirectionDegree) {
-			sprite.scene.physics.moveToObject(
-				effect,
-				enemyManager.player,
-				this.#speed
-			);
+			const player = getPlayerOrThrow();
+			sprite.scene.physics.moveToObject(effect, player, this.#speed);
 		}
 		if (undefined !== this.#forceDirectionDegree) {
 			const velocity = sprite.scene.physics.velocityFromAngle(
@@ -2015,7 +2002,8 @@ export class RangedRockBall implements Behavior {
 			});
 		}
 
-		sprite.scene.physics.add.overlap(enemyManager.player, effect, () => {
+		const player = getPlayerOrThrow();
+		sprite.scene.physics.add.overlap(player, effect, () => {
 			MainEvents.emit(Events.EnemyHitPlayer, true);
 			onDestroy();
 		});
@@ -2111,12 +2099,9 @@ export class RangedFireBall implements Behavior {
 			effect.setTint(this.#colorTint);
 		}
 
+		const player = getPlayerOrThrow();
 		if (undefined === this.#forceDirectionDegree) {
-			sprite.scene.physics.moveToObject(
-				effect,
-				enemyManager.player,
-				this.#speed
-			);
+			sprite.scene.physics.moveToObject(effect, player, this.#speed);
 		}
 		if (undefined !== this.#forceDirectionDegree) {
 			const velocity = sprite.scene.physics.velocityFromAngle(
@@ -2141,7 +2126,7 @@ export class RangedFireBall implements Behavior {
 			});
 		}
 
-		sprite.scene.physics.add.overlap(enemyManager.player, effect, () => {
+		sprite.scene.physics.add.overlap(player, effect, () => {
 			fireSound?.stop();
 			MainEvents.emit(Events.EnemyHitPlayer, true);
 			effect.destroy();
@@ -2183,8 +2168,7 @@ export class RangedIceBall implements Behavior {
 
 	init(
 		sprite: Phaser.GameObjects.Sprite,
-		goToNextState: BehaviorCompleteCallback,
-		enemyManager: EnemyManager
+		goToNextState: BehaviorCompleteCallback
 	): void {
 		if (!sprite.body || !isDynamicSprite(sprite)) {
 			throw new Error("Could not update monster");
@@ -2218,9 +2202,10 @@ export class RangedIceBall implements Behavior {
 		}
 		effect.setDisplaySize(effect.body.width * 0.8, effect.body.height * 0.8);
 		effect.body.setSize(effect.body.width * 0.5, effect.body.height * 0.5);
-		sprite.scene.physics.moveToObject(effect, enemyManager.player, this.#speed);
+		const player = getPlayerOrThrow();
+		sprite.scene.physics.moveToObject(effect, player, this.#speed);
 
-		sprite.scene.physics.add.overlap(enemyManager.player, effect, () => {
+		sprite.scene.physics.add.overlap(player, effect, () => {
 			sprite?.scene?.sound.stopByKey("ice");
 			MainEvents.emit(Events.EnemyHitPlayer, true);
 			effect.destroy();
@@ -2274,8 +2259,7 @@ export class WalkWithFire implements Behavior {
 
 	init(
 		sprite: Phaser.GameObjects.Sprite,
-		goToNextState: BehaviorCompleteCallback,
-		enemyManager: EnemyManager
+		goToNextState: BehaviorCompleteCallback
 	): void {
 		if (!sprite.body || !isDynamicSprite(sprite)) {
 			throw new Error("Could not update monster");
@@ -2323,7 +2307,8 @@ export class WalkWithFire implements Behavior {
 			this.#effect.body.width * 0.5,
 			this.#effect.body.height * 0.5
 		);
-		sprite.scene.physics.add.overlap(enemyManager.player, this.#effect, () => {
+		const player = getPlayerOrThrow();
+		sprite.scene.physics.add.overlap(player, this.#effect, () => {
 			walkSound.stop();
 			MainEvents.emit(Events.EnemyHitPlayer, true);
 			this.#effect.destroy();
@@ -2427,11 +2412,8 @@ export class IceBeam implements Behavior {
 		}
 		effect.setDisplaySize(effect.body.width * 0.8, effect.body.height * 0.8);
 		effect.body.setSize(effect.body.width * 0.5, effect.body.height * 0.5);
-		sprite.scene.physics.moveToObject(
-			effect,
-			enemyManager.player,
-			this.attackSpeed
-		);
+		const player = getPlayerOrThrow();
+		sprite.scene.physics.moveToObject(effect, player, this.attackSpeed);
 
 		const landLayer = enemyManager.map.getLayer("Background");
 		if (!landLayer) {
@@ -2448,7 +2430,7 @@ export class IceBeam implements Behavior {
 			}
 		);
 
-		sprite.scene.physics.add.overlap(enemyManager.player, effect, () => {
+		sprite.scene.physics.add.overlap(player, effect, () => {
 			sprite.scene?.sound.stopByKey("freeze");
 			MainEvents.emit(Events.EnemyHitPlayer, true);
 			effect.destroy();
@@ -2503,7 +2485,8 @@ export class IceBeam implements Behavior {
 		) {
 			return;
 		}
-		if (sprite.scene.physics.overlapTiles(enemyManager.player, [tile])) {
+		const player = getPlayerOrThrow();
+		if (sprite.scene.physics.overlapTiles(player, [tile])) {
 			// Do not melt the tile we stand on.
 			sprite.scene.time.addEvent({
 				delay: this.iceMeltTime,
@@ -2596,13 +2579,13 @@ export class SwoopAttack implements Behavior {
 
 	update(
 		sprite: Phaser.GameObjects.Sprite,
-		goToNextState: BehaviorCompleteCallback,
-		enemyManager: EnemyManager
+		goToNextState: BehaviorCompleteCallback
 	): void {
+		const player = getPlayerOrThrow();
 		if (!isDynamicSprite(sprite)) {
 			throw new Error("invalid sprite");
 		}
-		if (!enemyManager.player.body) {
+		if (!player.body) {
 			return;
 		}
 		if (sprite.data.get(DataKeys.Stunned)) {
@@ -2611,7 +2594,7 @@ export class SwoopAttack implements Behavior {
 
 		const distance = Phaser.Math.Distance.BetweenPoints(
 			sprite.body.center,
-			enemyManager.player.body.center
+			player.body.center
 		);
 		if (this.#awareDistance) {
 			if (distance > this.#awareDistance) {
@@ -2638,8 +2621,8 @@ export class SwoopAttack implements Behavior {
 		}
 		sprite.scene.physics.accelerateTo(
 			sprite,
-			enemyManager.player.body.center.x,
-			enemyManager.player.body.center.y,
+			player.body.center.x,
+			player.body.center.y,
 			this.#speed,
 			this.#maxSpeed,
 			this.#maxSpeed
@@ -2707,13 +2690,13 @@ export class FollowPlayer implements Behavior {
 
 	update(
 		sprite: Phaser.GameObjects.Sprite,
-		goToNextState: BehaviorCompleteCallback,
-		enemyManager: EnemyManager
+		goToNextState: BehaviorCompleteCallback
 	): void {
+		const player = getPlayerOrThrow();
 		if (!isDynamicSprite(sprite)) {
 			throw new Error("invalid sprite");
 		}
-		if (!enemyManager.player.body) {
+		if (!player.body) {
 			return;
 		}
 		if (sprite.data.get(DataKeys.Stunned)) {
@@ -2722,7 +2705,7 @@ export class FollowPlayer implements Behavior {
 
 		const distance = Phaser.Math.Distance.BetweenPoints(
 			sprite.body.center,
-			enemyManager.player.body.center
+			player.body.center
 		);
 		if (this.#awareDistance) {
 			if (distance > this.#awareDistance) {
@@ -2741,8 +2724,8 @@ export class FollowPlayer implements Behavior {
 
 		sprite.scene.physics.moveTo(
 			sprite,
-			enemyManager.player.body.center.x,
-			enemyManager.player.body.center.y,
+			player.body.center.x,
+			player.body.center.y,
 			this.#speed
 		);
 		if (
@@ -2850,7 +2833,8 @@ class Seeker extends Phaser.Physics.Arcade.Sprite {
 		this.setDisplaySize(this.body.width * 0.8, this.body.height * 0.8);
 		this.body.setSize(this.body.width * 0.5, this.body.height * 0.5);
 
-		this.scene.physics.add.overlap(this.#enemyManager.player, this, () => {
+		const player = getPlayerOrThrow();
+		this.scene.physics.add.overlap(player, this, () => {
 			this.scene?.sound?.stopByKey("fire-loop");
 			MainEvents.emit(Events.EnemyHitPlayer, true);
 			this.destroy();
@@ -2895,11 +2879,8 @@ class Seeker extends Phaser.Physics.Arcade.Sprite {
 		if (this.#beingDestroyed) {
 			return;
 		}
-		this.scene?.physics.moveToObject(
-			this,
-			this.#enemyManager.player,
-			this.#speed
-		);
+		const player = getPlayerOrThrow();
+		this.scene?.physics.moveToObject(this, player, this.#speed);
 	}
 }
 
@@ -2946,14 +2927,11 @@ export class ThrowRocks implements Behavior {
 	}
 
 	createRock() {
-		if (!this.#enemyManager.player.body) {
-			throw new Error("No player exists");
-		}
-
+		const player = getPlayerOrThrow();
 		this.#sprite.anims.play("throwrock");
 		const rock = this.#sprite.scene.add.sprite(
-			this.#enemyManager.player.body.center.x,
-			this.#enemyManager.player.body.center.y,
+			player.body.center.x,
+			player.body.center.y,
 			"dungeon_tiles_sprites",
 			865
 		);
@@ -3010,10 +2988,11 @@ export class ThrowRocks implements Behavior {
 		tile.setAlpha(1);
 		tile.body.pushable = false;
 
-		if (this.#sprite.scene?.physics.overlap(this.#enemyManager.player, tile)) {
+		const player = getPlayerOrThrow();
+		if (this.#sprite.scene?.physics.overlap(player, tile)) {
 			MainEvents.emit(Events.EnemyHitPlayer, true);
 		}
-		this.#sprite.scene?.physics.add.collider(this.#enemyManager.player, tile);
+		this.#sprite.scene?.physics.add.collider(player, tile);
 		this.#sprite.scene?.physics.add.collider(this.#enemyManager.enemies, tile);
 	}
 
