@@ -68,12 +68,15 @@ import {
 	LockableDoorSpriteIndices,
 } from "../lib/shared";
 import { MonsterCreator } from "../lib/MonsterCreator";
-import { SpriteComponent, getPlayerOrThrow } from "../lib/components";
+import {
+	SpriteComponent,
+	getPlayerOrThrow,
+	getSpriteOrThrow,
+} from "../lib/components";
 
 export class Game extends Scene {
 	debugGraphic: Phaser.GameObjects.Graphics | undefined;
 	layerDebugGraphic: Phaser.GameObjects.Graphics | undefined;
-	sword: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
 	power: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
 	healEffect: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody | undefined;
 	statusIcon: Phaser.GameObjects.Sprite | undefined;
@@ -197,7 +200,7 @@ export class Game extends Scene {
 		this.attackSprite.setDepth(4);
 		this.attackSprite.setVisible(false);
 
-		this.enemyManager = new EnemyManager(this, this.sword, this.map);
+		this.enemyManager = new EnemyManager(this, this.map);
 		this.monsterCreator = new MonsterCreator(
 			this,
 			this.enemyManager,
@@ -462,7 +465,7 @@ export class Game extends Scene {
 		);
 
 		this.physics.add.overlap(
-			this.sword,
+			getSpriteOrThrow("sword"),
 			this.enemyManager.enemies,
 			(_, enemy) => {
 				if (!isDynamicSprite(enemy)) {
@@ -471,7 +474,7 @@ export class Game extends Scene {
 				this.playerHitEnemy(enemy);
 			},
 			() => {
-				return this.sword.data.get(DataKeys.SwordAttackActive);
+				return getSpriteOrThrow("sword").data.get(DataKeys.SwordAttackActive);
 			}
 		);
 		this.physics.add.overlap(
@@ -1047,10 +1050,10 @@ export class Game extends Scene {
 	activateAttack() {
 		const player = getPlayerOrThrow();
 		player.body.setVelocity(0);
-		this.sword.data.set(DataKeys.SwordAttackActive, true);
+		getSpriteOrThrow("sword").data.set(DataKeys.SwordAttackActive, true);
 		this.updateSwordHitbox();
 
-		this.sword.setRotation(Phaser.Math.DegToRad(0));
+		getSpriteOrThrow("sword").setRotation(Phaser.Math.DegToRad(0));
 
 		// If the animation hasn't started, start it.
 		// Do not move the player hitbox when attacking; since it changes size it
@@ -1078,7 +1081,7 @@ export class Game extends Scene {
 		this.attackSound.play();
 
 		this.attackSprite.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
-			this.sword.data.set(DataKeys.SwordAttackActive, false);
+			getSpriteOrThrow("sword").data.set(DataKeys.SwordAttackActive, false);
 			this.attackSprite.setVisible(false);
 			player.setVisible(true);
 			this.lastAttackedAt = this.time.now;
@@ -2444,12 +2447,12 @@ export class Game extends Scene {
 			return swordWidth;
 		})();
 
-		this.sword.body.setSize(width, height);
+		getSpriteOrThrow("sword").body.setSize(width, height);
 
 		const [xOffset, yOffset] = this.getSwordOffset();
 		const player = getPlayerOrThrow();
-		this.sword.x = player.body.center.x + xOffset;
-		this.sword.y = player.body.center.y + yOffset;
+		getSpriteOrThrow("sword").x = player.body.center.x + xOffset;
+		getSpriteOrThrow("sword").y = player.body.center.y + yOffset;
 	}
 
 	getPowerOffset() {
@@ -2567,17 +2570,17 @@ export class Game extends Scene {
 	}
 
 	updateSwordHitbox() {
-		this.sword.body.debugShowBody = false;
+		getSpriteOrThrow("sword").body.debugShowBody = false;
 		this.power.body.debugShowBody = false;
-		this.sword.body.debugShowVelocity = false;
+		getSpriteOrThrow("sword").body.debugShowVelocity = false;
 		this.power.body.debugShowVelocity = false;
-		this.sword.setVelocity(0);
+		getSpriteOrThrow("sword").setVelocity(0);
 
 		// We update the sword/power hitbox on every frame even when not in use to
 		// make sure it stays in position relative to the player; otherwise the
 		// hitbox appears briefly at its old location.
 		if (!this.isPlayerSwordActive() && !this.isPlayerUsingPower()) {
-			this.sword.setVisible(false);
+			getSpriteOrThrow("sword").setVisible(false);
 			this.power.setVisible(false);
 			this.updateSwordHitboxForAttack();
 			this.updatePowerHitboxPosition();
@@ -2585,8 +2588,8 @@ export class Game extends Scene {
 		}
 
 		if (this.isPlayerSwordActive()) {
-			this.sword.body.debugShowBody = true;
-			this.sword.body.debugShowVelocity = true;
+			getSpriteOrThrow("sword").body.debugShowBody = true;
+			getSpriteOrThrow("sword").body.debugShowVelocity = true;
 			return;
 		}
 		if (this.isPlayerUsingPower()) {
@@ -2886,20 +2889,21 @@ export class Game extends Scene {
 		player.setDataEnabled();
 		player.setDebugBodyColor(0x00ff00);
 		player.setDepth(1);
+		SpriteComponent.set("player", player);
 
 		this.restorePlayerHitPoints();
 
-		this.sword = this.physics.add.sprite(player.x, player.y, "wind-power", 4);
-		this.sword.setDataEnabled();
-		this.sword.setDebugBodyColor(0x00fff0);
-		this.sword.setDepth(4);
-		this.sword.setPushable(false);
+		const sword = this.physics.add.sprite(player.x, player.y, "wind-power", 4);
+		sword.setDataEnabled();
+		sword.setDebugBodyColor(0x00fff0);
+		sword.setDepth(4);
+		sword.setPushable(false);
+		SpriteComponent.set("sword", sword);
 
 		this.power = this.physics.add.sprite(player.x, player.y, "wind-power", 4);
 		this.power.setDebugBodyColor(0x00fff0);
 		this.power.setDepth(4);
 
-		SpriteComponent.set("player", player);
 		this.updateSwordHitbox();
 
 		player.setCollideWorldBounds(true);

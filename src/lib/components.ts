@@ -4,9 +4,15 @@ export const SpriteComponent = new Map<
 >();
 
 export function getPlayerOrThrow(): Phaser.Types.Physics.Arcade.SpriteWithDynamicBody {
-	const player = SpriteComponent.get("player");
-	if (!player) {
-		throw new Error("No player found");
+	return getSpriteOrThrow("player");
+}
+
+export function getSpriteOrThrow(
+	entity: string
+): Phaser.Types.Physics.Arcade.SpriteWithDynamicBody {
+	const sprite = SpriteComponent.get(entity);
+	if (!sprite) {
+		throw new Error(`No sprite found for entity ${entity}`);
 	}
-	return player;
+	return sprite;
 }

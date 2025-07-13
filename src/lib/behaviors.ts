@@ -24,7 +24,11 @@ import { TeleportSystem } from "./TeleportSystem";
 import { Behavior, BehaviorCompleteCallback } from "./Behavior";
 import { MainEvents } from "./MainEvents";
 import { MountainMonster } from "../monsters/MountainMonster";
-import { SpriteComponent, getPlayerOrThrow } from "../lib/components";
+import {
+	SpriteComponent,
+	getPlayerOrThrow,
+	getSpriteOrThrow,
+} from "../lib/components";
 
 export class WaitForActive implements Behavior {
 	#distanceToActivate: number = 100;
@@ -1520,15 +1524,13 @@ export class SeekingVine implements Behavior {
 
 	init(
 		sprite: Phaser.GameObjects.Sprite,
-		goToNextState: BehaviorCompleteCallback,
-		enemyManager: EnemyManager
+		goToNextState: BehaviorCompleteCallback
 	): void {
 		if (!sprite.body || !isDynamicSprite(sprite)) {
 			throw new Error("Could not update monster");
 		}
 		this.#effect = new Seeker(
 			sprite.scene,
-			enemyManager,
 			sprite.body.center.x,
 			sprite.body.center.y,
 			"green-ball",
@@ -2788,12 +2790,10 @@ function getWalkingDirectionLeftRight(
 
 class Seeker extends Phaser.Physics.Arcade.Sprite {
 	#speed = 50;
-	#enemyManager: EnemyManager;
 	#beingDestroyed = false;
 
 	constructor(
 		scene: Phaser.Scene,
-		enemyManager: EnemyManager,
 		x: number,
 		y: number,
 		texture: string,
@@ -2802,7 +2802,6 @@ class Seeker extends Phaser.Physics.Arcade.Sprite {
 	) {
 		super(scene, x, y, texture, initialFrame);
 		this.#speed = speed;
-		this.#enemyManager = enemyManager;
 		this.init();
 		this.addToDisplayList();
 		this.addToUpdateList();
@@ -2843,8 +2842,9 @@ class Seeker extends Phaser.Physics.Arcade.Sprite {
 			this.destroy();
 		});
 
-		this.scene.physics.add.overlap(this.#enemyManager.sword, this, () => {
-			if (!this.#enemyManager.sword.data.get(DataKeys.SwordAttackActive)) {
+		const sword = getSpriteOrThrow("sword");
+		this.scene.physics.add.overlap(sword, this, () => {
+			if (!sword.data.get(DataKeys.SwordAttackActive)) {
 				return;
 			}
 			this.body.stop();
