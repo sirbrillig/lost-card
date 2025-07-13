@@ -29,6 +29,7 @@ export class WaitForActive implements Behavior {
 	#distanceToActivate: number = 100;
 	#waitAnimationKey: string | undefined = undefined;
 	#maxWaitTime: number | undefined;
+	#hasEnded: boolean = false;
 	name: string;
 
 	constructor(
@@ -69,7 +70,10 @@ export class WaitForActive implements Behavior {
 				delay: this.#maxWaitTime,
 				callback: () => {
 					sprite?.anims?.stop();
-
+					if (this.#hasEnded) {
+						return;
+					}
+					this.#hasEnded = true;
 					goToNextState();
 				},
 			});
@@ -92,6 +96,7 @@ export class WaitForActive implements Behavior {
 			enemyManager.player.body.center
 		);
 		if (distance < this.#distanceToActivate) {
+			this.#hasEnded = true;
 			goToNextState();
 		}
 	}
