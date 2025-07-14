@@ -10,6 +10,16 @@ export const ActiveRoomComponent = new Map<
 	Phaser.Types.Tilemaps.TiledObject
 >();
 
+export const ItemComponent = new Map<
+	string,
+	Phaser.Types.Physics.Arcade.SpriteWithDynamicBody
+>();
+
+/**********************
+ * Helpers ************
+ **********************
+ */
+
 export function getPlayerOrThrow(): Phaser.Types.Physics.Arcade.SpriteWithDynamicBody {
 	return getSpriteOrThrow("player");
 }

@@ -71,6 +71,7 @@ import { MonsterCreator } from "../lib/MonsterCreator";
 import {
 	SpriteComponent,
 	MapComponent,
+	ItemComponent,
 	getMap,
 	setActiveRoom,
 	getActiveRoom,
@@ -143,7 +144,6 @@ export class Game extends Scene {
 	createdDoors: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody[] = [];
 	createdSavePoints: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody[] = [];
 	createdTiles: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody[] = [];
-	createdItems: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody[] = [];
 	spawnPoints: Phaser.Types.Tilemaps.TiledObject[] = [];
 
 	constructor() {
@@ -549,8 +549,8 @@ export class Game extends Scene {
 			this.stuffLayer,
 			this.hiddenRoomLayer,
 			...this.createdDoors,
-			...this.createdItems,
 			...this.createdTiles,
+			...ItemComponent.values(),
 			...this.enemyManager.enemies.getChildren().filter(isSprite),
 		];
 	}
@@ -1020,7 +1020,7 @@ export class Game extends Scene {
 				getMap(),
 				this.enemyManager.enemies,
 				[
-					...this.createdItems,
+					...ItemComponent.values(),
 					...this.createdTiles,
 					...this.createdDoors,
 					...this.createdFinalDoors,
@@ -1172,10 +1172,12 @@ export class Game extends Scene {
 	}
 
 	createItems() {
-		this.createdItems = createSpritesFromObjectLayer(getMap(), "Items", {
+		createSpritesFromObjectLayer(getMap(), "Items", {
 			filterCallback: this.shouldCreateLayerObject.bind(this),
 			callback: this.recordObjectIdOnSprite.bind(this),
 			getTilesetKeyByName: this.getTilesetKeyByName.bind(this),
+		}).forEach((item) => {
+			ItemComponent.set(item.data.get(DataKeys.ItemObjectId), item);
 		});
 	}
 
@@ -1251,7 +1253,7 @@ export class Game extends Scene {
 			getMap(),
 			this.enemyManager.enemies,
 			[
-				...this.createdItems,
+				...ItemComponent.values(),
 				...this.createdTiles,
 				...this.createdDoors,
 				...this.createdFinalDoors,
@@ -1970,7 +1972,7 @@ export class Game extends Scene {
 				getMap(),
 				this.enemyManager.enemies,
 				[
-					...this.createdItems,
+					...ItemComponent.values(),
 					...this.createdTiles,
 					...this.createdDoors,
 					...this.createdFinalDoors,
@@ -1983,7 +1985,7 @@ export class Game extends Scene {
 	}
 
 	hideHiddenItems() {
-		this.createdItems.forEach((item) => {
+		ItemComponent.forEach((item) => {
 			if (item.data.get("hidden")) {
 				// If the item has been previous revealed, do not hide it.
 				const itemId: number | undefined = item.data.get(DataKeys.ItemObjectId);
@@ -1999,7 +2001,7 @@ export class Game extends Scene {
 
 	getAllHiddenItemsInRoom(): Phaser.Types.Physics.Arcade.SpriteWithDynamicBody[] {
 		const activeRoom = getActiveRoom();
-		return this.createdItems.filter((item) => {
+		return Array.from(ItemComponent.values()).filter((item) => {
 			if (!activeRoom) {
 				return false;
 			}
@@ -2076,7 +2078,10 @@ export class Game extends Scene {
 
 	maybePickUpItem() {
 		const player = getPlayerOrThrow();
-		const touchingItem = getItemTouchingPlayer(this.createdItems, player);
+		const touchingItem = getItemTouchingPlayer(
+			Array.from(ItemComponent.values()),
+			player
+		);
 		if (touchingItem && touchingItem.active) {
 			switch (touchingItem.name) {
 				case "Sword":
@@ -2170,9 +2175,7 @@ export class Game extends Scene {
 	}
 
 	removeItem(itemToRemove: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody) {
-		this.createdItems = this.createdItems.filter(
-			(item) => item !== itemToRemove
-		);
+		ItemComponent.delete(itemToRemove.data.get(DataKeys.ItemObjectId));
 		const itemsRemoved =
 			getDataFromRegistry(this.registry, "itemsRemoved") ?? [];
 		const itemObject = this.findItemObjectMatchingCreatedItem(itemToRemove);
