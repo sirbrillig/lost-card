@@ -1172,6 +1172,7 @@ export class Game extends Scene {
 	}
 
 	createItems() {
+		ItemComponent.clear();
 		createSpritesFromObjectLayer(getMap(), "Items", {
 			filterCallback: this.shouldCreateLayerObject.bind(this),
 			callback: this.recordObjectIdOnSprite.bind(this),
