@@ -4025,11 +4025,7 @@ export class Game extends Scene {
 
 		savePlayerPositionToRegistry(
 			this.registry,
-			getSavedDataPlayerPosition(
-				getMap(),
-				player.body.center.x,
-				player.body.center.y
-			)
+			getSavedDataPlayerPosition(getMap(), player.x, player.y)
 		);
 
 		this.updateSwordHitbox();

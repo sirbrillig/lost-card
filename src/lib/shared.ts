@@ -984,12 +984,16 @@ export function getPlayerCoordinates(
 	saveData: SaveDataPlayerPosition,
 	map: Phaser.Tilemaps.Tilemap
 ): { x: number; y: number } | undefined {
+	if (
+		!saveData.playerRoomX ||
+		!saveData.playerRoomY ||
+		!saveData.playerActiveRoom
+	) {
+		return undefined;
+	}
 	const playerRoomX = saveData.playerRoomX;
 	const playerRoomY = saveData.playerRoomY;
 	const roomName = saveData.playerActiveRoom;
-	if (!playerRoomX || !playerRoomY || !roomName) {
-		return undefined;
-	}
 	const matchingRoom = getRooms(map).find((room) => room.name === roomName);
 	if (!matchingRoom?.x || !matchingRoom.y) {
 		return undefined;
