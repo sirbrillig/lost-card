@@ -110,7 +110,7 @@ export class Preloader extends Scene {
 			frameHeight: 32,
 		});
 		this.load.spritesheet("plant-power", "Vine3.png", {
-			frameWidth: 16,
+			frameWidth: 8,
 			frameHeight: 10,
 		});
 		this.load.spritesheet("cloud-power", "cloud_power.png", {

@@ -92,6 +92,7 @@ export class Game extends Scene {
 	enemyCollider: Phaser.Physics.Arcade.Collider;
 	maskGraphics: Phaser.GameObjects.Graphics;
 	mask: Phaser.Display.Masks.GeometryMask;
+	plantCardSegments: Phaser.GameObjects.Image[] = [];
 
 	backgroundMusic: Sound | undefined;
 	attackSound: Sound;
@@ -428,8 +429,7 @@ export class Game extends Scene {
 				if (enemy.data.get("isPlantCardGrappleActive")) {
 					enemy?.emit(Events.MonsterStun, false);
 					enemy.data.set("isPlantCardGrappleActive", false);
-					this.power.anims.stop();
-					this.power.visible = false;
+					this.#endPowerUse();
 					return;
 				}
 				this.enemyHitPlayer();
@@ -1540,12 +1540,18 @@ export class Game extends Scene {
 
 	update() {
 		this.checkForGameOver();
+
+		const player = getPlayerOrThrow();
+		if (this.isPlayerUsingPower() && this.getActivePower() === "PlantCard") {
+			this.#drawPlantCardLine(
+				new Phaser.Math.Vector2(this.power.x, this.power.y)
+			);
+		}
 		this.enemyManager.enemies.getChildren().forEach((enemy) => {
 			if (!isDynamicSprite(enemy)) {
 				return;
 			}
 			if (enemy.data.get("isPlantCardGrappleActive")) {
-				const player = getPlayerOrThrow();
 				const distance = Phaser.Math.Distance.BetweenPoints(
 					enemy.body.center,
 					player.body.center
@@ -1553,8 +1559,7 @@ export class Game extends Scene {
 				if (distance < 30) {
 					enemy.emit(Events.MonsterStun, false);
 					enemy.data.set("isPlantCardGrappleActive", false);
-					this.power.anims.stop();
-					this.power.visible = false;
+					this.#endPowerUse();
 				}
 			}
 
@@ -1633,10 +1638,10 @@ export class Game extends Scene {
 		player.data.set("isPlantCardGrappleActive", true);
 		this.power.anims.pause();
 		this.power.body.stop();
-		this.movePlayerTowardTileWithPlantCard(tile.body.center);
+		this.#movePlayerTowardTileWithPlantCard(tile.body.center);
 	}
 
-	movePlayerTowardTileWithPlantCard(tile: { x: number; y: number }): void {
+	#movePlayerTowardTileWithPlantCard(tile: { x: number; y: number }): void {
 		const player = getPlayerOrThrow();
 		const lastSafePosition = new Phaser.Math.Vector2(player.x, player.y);
 		const velocity = createVelocityForDirection(
@@ -1649,12 +1654,13 @@ export class Game extends Scene {
 			player.body.center
 		);
 		let isMoving = true;
-		const stopEvent = this.time.addEvent({
+		this.time.addEvent({
 			delay: 50,
 			callback: () => {
 				if (!isMoving) {
 					return;
 				}
+				this.#drawPlantCardLine(new Phaser.Math.Vector2(tile.x, tile.y));
 				const distance = Phaser.Math.Distance.BetweenPoints(
 					tile,
 					player.body.center
@@ -1666,10 +1672,8 @@ export class Game extends Scene {
 				) {
 					player.body.stop();
 					player.data.set("isPlantCardGrappleActive", false);
-					this.power.anims.stop();
-					this.power.visible = false;
-					stopEvent?.destroy();
 					isMoving = false;
+					this.#endPowerUse();
 
 					// If the player ends up inside a wall, hurt them and expel them.
 					if (isSpriteInsideSolidTile(player, this.landLayer)) {
@@ -3547,41 +3551,93 @@ export class Game extends Scene {
 			delay: config.spiritPowerTime,
 			callback: () => {
 				endAnimation.stop();
-				this.power.anims.stop();
-				this.power.anims.complete();
 				this.sound.stopByKey("spirit");
-				this.power.setAlpha(1);
+				this.#endPowerUse();
 			},
 		});
 	}
 
-	makePlantCardTrail(rad: number, flip: boolean): void {
-		const trailImages: Phaser.GameObjects.Image[] = [];
-		const addTrail = () => {
-			const trailImage = this.add.image(
-				this.power.x,
-				this.power.y,
-				"plant-power"
-			);
-			trailImage.setRotation(rad);
-			trailImages.push(trailImage);
-			this.power.setFlipX(flip);
-		};
-		addTrail();
-		const trailCreator = this.time.addEvent({
-			delay: config.plantCardTrailAddDelay,
-			callback: () => {
-				addTrail();
-			},
-			loop: true,
+	#endPowerUse(): void {
+		this.power.anims.stop();
+		this.power.anims.complete();
+		this.power.setAlpha(1);
+		this.power.setVisible(false);
+		this.power.setVelocity(0);
+		this.power.setFlipX(false);
+		this.#clearPlantCardLine();
+	}
+
+	#clearPlantCardLine(): void {
+		this.plantCardSegments.forEach((segment) => {
+			segment.destroy();
 		});
-		this.time.addEvent({
-			delay: config.plantCardTrailTime,
-			callback: () => {
-				trailCreator.destroy();
-				trailImages.map((image) => image.destroy());
-			},
-		});
+		this.plantCardSegments = [];
+	}
+
+	#drawPlantCardLine(target: Phaser.Math.Vector2): void {
+		// Make the sprite that marks the end of the line invisible. We only want
+		// to see the line itself.
+		this.power.setAlpha(0);
+
+		// Remove the last line.
+		this.#clearPlantCardLine();
+
+		// Draw the line of sprites between the current position of the end of the
+		// line and the player.
+		const player = getPlayerOrThrow();
+		const xOffset = (() => {
+			switch (this.playerDirection) {
+				case SpriteLeft:
+					return -player.width / 2;
+				case SpriteRight:
+					return player.width / 2;
+				default:
+					return 0;
+			}
+		})();
+		const yOffset = (() => {
+			switch (this.playerDirection) {
+				case SpriteUp:
+					return -player.height / 2;
+				case SpriteDown:
+					return player.height / 2;
+				default:
+					return 0;
+			}
+		})();
+		const start = new Phaser.Math.Vector2(
+			player.body.center.x + xOffset,
+			player.body.center.y + yOffset
+		);
+		const vineLength = Phaser.Math.Distance.Between(
+			start.x,
+			start.y,
+			target.x,
+			target.y
+		);
+		const segmentSize = 8;
+		const numSegments = Math.floor(vineLength / segmentSize);
+		const deltaX = Math.abs(target.x - start.x);
+		const deltaY = Math.abs(target.y - start.y);
+		const vineDirection = deltaX > deltaY ? "horizontal" : "vertical";
+
+		for (let i = 0; i < numSegments; i++) {
+			let segmentX, segmentY;
+
+			if (vineDirection === "horizontal") {
+				segmentX = start.x + i * segmentSize * (target.x > start.x ? 1 : -1);
+				segmentY = start.y;
+			} else {
+				segmentX = start.x;
+				segmentY = start.y + i * segmentSize * (target.y > start.y ? 1 : -1);
+			}
+
+			const segment = this.add.image(segmentX, segmentY, "plant-power");
+			if (vineDirection === "vertical") {
+				segment.setRotation(Phaser.Math.DegToRad(90));
+			}
+			this.plantCardSegments.push(segment);
+		}
 	}
 
 	playPowerAnimation(): void {
@@ -3595,9 +3651,11 @@ export class Game extends Scene {
 				switch (this.getActivePower()) {
 					case "PlantCard":
 						this.power.setRotation(Phaser.Math.DegToRad(90));
-						this.makePlantCardTrail(Phaser.Math.DegToRad(90), true);
 						this.power.setVelocity(0, -config.plantCardVelocity);
 						this.power.anims.play("plant-power-right", true);
+						this.power.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
+							this.#endPowerUse();
+						});
 						this.power.setFlipX(true);
 						break;
 					case "CloudCard":
@@ -3630,9 +3688,11 @@ export class Game extends Scene {
 				this.power.setRotation(Phaser.Math.DegToRad(0));
 				switch (this.getActivePower()) {
 					case "PlantCard":
-						this.makePlantCardTrail(Phaser.Math.DegToRad(0), false);
 						this.power.setVelocity(config.plantCardVelocity, 0);
 						this.power.anims.play("plant-power-right", true);
+						this.power.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
+							this.#endPowerUse();
+						});
 						break;
 					case "CloudCard":
 						this.power.anims.play("cloud-power", true);
@@ -3660,9 +3720,11 @@ export class Game extends Scene {
 				switch (this.getActivePower()) {
 					case "PlantCard":
 						this.power.setRotation(Phaser.Math.DegToRad(90));
-						this.makePlantCardTrail(Phaser.Math.DegToRad(90), false);
 						this.power.setVelocity(0, config.plantCardVelocity);
 						this.power.anims.play("plant-power-right", true);
+						this.power.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
+							this.#endPowerUse();
+						});
 						break;
 					case "CloudCard":
 						this.power.anims.play("cloud-power", true);
@@ -3692,10 +3754,12 @@ export class Game extends Scene {
 				this.power.setRotation(Phaser.Math.DegToRad(0));
 				switch (this.getActivePower()) {
 					case "PlantCard":
-						this.makePlantCardTrail(Phaser.Math.DegToRad(0), true);
 						this.power.setVelocity(-config.plantCardVelocity, 0);
 						this.power.anims.play("plant-power-right", true);
 						this.power.setFlipX(true);
+						this.power.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
+							this.#endPowerUse();
+						});
 						break;
 					case "CloudCard":
 						this.power.anims.play("cloud-power", true);

@@ -28,8 +28,6 @@ export const config = {
 	iceCardFrozenTime: 3000,
 	iceMeltTime: 4000,
 	plantCardVelocity: 160,
-	plantCardTrailAddDelay: 90,
-	plantCardTrailTime: 500,
 	plantCardAnimationRepeat: 5,
 	firePowerVelocity: 120,
 	gateCloseSpeed: 340,
