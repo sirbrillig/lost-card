@@ -2520,6 +2520,9 @@ export class Game extends Scene {
 			if (this.getActivePower() === "FireCard") {
 				return 12;
 			}
+			if (this.getActivePower() === "PlantCard") {
+				return 2;
+			}
 			if (
 				this.playerDirection === SpriteLeft ||
 				this.playerDirection === SpriteRight
@@ -2534,6 +2537,9 @@ export class Game extends Scene {
 			}
 			if (this.getActivePower() === "FireCard") {
 				return 12;
+			}
+			if (this.getActivePower() === "PlantCard") {
+				return 2;
 			}
 			if (
 				this.playerDirection === SpriteUp ||
