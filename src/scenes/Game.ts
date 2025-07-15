@@ -1442,9 +1442,9 @@ export class Game extends Scene {
 			return;
 		}
 
-		const player = getPlayerOrThrow();
-		player.body.stop();
 		if (door.data.get(DataKeys.LockedDoor)) {
+			const player = getPlayerOrThrow();
+			player.body.stop();
 			return;
 		}
 		const destinationTile = getMap().findObject(
