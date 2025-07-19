@@ -2291,7 +2291,7 @@ export class Game extends Scene {
 		// Face right
 		this.setPlayerDirection(SpriteRight);
 		this.setPlayerIdleFrame();
-		this.updatePowerHitboxPosition();
+		this.#updatePowerHitbox();
 		this.power.setRotation(Phaser.Math.DegToRad(0));
 
 		// Play power animation
@@ -2537,7 +2537,7 @@ export class Game extends Scene {
 		return [xOffset, yOffset];
 	}
 
-	updatePowerHitboxPosition() {
+	#updatePowerHitbox() {
 		if (
 			this.isPlayerUsingPower() &&
 			!["SpiritCard"].includes(this.getActivePower() as string)
@@ -2551,7 +2551,7 @@ export class Game extends Scene {
 				return 12;
 			}
 			if (this.getActivePower() === "FireCard") {
-				return 12;
+				return config.firePowerHitBoxWidth;
 			}
 			if (this.getActivePower() === "PlantCard") {
 				return 2;
@@ -2569,7 +2569,7 @@ export class Game extends Scene {
 				return 12;
 			}
 			if (this.getActivePower() === "FireCard") {
-				return 12;
+				return config.firePowerHitBoxHeight;
 			}
 			if (this.getActivePower() === "PlantCard") {
 				return 2;
@@ -2632,7 +2632,7 @@ export class Game extends Scene {
 			sword.setVisible(false);
 			this.power.setVisible(false);
 			this.updateSwordHitboxForAttack();
-			this.updatePowerHitboxPosition();
+			this.#updatePowerHitbox();
 			return;
 		}
 
@@ -4168,7 +4168,7 @@ export class Game extends Scene {
 		);
 
 		this.updateSwordHitbox();
-		this.updatePowerHitboxPosition();
+		this.#updatePowerHitbox();
 		this.updatePlayerMovement();
 		this.updateHealEffectPosition();
 		this.updateHeartCard();

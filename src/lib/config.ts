@@ -58,6 +58,8 @@ export const config = {
 	playerHitBoxHeight: 10,
 	playerHitBoxOffsetX: 0,
 	playerHitBoxOffsetY: 5, // Move hitbox closer to feet
+	firePowerHitBoxWidth: 8,
+	firePowerHitBoxHeight: 8,
 	playerOriginX: 0.5,
 	playerOriginY: 0.5,
 	powerOffsetX: 10,
