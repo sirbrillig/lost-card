@@ -66,6 +66,7 @@ import {
 	getDoorsInRoom,
 	areMonstersInRoom,
 	LockableDoorSpriteIndices,
+	doesTileBlockFire,
 } from "../lib/shared";
 import { MonsterCreator } from "../lib/MonsterCreator";
 import {
@@ -73,6 +74,8 @@ import {
 	SpriteComponent,
 	MapComponent,
 	ItemComponent,
+	DashingComponent,
+	PowerInUse,
 	getMap,
 	setActiveRoom,
 	getActiveRoom,
@@ -218,8 +221,16 @@ export class Game extends Scene {
 			}
 		);
 
-		this.landLayer = this.createTileLayer("Background", tilesetTile, 0);
-		this.hiddenRoomLayer = this.createTileLayer("HiddenRooms", tilesetTile, 0);
+		this.landLayer = this.createTileLayer(
+			"Background",
+			tilesetTile,
+			config.backgroundDepth
+		);
+		this.hiddenRoomLayer = this.createTileLayer(
+			"HiddenRooms",
+			tilesetTile,
+			config.backgroundDepth
+		);
 
 		// Handle tiles that hurt the player
 		this.physics.add.collider(
@@ -325,8 +336,17 @@ export class Game extends Scene {
 				return enemy.doesCollideWithTile(tile);
 			}
 		);
-		this.aboveLayer = this.createTileLayer("Above", tilesetTile, 10);
-		this.stuffLayer = this.createTileLayer("Stuff", tilesetTile, 0);
+		this.aboveLayer = this.createTileLayer(
+			"Above",
+			tilesetTile,
+			config.aboveLayerDepth
+		);
+
+		this.stuffLayer = this.createTileLayer(
+			"Stuff",
+			tilesetTile,
+			config.backgroundDepth
+		);
 		this.physics.add.collider(this.stuffLayer, player, undefined, () => {
 			if (this.isPlayerUsingPower() && this.getActivePower() === "SpiritCard") {
 				return false;
@@ -472,6 +492,7 @@ export class Game extends Scene {
 				return sword.data.get(DataKeys.SwordAttackActive);
 			}
 		);
+
 		this.physics.add.overlap(
 			this.power,
 			this.enemyManager.enemies,
@@ -482,23 +503,21 @@ export class Game extends Scene {
 				this.playerHitEnemy(enemy);
 			}
 		);
+
 		this.physics.add.overlap(this.power, this.hiddenRoomLayer, (_, tile) => {
-			if (!isTilemapTile(tile)) {
-				return;
+			if (isTilemapTile(tile)) {
+				this.#handlePowerCollideTile(tile);
 			}
-			if (!this.isPlayerUsingPower() || this.getActivePower() !== "IceCard") {
-				return;
-			}
-			this.freezeWaterTile(tile);
 		});
 		this.physics.add.overlap(this.power, this.landLayer, (_, tile) => {
-			if (!isTilemapTile(tile)) {
-				return;
+			if (isTilemapTile(tile)) {
+				this.#handlePowerCollideTile(tile);
 			}
-			if (!this.isPlayerUsingPower() || this.getActivePower() !== "IceCard") {
-				return;
+		});
+		this.physics.add.overlap(this.power, this.stuffLayer, (_, tile) => {
+			if (isTilemapTile(tile)) {
+				this.#handlePowerCollideTile(tile);
 			}
-			this.freezeWaterTile(tile);
 		});
 
 		this.createInputs();
@@ -526,9 +545,28 @@ export class Game extends Scene {
 		this.recordSecretRoomsTotal();
 	}
 
+	#handlePowerCollideTile(
+		tile:
+			| Phaser.Tilemaps.Tile
+			| Phaser.Types.Physics.Arcade.SpriteWithDynamicBody
+	): void {
+		if (
+			isTilemapTile(tile) &&
+			this.isPlayerUsingPower() &&
+			this.getActivePower() === "IceCard"
+		) {
+			this.freezeWaterTile(tile);
+		}
+		if (this.isPlayerUsingPower() && this.getActivePower() === "FireCard") {
+			if (doesTileBlockFire(tile)) {
+				this.#endPowerUse();
+			}
+		}
+	}
+
 	setUpVisibilityMask() {
 		this.maskGraphics = this.add.graphics();
-		this.maskGraphics.setDepth(-1);
+		this.maskGraphics.setDepth(config.maskDepth);
 		this.mask = this.maskGraphics.createGeometryMask();
 	}
 
@@ -605,7 +643,7 @@ export class Game extends Scene {
 			3
 		);
 		this.statusIcon = statusIcon;
-		this.statusIcon.setDepth(5);
+		this.statusIcon.setDepth(config.effectDepth);
 		this.updateStatusIcon();
 		this.time.addEvent({
 			repeat: 0,
@@ -961,7 +999,7 @@ export class Game extends Scene {
 			throw new Error("Heal effect is not a sprite");
 		}
 		this.healEffect = healEffect;
-		this.healEffect.setDepth(5);
+		this.healEffect.setDepth(config.effectDepth);
 		this.healEffect.setAlpha(0.5);
 		this.healEffect.setScale(0.2);
 
@@ -1078,11 +1116,16 @@ export class Game extends Scene {
 	}
 
 	activatePower() {
+		const activePower = this.getActivePower();
+		if (!activePower) {
+			return;
+		}
 		const player = getPlayerOrThrow();
 		player.body.setVelocity(0);
 		player.anims.stop();
 		this.setPlayerIdleFrame();
 		this.updateSwordHitbox();
+		PowerInUse.set(activePower, true);
 		this.playPowerAnimation();
 		this.playPowerSound();
 	}
@@ -1719,22 +1762,15 @@ export class Game extends Scene {
 	) {
 		const isAffectedByPower = tile.data.get("affectedByFireCard");
 		if (!isAffectedByPower) {
+			this.#handlePowerCollideTile(tile);
 			return;
 		}
 
-		// The fire card destroys tiles.
 		this.createdTiles = this.createdTiles.filter((x) => x !== tile);
 		tile.destroy();
 
-		this.power.anims.stop();
-		this.power.setVisible(false);
-
-		const effect = this.add.sprite(tile.x, tile.y, "fire-power-right", 0);
-		effect.setDepth(5);
-		effect.anims.play("fire-power-right", true);
-		effect.on(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
-			effect.destroy();
-		});
+		this.#endPowerUse();
+		this.#makeFireExplosion(tile);
 	}
 
 	makeAppearingTileAppear(
@@ -1891,8 +1927,7 @@ export class Game extends Scene {
 				if (player.data.get("isPlantCardGrappleActive")) {
 					// In case we were being pulled by the PlantCard
 					player.data.set("isPlantCardGrappleActive", false);
-					this.power.anims.stop();
-					this.power.visible = false;
+					this.#endPowerUse();
 				}
 
 				if (tile.name.endsWith("Sign")) {
@@ -2038,7 +2073,7 @@ export class Game extends Scene {
 			"character_appear",
 			0
 		);
-		effect.setDepth(5);
+		effect.setDepth(config.effectDepth);
 		effect.anims.play("white_fire_circle", true);
 		effect.anims.chain("appear");
 		this.holyLoopSound.play();
@@ -2454,25 +2489,25 @@ export class Game extends Scene {
 		sword.y = player.body.center.y + yOffset;
 	}
 
-	getPowerOffset() {
+	#getPowerOffset() {
 		if (["SpiritCard", "CloudCard"].includes(this.getActivePower() as string)) {
 			return [0, 0];
 		}
 		const xOffset = (() => {
 			if (this.playerDirection === SpriteLeft) {
-				return -20;
+				return -config.powerOffsetX;
 			}
 			if (this.playerDirection === SpriteRight) {
-				return 20;
+				return config.powerOffsetX;
 			}
 			return 0;
 		})();
 		const yOffset = (() => {
 			if (this.playerDirection === SpriteUp) {
-				return -20;
+				return -config.powerOffsetY;
 			}
 			if (this.playerDirection === SpriteDown) {
-				return 20;
+				return config.powerOffsetY;
 			}
 			return 0;
 		})();
@@ -2550,10 +2585,16 @@ export class Game extends Scene {
 
 		this.power.body.setSize(width, height);
 
-		const [xOffset, yOffset] = this.getPowerOffset();
+		const [xOffset, yOffset] = this.#getPowerOffset();
 		const player = getPlayerOrThrow();
-		this.power.x = player.body.center.x + xOffset;
-		this.power.y = player.body.center.y + yOffset;
+		this.power.setDepth(config.powerDepth);
+		if (this.playerDirection === SpriteUp) {
+			this.power.setDepth(config.powerDepthUp);
+		}
+		this.power.setPosition(
+			player.body.center.x + xOffset,
+			player.body.center.y + yOffset
+		);
 	}
 
 	// This will be true once the player starts their attack flow. However, there
@@ -2942,7 +2983,7 @@ export class Game extends Scene {
 		);
 		player.setDataEnabled();
 		player.setDebugBodyColor(0x00ff00);
-		player.setDepth(1);
+		player.setDepth(config.playerDepth);
 		PhysicsSpriteComponent.set("player", player);
 
 		this.restorePlayerHitPoints();
@@ -2950,7 +2991,7 @@ export class Game extends Scene {
 		const sword = this.physics.add.sprite(player.x, player.y, "wind-power", 4);
 		sword.setDataEnabled();
 		sword.setDebugBodyColor(0x00fff0);
-		sword.setDepth(4);
+		sword.setDepth(config.swordDepth);
 		sword.setPushable(false);
 		PhysicsSpriteComponent.set("sword", sword);
 
@@ -2960,7 +3001,7 @@ export class Game extends Scene {
 			"character",
 			"sword-up-0.png"
 		);
-		attackSprite.setDepth(4);
+		attackSprite.setDepth(config.swordDepth);
 		attackSprite.setVisible(false);
 		SpriteComponent.set("attack", attackSprite);
 
@@ -2970,13 +3011,13 @@ export class Game extends Scene {
 			"character-dash",
 			"Dash Side Sprite No Shadow-0.png"
 		);
-		dashSprite.setDepth(4);
+		dashSprite.setDepth(config.swordDepth);
 		dashSprite.setVisible(false);
 		SpriteComponent.set("dash", dashSprite);
 
 		this.power = this.physics.add.sprite(player.x, player.y, "wind-power", 4);
 		this.power.setDebugBodyColor(0x00fff0);
-		this.power.setDepth(4);
+		this.power.setDepth(config.powerDepth);
 
 		this.updateSwordHitbox();
 
@@ -2997,7 +3038,7 @@ export class Game extends Scene {
 			0
 		);
 		effect.setOrigin(0.5, 0.5);
-		effect.setDepth(5);
+		effect.setDepth(config.effectDepth);
 		effect.anims.play("white_fire_circle", true);
 		effect.anims.chain("appear");
 		this.holyLoopSound.play();
@@ -3122,19 +3163,8 @@ export class Game extends Scene {
 		}
 		if (this.isPlayerUsingPower() && this.getActivePower() === "FireCard") {
 			this.sendHitToEnemy(enemy, 1);
-			this.power.anims.stop();
-			this.power.setVisible(false);
-			const effect = this.add.sprite(
-				enemy.body.center.x,
-				enemy.body.center.y,
-				"fire-power-right",
-				0
-			);
-			effect.setDepth(5);
-			effect.anims.play("fire-power-right", true);
-			effect.on(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
-				effect.destroy();
-			});
+			this.#endFireballAnimation();
+			this.#makeFireExplosion(enemy.body.center);
 		}
 	}
 
@@ -3249,7 +3279,7 @@ export class Game extends Scene {
 			"player-hit",
 			2
 		);
-		effect.setDepth(5);
+		effect.setDepth(config.effectDepth);
 		effect.setAlpha(0.9);
 		effect.anims.play("player-hit", true);
 		effect.on(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
@@ -3544,11 +3574,7 @@ export class Game extends Scene {
 	}
 
 	isPlayerUsingPower(): boolean {
-		return (
-			this.power?.anims?.getName().includes("power") &&
-			this.power.visible === true &&
-			this.power.anims.hasStarted
-		);
+		return PowerInUse.size > 0;
 	}
 
 	getActivePower(): Powers | undefined {
@@ -3604,6 +3630,10 @@ export class Game extends Scene {
 	}
 
 	#endPowerUse(): void {
+		if (PowerInUse.size < 1) {
+			return;
+		}
+		this.#endFireballAnimation();
 		const player = getPlayerOrThrow();
 		player.setVelocity(0, 0);
 		this.power.anims.stop();
@@ -3614,6 +3644,25 @@ export class Game extends Scene {
 		this.power.setFlipX(false);
 		this.#clearPlantCardLine();
 		this.#endDashAnimation();
+		PowerInUse.clear();
+	}
+
+	#makeFireExplosion(target: { x: number; y: number }): void {
+		const effect = this.add.sprite(target.x, target.y, "fire-power-right", 0);
+		effect.setDepth(config.effectDepth);
+		effect.anims.play("fire-power-right", true);
+		effect.on(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
+			effect.destroy();
+		});
+	}
+
+	#endFireballAnimation(): void {
+		if (!PowerInUse.get("FireCard")) {
+			return;
+		}
+		this.power.anims.stop();
+		this.power.setVisible(false);
+		this.#makeFireExplosion(this.power.body.center);
 	}
 
 	#clearPlantCardLine(): void {
@@ -3692,6 +3741,7 @@ export class Game extends Scene {
 	#playDashAnimation(): void {
 		const player = getPlayerOrThrow();
 		const dashSprite = getSpriteOrThrow("dash");
+		DashingComponent.set("player", true);
 		dashSprite.setVisible(true);
 		dashSprite.setPosition(player.body.center.x, player.body.center.y);
 		dashSprite.setFlipX(false);
@@ -3714,6 +3764,9 @@ export class Game extends Scene {
 	}
 
 	#endDashAnimation(): void {
+		if (!DashingComponent.get("player")) {
+			return;
+		}
 		const player = getPlayerOrThrow();
 		const dashSprite = getSpriteOrThrow("dash");
 		switch (this.playerDirection) {
@@ -3734,6 +3787,7 @@ export class Game extends Scene {
 		dashSprite.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
 			dashSprite.setVisible(false);
 			player.setVisible(true);
+			DashingComponent.delete("player");
 		});
 	}
 
@@ -3742,26 +3796,24 @@ export class Game extends Scene {
 		this.power.setVelocity(0);
 		this.power.setFlipX(false);
 		this.power.setAlpha(1);
+		const activePower = this.getActivePower();
+		if (!activePower) {
+			return;
+		}
 		const player = getPlayerOrThrow();
 		switch (this.playerDirection) {
 			case SpriteUp:
-				switch (this.getActivePower()) {
+				switch (activePower) {
 					case "PlantCard":
 						this.power.setRotation(Phaser.Math.DegToRad(90));
 						this.power.setVelocity(0, -config.plantCardVelocity);
 						this.power.anims.play("plant-power-right", true);
-						this.power.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
-							this.#endPowerUse();
-						});
 						this.power.setFlipX(true);
 						break;
 					case "CloudCard":
 						this.power.anims.play("cloud-power", true);
 						player.setVelocity(0, -config.cloudCardSpeed);
 						this.#playDashAnimation();
-						this.power.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
-							this.#endPowerUse();
-						});
 						break;
 					case "SpiritCard":
 						this.playSpiritPowerAnimation();
@@ -3790,17 +3842,11 @@ export class Game extends Scene {
 					case "PlantCard":
 						this.power.setVelocity(config.plantCardVelocity, 0);
 						this.power.anims.play("plant-power-right", true);
-						this.power.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
-							this.#endPowerUse();
-						});
 						break;
 					case "CloudCard":
 						this.power.anims.play("cloud-power", true);
 						player.setVelocity(config.cloudCardSpeed, 0);
 						this.#playDashAnimation();
-						this.power.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
-							this.#endPowerUse();
-						});
 						break;
 					case "SpiritCard":
 						this.playSpiritPowerAnimation();
@@ -3824,17 +3870,11 @@ export class Game extends Scene {
 						this.power.setRotation(Phaser.Math.DegToRad(90));
 						this.power.setVelocity(0, config.plantCardVelocity);
 						this.power.anims.play("plant-power-right", true);
-						this.power.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
-							this.#endPowerUse();
-						});
 						break;
 					case "CloudCard":
 						this.power.anims.play("cloud-power", true);
 						player.setVelocity(0, config.cloudCardSpeed);
 						this.#playDashAnimation();
-						this.power.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
-							this.#endPowerUse();
-						});
 						break;
 					case "SpiritCard":
 						this.playSpiritPowerAnimation();
@@ -3862,17 +3902,11 @@ export class Game extends Scene {
 						this.power.setVelocity(-config.plantCardVelocity, 0);
 						this.power.anims.play("plant-power-right", true);
 						this.power.setFlipX(true);
-						this.power.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
-							this.#endPowerUse();
-						});
 						break;
 					case "CloudCard":
 						this.power.anims.play("cloud-power", true);
 						player.setVelocity(-config.cloudCardSpeed, 0);
 						this.#playDashAnimation();
-						this.power.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
-							this.#endPowerUse();
-						});
 						break;
 					case "SpiritCard":
 						this.playSpiritPowerAnimation();
@@ -3894,6 +3928,9 @@ export class Game extends Scene {
 				}
 				break;
 		}
+		this.power.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
+			this.#endPowerUse();
+		});
 	}
 
 	canPlayerMove(): boolean {

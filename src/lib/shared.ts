@@ -1400,3 +1400,28 @@ export function areMonstersInRoom(
 		).length > 0
 	);
 }
+
+export const tilePropertiesThatDoNotBlockFire = [
+	"isHole",
+	"isLava",
+	"isWater",
+	"isSpikes",
+	"isSlime",
+	"isSky",
+];
+
+export function doesTileBlockFire(
+	tile: Phaser.Tilemaps.Tile | Phaser.Types.Physics.Arcade.SpriteWithDynamicBody
+): boolean {
+	let properties = isTileWithPropertiesObject(tile) ? tile.properties : {};
+	if (isDynamicSprite(tile)) {
+		properties = tile.data.values;
+	}
+	if (!properties.collides) {
+		return false;
+	}
+	if (tilePropertiesThatDoNotBlockFire.some((prop) => properties[prop])) {
+		return false;
+	}
+	return true;
+}

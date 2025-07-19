@@ -17,6 +17,10 @@ export const ItemComponent = new Map<
 	Phaser.Types.Physics.Arcade.SpriteWithDynamicBody
 >();
 
+export const DashingComponent = new Map<string, boolean>();
+
+export const PowerInUse = new Map<string, boolean>();
+
 /**********************
  * Helpers ************
  **********************

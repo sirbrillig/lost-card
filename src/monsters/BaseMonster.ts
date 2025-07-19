@@ -54,7 +54,7 @@ export class BaseMonster extends Phaser.Physics.Arcade.Sprite {
 			frameRate: 20,
 		});
 
-		this.setDepth(1);
+		this.setDepth(config.playerDepth);
 		this.setSize(this.width * 0.35, this.height * 0.35);
 		this.setOffset(this.body.offset.x, this.body.offset.y + 9);
 		this.setCollideWorldBounds(true);
@@ -234,7 +234,7 @@ export class BaseMonster extends Phaser.Physics.Arcade.Sprite {
 			"player-hit",
 			2
 		);
-		effect.setDepth(5);
+		effect.setDepth(config.effectDepth);
 		effect.setAlpha(0.9);
 		effect.anims.play("player-hit", true);
 		effect.on(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
@@ -388,7 +388,7 @@ export class BaseMonster extends Phaser.Physics.Arcade.Sprite {
 			"explode",
 			0
 		);
-		effect.setDepth(5);
+		effect.setDepth(config.effectDepth);
 		effect.setScale(3);
 		effect.setTintFill();
 		effect.anims.play("explode");
@@ -428,7 +428,7 @@ export class BaseMonster extends Phaser.Physics.Arcade.Sprite {
 		circleGraphics.postFX.addGlow(this.primaryColor);
 		circleGraphics.lineStyle(circleThickness, this.primaryColor);
 		circleGraphics.strokeCircleShape(circle);
-		circleGraphics.setDepth(5);
+		circleGraphics.setDepth(config.effectDepth);
 		this.scene.tweens.addCounter({
 			from: 10,
 			to: 300,
@@ -461,7 +461,7 @@ export class BaseMonster extends Phaser.Physics.Arcade.Sprite {
 			"explode",
 			0
 		);
-		effect.setDepth(5);
+		effect.setDepth(config.effectDepth);
 		effect.setTint(this.primaryColor);
 		effect.anims.play("explode");
 		this.playDestroySound();

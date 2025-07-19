@@ -46,7 +46,7 @@ class Aura {
 				texture,
 				frame
 			)
-			.setDepth(6)
+			.setDepth(config.mapIconDepth)
 			.setOrigin(1);
 		this.image = image;
 		this.name = name;
@@ -105,7 +105,7 @@ export class GameMap extends Scene {
 				`Press ${getButtonNames(this).map} to resume`,
 				12
 			)
-			.setDepth(9)
+			.setDepth(config.mapDepth)
 			.setMaxWidth(this.cameras.main.width - itemSize / 2)
 			.setOrigin(0);
 	}
@@ -141,7 +141,7 @@ export class GameMap extends Scene {
 				`Select up to ${config.maxActiveAuras} aura cards to be active`,
 				12
 			)
-			.setDepth(9)
+			.setDepth(config.mapDepth)
 			.setMaxWidth(this.cameras.main.width - itemSize / 2)
 			.setOrigin(0);
 		this.selectedAura = 0;
@@ -183,7 +183,7 @@ export class GameMap extends Scene {
 				getAuraDescription(activeAura as Auras),
 				12
 			)
-			.setDepth(9)
+			.setDepth(config.mapDepth)
 			.setMaxWidth((this.cameras.main.width / 8) * 3)
 			.setOrigin(0);
 	}
@@ -272,7 +272,7 @@ export class GameMap extends Scene {
 					room.height * mapScale,
 					roomBackgroundColor
 				)
-				.setDepth(9)
+				.setDepth(config.mapDepth)
 				.setOrigin(0)
 				.setStrokeStyle(1, roomBorderColor);
 		});
@@ -321,7 +321,7 @@ export class GameMap extends Scene {
 			.sprite(playerPositionOnMap.x, playerPositionOnMap.y, "icons2", 5)
 			.setOrigin(0.5)
 			.setScale(0.8)
-			.setDepth(10);
+			.setDepth(config.mapPlayerIconDepth);
 
 		this.tweens.add({
 			targets: playerMarker,

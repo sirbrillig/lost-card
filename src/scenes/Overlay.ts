@@ -1,4 +1,5 @@
 import { Scene } from "phaser";
+import { config } from "../lib/config";
 import { MainEvents } from "../lib/MainEvents";
 import { EnemyManager } from "../lib/EnemyManager";
 import {
@@ -41,7 +42,7 @@ class Aura {
 				texture,
 				frame
 			)
-			.setDepth(6)
+			.setDepth(config.overlayDepth)
 			.setOrigin(1);
 		this.image = image;
 		this.name = name;
@@ -82,7 +83,7 @@ class Card {
 				texture,
 				frame
 			)
-			.setDepth(6)
+			.setDepth(config.overlayDepth)
 			.setOrigin(1);
 		this.image = image;
 		this.name = name;
@@ -104,7 +105,7 @@ class Card {
 					5,
 					5
 				)
-				.setDepth(5)
+				.setDepth(config.overlayEffectDepth)
 				.setOrigin(0.5);
 		}
 		if (!this.isSelected) {
@@ -155,7 +156,7 @@ class PotionItem {
 				`${this.totalPotions}`,
 				12
 			)
-			.setDepth(9)
+			.setDepth(config.overlayLabelDepth)
 			.setOrigin(0.5);
 	}
 
@@ -365,7 +366,7 @@ export class Overlay extends Scene {
 					"Saved",
 					12
 				)
-				.setDepth(9)
+				.setDepth(config.overlayLabelDepth)
 				.setOrigin(0.5);
 
 			this.time.addEvent({
@@ -483,7 +484,7 @@ export class Overlay extends Scene {
 		if (!this.keyCountIcon) {
 			this.keyCountIcon = this.add.image(x, y, "icons3", 28).setOrigin(0.5);
 			this.keyCountIcon.setPosition(x, y);
-			this.keyCountIcon.setDepth(8);
+			this.keyCountIcon.setDepth(config.overlayLabelIconDepth);
 		}
 
 		if (!this.keyCountLabel) {
@@ -495,7 +496,7 @@ export class Overlay extends Scene {
 					"0",
 					12
 				)
-				.setDepth(9)
+				.setDepth(config.overlayLabelDepth)
 				.setOrigin(0.5);
 		}
 		try {

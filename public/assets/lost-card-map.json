@@ -18016,6 +18016,11 @@
                          "name":"collides",
                          "type":"bool",
                          "value":true
+                        }, 
+                        {
+                         "name":"isLava",
+                         "type":"bool",
+                         "value":true
                         }]
                 }, 
                 {
@@ -18023,6 +18028,11 @@
                  "properties":[
                         {
                          "name":"collides",
+                         "type":"bool",
+                         "value":true
+                        }, 
+                        {
+                         "name":"isLava",
                          "type":"bool",
                          "value":true
                         }]
@@ -18034,6 +18044,11 @@
                          "name":"collides",
                          "type":"bool",
                          "value":true
+                        }, 
+                        {
+                         "name":"isSky",
+                         "type":"bool",
+                         "value":true
                         }]
                 }, 
                 {
@@ -18041,6 +18056,11 @@
                  "properties":[
                         {
                          "name":"collides",
+                         "type":"bool",
+                         "value":true
+                        }, 
+                        {
+                         "name":"isSky",
                          "type":"bool",
                          "value":true
                         }]
@@ -18395,6 +18415,11 @@
                          "name":"collides",
                          "type":"bool",
                          "value":true
+                        }, 
+                        {
+                         "name":"isLava",
+                         "type":"bool",
+                         "value":true
                         }]
                 }, 
                 {
@@ -18402,6 +18427,11 @@
                  "properties":[
                         {
                          "name":"collides",
+                         "type":"bool",
+                         "value":true
+                        }, 
+                        {
+                         "name":"isLava",
                          "type":"bool",
                          "value":true
                         }]
@@ -18413,6 +18443,11 @@
                          "name":"collides",
                          "type":"bool",
                          "value":true
+                        }, 
+                        {
+                         "name":"isSky",
+                         "type":"bool",
+                         "value":true
                         }]
                 }, 
                 {
@@ -18420,6 +18455,11 @@
                  "properties":[
                         {
                          "name":"collides",
+                         "type":"bool",
+                         "value":true
+                        }, 
+                        {
+                         "name":"isSky",
                          "type":"bool",
                          "value":true
                         }]
@@ -19615,6 +19655,11 @@
                          "name":"deadly",
                          "type":"bool",
                          "value":false
+                        }, 
+                        {
+                         "name":"isHole",
+                         "type":"bool",
+                         "value":true
                         }]
                 }, 
                 {
@@ -19624,6 +19669,11 @@
                          "name":"collides",
                          "type":"bool",
                          "value":false
+                        }, 
+                        {
+                         "name":"isHole",
+                         "type":"bool",
+                         "value":true
                         }]
                 }, 
                 {
@@ -19633,6 +19683,11 @@
                          "name":"collides",
                          "type":"bool",
                          "value":false
+                        }, 
+                        {
+                         "name":"isHole",
+                         "type":"bool",
+                         "value":true
                         }]
                 }, 
                 {
@@ -19642,6 +19697,11 @@
                          "name":"collides",
                          "type":"bool",
                          "value":false
+                        }, 
+                        {
+                         "name":"isHole",
+                         "type":"bool",
+                         "value":true
                         }]
                 }, 
                 {
@@ -19651,6 +19711,11 @@
                          "name":"collides",
                          "type":"bool",
                          "value":false
+                        }, 
+                        {
+                         "name":"isHole",
+                         "type":"bool",
+                         "value":true
                         }]
                 }, 
                 {
@@ -19985,6 +20050,11 @@
                          "name":"collides",
                          "type":"bool",
                          "value":true
+                        }, 
+                        {
+                         "name":"isHole",
+                         "type":"bool",
+                         "value":true
                         }]
                 }, 
                 {
@@ -19994,6 +20064,11 @@
                          "name":"collides",
                          "type":"bool",
                          "value":false
+                        }, 
+                        {
+                         "name":"isHole",
+                         "type":"bool",
+                         "value":true
                         }]
                 }, 
                 {
@@ -20003,6 +20078,11 @@
                          "name":"collides",
                          "type":"bool",
                          "value":false
+                        }, 
+                        {
+                         "name":"isHole",
+                         "type":"bool",
+                         "value":true
                         }]
                 }, 
                 {
@@ -20012,6 +20092,11 @@
                          "name":"collides",
                          "type":"bool",
                          "value":false
+                        }, 
+                        {
+                         "name":"isHole",
+                         "type":"bool",
+                         "value":true
                         }]
                 }, 
                 {
@@ -20021,6 +20106,11 @@
                          "name":"collides",
                          "type":"bool",
                          "value":false
+                        }, 
+                        {
+                         "name":"isHole",
+                         "type":"bool",
+                         "value":true
                         }]
                 }, 
                 {
@@ -20359,6 +20449,11 @@
                          "name":"collides",
                          "type":"bool",
                          "value":true
+                        }, 
+                        {
+                         "name":"isHole",
+                         "type":"bool",
+                         "value":true
                         }]
                 }, 
                 {
@@ -20368,6 +20463,11 @@
                          "name":"collides",
                          "type":"bool",
                          "value":false
+                        }, 
+                        {
+                         "name":"isHole",
+                         "type":"bool",
+                         "value":true
                         }]
                 }, 
                 {
@@ -20377,6 +20477,11 @@
                          "name":"collides",
                          "type":"bool",
                          "value":false
+                        }, 
+                        {
+                         "name":"isHole",
+                         "type":"bool",
+                         "value":true
                         }]
                 }, 
                 {
@@ -20386,6 +20491,11 @@
                          "name":"collides",
                          "type":"bool",
                          "value":false
+                        }, 
+                        {
+                         "name":"isHole",
+                         "type":"bool",
+                         "value":true
                         }]
                 }, 
                 {
@@ -20395,6 +20505,11 @@
                          "name":"collides",
                          "type":"bool",
                          "value":false
+                        }, 
+                        {
+                         "name":"isHole",
+                         "type":"bool",
+                         "value":true
                         }]
                 }, 
                 {
@@ -20743,6 +20858,11 @@
                          "name":"collides",
                          "type":"bool",
                          "value":true
+                        }, 
+                        {
+                         "name":"isHole",
+                         "type":"bool",
+                         "value":true
                         }]
                 }, 
                 {
@@ -20752,6 +20872,11 @@
                          "name":"collides",
                          "type":"bool",
                          "value":false
+                        }, 
+                        {
+                         "name":"isHole",
+                         "type":"bool",
+                         "value":true
                         }]
                 }, 
                 {
@@ -20761,6 +20886,11 @@
                          "name":"collides",
                          "type":"bool",
                          "value":false
+                        }, 
+                        {
+                         "name":"isHole",
+                         "type":"bool",
+                         "value":true
                         }]
                 }, 
                 {
@@ -20770,6 +20900,11 @@
                          "name":"collides",
                          "type":"bool",
                          "value":false
+                        }, 
+                        {
+                         "name":"isHole",
+                         "type":"bool",
+                         "value":true
                         }]
                 }, 
                 {
@@ -20779,6 +20914,11 @@
                          "name":"collides",
                          "type":"bool",
                          "value":false
+                        }, 
+                        {
+                         "name":"isHole",
+                         "type":"bool",
+                         "value":true
                         }]
                 }, 
                 {
@@ -21117,6 +21257,11 @@
                          "name":"collides",
                          "type":"bool",
                          "value":false
+                        }, 
+                        {
+                         "name":"isHole",
+                         "type":"bool",
+                         "value":false
                         }]
                 }, 
                 {
@@ -21124,6 +21269,11 @@
                  "properties":[
                         {
                          "name":"collides",
+                         "type":"bool",
+                         "value":true
+                        }, 
+                        {
+                         "name":"isHole",
                          "type":"bool",
                          "value":true
                         }]
@@ -21135,6 +21285,11 @@
                          "name":"collides",
                          "type":"bool",
                          "value":true
+                        }, 
+                        {
+                         "name":"isHole",
+                         "type":"bool",
+                         "value":true
                         }]
                 }, 
                 {
@@ -21142,6 +21297,11 @@
                  "properties":[
                         {
                          "name":"collides",
+                         "type":"bool",
+                         "value":true
+                        }, 
+                        {
+                         "name":"isHole",
                          "type":"bool",
                          "value":true
                         }]
@@ -21158,6 +21318,11 @@
                          "name":"deadly",
                          "type":"bool",
                          "value":false
+                        }, 
+                        {
+                         "name":"isHole",
+                         "type":"bool",
+                         "value":true
                         }]
                 }, 
                 {
@@ -22780,6 +22945,11 @@
                         }, 
                         {
                          "name":"hurts",
+                         "type":"bool",
+                         "value":true
+                        }, 
+                        {
+                         "name":"isSpikes",
                          "type":"bool",
                          "value":true
                         }]

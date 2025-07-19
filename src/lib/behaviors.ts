@@ -1,3 +1,4 @@
+import { config } from "../lib/config";
 import {
 	Sound,
 	moveHitboxInFrontOfSprite,
@@ -164,7 +165,7 @@ export class Roar implements Behavior {
 		if ("primaryColor" in sprite) {
 			effect.setTint(sprite.primaryColor as number);
 		}
-		effect.setDepth(5);
+		effect.setDepth(config.effectDepth);
 		effect.anims.play("orange_boom", true);
 		sprite.once(Events.MonsterDying, () => {
 			effect?.destroy();
@@ -723,7 +724,7 @@ export class RandomTeleport implements Behavior {
 			"teleport",
 			0
 		);
-		effect1.setDepth(5);
+		effect1.setDepth(config.effectDepth);
 		effect1.anims.play("teleport", true);
 		sprite.scene.sound.play("holy");
 		sprite.once(Events.MonsterDying, () => {
@@ -822,7 +823,7 @@ export class TeleportToPlatform implements Behavior {
 			"teleport",
 			0
 		);
-		effect1.setDepth(5);
+		effect1.setDepth(config.effectDepth);
 		effect1.anims.play("teleport", true);
 		sprite.scene.sound.play("holy");
 		sprite.once(Events.MonsterDying, () => {
@@ -1019,7 +1020,7 @@ export class PowerUp implements Behavior {
 			effect.setTint(sprite.primaryColor as number);
 		}
 		effect.setScale(this.#scale);
-		effect.setDepth(5);
+		effect.setDepth(config.effectDepth);
 		effect.setAlpha(0.7);
 		effect.anims.play("powerup", true);
 		sprite.scene.sound.play("ice-charge");
@@ -1099,7 +1100,7 @@ export class SlashTowardPlayer implements Behavior {
 		this.#effect = effect;
 		this.#effect.setSize(this.#hitboxSize, this.#hitboxSize);
 		this.#effect.setDisplaySize(this.#hitboxSize, this.#hitboxSize);
-		this.#effect.setDepth(5);
+		this.#effect.setDepth(config.effectDepth);
 		moveHitboxInFrontOfSprite(sprite, direction, this.#effect);
 		this.#effect.anims.play("slash-effect", true);
 		sprite.scene.sound.play("attack");
@@ -1170,7 +1171,7 @@ export class BigSwing implements Behavior {
 		sprite.scene.physics.add.existing(effect);
 		effect.setSize(sprite.body.width * 4, sprite.body.height * 4);
 		effect.setDisplaySize(sprite.body.width * 4, sprite.body.height * 4);
-		effect.setDepth(5);
+		effect.setDepth(config.effectDepth);
 		effect.anims.play("slash-effect", true);
 		sprite.scene.sound.play("attack");
 
@@ -1227,7 +1228,7 @@ export class IceAttack implements Behavior {
 		// Both use width so this remains square
 		effect.setSize(sprite.body.width * 5, sprite.body.width * 5);
 		effect.setDisplaySize(sprite.body.width * 5, sprite.body.width * 5);
-		effect.setDepth(5);
+		effect.setDepth(config.effectDepth);
 		effect.anims.play("ice_attack", true);
 		sprite.scene.sound.play("ice");
 
@@ -1937,7 +1938,7 @@ export class RangedRockBall implements Behavior {
 			865
 		);
 		sprite.scene.physics.add.existing(effect);
-		effect.setDepth(5);
+		effect.setDepth(config.effectDepth);
 		if (!isDynamicSprite(effect)) {
 			throw new Error("Could not update rock ball");
 		}
@@ -2076,7 +2077,7 @@ export class RangedFireBall implements Behavior {
 			0
 		);
 		sprite.scene.physics.add.existing(effect);
-		effect.setDepth(5);
+		effect.setDepth(config.effectDepth);
 		effect.anims.play(
 			{
 				key: "fire-power",
@@ -2184,7 +2185,7 @@ export class RangedIceBall implements Behavior {
 			0
 		);
 		sprite.scene.physics.add.existing(effect);
-		effect.setDepth(5);
+		effect.setDepth(config.effectDepth);
 		effect.anims.play(
 			{
 				key: "ice_ball",
@@ -2284,7 +2285,7 @@ export class WalkWithFire implements Behavior {
 			0
 		);
 		sprite.scene.physics.add.existing(this.#effect);
-		this.#effect.setDepth(5);
+		this.#effect.setDepth(config.effectDepth);
 		this.#effect.anims.play(
 			{
 				key: "fire-power",
@@ -2394,7 +2395,7 @@ export class IceBeam implements Behavior {
 			0
 		);
 		sprite.scene.physics.add.existing(effect);
-		effect.setDepth(5);
+		effect.setDepth(config.effectDepth);
 		effect.anims.play(
 			{
 				key: "ice_beam",
@@ -2811,7 +2812,7 @@ class Seeker extends Phaser.Physics.Arcade.Sprite {
 			yoyo: true,
 		});
 		this.scene.physics.add.existing(this);
-		this.setDepth(5);
+		this.setDepth(config.effectDepth);
 		this.anims.play(
 			{
 				key: "green-ball",
@@ -2858,7 +2859,7 @@ class Seeker extends Phaser.Physics.Arcade.Sprite {
 				"fire-power",
 				0
 			);
-			effect.setDepth(5);
+			effect.setDepth(config.effectDepth);
 			effect.anims.play("fire-power", true);
 			effect.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
 				this.scene?.sound?.stopByKey("fire-loop");
