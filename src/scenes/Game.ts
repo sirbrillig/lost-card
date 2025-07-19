@@ -3163,7 +3163,7 @@ export class Game extends Scene {
 		}
 		if (this.isPlayerUsingPower() && this.getActivePower() === "FireCard") {
 			this.sendHitToEnemy(enemy, 1);
-			this.#endFireballAnimation();
+			this.#endPowerUse();
 			this.#makeFireExplosion(enemy.body.center);
 		}
 	}
@@ -3633,9 +3633,14 @@ export class Game extends Scene {
 		if (PowerInUse.size < 1) {
 			return;
 		}
+		// We have to start the explosion animation here because the fire power
+		// needs to still be active to trigger it.
 		this.#endFireballAnimation();
 		const player = getPlayerOrThrow();
 		player.setVelocity(0, 0);
+		// We have to clear the PowerInUse here because when we stop the animation
+		// it might trigger another call to endPowerUse.
+		PowerInUse.clear();
 		this.power.anims.stop();
 		this.power.anims.complete();
 		this.power.setAlpha(1);
@@ -3644,7 +3649,6 @@ export class Game extends Scene {
 		this.power.setFlipX(false);
 		this.#clearPlantCardLine();
 		this.#endDashAnimation();
-		PowerInUse.clear();
 	}
 
 	#makeFireExplosion(target: { x: number; y: number }): void {
@@ -3660,6 +3664,7 @@ export class Game extends Scene {
 		if (!PowerInUse.get("FireCard")) {
 			return;
 		}
+		this.power.setVelocity(0, 0);
 		this.power.anims.stop();
 		this.power.setVisible(false);
 		this.#makeFireExplosion(this.power.body.center);
