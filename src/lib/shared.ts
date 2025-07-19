@@ -1425,3 +1425,15 @@ export function doesTileBlockFire(
 	}
 	return true;
 }
+
+export function makeFireExplosion(
+	scene: Phaser.Scene,
+	target: { x: number; y: number }
+): void {
+	const effect = scene.add.sprite(target.x, target.y, "fire-power-right", 0);
+	effect.setDepth(config.effectDepth);
+	effect.anims.play("fire-power-right", true);
+	effect.on(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
+		effect.destroy();
+	});
+}

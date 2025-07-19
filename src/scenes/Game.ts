@@ -67,6 +67,7 @@ import {
 	areMonstersInRoom,
 	LockableDoorSpriteIndices,
 	doesTileBlockFire,
+	makeFireExplosion,
 } from "../lib/shared";
 import { MonsterCreator } from "../lib/MonsterCreator";
 import {
@@ -1770,7 +1771,7 @@ export class Game extends Scene {
 		tile.destroy();
 
 		this.#endPowerUse();
-		this.#makeFireExplosion(tile);
+		makeFireExplosion(this, tile);
 	}
 
 	makeAppearingTileAppear(
@@ -3164,7 +3165,7 @@ export class Game extends Scene {
 		if (this.isPlayerUsingPower() && this.getActivePower() === "FireCard") {
 			this.sendHitToEnemy(enemy, 1);
 			this.#endPowerUse();
-			this.#makeFireExplosion(enemy.body.center);
+			makeFireExplosion(this, enemy.body.center);
 		}
 	}
 
@@ -3651,15 +3652,6 @@ export class Game extends Scene {
 		this.#endDashAnimation();
 	}
 
-	#makeFireExplosion(target: { x: number; y: number }): void {
-		const effect = this.add.sprite(target.x, target.y, "fire-power-right", 0);
-		effect.setDepth(config.effectDepth);
-		effect.anims.play("fire-power-right", true);
-		effect.on(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
-			effect.destroy();
-		});
-	}
-
 	#endFireballAnimation(): void {
 		if (!PowerInUse.get("FireCard")) {
 			return;
@@ -3667,7 +3659,7 @@ export class Game extends Scene {
 		this.power.setVelocity(0, 0);
 		this.power.anims.stop();
 		this.power.setVisible(false);
-		this.#makeFireExplosion(this.power.body.center);
+		makeFireExplosion(this, this.power.body.center);
 	}
 
 	#clearPlantCardLine(): void {
