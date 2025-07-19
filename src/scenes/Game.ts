@@ -3262,32 +3262,6 @@ export class Game extends Scene {
 		});
 	}
 
-	zoomCameraForHurtPlayer() {
-		this.cameras.main.zoomTo(
-			config.postHitCameraZoomScale,
-			config.postHitCameraZoomInDelay,
-			"Linear",
-			false,
-			(_, progress) => {
-				if (progress === 1) {
-					this.time.addEvent({
-						delay: 0,
-						callback: () => {
-							if (this.getPlayerHitPoints() > 0) {
-								this.cameras.main.zoomTo(
-									1,
-									config.postHitCameraZoomOutDelay,
-									"Linear",
-									true
-								);
-							}
-						},
-					});
-				}
-			}
-		);
-	}
-
 	showParticlesForHurtPlayer() {
 		const player = getPlayerOrThrow();
 		const emitter = this.add.particles(
@@ -3316,7 +3290,6 @@ export class Game extends Scene {
 		);
 		this.playEffectForHurtPlayer();
 		this.showParticlesForHurtPlayer();
-		this.zoomCameraForHurtPlayer();
 		this.hitStopForHurtPlayer();
 		vibrate(this, 2, 300);
 	}
