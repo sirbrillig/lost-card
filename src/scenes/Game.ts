@@ -1638,6 +1638,7 @@ export class Game extends Scene {
 	}
 
 	#movePlayerTowardTileWithPlantCard(tile: { x: number; y: number }): void {
+		this.#playDashAnimation();
 		const player = getPlayerOrThrow();
 		const lastSafePosition = new Phaser.Math.Vector2(player.x, player.y);
 		const velocity = createVelocityForDirection(
