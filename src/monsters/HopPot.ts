@@ -28,20 +28,21 @@ export class HopPot extends BaseMonster {
 			case "idle":
 				this.nextState = "target";
 				return new WaitForActive(state, {
-					distance: 40,
+					distance: 50,
 				});
 			case "target":
 				this.nextState = "leap";
 				return new LaserSight(state, {
 					isHidden: true,
 					postAttackTime: Phaser.Math.Between(300, 700),
-					maxLength: Phaser.Math.Between(15, 30),
+					maxLength: Phaser.Math.Between(15, 40),
 					onTarget: (target: { x: number; y: number }) =>
 						(this.#targetPosition = target),
 				});
 			case "leap":
 				this.nextState = "idle";
 				return new Leap(state, {
+					jumpTime: 800,
 					targetPosition: this.#targetPosition,
 				});
 		}

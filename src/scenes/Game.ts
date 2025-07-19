@@ -770,7 +770,7 @@ export class Game extends Scene {
 			(_: unknown, progress: number) => {
 				if (progress === 1) {
 					this.respawnRegion(getRegionFromRoomName("FB"));
-					this.movePlayerToPoint(destinationX, destinationY);
+					this.#movePlayerToPoint(destinationX, destinationY);
 					this.playMusicForRegion(getRegionFromRoomName("FB"));
 					this.setPlayerHiddenInvincible(false);
 					this.setPlayerStunned(false);
@@ -1264,10 +1264,10 @@ export class Game extends Scene {
 		);
 		this.playMusicForRegion(getRegionFromRoomName(room.name));
 		this.respawnRegion(getRegionFromRoomName(room.name));
-		this.moveCameraToRoom(room);
+		this.#moveCameraToRoom(room);
 	}
 
-	moveCameraToRoom(room: Phaser.Types.Tilemaps.TiledObject) {
+	#moveCameraToRoom(room: Phaser.Types.Tilemaps.TiledObject) {
 		this.lastDialogData = undefined;
 		const camera = this.cameras.main;
 
@@ -1308,18 +1308,18 @@ export class Game extends Scene {
 
 		this.toggleLightsInRoom();
 
-		this.maybeLockDoors();
+		this.#maybeLockDoors();
 
 		this.recordRoomVisit(room.name);
 	}
 
-	maybeLockDoors() {
+	#maybeLockDoors() {
 		const player = getPlayerOrThrow();
 		if (
 			isPlayerInMetaArea(getMap(), player, MapMetaKeys.DoorLockAreaName) &&
 			areMonstersInRoom(this.enemyManager)
 		) {
-			this.lockDoorsInRoom();
+			this.#lockDoorsInRoom();
 		}
 	}
 
@@ -1332,26 +1332,39 @@ export class Game extends Scene {
 		}
 	}
 
-	lockDoorsInRoom() {
+	#lockDoor(door: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody): void {
+		const currentFrame = parseInt(door.frame.name);
+		if (!LockableDoorSpriteIndices.includes(currentFrame)) {
+			return;
+		}
+		// Replace each door sprite with appropriate angle locked sprite
+		door.setFrame(currentFrame + 1);
+		// Mark each door as locked
+		door.data.set(DataKeys.LockedDoor, true);
+	}
+
+	#unlockDoor(door: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody): void {
+		if (!door.data.get(DataKeys.LockedDoor)) {
+			return;
+		}
+		// Replace each door sprite with appropriate angle unlocked sprite
+		door.setFrame(parseInt(door.frame.name) - 1);
+		// Mark each door as unlocked
+		door.data.set(DataKeys.LockedDoor, false);
+	}
+
+	#lockDoorsInRoom() {
 		const activeRoom = getActiveRoom();
 		if (!activeRoom) {
 			return;
 		}
-		// Find all doors in room
 		const doorsInRoom = getDoorsInRoom(this.createdDoors, activeRoom);
 		doorsInRoom.forEach((door) => {
-			const currentFrame = parseInt(door.frame.name);
-			if (!LockableDoorSpriteIndices.includes(currentFrame)) {
-				return;
-			}
-			// Replace each door sprite with appropriate angle locked sprite
-			door.setFrame(currentFrame + 1);
-			// Mark each door as locked
-			door.data.set(DataKeys.LockedDoor, true);
+			this.#lockDoor(door);
 		});
 	}
 
-	unlockDoorsInRoom() {
+	#unlockDoorsInRoom() {
 		const activeRoom = getActiveRoom();
 		if (!activeRoom) {
 			return;
@@ -1359,13 +1372,7 @@ export class Game extends Scene {
 		// Find all doors in room
 		const doorsInRoom = getDoorsInRoom(this.createdDoors, activeRoom);
 		doorsInRoom.forEach((door) => {
-			if (!door.data.get(DataKeys.LockedDoor)) {
-				return;
-			}
-			// Replace each door sprite with appropriate angle unlocked sprite
-			door.setFrame(parseInt(door.frame.name) - 1);
-			// Mark each door as unlocked
-			door.data.set(DataKeys.LockedDoor, false);
+			this.#unlockDoor(door);
 		});
 	}
 
@@ -1497,6 +1504,9 @@ export class Game extends Scene {
 		if (destinationDirection === undefined) {
 			throw new Error("Hit door without destination direction");
 		}
+		const shouldDoorLockAfterExit = destinationDoor?.data.get(
+			MapMetaKeys.DoorLockAfterExit
+		);
 
 		// if the player enters a door, teleport them just past the corresponding door
 		const [destinationX, destinationY] = getDoorDestinationCoordinates(
@@ -1537,10 +1547,13 @@ export class Game extends Scene {
 						this.playMusicForRegion(getRegionFromRoomName(room.name));
 						this.respawnRegion(newRegion);
 					}
-					this.movePlayerToPoint(destinationX, destinationY);
+					this.#movePlayerToPoint(destinationX, destinationY);
 					this.setPlayerStunned(false);
 					this.setPlayerHiddenInvincible(false);
 					this.cameras.main.fadeIn(fadeTime);
+					if (shouldDoorLockAfterExit && destinationDoor) {
+						this.#lockDoor(destinationDoor);
+					}
 					MainEvents.emit(Events.EnteredRoom);
 				}
 			}
@@ -2433,11 +2446,11 @@ export class Game extends Scene {
 		});
 	}
 
-	movePlayerToPoint(x: number, y: number) {
+	#movePlayerToPoint(x: number, y: number) {
 		const player = getPlayerOrThrow();
 		player.setPosition(x, y);
 		const room = getRoomForPoint(getMap(), player.x, player.y);
-		this.moveCameraToRoom(room);
+		this.#moveCameraToRoom(room);
 	}
 
 	getPlayerSpeed(): number {
@@ -3104,7 +3117,7 @@ export class Game extends Scene {
 				]);
 				if (!areAnyMonstersInRoom) {
 					this.showAllHiddenItemsInRoom();
-					this.unlockDoorsInRoom();
+					this.#unlockDoorsInRoom();
 				}
 			});
 			this.addEnemyToEnemyManager(monster, point);

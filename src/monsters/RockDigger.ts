@@ -11,7 +11,7 @@ import { isTileWithPropertiesObject } from "../lib/shared";
 import { BaseMonster } from "./BaseMonster";
 
 export class RockDigger extends BaseMonster {
-	hitPoints: number = 8;
+	hitPoints: number = 10;
 
 	constructor(
 		scene: Phaser.Scene,
