@@ -88,7 +88,6 @@ import {
 export class Game extends Scene {
 	debugGraphic: Phaser.GameObjects.Graphics | undefined;
 	layerDebugGraphic: Phaser.GameObjects.Graphics | undefined;
-	power: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
 	healEffect: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody | undefined;
 	statusIcon: Phaser.GameObjects.Sprite | undefined;
 	statusBounce: Phaser.Tweens.Tween | undefined;
@@ -494,28 +493,25 @@ export class Game extends Scene {
 			}
 		);
 
-		this.physics.add.overlap(
-			this.power,
-			this.enemyManager.enemies,
-			(_, enemy) => {
-				if (!isDynamicSprite(enemy)) {
-					throw new Error("Enemy sprite is not valid for hitboxing with power");
-				}
-				this.playerHitEnemy(enemy);
+		const power = getPhysicsSpriteOrThrow("power");
+		this.physics.add.overlap(power, this.enemyManager.enemies, (_, enemy) => {
+			if (!isDynamicSprite(enemy)) {
+				throw new Error("Enemy sprite is not valid for hitboxing with power");
 			}
-		);
+			this.playerHitEnemy(enemy);
+		});
 
-		this.physics.add.overlap(this.power, this.hiddenRoomLayer, (_, tile) => {
+		this.physics.add.overlap(power, this.hiddenRoomLayer, (_, tile) => {
 			if (isTilemapTile(tile)) {
 				this.#handlePowerCollideTile(tile);
 			}
 		});
-		this.physics.add.overlap(this.power, this.landLayer, (_, tile) => {
+		this.physics.add.overlap(power, this.landLayer, (_, tile) => {
 			if (isTilemapTile(tile)) {
 				this.#handlePowerCollideTile(tile);
 			}
 		});
-		this.physics.add.overlap(this.power, this.stuffLayer, (_, tile) => {
+		this.physics.add.overlap(power, this.stuffLayer, (_, tile) => {
 			if (isTilemapTile(tile)) {
 				this.#handlePowerCollideTile(tile);
 			}
@@ -1582,10 +1578,9 @@ export class Game extends Scene {
 		this.checkForGameOver();
 
 		const player = getPlayerOrThrow();
+		const power = getPhysicsSpriteOrThrow("power");
 		if (this.isPlayerUsingPower() && this.getActivePower() === "PlantCard") {
-			this.#drawPlantCardLine(
-				new Phaser.Math.Vector2(this.power.x, this.power.y)
-			);
+			this.#drawPlantCardLine(new Phaser.Math.Vector2(power.x, power.y));
 		}
 		this.enemyManager.enemies.getChildren().forEach((enemy) => {
 			if (!isDynamicSprite(enemy)) {
@@ -1636,8 +1631,9 @@ export class Game extends Scene {
 			return;
 		}
 
+		const power = getPhysicsSpriteOrThrow("power");
 		this.createdTiles.forEach((tile) => {
-			if (this.physics.overlap(this.power, tile)) {
+			if (this.physics.overlap(power, tile)) {
 				if (!tile.visible) {
 					return;
 				}
@@ -1667,17 +1663,15 @@ export class Game extends Scene {
 			return;
 		}
 		const player = getPlayerOrThrow();
-		if (
-			player.data.get("isPlantCardGrappleActive") ||
-			this.power.anims.isPaused
-		) {
+		const power = getPhysicsSpriteOrThrow("power");
+		if (player.data.get("isPlantCardGrappleActive") || power.anims.isPaused) {
 			return;
 		}
 
 		// The plant card moves you next to the target, over any land obstacle
 		player.data.set("isPlantCardGrappleActive", true);
-		this.power.anims.pause();
-		this.power.body.stop();
+		power.anims.pause();
+		power.body.stop();
 		this.#movePlayerTowardTileWithPlantCard(tile.body.center);
 	}
 
@@ -2293,29 +2287,30 @@ export class Game extends Scene {
 		this.setPlayerDirection(SpriteRight);
 		this.setPlayerIdleFrame();
 		this.#updatePowerHitbox();
-		this.power.setRotation(Phaser.Math.DegToRad(0));
+		const power = getPhysicsSpriteOrThrow("power");
+		power.setRotation(Phaser.Math.DegToRad(0));
 
 		// Play power animation
 		switch (card) {
 			case "IceCard":
-				this.power.setVelocity(config.icePowerVelocity, 0);
-				this.power.anims.play("ice-power-right", true);
+				power.setVelocity(config.icePowerVelocity, 0);
+				power.anims.play("ice-power-right", true);
 				break;
 			case "SpiritCard":
 				this.playSpiritPowerAnimation();
 				break;
 			case "CloudCard":
-				this.power.anims.play("cloud-power", true);
+				power.anims.play("cloud-power", true);
 				break;
 			case "FireCard":
-				this.power.setVelocity(config.firePowerVelocity, 0);
-				this.power.anims.play("fire-power-right", true);
+				power.setVelocity(config.firePowerVelocity, 0);
+				power.anims.play("fire-power-right", true);
 				break;
 			case "PlantCard":
-				this.power.anims.play("plant-power-right", true);
+				power.anims.play("plant-power-right", true);
 				break;
 			case "WindCard":
-				this.power.anims.play("wind-power-right", true);
+				power.anims.play("wind-power-right", true);
 				break;
 		}
 	}
@@ -2584,15 +2579,16 @@ export class Game extends Scene {
 			return 16;
 		})();
 
-		this.power.body.setSize(width, height);
+		const power = getPhysicsSpriteOrThrow("power");
+		power.body.setSize(width, height);
 
 		const [xOffset, yOffset] = this.#getPowerOffset();
 		const player = getPlayerOrThrow();
-		this.power.setDepth(config.powerDepth);
+		power.setDepth(config.powerDepth);
 		if (this.playerDirection === SpriteUp) {
-			this.power.setDepth(config.powerDepthUp);
+			power.setDepth(config.powerDepthUp);
 		}
-		this.power.setPosition(
+		power.setPosition(
 			player.body.center.x + xOffset,
 			player.body.center.y + yOffset
 		);
@@ -2621,9 +2617,10 @@ export class Game extends Scene {
 	updateSwordHitbox() {
 		const sword = getPhysicsSpriteOrThrow("sword");
 		sword.body.debugShowBody = false;
-		this.power.body.debugShowBody = false;
+		const power = getPhysicsSpriteOrThrow("power");
+		power.body.debugShowBody = false;
 		sword.body.debugShowVelocity = false;
-		this.power.body.debugShowVelocity = false;
+		power.body.debugShowVelocity = false;
 		sword.setVelocity(0);
 
 		// We update the sword/power hitbox on every frame even when not in use to
@@ -2631,7 +2628,7 @@ export class Game extends Scene {
 		// hitbox appears briefly at its old location.
 		if (!this.isPlayerSwordActive() && !this.isPlayerUsingPower()) {
 			sword.setVisible(false);
-			this.power.setVisible(false);
+			power.setVisible(false);
 			this.updateSwordHitboxForAttack();
 			this.#updatePowerHitbox();
 			return;
@@ -2643,8 +2640,8 @@ export class Game extends Scene {
 			return;
 		}
 		if (this.isPlayerUsingPower()) {
-			this.power.body.debugShowBody = true;
-			this.power.body.debugShowVelocity = true;
+			power.body.debugShowBody = true;
+			power.body.debugShowVelocity = true;
 			return;
 		}
 	}
@@ -3016,9 +3013,10 @@ export class Game extends Scene {
 		dashSprite.setVisible(false);
 		SpriteComponent.set("dash", dashSprite);
 
-		this.power = this.physics.add.sprite(player.x, player.y, "wind-power", 4);
-		this.power.setDebugBodyColor(0x00fff0);
-		this.power.setDepth(config.powerDepth);
+		const power = this.physics.add.sprite(player.x, player.y, "wind-power", 4);
+		power.setDebugBodyColor(0x00fff0);
+		power.setDepth(config.powerDepth);
+		PhysicsSpriteComponent.set("power", power);
 
 		this.updateSwordHitbox();
 
@@ -3218,7 +3216,8 @@ export class Game extends Scene {
 
 		const player = getPlayerOrThrow();
 		this.physics.moveToObject(enemy, player, config.plantCardVelocity);
-		this.power.body.stop();
+		const power = getPhysicsSpriteOrThrow("power");
+		power.body.stop();
 	}
 
 	sendHitToEnemy(
@@ -3610,11 +3609,12 @@ export class Game extends Scene {
 	}
 
 	playSpiritPowerAnimation() {
-		this.power.anims.play("spirit-power", true);
-		this.power.setAlpha(0.5);
+		const power = getPhysicsSpriteOrThrow("power");
+		power.anims.play("spirit-power", true);
+		power.setAlpha(0.5);
 		const endAnimation = this.tweens.add({
 			delay: config.spiritPowerTime - 1000,
-			targets: this.power,
+			targets: power,
 			alpha: 0,
 			duration: 200,
 			repeat: -1,
@@ -3642,12 +3642,13 @@ export class Game extends Scene {
 		// We have to clear the PowerInUse here because when we stop the animation
 		// it might trigger another call to endPowerUse.
 		PowerInUse.clear();
-		this.power.anims.stop();
-		this.power.anims.complete();
-		this.power.setAlpha(1);
-		this.power.setVisible(false);
-		this.power.setVelocity(0);
-		this.power.setFlipX(false);
+		const power = getPhysicsSpriteOrThrow("power");
+		power.anims.stop();
+		power.anims.complete();
+		power.setAlpha(1);
+		power.setVisible(false);
+		power.setVelocity(0);
+		power.setFlipX(false);
 		this.#clearPlantCardLine();
 		this.#endDashAnimation();
 	}
@@ -3656,10 +3657,11 @@ export class Game extends Scene {
 		if (!PowerInUse.get("FireCard")) {
 			return;
 		}
-		this.power.setVelocity(0, 0);
-		this.power.anims.stop();
-		this.power.setVisible(false);
-		makeFireExplosion(this, this.power.body.center);
+		const power = getPhysicsSpriteOrThrow("power");
+		power.setVelocity(0, 0);
+		power.anims.stop();
+		power.setVisible(false);
+		makeFireExplosion(this, power.body.center);
 	}
 
 	#clearPlantCardLine(): void {
@@ -3672,7 +3674,8 @@ export class Game extends Scene {
 	#drawPlantCardLine(target: Phaser.Math.Vector2): void {
 		// Make the sprite that marks the end of the line invisible. We only want
 		// to see the line itself.
-		this.power.setAlpha(0);
+		const power = getPhysicsSpriteOrThrow("power");
+		power.setAlpha(0);
 
 		// Remove the last line.
 		this.#clearPlantCardLine();
@@ -3790,9 +3793,10 @@ export class Game extends Scene {
 
 	playPowerAnimation(): void {
 		this.lastPowerAt = this.time.now;
-		this.power.setVelocity(0);
-		this.power.setFlipX(false);
-		this.power.setAlpha(1);
+		const power = getPhysicsSpriteOrThrow("power");
+		power.setVelocity(0);
+		power.setFlipX(false);
+		power.setAlpha(1);
 		const activePower = this.getActivePower();
 		if (!activePower) {
 			return;
@@ -3802,13 +3806,13 @@ export class Game extends Scene {
 			case SpriteUp:
 				switch (activePower) {
 					case "PlantCard":
-						this.power.setRotation(Phaser.Math.DegToRad(90));
-						this.power.setVelocity(0, -config.plantCardVelocity);
-						this.power.anims.play("plant-power-right", true);
-						this.power.setFlipX(true);
+						power.setRotation(Phaser.Math.DegToRad(90));
+						power.setVelocity(0, -config.plantCardVelocity);
+						power.anims.play("plant-power-right", true);
+						power.setFlipX(true);
 						break;
 					case "CloudCard":
-						this.power.anims.play("cloud-power", true);
+						power.anims.play("cloud-power", true);
 						player.setVelocity(0, -config.cloudCardSpeed);
 						this.#playDashAnimation();
 						break;
@@ -3816,32 +3820,32 @@ export class Game extends Scene {
 						this.playSpiritPowerAnimation();
 						break;
 					case "FireCard":
-						this.power.setRotation(Phaser.Math.DegToRad(90));
-						this.power.setVelocity(0, -config.firePowerVelocity);
-						this.power.anims.play("fire-power-right", true);
-						this.power.setFlipX(true);
+						power.setRotation(Phaser.Math.DegToRad(90));
+						power.setVelocity(0, -config.firePowerVelocity);
+						power.anims.play("fire-power-right", true);
+						power.setFlipX(true);
 						break;
 					case "IceCard":
-						this.power.setRotation(Phaser.Math.DegToRad(90));
-						this.power.setVelocity(0, -config.icePowerVelocity);
-						this.power.anims.play("ice-power-right", true);
-						this.power.setFlipX(true);
+						power.setRotation(Phaser.Math.DegToRad(90));
+						power.setVelocity(0, -config.icePowerVelocity);
+						power.anims.play("ice-power-right", true);
+						power.setFlipX(true);
 						break;
 					case "WindCard":
-						this.power.setRotation(Phaser.Math.DegToRad(-90));
-						this.power.anims.play("wind-power-right", true);
+						power.setRotation(Phaser.Math.DegToRad(-90));
+						power.anims.play("wind-power-right", true);
 						break;
 				}
 				break;
 			case SpriteRight:
-				this.power.setRotation(Phaser.Math.DegToRad(0));
+				power.setRotation(Phaser.Math.DegToRad(0));
 				switch (this.getActivePower()) {
 					case "PlantCard":
-						this.power.setVelocity(config.plantCardVelocity, 0);
-						this.power.anims.play("plant-power-right", true);
+						power.setVelocity(config.plantCardVelocity, 0);
+						power.anims.play("plant-power-right", true);
 						break;
 					case "CloudCard":
-						this.power.anims.play("cloud-power", true);
+						power.anims.play("cloud-power", true);
 						player.setVelocity(config.cloudCardSpeed, 0);
 						this.#playDashAnimation();
 						break;
@@ -3849,27 +3853,27 @@ export class Game extends Scene {
 						this.playSpiritPowerAnimation();
 						break;
 					case "FireCard":
-						this.power.setVelocity(config.firePowerVelocity, 0);
-						this.power.anims.play("fire-power-right", true);
+						power.setVelocity(config.firePowerVelocity, 0);
+						power.anims.play("fire-power-right", true);
 						break;
 					case "IceCard":
-						this.power.setVelocity(config.icePowerVelocity, 0);
-						this.power.anims.play("ice-power-right", true);
+						power.setVelocity(config.icePowerVelocity, 0);
+						power.anims.play("ice-power-right", true);
 						break;
 					case "WindCard":
-						this.power.anims.play("wind-power-right", true);
+						power.anims.play("wind-power-right", true);
 						break;
 				}
 				break;
 			case SpriteDown:
 				switch (this.getActivePower()) {
 					case "PlantCard":
-						this.power.setRotation(Phaser.Math.DegToRad(90));
-						this.power.setVelocity(0, config.plantCardVelocity);
-						this.power.anims.play("plant-power-right", true);
+						power.setRotation(Phaser.Math.DegToRad(90));
+						power.setVelocity(0, config.plantCardVelocity);
+						power.anims.play("plant-power-right", true);
 						break;
 					case "CloudCard":
-						this.power.anims.play("cloud-power", true);
+						power.anims.play("cloud-power", true);
 						player.setVelocity(0, config.cloudCardSpeed);
 						this.#playDashAnimation();
 						break;
@@ -3877,31 +3881,31 @@ export class Game extends Scene {
 						this.playSpiritPowerAnimation();
 						break;
 					case "FireCard":
-						this.power.setRotation(Phaser.Math.DegToRad(90));
-						this.power.setVelocity(0, config.firePowerVelocity);
-						this.power.anims.play("fire-power-right", true);
+						power.setRotation(Phaser.Math.DegToRad(90));
+						power.setVelocity(0, config.firePowerVelocity);
+						power.anims.play("fire-power-right", true);
 						break;
 					case "IceCard":
-						this.power.setRotation(Phaser.Math.DegToRad(90));
-						this.power.setVelocity(0, config.icePowerVelocity);
-						this.power.anims.play("ice-power-right", true);
+						power.setRotation(Phaser.Math.DegToRad(90));
+						power.setVelocity(0, config.icePowerVelocity);
+						power.anims.play("ice-power-right", true);
 						break;
 					case "WindCard":
-						this.power.setRotation(Phaser.Math.DegToRad(90));
-						this.power.anims.play("wind-power-right", true);
+						power.setRotation(Phaser.Math.DegToRad(90));
+						power.anims.play("wind-power-right", true);
 						break;
 				}
 				break;
 			case SpriteLeft:
-				this.power.setRotation(Phaser.Math.DegToRad(0));
+				power.setRotation(Phaser.Math.DegToRad(0));
 				switch (this.getActivePower()) {
 					case "PlantCard":
-						this.power.setVelocity(-config.plantCardVelocity, 0);
-						this.power.anims.play("plant-power-right", true);
-						this.power.setFlipX(true);
+						power.setVelocity(-config.plantCardVelocity, 0);
+						power.anims.play("plant-power-right", true);
+						power.setFlipX(true);
 						break;
 					case "CloudCard":
-						this.power.anims.play("cloud-power", true);
+						power.anims.play("cloud-power", true);
 						player.setVelocity(-config.cloudCardSpeed, 0);
 						this.#playDashAnimation();
 						break;
@@ -3909,23 +3913,23 @@ export class Game extends Scene {
 						this.playSpiritPowerAnimation();
 						break;
 					case "FireCard":
-						this.power.setVelocity(-config.firePowerVelocity, 0);
-						this.power.anims.play("fire-power-right", true);
-						this.power.setFlipX(true);
+						power.setVelocity(-config.firePowerVelocity, 0);
+						power.anims.play("fire-power-right", true);
+						power.setFlipX(true);
 						break;
 					case "IceCard":
-						this.power.setVelocity(-config.icePowerVelocity, 0);
-						this.power.anims.play("ice-power-right", true);
-						this.power.setFlipX(true);
+						power.setVelocity(-config.icePowerVelocity, 0);
+						power.anims.play("ice-power-right", true);
+						power.setFlipX(true);
 						break;
 					case "WindCard":
-						this.power.setRotation(Phaser.Math.DegToRad(-180));
-						this.power.anims.play("wind-power-right", true);
+						power.setRotation(Phaser.Math.DegToRad(-180));
+						power.anims.play("wind-power-right", true);
 						break;
 				}
 				break;
 		}
-		this.power.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
+		power.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
 			this.#endPowerUse();
 		});
 	}

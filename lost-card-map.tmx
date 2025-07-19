@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.1" orientation="orthogonal" renderorder="right-down" width="200" height="200" tilewidth="16" tileheight="16" infinite="0" nextlayerid="20" nextobjectid="1306">
+<map version="1.10" tiledversion="1.11.1" orientation="orthogonal" renderorder="right-down" width="200" height="200" tilewidth="16" tileheight="16" infinite="0" nextlayerid="20" nextobjectid="1307">
  <editorsettings>
   <export target="public/assets/lost-card-map.json" format="json"/>
  </editorsettings>
@@ -9909,6 +9909,7 @@
   <object id="1138" gid="2301" x="1488" y="2080" width="16" height="16"/>
   <object id="699" gid="2301" x="1184.63" y="2094.89" width="16" height="16"/>
   <object id="1150" gid="2301" x="1056" y="2128" width="16" height="16"/>
+  <object id="1306" gid="2301" x="1056" y="2144" width="16" height="16"/>
   <object id="701" gid="2301" x="976.978" y="1968.8" width="16" height="16"/>
   <object id="709" gid="2301" x="1006.88" y="2882.69" width="16" height="16"/>
   <object id="710" gid="2301" x="1003.89" y="3071.51" width="16" height="16"/>
