@@ -1642,7 +1642,7 @@ export class Game extends Scene {
 		const player = getPlayerOrThrow();
 		const lastSafePosition = new Phaser.Math.Vector2(player.x, player.y);
 		const velocity = createVelocityForDirection(
-			config.plantCardVelocity,
+			config.plantCardPullVelocity,
 			this.playerDirection
 		);
 		player.body.setVelocity(velocity.x, velocity.y);
@@ -1652,7 +1652,7 @@ export class Game extends Scene {
 		);
 		let isMoving = true;
 		this.time.addEvent({
-			delay: 50,
+			delay: 25,
 			callback: () => {
 				if (!isMoving) {
 					return;
