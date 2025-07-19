@@ -13,6 +13,7 @@ import {
 	getDataFromRegistry,
 	saveDataToRegistry,
 } from "../lib/shared";
+import { PowerInUse } from "../lib/components";
 
 const heartSize: number = 18;
 const itemSize: number = 17;
@@ -414,6 +415,9 @@ export class Overlay extends Scene {
 	}
 
 	rotatePowerRight() {
+		if (PowerInUse.size > 0) {
+			return;
+		}
 		// Rotate Active Power
 		const available = powerOrder.filter((power) => this.isPowerEquipped(power));
 		const active = this.getActivePower();
@@ -426,6 +430,9 @@ export class Overlay extends Scene {
 	}
 
 	rotatePowerLeft() {
+		if (PowerInUse.size > 0) {
+			return;
+		}
 		const available = powerOrder.filter((power) => this.isPowerEquipped(power));
 		const active = this.getActivePower();
 		if (!active) {
