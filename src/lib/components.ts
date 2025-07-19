@@ -1,7 +1,9 @@
-export const SpriteComponent = new Map<
+export const PhysicsSpriteComponent = new Map<
 	string,
 	Phaser.Types.Physics.Arcade.SpriteWithDynamicBody
 >();
+
+export const SpriteComponent = new Map<string, Phaser.GameObjects.Sprite>();
 
 export const MapComponent = new Map<string, Phaser.Tilemaps.Tilemap>();
 
@@ -21,13 +23,21 @@ export const ItemComponent = new Map<
  */
 
 export function getPlayerOrThrow(): Phaser.Types.Physics.Arcade.SpriteWithDynamicBody {
-	return getSpriteOrThrow("player");
+	return getPhysicsSpriteOrThrow("player");
 }
 
-export function getSpriteOrThrow(
+export function getPhysicsSpriteOrThrow(
 	entity: string
 ): Phaser.Types.Physics.Arcade.SpriteWithDynamicBody {
-	const sprite = SpriteComponent.get(entity);
+	let sprite = PhysicsSpriteComponent.get(entity);
+	if (!sprite) {
+		throw new Error(`No sprite found for entity ${entity}`);
+	}
+	return sprite;
+}
+
+export function getSpriteOrThrow(entity: string) {
+	let sprite = SpriteComponent.get(entity);
 	if (!sprite) {
 		throw new Error(`No sprite found for entity ${entity}`);
 	}

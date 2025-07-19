@@ -88,6 +88,11 @@ export class Preloader extends Scene {
 		);
 
 		this.load.atlas("character", "character.png", "character.json");
+		this.load.atlas(
+			"character-dash",
+			"character-dash.png",
+			"character-dash.json"
+		);
 
 		this.load.spritesheet("player-hit", "player-hit.png", {
 			frameWidth: 32,

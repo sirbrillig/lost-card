@@ -25,9 +25,9 @@ import { Behavior, BehaviorCompleteCallback } from "./Behavior";
 import { MainEvents } from "./MainEvents";
 import { MountainMonster } from "../monsters/MountainMonster";
 import {
-	SpriteComponent,
+	PhysicsSpriteComponent,
 	getPlayerOrThrow,
-	getSpriteOrThrow,
+	getPhysicsSpriteOrThrow,
 	getMap,
 	getActiveRoom,
 } from "../lib/components";
@@ -91,7 +91,7 @@ export class WaitForActive implements Behavior {
 		sprite: Phaser.GameObjects.Sprite,
 		goToNextState: BehaviorCompleteCallback
 	): void {
-		const player = SpriteComponent.get("player");
+		const player = PhysicsSpriteComponent.get("player");
 		if (!player) {
 			return;
 		}
@@ -420,7 +420,7 @@ export class Burrow implements Behavior {
 					callback: () => {
 						sprite?.setVisible(true);
 						if (this.#hitsOnAppear) {
-							const player = SpriteComponent.get("player");
+							const player = PhysicsSpriteComponent.get("player");
 							if (!player) {
 								return;
 							}
@@ -2836,7 +2836,7 @@ class Seeker extends Phaser.Physics.Arcade.Sprite {
 			this.destroy();
 		});
 
-		const sword = getSpriteOrThrow("sword");
+		const sword = getPhysicsSpriteOrThrow("sword");
 		this.scene.physics.add.overlap(sword, this, () => {
 			if (!sword.data.get(DataKeys.SwordAttackActive)) {
 				return;

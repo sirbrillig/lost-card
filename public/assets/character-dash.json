@@ -1,0 +1,272 @@
+{
+	"textures": [
+		{
+			"image": "character-dash.png",
+			"format": "RGBA8888",
+			"size": {
+				"w": 113,
+				"h": 50
+			},
+			"scale": 1,
+			"frames": [
+				{
+					"filename": "Dash Back Sprite No Shadow-0.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 20,
+						"h": 27
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 20,
+						"h": 27
+					},
+					"frame": {
+						"x": 1,
+						"y": 1,
+						"w": 20,
+						"h": 27
+					}
+				},
+				{
+					"filename": "Dash Side Sprite No Shadow-1.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 24,
+						"h": 19
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 24,
+						"h": 19
+					},
+					"frame": {
+						"x": 1,
+						"y": 30,
+						"w": 24,
+						"h": 19
+					}
+				},
+				{
+					"filename": "Dash Back Sprite No Shadow-1.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 16,
+						"h": 27
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 16,
+						"h": 27
+					},
+					"frame": {
+						"x": 23,
+						"y": 1,
+						"w": 16,
+						"h": 27
+					}
+				},
+				{
+					"filename": "Dash Side Sprite No Shadow-0.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 27,
+						"h": 14
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 27,
+						"h": 14
+					},
+					"frame": {
+						"x": 27,
+						"y": 30,
+						"w": 27,
+						"h": 14
+					}
+				},
+				{
+					"filename": "Dash Front Sprite No Shadow-0.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 16,
+						"h": 26
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 16,
+						"h": 26
+					},
+					"frame": {
+						"x": 41,
+						"y": 1,
+						"w": 16,
+						"h": 26
+					}
+				},
+				{
+					"filename": "Dash Side Sprite No Shadow-2.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 14,
+						"h": 20
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 14,
+						"h": 20
+					},
+					"frame": {
+						"x": 56,
+						"y": 29,
+						"w": 14,
+						"h": 20
+					}
+				},
+				{
+					"filename": "Dash Front Sprite No Shadow-1.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 14,
+						"h": 24
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 14,
+						"h": 24
+					},
+					"frame": {
+						"x": 59,
+						"y": 1,
+						"w": 14,
+						"h": 24
+					}
+				},
+				{
+					"filename": "Dash Front Sprite No Shadow-2.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 14,
+						"h": 22
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 14,
+						"h": 22
+					},
+					"frame": {
+						"x": 72,
+						"y": 27,
+						"w": 14,
+						"h": 22
+					}
+				},
+				{
+					"filename": "Dash Back Sprite No Shadow-3.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 13,
+						"h": 22
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 13,
+						"h": 22
+					},
+					"frame": {
+						"x": 75,
+						"y": 1,
+						"w": 13,
+						"h": 22
+					}
+				},
+				{
+					"filename": "Dash Front Sprite No Shadow-3.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 11,
+						"h": 22
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 11,
+						"h": 22
+					},
+					"frame": {
+						"x": 88,
+						"y": 25,
+						"w": 11,
+						"h": 22
+					}
+				},
+				{
+					"filename": "Dash Back Sprite No Shadow-2.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 15,
+						"h": 21
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 15,
+						"h": 21
+					},
+					"frame": {
+						"x": 90,
+						"y": 1,
+						"w": 15,
+						"h": 21
+					}
+				},
+				{
+					"filename": "Dash Side Sprite No Shadow-3.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 11,
+						"h": 21
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 11,
+						"h": 21
+					},
+					"frame": {
+						"x": 101,
+						"y": 24,
+						"w": 11,
+						"h": 21
+					}
+				}
+			]
+		}
+	],
+	"meta": {
+		"app": "https://www.codeandweb.com/texturepacker",
+		"version": "3.0",
+		"smartupdate": "$TexturePacker:SmartUpdate:8261aa7c94b6f073e69ad34f8ffab029:5bff039c83852922ca8ce3d40d798794:e0bd3691c25294e377fe84ed78f607b1$"
+	}
+}

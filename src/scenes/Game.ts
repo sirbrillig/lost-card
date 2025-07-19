@@ -69,6 +69,7 @@ import {
 } from "../lib/shared";
 import { MonsterCreator } from "../lib/MonsterCreator";
 import {
+	PhysicsSpriteComponent,
 	SpriteComponent,
 	MapComponent,
 	ItemComponent,
@@ -76,6 +77,7 @@ import {
 	setActiveRoom,
 	getActiveRoom,
 	getPlayerOrThrow,
+	getPhysicsSpriteOrThrow,
 	getSpriteOrThrow,
 } from "../lib/components";
 
@@ -86,7 +88,6 @@ export class Game extends Scene {
 	healEffect: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody | undefined;
 	statusIcon: Phaser.GameObjects.Sprite | undefined;
 	statusBounce: Phaser.Tweens.Tween | undefined;
-	attackSprite: Phaser.GameObjects.Sprite;
 	enemyManager: EnemyManager;
 	monsterCreator: MonsterCreator;
 	enemyCollider: Phaser.Physics.Arcade.Collider;
@@ -193,14 +194,6 @@ export class Game extends Scene {
 			playerCoordinates?.y ?? spawnPoint.y
 		);
 		const player = getPlayerOrThrow();
-		this.attackSprite = this.add.sprite(
-			player.body.center.x,
-			player.body.center.y,
-			"character",
-			"sword-up-0.png"
-		);
-		this.attackSprite.setDepth(4);
-		this.attackSprite.setVisible(false);
 
 		this.enemyManager = new EnemyManager(this);
 		this.monsterCreator = new MonsterCreator(
@@ -465,8 +458,9 @@ export class Game extends Scene {
 			}
 		);
 
+		const sword = getPhysicsSpriteOrThrow("sword");
 		this.physics.add.overlap(
-			getSpriteOrThrow("sword"),
+			sword,
 			this.enemyManager.enemies,
 			(_, enemy) => {
 				if (!isDynamicSprite(enemy)) {
@@ -475,7 +469,7 @@ export class Game extends Scene {
 				this.playerHitEnemy(enemy);
 			},
 			() => {
-				return getSpriteOrThrow("sword").data.get(DataKeys.SwordAttackActive);
+				return sword.data.get(DataKeys.SwordAttackActive);
 			}
 		);
 		this.physics.add.overlap(
@@ -1043,39 +1037,41 @@ export class Game extends Scene {
 	activateAttack() {
 		const player = getPlayerOrThrow();
 		player.body.setVelocity(0);
-		getSpriteOrThrow("sword").data.set(DataKeys.SwordAttackActive, true);
+		const sword = getPhysicsSpriteOrThrow("sword");
+		sword.data.set(DataKeys.SwordAttackActive, true);
 		this.updateSwordHitbox();
 
-		getSpriteOrThrow("sword").setRotation(Phaser.Math.DegToRad(0));
+		sword.setRotation(Phaser.Math.DegToRad(0));
 
 		// If the animation hasn't started, start it.
 		// Do not move the player hitbox when attacking; since it changes size it
 		// causes accidental hits as it wiggles around. Instead we use a separate
 		// sprite for the attack animation and leave the player and its hitbox
 		// alone.
-		this.attackSprite.setVisible(true);
-		this.attackSprite.setPosition(player.body.center.x, player.body.center.y);
+		const attackSprite = getSpriteOrThrow("attack");
+		attackSprite.setVisible(true);
+		attackSprite.setPosition(player.body.center.x, player.body.center.y);
 		player.setVisible(false);
 		switch (this.playerDirection) {
 			case SpriteUp:
-				this.attackSprite.play("up-attack", true);
+				attackSprite.play("up-attack", true);
 				break;
 			case SpriteRight:
-				this.attackSprite.play("right-attack", true);
+				attackSprite.play("right-attack", true);
 				break;
 			case SpriteDown:
-				this.attackSprite.play("down-attack", true);
+				attackSprite.play("down-attack", true);
 				break;
 			case SpriteLeft:
-				this.attackSprite.play("left-attack", true);
+				attackSprite.play("left-attack", true);
 				break;
 		}
 
 		this.attackSound.play();
 
-		this.attackSprite.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
-			getSpriteOrThrow("sword").data.set(DataKeys.SwordAttackActive, false);
-			this.attackSprite.setVisible(false);
+		attackSprite.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
+			sword.data.set(DataKeys.SwordAttackActive, false);
+			attackSprite.setVisible(false);
 			player.setVisible(true);
 			this.lastAttackedAt = this.time.now;
 		});
@@ -2448,12 +2444,13 @@ export class Game extends Scene {
 			return swordWidth;
 		})();
 
-		getSpriteOrThrow("sword").body.setSize(width, height);
+		const sword = getPhysicsSpriteOrThrow("sword");
+		sword.body.setSize(width, height);
 
 		const [xOffset, yOffset] = this.getSwordOffset();
 		const player = getPlayerOrThrow();
-		getSpriteOrThrow("sword").x = player.body.center.x + xOffset;
-		getSpriteOrThrow("sword").y = player.body.center.y + yOffset;
+		sword.x = player.body.center.x + xOffset;
+		sword.y = player.body.center.y + yOffset;
 	}
 
 	getPowerOffset() {
@@ -2562,9 +2559,10 @@ export class Game extends Scene {
 	// are frames of the attack where the sword does not threaten anyone. To know
 	// if the sword is active, use `isPlayerSwordActive()` instead.
 	isPlayerAttacking() {
+		const attackSprite = getSpriteOrThrow("attack");
 		return (
-			this.attackSprite?.anims?.getName().includes("attack") &&
-			this.attackSprite.visible === true
+			attackSprite?.anims?.getName().includes("attack") &&
+			attackSprite.visible === true
 		);
 	}
 
@@ -2573,21 +2571,23 @@ export class Game extends Scene {
 	// animation. This function will return true only when the sword is
 	// threatening damage.
 	isPlayerSwordActive() {
-		return this.isPlayerAttacking() && this.attackSprite.anims.hasStarted;
+		const attackSprite = getSpriteOrThrow("attack");
+		return this.isPlayerAttacking() && attackSprite.anims.hasStarted;
 	}
 
 	updateSwordHitbox() {
-		getSpriteOrThrow("sword").body.debugShowBody = false;
+		const sword = getPhysicsSpriteOrThrow("sword");
+		sword.body.debugShowBody = false;
 		this.power.body.debugShowBody = false;
-		getSpriteOrThrow("sword").body.debugShowVelocity = false;
+		sword.body.debugShowVelocity = false;
 		this.power.body.debugShowVelocity = false;
-		getSpriteOrThrow("sword").setVelocity(0);
+		sword.setVelocity(0);
 
 		// We update the sword/power hitbox on every frame even when not in use to
 		// make sure it stays in position relative to the player; otherwise the
 		// hitbox appears briefly at its old location.
 		if (!this.isPlayerSwordActive() && !this.isPlayerUsingPower()) {
-			getSpriteOrThrow("sword").setVisible(false);
+			sword.setVisible(false);
 			this.power.setVisible(false);
 			this.updateSwordHitboxForAttack();
 			this.updatePowerHitboxPosition();
@@ -2595,8 +2595,8 @@ export class Game extends Scene {
 		}
 
 		if (this.isPlayerSwordActive()) {
-			getSpriteOrThrow("sword").body.debugShowBody = true;
-			getSpriteOrThrow("sword").body.debugShowVelocity = true;
+			sword.body.debugShowBody = true;
+			sword.body.debugShowVelocity = true;
 			return;
 		}
 		if (this.isPlayerUsingPower()) {
@@ -2811,6 +2811,52 @@ export class Game extends Scene {
 			showBeforeDelay: true,
 		});
 
+		const upDashFrames = anims.generateFrameNames("character-dash", {
+			prefix: "Dash Back Sprite No Shadow-",
+			suffix: ".png",
+			end: 3,
+		});
+		anims.create({
+			key: "up-dash-start",
+			frames: upDashFrames.slice().reverse(),
+			frameRate: config.dashFrameRate,
+		});
+		anims.create({
+			key: "up-dash-end",
+			frames: upDashFrames,
+			frameRate: config.dashFrameRate,
+		});
+		const downDashFrames = anims.generateFrameNames("character-dash", {
+			prefix: "Dash Front Sprite No Shadow-",
+			suffix: ".png",
+			end: 3,
+		});
+		anims.create({
+			key: "down-dash-start",
+			frames: downDashFrames.slice().reverse(),
+			frameRate: config.dashFrameRate,
+		});
+		anims.create({
+			key: "down-dash-end",
+			frames: downDashFrames,
+			frameRate: config.dashFrameRate,
+		});
+		const sideDashFrames = anims.generateFrameNames("character-dash", {
+			prefix: "Dash Side Sprite No Shadow-",
+			suffix: ".png",
+			end: 3,
+		});
+		anims.create({
+			key: "side-dash-start",
+			frames: sideDashFrames.slice().reverse(),
+			frameRate: config.dashFrameRate,
+		});
+		anims.create({
+			key: "side-dash-end",
+			frames: sideDashFrames,
+			frameRate: config.dashFrameRate,
+		});
+
 		anims.create({
 			key: "plant-power-right",
 			frames: anims.generateFrameNumbers("plant-power"),
@@ -2896,7 +2942,7 @@ export class Game extends Scene {
 		player.setDataEnabled();
 		player.setDebugBodyColor(0x00ff00);
 		player.setDepth(1);
-		SpriteComponent.set("player", player);
+		PhysicsSpriteComponent.set("player", player);
 
 		this.restorePlayerHitPoints();
 
@@ -2905,7 +2951,27 @@ export class Game extends Scene {
 		sword.setDebugBodyColor(0x00fff0);
 		sword.setDepth(4);
 		sword.setPushable(false);
-		SpriteComponent.set("sword", sword);
+		PhysicsSpriteComponent.set("sword", sword);
+
+		const attackSprite = this.add.sprite(
+			player.body.center.x,
+			player.body.center.y,
+			"character",
+			"sword-up-0.png"
+		);
+		attackSprite.setDepth(4);
+		attackSprite.setVisible(false);
+		SpriteComponent.set("attack", attackSprite);
+
+		const dashSprite = this.add.sprite(
+			player.body.center.x,
+			player.body.center.y,
+			"character-dash",
+			"Dash Side Sprite No Shadow-0.png"
+		);
+		dashSprite.setDepth(4);
+		dashSprite.setVisible(false);
+		SpriteComponent.set("dash", dashSprite);
 
 		this.power = this.physics.add.sprite(player.x, player.y, "wind-power", 4);
 		this.power.setDebugBodyColor(0x00fff0);
@@ -3564,6 +3630,8 @@ export class Game extends Scene {
 	}
 
 	#endPowerUse(): void {
+		const player = getPlayerOrThrow();
+		player.setVelocity(0, 0);
 		this.power.anims.stop();
 		this.power.anims.complete();
 		this.power.setAlpha(1);
@@ -3571,6 +3639,7 @@ export class Game extends Scene {
 		this.power.setVelocity(0);
 		this.power.setFlipX(false);
 		this.#clearPlantCardLine();
+		this.#endDashAnimation();
 	}
 
 	#clearPlantCardLine(): void {
@@ -3646,6 +3715,54 @@ export class Game extends Scene {
 		}
 	}
 
+	#playDashAnimation(): void {
+		const player = getPlayerOrThrow();
+		const dashSprite = getSpriteOrThrow("dash");
+		dashSprite.setVisible(true);
+		dashSprite.setPosition(player.body.center.x, player.body.center.y);
+		dashSprite.setFlipX(false);
+		player.setVisible(false);
+		switch (this.playerDirection) {
+			case SpriteUp:
+				dashSprite.play("up-dash-start", true);
+				break;
+			case SpriteRight:
+				dashSprite.play("side-dash-start", true);
+				break;
+			case SpriteDown:
+				dashSprite.play("down-dash-start", true);
+				break;
+			case SpriteLeft:
+				dashSprite.play("side-dash-start", true);
+				dashSprite.setFlipX(true);
+				break;
+		}
+	}
+
+	#endDashAnimation(): void {
+		const player = getPlayerOrThrow();
+		const dashSprite = getSpriteOrThrow("dash");
+		switch (this.playerDirection) {
+			case SpriteUp:
+				dashSprite.play("up-dash-end", true);
+				break;
+			case SpriteRight:
+				dashSprite.play("side-dash-end", true);
+				break;
+			case SpriteDown:
+				dashSprite.play("down-dash-end", true);
+				break;
+			case SpriteLeft:
+				dashSprite.play("side-dash-end", true);
+				dashSprite.setFlipX(true);
+				break;
+		}
+		dashSprite.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
+			dashSprite.setVisible(false);
+			player.setVisible(true);
+		});
+	}
+
 	playPowerAnimation(): void {
 		this.lastPowerAt = this.time.now;
 		this.power.setVelocity(0);
@@ -3667,7 +3784,10 @@ export class Game extends Scene {
 					case "CloudCard":
 						this.power.anims.play("cloud-power", true);
 						player.setVelocity(0, -config.cloudCardSpeed);
-						player.anims.play("up-walk");
+						this.#playDashAnimation();
+						this.power.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
+							this.#endPowerUse();
+						});
 						break;
 					case "SpiritCard":
 						this.playSpiritPowerAnimation();
@@ -3703,8 +3823,10 @@ export class Game extends Scene {
 					case "CloudCard":
 						this.power.anims.play("cloud-power", true);
 						player.setVelocity(config.cloudCardSpeed, 0);
-						player.anims.play("left-walk");
-						player.setFlipX(true);
+						this.#playDashAnimation();
+						this.power.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
+							this.#endPowerUse();
+						});
 						break;
 					case "SpiritCard":
 						this.playSpiritPowerAnimation();
@@ -3735,7 +3857,10 @@ export class Game extends Scene {
 					case "CloudCard":
 						this.power.anims.play("cloud-power", true);
 						player.setVelocity(0, config.cloudCardSpeed);
-						player.anims.play("down-walk");
+						this.#playDashAnimation();
+						this.power.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
+							this.#endPowerUse();
+						});
 						break;
 					case "SpiritCard":
 						this.playSpiritPowerAnimation();
@@ -3770,7 +3895,10 @@ export class Game extends Scene {
 					case "CloudCard":
 						this.power.anims.play("cloud-power", true);
 						player.setVelocity(-config.cloudCardSpeed, 0);
-						player.anims.play("left-walk");
+						this.#playDashAnimation();
+						this.power.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
+							this.#endPowerUse();
+						});
 						break;
 					case "SpiritCard":
 						this.playSpiritPowerAnimation();
@@ -4044,6 +4172,8 @@ export class Game extends Scene {
 			this.maybePickUpItem();
 			this.updateStatusIcon();
 		}
+		const dashSprite = getSpriteOrThrow("dash");
+		dashSprite.setPosition(player.body.center.x, player.body.center.y);
 	}
 
 	setPlayerIdleFrame() {
