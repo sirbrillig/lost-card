@@ -60,8 +60,8 @@ export const MapMetaKeys = {
 	StartPoint: "Start Point",
 	TempStartPoint: "Temp Start",
 	DarknessAreaName: "Darkness",
-	DoorLockAreaName: "LockAllDoors",
 	DoorLockAfterExit: "locks",
+	DoorUnlockAfterEnemiesDefeat: "enemyUnlock",
 } as const;
 
 export const LockableDoorSpriteIndices = [

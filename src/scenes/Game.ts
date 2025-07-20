@@ -1369,10 +1369,12 @@ export class Game extends Scene {
 		if (!activeRoom) {
 			return;
 		}
-		// Find all doors in room
+		// Find all doors in room marked as unlockable
 		const doorsInRoom = getDoorsInRoom(this.createdDoors, activeRoom);
 		doorsInRoom.forEach((door) => {
-			this.#unlockDoor(door);
+			if (door.data.get(MapMetaKeys.DoorUnlockAfterEnemiesDefeat)) {
+				this.#unlockDoor(door);
+			}
 		});
 	}
 
