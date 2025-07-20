@@ -1602,6 +1602,7 @@ export class Game extends Scene {
 	updateRoom() {
 		this.checkForPowerHitTiles();
 		this.updateAppearingTiles();
+		this.checkForSwordHitTiles();
 	}
 
 	destroyCreatedTile(tile: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody) {
@@ -1616,6 +1617,27 @@ export class Game extends Scene {
 			this.stuffLayer.removeTileAtWorldXY(tile.x, tile.y);
 			tile.destroy();
 		});
+	}
+
+	checkForSwordHitTiles() {
+		if (!this.isPlayerSwordActive()) {
+			return;
+		}
+
+		const sword = getPhysicsSpriteOrThrow("sword");
+		const hitTiles = this.createdTiles.filter((tile) => {
+			if (!this.physics.overlap(sword, tile)) {
+				return false;
+			}
+			if (!tile.data.get(DataKeys.AffectedBySword)) {
+				return false;
+			}
+			return true;
+		});
+		this.createdTiles = this.createdTiles.filter(
+			(x) => !hitTiles.some((tile) => tile === x)
+		);
+		hitTiles.forEach((tile) => tile.destroy());
 	}
 
 	checkForPowerHitTiles() {
@@ -1866,13 +1888,13 @@ export class Game extends Scene {
 		if (title === "TutorialSign") {
 			this.showDialog({
 				heading: "The door is shut",
-				text: "Once, cards of power protected the kingdoms, but the cards have been lost. Monsters have sealed the people behind this door.",
+				text: "Once, cards of power protected the kingdoms, but the cards have been lost.",
 			});
 		}
-		if (title === "SaveSign") {
+		if (title === "KeySign") {
 			this.showDialog({
-				heading: "Light the lanterns",
-				text: "Your soul is bound to the lantern light and can be rekindled there.",
+				heading: "Find the six keys",
+				text: "Collect six keys to open the path to the monster who stole the card of kings.",
 			});
 		}
 		if (title === "MapSign") {
@@ -1881,22 +1903,10 @@ export class Game extends Scene {
 				text: `Press ${getButtonNames(this).map} to pause and view the map.`,
 			});
 		}
-		if (title === "SwordSign") {
-			this.showDialog({
-				heading: "Do not go further unarmed",
-				text: "It would be unwise to face the monsters unarmed. Visit the armory south of the throne room.",
-			});
-		}
-		if (title === "ArmorySign") {
-			this.showDialog({
-				heading: "The Armory",
-				text: "It would be unwise to face the monsters unarmed. Find a weapon in here.",
-			});
-		}
 		if (title === "SummoningSign") {
 			this.showDialog({
 				heading: "I summon you from the past",
-				text: "You have lived before. Now live again to save us from our doom.",
+				text: "Your soul is bound to the lantern light and can be rekindled there.",
 			});
 		}
 	}

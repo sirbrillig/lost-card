@@ -50,6 +50,7 @@ export const DataKeys = {
 	MonsterPosition: "monsterPosition",
 	ActivePower: "activePower",
 	SwordAttackActive: "attackActive",
+	AffectedBySword: "affectedBySword",
 	ItemObjectId: "objectId",
 	PlayerDirection: "PlayerDirection",
 	DefeatedMonsters: "DefeatedBosses",
