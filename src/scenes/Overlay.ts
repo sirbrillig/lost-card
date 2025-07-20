@@ -18,6 +18,7 @@ import { PowerInUse } from "../lib/components";
 const heartSize: number = 18;
 const itemSize: number = 17;
 const portraitPadding = 22;
+const halfHeartFrame = 21;
 const inactiveFrame = 13;
 const activeFrame = 29;
 const itemTopMargin = 35;
@@ -296,9 +297,11 @@ export class Overlay extends Scene {
 	auras: Aura[] = [];
 	hearts: Heart[] = [];
 	keyCount: number = 0;
+	halfHearts: number = 0;
 	totalHearts: number = 0;
 	activeHearts: number = 0;
 	bg: Phaser.GameObjects.NineSlice;
+	halfHeartImage: Phaser.GameObjects.Image | undefined;
 	keyCountIcon: Phaser.GameObjects.Image | undefined;
 	keyCountLabel: Phaser.GameObjects.BitmapText | undefined;
 	saveMessageTime = 1000;
@@ -321,6 +324,8 @@ export class Overlay extends Scene {
 		this.items = [];
 		this.hearts.forEach((item) => item.destroy());
 		this.hearts = [];
+		this.halfHearts =
+			getDataFromRegistry(this.registry, "playerHalfHearts") ?? 0;
 		this.totalHearts =
 			getDataFromRegistry(this.registry, "playerTotalHitPoints") ?? 0;
 		this.activeHearts =
@@ -347,6 +352,17 @@ export class Overlay extends Scene {
 		this.createHearts();
 		this.updateItems();
 		this.updateSelectedItem();
+
+		this.halfHeartImage = this.add
+			.image(
+				this.cameras.main.x + 4,
+				this.cameras.main.y + 20,
+				"icons3",
+				halfHeartFrame
+			)
+			.setScale(0.8)
+			.setOrigin(0)
+			.setVisible(false);
 
 		MainEvents.on(Events.PowerEquipped, () => {
 			this.items.forEach((item) => item.destroy());
@@ -582,6 +598,13 @@ export class Overlay extends Scene {
 		const activeHearts =
 			getDataFromRegistry(this.registry, "playerHitPoints") ?? 0;
 		const keyCount = this.getKeyCount();
+		const halfHearts =
+			getDataFromRegistry(this.registry, "playerHalfHearts") ?? 0;
+
+		if (this.halfHearts !== halfHearts) {
+			this.halfHearts = halfHearts;
+			this.halfHeartImage?.setVisible(this.halfHearts > 0 ? true : false);
+		}
 
 		if (this.totalHearts !== totalHearts) {
 			this.totalHearts = totalHearts;

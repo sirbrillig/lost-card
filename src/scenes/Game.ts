@@ -1308,19 +1308,7 @@ export class Game extends Scene {
 
 		this.toggleLightsInRoom();
 
-		this.#maybeLockDoors();
-
 		this.recordRoomVisit(room.name);
-	}
-
-	#maybeLockDoors() {
-		const player = getPlayerOrThrow();
-		if (
-			isPlayerInMetaArea(getMap(), player, MapMetaKeys.DoorLockAreaName) &&
-			areMonstersInRoom(this.enemyManager)
-		) {
-			this.#lockDoorsInRoom();
-		}
 	}
 
 	toggleLightsInRoom() {
@@ -1351,17 +1339,6 @@ export class Game extends Scene {
 		door.setFrame(parseInt(door.frame.name) - 1);
 		// Mark each door as unlocked
 		door.data.set(DataKeys.LockedDoor, false);
-	}
-
-	#lockDoorsInRoom() {
-		const activeRoom = getActiveRoom();
-		if (!activeRoom) {
-			return;
-		}
-		const doorsInRoom = getDoorsInRoom(this.createdDoors, activeRoom);
-		doorsInRoom.forEach((door) => {
-			this.#lockDoor(door);
-		});
 	}
 
 	#unlockDoorsInRoom() {
@@ -2194,8 +2171,11 @@ export class Game extends Scene {
 				case "CloudCard":
 					this.pickUpCard(touchingItem.name);
 					break;
+				case "HalfHeart":
+					this.#pickUpHalfHeart();
+					break;
 				case "Heart":
-					this.pickUpHeart();
+					this.#pickUpHeart();
 					break;
 				case "Key":
 					this.pickUpKey();
@@ -2279,7 +2259,7 @@ export class Game extends Scene {
 		});
 	}
 
-	pickUpHeart() {
+	#pickUpHeart() {
 		this.sound.play("heart");
 		let playerTotalHitPoints = this.getPlayerTotalHitPoints();
 		playerTotalHitPoints += 1;
@@ -2289,6 +2269,30 @@ export class Game extends Scene {
 			playerTotalHitPoints
 		);
 		this.restorePlayerHitPoints();
+	}
+
+	#pickUpHalfHeart() {
+		const currentHalfHearts = getDataFromRegistry(
+			this.registry,
+			"playerHalfHearts"
+		);
+		if (currentHalfHearts) {
+			saveDataToRegistry(this.registry, "playerHalfHearts", 0);
+			this.#pickUpHeart();
+			this.showDialog({
+				heading: "Half a heart",
+				text: "You have collected two of these. You gain a full heart!",
+			});
+			return;
+		}
+
+		this.sound.play("heart");
+		saveDataToRegistry(this.registry, "playerHalfHearts", 1);
+		this.restorePlayerHitPoints();
+		this.showDialog({
+			heading: "Half a heart",
+			text: "Collect two of these to increase your total hit points!",
+		});
 	}
 
 	setPlayerDirection(direction: SpriteDirection) {

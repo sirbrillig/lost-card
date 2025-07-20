@@ -915,6 +915,7 @@ export type SaveData = {
 	SecretRoomsTotal?: number;
 	ActiveAuras?: Auras[];
 	RoomsVisited?: string[];
+	playerHalfHearts?: number;
 	playerTotalHitPoints?: number;
 	playerHitPoints?: number;
 	hasSword?: boolean;
