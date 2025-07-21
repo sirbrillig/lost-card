@@ -57,6 +57,7 @@ export class Preloader extends Scene {
 			frameWidth: 17,
 			frameHeight: 21,
 		});
+		this.load.image("grass-bit", "grass-bit.png");
 		this.load.spritesheet("icons3", "white_sprite_sheet.png", {
 			frameWidth: 18,
 			frameHeight: 18,

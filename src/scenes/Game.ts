@@ -1152,6 +1152,8 @@ export class Game extends Scene {
 
 	getTilesetKeyByName(name: string): string | undefined {
 		switch (name) {
+			case "grass-bit":
+				return "grass-bit";
 			case "npcs":
 				return "npcs";
 			case "Icons":
