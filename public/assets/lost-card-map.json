@@ -5460,34 +5460,6 @@
                  "y":720
                 }, 
                 {
-                 "gid":1073743959,
-                 "height":16,
-                 "id":1420,
-                 "name":"",
-                 "properties":[
-                        {
-                         "name":"doordirection",
-                         "type":"int",
-                         "value":2
-                        }, 
-                        {
-                         "name":"doorto",
-                         "type":"object",
-                         "value":1471
-                        }, 
-                        {
-                         "name":"locks",
-                         "type":"bool",
-                         "value":true
-                        }],
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":16,
-                 "x":2480,
-                 "y":656
-                }, 
-                {
                  "gid":2467,
                  "height":16,
                  "id":1421,

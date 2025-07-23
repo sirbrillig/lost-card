@@ -998,7 +998,7 @@ export function getPlayerCoordinates(
 	const playerRoomY = saveData.playerRoomY;
 	const roomName = saveData.playerActiveRoom;
 	const matchingRoom = getRooms(map).find((room) => room.name === roomName);
-	if (!matchingRoom?.x || !matchingRoom.y) {
+	if (matchingRoom?.x === undefined || matchingRoom.y === undefined) {
 		return undefined;
 	}
 	const globalX = matchingRoom.x + playerRoomX;
@@ -1019,7 +1019,7 @@ export function getSavedDataPlayerPosition(
 	globalPlayerY: number
 ): SaveDataPlayerPosition {
 	const room = getRoomForPoint(map, globalPlayerX, globalPlayerY);
-	if (!room.x || !room.y) {
+	if (typeof room.x !== "number" || typeof room.y !== "number") {
 		throw new Error("Could not get position for room with player");
 	}
 	return {

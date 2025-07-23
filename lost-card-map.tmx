@@ -8871,13 +8871,6 @@
     <property name="doorto" type="object" value="1415"/>
    </properties>
   </object>
-  <object id="1420" gid="1073743959" x="2480" y="656" width="16" height="16">
-   <properties>
-    <property name="doordirection" type="int" value="2"/>
-    <property name="doorto" type="object" value="1471"/>
-    <property name="locks" type="bool" value="true"/>
-   </properties>
-  </object>
   <object id="1421" name="Door" gid="2467" x="2080" y="528" width="16" height="16">
    <properties>
     <property name="doorto" type="object" value="1422"/>
