@@ -738,14 +738,6 @@ export class Game extends Scene {
 			return;
 		}
 
-		if (!("name" in door)) {
-			throw new Error("Final door has no name");
-		}
-
-		if ("name" in door && door.name !== "FinalDoor") {
-			return;
-		}
-
 		this.sound.stopAll();
 		const destinationTile = getMap().findObject(
 			"FinalDoor",
