@@ -107,7 +107,7 @@ class Card {
 					5,
 					5
 				)
-				.setDepth(config.overlayEffectDepth)
+				.setDepth(config.overlaySelectedItemFrameDepth)
 				.setOrigin(0.5);
 		}
 		if (!this.isSelected) {

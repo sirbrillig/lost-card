@@ -5583,6 +5583,17 @@
                  "width":304,
                  "x":2624,
                  "y":2448
+                }, 
+                {
+                 "height":0,
+                 "id":1474,
+                 "name":"Spotlight",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":1744,
+                 "y":1088
                 }],
          "opacity":1,
          "properties":[
@@ -19808,7 +19819,7 @@
          "y":0
         }],
  "nextlayerid":20,
- "nextobjectid":1473,
+ "nextobjectid":1475,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.1",

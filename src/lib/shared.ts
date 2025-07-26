@@ -61,6 +61,7 @@ export const MapMetaKeys = {
 	StartPoint: "Start Point",
 	TempStartPoint: "Temp Start",
 	DarknessAreaName: "Darkness",
+	SpotlightAreaName: "Spotlight",
 	DoorLockAfterExit: "locks",
 	DoorUnlockAfterEnemiesDefeat: "enemyUnlock",
 } as const;

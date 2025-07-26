@@ -95,6 +95,7 @@ export class Game extends Scene {
 	monsterCreator: MonsterCreator;
 	enemyCollider: Phaser.Physics.Arcade.Collider;
 	maskGraphics: Phaser.GameObjects.Graphics;
+	darkness: Phaser.GameObjects.Graphics;
 	mask: Phaser.Display.Masks.GeometryMask;
 	plantCardSegments: Phaser.GameObjects.Image[] = [];
 
@@ -114,7 +115,7 @@ export class Game extends Scene {
 	plantSound: Sound;
 
 	isGameOver: boolean = false;
-	isMaskActive: boolean = false;
+	isRoomDark: boolean = false;
 	hasPlayerMovedSinceAppearing: boolean = false;
 	lastAttackedAt: number = 0;
 	lastPowerAt: number = 0;
@@ -378,8 +379,8 @@ export class Game extends Scene {
 		this.createItems();
 		this.createSavePoints();
 
-		this.physics.add.collider(this.createdFinalDoors, player, (tile) => {
-			this.checkFinalDoor(tile);
+		this.physics.add.collider(this.createdFinalDoors, player, () => {
+			this.checkFinalDoor();
 		});
 
 		// Enemies collide with doors but players can pass through them.
@@ -565,6 +566,8 @@ export class Game extends Scene {
 		this.maskGraphics = this.add.graphics();
 		this.maskGraphics.setDepth(config.maskDepth);
 		this.mask = this.maskGraphics.createGeometryMask();
+		this.darkness = this.add.graphics();
+		this.darkness.setDepth(config.darknessDepth);
 	}
 
 	getMaskableObjects(): Array<
@@ -579,36 +582,95 @@ export class Game extends Scene {
 			this.hiddenRoomLayer,
 			...this.createdDoors,
 			...this.createdTiles,
+			...this.createdFinalDoors,
 			...ItemComponent.values(),
 			...this.enemyManager.enemies.getChildren().filter(isSprite),
 		];
 	}
 
-	enableMask() {
-		this.isMaskActive = true;
+	enableDarkRoom() {
+		this.isRoomDark = true;
 		this.getMaskableObjects().forEach((obj) => {
 			obj.setMask(this.mask);
 		});
 	}
 
-	disableMask() {
-		this.isMaskActive = false;
+	disableDarkRoom() {
+		this.isRoomDark = false;
 		this.getMaskableObjects().forEach((obj) => {
 			obj.clearMask();
 		});
 	}
 
-	updateVisibilityMask() {
+	#updateVisibilityMask() {
+		this.darkness.clear();
 		this.maskGraphics.clear();
-		if (!this.isMaskActive) {
+
+		const player = getPlayerOrThrow();
+		const areas = getMap().filterObjects(
+			"MetaObjects",
+			(obj) => obj.name === MapMetaKeys.SpotlightAreaName
+		);
+		const nearbyTarget = areas?.find((area) => {
+			if (area.x === undefined || area.y === undefined) {
+				return false;
+			}
+			const distance = Phaser.Math.Distance.BetweenPoints(
+				{ x: area.x, y: area.y },
+				player.body.center
+			);
+			const spotlightTargetDistance = 200;
+			if (distance < spotlightTargetDistance) {
+				return true;
+			}
+			return false;
+		});
+		if (nearbyTarget?.x && nearbyTarget?.y) {
+			const distance = Phaser.Math.Distance.BetweenPoints(
+				{ x: nearbyTarget.x, y: nearbyTarget.y },
+				player.body.center
+			);
+			const maxDistance = 200;
+			const minDistance = 2;
+			const distanceBasedAlpha = Phaser.Math.Clamp(
+				(maxDistance - distance) / (maxDistance - minDistance),
+				0,
+				// This is just to highlight a target so we don't want it to get too dark.
+				0.5
+			);
+			this.#drawSpotlight(
+				{ x: nearbyTarget.x, y: nearbyTarget.y },
+				config.targetSpotlightRadius,
+				distanceBasedAlpha
+			);
 			return;
 		}
-		const player = getPlayerOrThrow();
-		this.maskGraphics.fillCircle(
-			player.body.center.x,
-			player.body.center.y,
-			config.visibilityMaskRadius
-		);
+
+		if (this.isRoomDark) {
+			this.#drawSpotlight(
+				player.body.center,
+				config.darkRoomSpotlightRadius,
+				0
+			);
+		}
+	}
+
+	#drawSpotlight(
+		target: { x: number; y: number },
+		radius: number,
+		darknessIntensity: number
+	) {
+		this.maskGraphics.fillCircle(target.x, target.y, radius);
+
+		const room = getActiveRoom();
+		if (darknessIntensity && room?.x !== undefined && room.y !== undefined) {
+			this.darkness.fillStyle(0x000000, darknessIntensity);
+			this.darkness.fillRect(room.x, room.y, 800, 600);
+			this.mask.setInvertAlpha(true);
+			this.darkness.setMask(this.mask);
+		} else {
+			this.mask.setInvertAlpha(false);
+		}
 	}
 
 	restartStatusBounce() {
@@ -724,9 +786,7 @@ export class Game extends Scene {
 		});
 	}
 
-	checkFinalDoor(
-		door: Phaser.Tilemaps.Tile | Phaser.Types.Physics.Arcade.GameObjectWithBody
-	) {
+	checkFinalDoor() {
 		if (this.isPlayerStunned()) {
 			return;
 		}
@@ -950,10 +1010,10 @@ export class Game extends Scene {
 			if (!isCheatMode) {
 				return;
 			}
-			if (this.isMaskActive) {
-				this.disableMask();
+			if (this.isRoomDark) {
+				this.disableDarkRoom();
 			} else {
-				this.enableMask();
+				this.enableDarkRoom();
 			}
 		});
 	}
@@ -1308,9 +1368,9 @@ export class Game extends Scene {
 	toggleLightsInRoom() {
 		const player = getPlayerOrThrow();
 		if (isPlayerInMetaArea(getMap(), player, MapMetaKeys.DarknessAreaName)) {
-			this.enableMask();
+			this.enableDarkRoom();
 		} else {
-			this.disableMask();
+			this.disableDarkRoom();
 		}
 	}
 
@@ -1590,7 +1650,7 @@ export class Game extends Scene {
 		this.updatePlayer();
 		this.updateRoom();
 		this.updateGatePillars();
-		this.updateVisibilityMask();
+		this.#updateVisibilityMask();
 	}
 
 	updateRoom() {

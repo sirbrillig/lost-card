@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.1" orientation="orthogonal" renderorder="right-down" width="200" height="200" tilewidth="16" tileheight="16" infinite="0" nextlayerid="20" nextobjectid="1473">
+<map version="1.10" tiledversion="1.11.1" orientation="orthogonal" renderorder="right-down" width="200" height="200" tilewidth="16" tileheight="16" infinite="0" nextlayerid="20" nextobjectid="1475">
  <editorsettings>
   <export target="public/assets/lost-card-map.json" format="json"/>
  </editorsettings>
@@ -8894,6 +8894,7 @@
   <object id="1251" name="Darkness" x="2720" y="1264" width="272" height="160"/>
   <object id="1253" name="Darkness" x="2800" y="960" width="112" height="304"/>
   <object id="1298" name="LockAllDoors" x="2624" y="2448" width="304" height="272"/>
+  <object id="1474" name="Spotlight" x="1744" y="1088"/>
  </objectgroup>
  <objectgroup id="12" name="Creatures">
   <object id="45" name="MountainMonster" x="1444.51" y="989.496">
