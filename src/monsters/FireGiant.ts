@@ -105,14 +105,13 @@ export class FireGiant extends BaseMonster {
 		const targetTileDistance = tileDistances[targetOfTwo - 1];
 		const targetTile = tilesByDistance[targetTileDistance];
 		return {
-			x: targetTile.pixelX + targetTile.width / 2,
-			y: targetTile.pixelY + targetTile.height / 2,
+			x: targetTile.pixelX,
+			y: targetTile.pixelY + targetTile.height,
 		};
 	}
 
 	prepareSelfDestructingEnemy(enemy: LavaBlorp): Phaser.GameObjects.Sprite {
 		enemy.timeBeforeBubble = 1;
-		enemy.timeBeforeExplode = 200;
 		enemy.updateAfterBehavior = (key: string) => {
 			if (key === "lava-explode") {
 				enemy?.destroy();

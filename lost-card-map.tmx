@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.1" orientation="orthogonal" renderorder="right-down" width="200" height="200" tilewidth="16" tileheight="16" infinite="0" nextlayerid="20" nextobjectid="1523">
+<map version="1.10" tiledversion="1.11.1" orientation="orthogonal" renderorder="right-down" width="200" height="200" tilewidth="16" tileheight="16" infinite="0" nextlayerid="20" nextobjectid="1542">
  <editorsettings>
   <export target="public/assets/lost-card-map.json" format="json"/>
  </editorsettings>
@@ -8987,40 +8987,10 @@
   <object id="1474" name="Spotlight" x="1744" y="1088"/>
  </objectgroup>
  <objectgroup id="12" name="Creatures">
-  <object id="45" name="MountainMonster" x="1444.51" y="989.496">
-   <properties>
-    <property name="isMonster" type="bool" value="true"/>
-   </properties>
-   <point/>
-  </object>
-  <object id="46" name="MountainMonster" x="1443.87" y="1019.48">
-   <properties>
-    <property name="isMonster" type="bool" value="true"/>
-   </properties>
-   <point/>
-  </object>
   <object id="47" name="MountainBoss" x="1465.25" y="67.6412">
    <properties>
     <property name="doNotRespawn" type="bool" value="true"/>
     <property name="isBoss" type="bool" value="true"/>
-    <property name="isMonster" type="bool" value="true"/>
-   </properties>
-   <point/>
-  </object>
-  <object id="62" name="MountainMonster" x="1366.85" y="803.438">
-   <properties>
-    <property name="isMonster" type="bool" value="true"/>
-   </properties>
-   <point/>
-  </object>
-  <object id="321" name="MountainMonster" x="1399.34" y="664.769">
-   <properties>
-    <property name="isMonster" type="bool" value="true"/>
-   </properties>
-   <point/>
-  </object>
-  <object id="335" name="MountainMonster" x="1418.57" y="684.896">
-   <properties>
     <property name="isMonster" type="bool" value="true"/>
    </properties>
    <point/>
@@ -9469,42 +9439,6 @@
   <object id="1122" name="PoisonShroom" x="1562.43" y="2842.79">
    <point/>
   </object>
-  <object id="1157" name="LavaBlorp" x="3159.7" y="2170.06">
-   <point/>
-  </object>
-  <object id="1158" name="LavaBlorp" x="3127.92" y="2185.97">
-   <point/>
-  </object>
-  <object id="1160" name="LavaBlorp" x="3161.61" y="2298.28">
-   <point/>
-  </object>
-  <object id="1163" name="LavaBlorp" x="3127.57" y="2298.28">
-   <point/>
-  </object>
-  <object id="1161" name="LavaBlorp" x="3143.88" y="2410">
-   <point/>
-  </object>
-  <object id="1164" name="LavaBlorp" x="3175.89" y="2409.24">
-   <point/>
-  </object>
-  <object id="1159" name="LavaBlorp" x="3176.4" y="2026.35">
-   <point/>
-  </object>
-  <object id="1173" name="LavaBlorp" x="3175.96" y="2121.79">
-   <point/>
-  </object>
-  <object id="1174" name="LavaBlorp" x="3159.96" y="2073.79">
-   <point/>
-  </object>
-  <object id="1175" name="LavaBlorp" x="3111.96" y="2025.79">
-   <point/>
-  </object>
-  <object id="1176" name="LavaBlorp" x="3127.96" y="2057.79">
-   <point/>
-  </object>
-  <object id="1177" name="LavaBlorp" x="3111.96" y="2121.79">
-   <point/>
-  </object>
   <object id="1178" name="FireSpout" x="3000.51" y="2057.35">
    <point/>
   </object>
@@ -9535,6 +9469,23 @@
     <property name="doesNotRespawn" type="bool" value="true"/>
    </properties>
   </object>
+  <object id="1523" name="MountainMonster" gid="1319" x="1360" y="816" width="16" height="16"/>
+  <object id="1524" name="MountainMonster" gid="1319" x="1424" y="992" width="16" height="16"/>
+  <object id="1525" name="MountainMonster" gid="1319" x="1440" y="1024" width="16" height="16"/>
+  <object id="1526" name="MountainMonster" gid="2713" x="1392" y="672" width="16" height="16"/>
+  <object id="1527" name="MountainMonster" gid="2713" x="1408" y="688" width="16" height="16"/>
+  <object id="1528" name="LavaBlorp" gid="2713" x="3104" y="2032" width="16" height="16"/>
+  <object id="1530" name="LavaBlorp" gid="2713" x="3168" y="2032" width="16" height="16"/>
+  <object id="1531" name="LavaBlorp" gid="2713" x="3152" y="2080" width="16" height="16"/>
+  <object id="1532" name="LavaBlorp" gid="2713" x="3120" y="2064" width="16" height="16"/>
+  <object id="1533" name="LavaBlorp" gid="2713" x="3104" y="2128" width="16" height="16"/>
+  <object id="1534" name="LavaBlorp" gid="2713" x="3168" y="2128" width="16" height="16"/>
+  <object id="1535" name="LavaBlorp" gid="2713" x="3152" y="2176" width="16" height="16"/>
+  <object id="1536" name="LavaBlorp" gid="2713" x="3120" y="2192" width="16" height="16"/>
+  <object id="1537" name="LavaBlorp" gid="2713" x="3120" y="2304" width="16" height="16"/>
+  <object id="1538" name="LavaBlorp" gid="2713" x="3152" y="2304" width="16" height="16"/>
+  <object id="1540" name="LavaBlorp" gid="2713" x="3168" y="2416" width="16" height="16"/>
+  <object id="1541" name="LavaBlorp" gid="2713" x="3136" y="2416" width="16" height="16"/>
  </objectgroup>
  <objectgroup id="10" name="Rooms">
   <object id="15" name="MK1" x="2080" y="800" width="192" height="144">
