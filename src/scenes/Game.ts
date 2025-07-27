@@ -378,6 +378,7 @@ export class Game extends Scene {
 		this.createAppearingTiles();
 		this.createItems();
 		this.createSavePoints();
+		this.#restoreSwitches();
 
 		this.physics.add.collider(this.createdFinalDoors, player, () => {
 			this.checkFinalDoor();
@@ -1638,7 +1639,6 @@ export class Game extends Scene {
 				}
 				return isPointInRegion(getMap(), point.x, point.y, region);
 			}) ?? [];
-		this.#closeBarriers();
 	}
 
 	checkForGameOver() {
@@ -1735,11 +1735,20 @@ export class Game extends Scene {
 				return;
 			}
 			if (tile.data.get(DataKeys.IsSwitch)) {
-				this.#findBarriersForSwitch(tile).forEach((barrier) => {
-					this.#openBarrier(barrier);
-				});
+				this.#hitSwitch(tile);
 				return;
 			}
+		});
+	}
+
+	#hitSwitch(tile: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody): void {
+		const tileId = tile.data.get(DataKeys.ItemObjectId);
+		const switchesPressed =
+			getDataFromRegistry(this.registry, "SwitchesPressed") ?? [];
+		switchesPressed.push(tileId);
+		saveDataToRegistry(this.registry, "SwitchesPressed", switchesPressed);
+		this.#findBarriersForSwitch(tile).forEach((barrier) => {
+			this.#openBarrier(barrier);
 		});
 	}
 
@@ -1765,30 +1774,18 @@ export class Game extends Scene {
 		});
 	}
 
-	#closeBarrier(
-		barrier: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody
-	): void {
-		if (!barrier.data.get(DataKeys.OpenGate)) {
-			return;
-		}
-		const originalPosition = barrier.data.get(DataKeys.OriginalPosition);
-		if (!originalPosition) {
-			return;
-		}
-		barrier.data.remove(DataKeys.OriginalPosition);
-		barrier.data.remove(DataKeys.OpenGate);
-		this.tweens.killTweensOf(barrier);
-		this.tweens.add({
-			targets: barrier,
-			x: originalPosition.x,
-			y: originalPosition.y,
-			duration: config.barrierMovementSpeed,
-		});
-	}
-
-	#closeBarriers(): void {
-		this.createdTiles.forEach((tile) => {
-			this.#closeBarrier(tile);
+	#restoreSwitches(): void {
+		const switchesPressed =
+			getDataFromRegistry(this.registry, "SwitchesPressed") ?? [];
+		switchesPressed.forEach((tileId) => {
+			const tile = this.#findSpriteWithMapId(
+				tileId,
+				"Transients",
+				this.createdTiles
+			);
+			if (tile) {
+				this.#hitSwitch(tile.sprite);
+			}
 		});
 	}
 

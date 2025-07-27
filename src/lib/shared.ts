@@ -923,6 +923,7 @@ export type SaveData = {
 	SecretRoomsTotal?: number;
 	ActiveAuras?: Auras[];
 	RoomsVisited?: string[];
+	SwitchesPressed?: string[];
 	playerHalfHearts?: number;
 	playerTotalHitPoints?: number;
 	playerHitPoints?: number;
