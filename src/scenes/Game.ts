@@ -1255,6 +1255,7 @@ export class Game extends Scene {
 	createAppearingTiles() {
 		this.createdTiles = createSpritesFromObjectLayer(getMap(), "Transients", {
 			getTilesetKeyByName: this.getTilesetKeyByName.bind(this),
+			callback: this.recordObjectIdOnSprite.bind(this),
 		}).map((sprite) => {
 			sprite.body.setSize(sprite.body.width * 0.75, sprite.body.height * 0.75);
 			return sprite;
@@ -1429,19 +1430,19 @@ export class Game extends Scene {
 			(tile) =>
 				tile.name === "GatePillar" &&
 				tile.visible === true &&
-				!tile.data.get("openGate")
+				!tile.data.get(DataKeys.OpenGate)
 		);
 		if (!gatePillar) {
 			return;
 		}
 		const gatePosition = new Phaser.Math.Vector2(gatePillar.x, gatePillar.y);
-		gatePillar.data.set("openGate", true);
+		gatePillar.data.set(DataKeys.OpenGate, true);
 		this.createdTiles
 			.filter((tile) => tile.name === "GateWall" && tile.visible === true)
 			.forEach((tile) => {
-				if (!tile.data.get("originalPosition")) {
+				if (!tile.data.get(DataKeys.OriginalPosition)) {
 					const tilePosition = new Phaser.Math.Vector2(tile.x, tile.y);
-					tile.data.set("originalPosition", tilePosition);
+					tile.data.set(DataKeys.OriginalPosition, tilePosition);
 				}
 				this.tweens.killTweensOf(tile);
 				this.tweens.add({
@@ -1479,18 +1480,18 @@ export class Game extends Scene {
 
 	closeGatePillars() {
 		const gatePillar = this.createdTiles.find(
-			(tile) => tile.name === "GatePillar" && tile.data?.get("openGate")
+			(tile) => tile.name === "GatePillar" && tile.data?.get(DataKeys.OpenGate)
 		);
 		if (!gatePillar) {
 			return;
 		}
 		let gateCloseSpeed =
 			gatePillar.data.get("gateCloseSpeed") ?? config.gateCloseSpeed;
-		gatePillar.data.set("openGate", false);
+		gatePillar.data.set(DataKeys.OpenGate, false);
 		this.createdTiles
 			.filter((tile) => tile.name === "GateWall")
 			.forEach((tile) => {
-				const tilePosition = tile.data.get("originalPosition");
+				const tilePosition = tile.data.get(DataKeys.OriginalPosition);
 				if (tilePosition) {
 					this.tweens.killTweensOf(tile);
 					this.tweens.add({
@@ -1503,8 +1504,42 @@ export class Game extends Scene {
 			});
 	}
 
+	#findSpriteWithMapId(
+		mapId: string | number,
+		layer: string,
+		createdTiles: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody[]
+	):
+		| {
+				tile: Phaser.Types.Tilemaps.TiledObject;
+				sprite: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
+		  }
+		| undefined {
+		const tile = getMap().findObject(
+			layer,
+			(obj: unknown) => getObjectId(obj) === mapId
+		);
+		if (!tile) {
+			throw new Error(`No tile found matching map ID ${mapId}`);
+		}
+		const sprite = createdTiles.find((tileSprite) => {
+			const tileSpriteObjectId = tileSprite.data.get(DataKeys.ItemObjectId);
+			if (!tileSpriteObjectId) {
+				throw new Error(
+					`No object ID found for sprite when searching for for map ID ${mapId}`
+				);
+			}
+			return tile.id === tileSprite.data.get(DataKeys.ItemObjectId);
+		});
+		if (!sprite) {
+			throw new Error(
+				`No sprite found matching tile ID ${tile.id} for map ID ${mapId}`
+			);
+		}
+		return { tile, sprite };
+	}
+
 	handleCollideDoor(door: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody) {
-		const destinationId = door.data.get("doorto");
+		const destinationId = door.data.get(DataKeys.DoorTarget);
 		if (!destinationId) {
 			throw new Error("Hit door without destination id");
 		}
@@ -1523,27 +1558,28 @@ export class Game extends Scene {
 			player.body.stop();
 			return;
 		}
-		const destinationTile = getMap().findObject(
+
+		const destinationDoor = this.#findSpriteWithMapId(
+			destinationId,
 			"Doors",
-			(obj: unknown) => getObjectId(obj) === destinationId
+			this.createdDoors
 		);
-		if (!destinationTile) {
-			throw new Error("Hit door without destination tile");
+		if (!destinationDoor) {
+			throw new Error("Hit door without destination");
 		}
-		const destinationDoor = this.createdDoors.find((door) => {
-			return destinationTile.id === door.data.get(DataKeys.ItemObjectId);
-		});
-		const destinationDirection = destinationDoor?.data.get("doordirection");
+
+		const destinationDirection =
+			destinationDoor.sprite.data.get("doordirection");
 		if (destinationDirection === undefined) {
 			throw new Error("Hit door without destination direction");
 		}
-		const shouldDoorLockAfterExit = destinationDoor?.data.get(
+		const shouldDoorLockAfterExit = destinationDoor.sprite.data.get(
 			MapMetaKeys.DoorLockAfterExit
 		);
 
 		// if the player enters a door, teleport them just past the corresponding door
 		const [destinationX, destinationY] = getDoorDestinationCoordinates(
-			destinationTile,
+			destinationDoor.tile,
 			destinationDirection
 		);
 
@@ -1585,7 +1621,7 @@ export class Game extends Scene {
 					this.setPlayerHiddenInvincible(false);
 					this.cameras.main.fadeIn(fadeTime);
 					if (shouldDoorLockAfterExit && destinationDoor) {
-						this.#lockDoor(destinationDoor);
+						this.#lockDoor(destinationDoor.sprite);
 					}
 					MainEvents.emit(Events.EnteredRoom);
 				}
@@ -1659,7 +1695,7 @@ export class Game extends Scene {
 		this.checkForSwordHitTiles();
 	}
 
-	destroyCreatedTile(tile: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody) {
+	#destroyCreatedTile(tile: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody) {
 		this.cameras.main.shake(200, 0.004);
 		vibrate(this, 1, 200);
 
@@ -1679,19 +1715,63 @@ export class Game extends Scene {
 		}
 
 		const sword = getPhysicsSpriteOrThrow("sword");
-		const hitTiles = this.createdTiles.filter((tile) => {
+		this.createdTiles.forEach((tile) => {
 			if (!this.physics.overlap(sword, tile)) {
-				return false;
+				return;
 			}
-			if (!tile.data.get(DataKeys.AffectedBySword)) {
-				return false;
+			if (tile.data.get(DataKeys.DestroyedBySword)) {
+				this.#destroyCreatedTile(tile);
+				return;
 			}
-			return true;
+			if (tile.data.get(DataKeys.IsSwitch)) {
+				this.#findBarriersForSwitch(tile).forEach((barrier) => {
+					this.#openBarrier(barrier);
+				});
+				return;
+			}
 		});
-		this.createdTiles = this.createdTiles.filter(
-			(x) => !hitTiles.some((tile) => tile === x)
-		);
-		hitTiles.forEach((tile) => tile.destroy());
+	}
+
+	#openBarrier(
+		barrier: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody
+	): void {
+		if (barrier.data.get(DataKeys.OpenGate)) {
+			return;
+		}
+		const originalPosition = new Phaser.Math.Vector2(barrier.x, barrier.y);
+		const newX =
+			barrier.data.get(DataKeys.GateOpenDirection) === SpriteLeft
+				? barrier.x - barrier.width
+				: barrier.x + barrier.width;
+		barrier.data.set(DataKeys.OriginalPosition, originalPosition);
+		barrier.data.set(DataKeys.OpenGate, true);
+		this.tweens.killTweensOf(barrier);
+		this.tweens.add({
+			targets: barrier,
+			x: newX,
+			y: barrier.y,
+			duration: config.gateCloseSpeed * 2,
+		});
+	}
+
+	#findBarriersForSwitch(
+		switchTile: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody
+	): Phaser.Types.Physics.Arcade.SpriteWithDynamicBody[] {
+		return this.createdTiles.filter((tile) => {
+			const controllerKey = tile.data.get(DataKeys.ControlledBy);
+			if (!controllerKey) {
+				return false;
+			}
+			const controller = this.#findSpriteWithMapId(
+				controllerKey,
+				"Transients",
+				this.createdTiles
+			);
+			if (controller?.sprite === switchTile) {
+				return true;
+			}
+			return false;
+		});
 	}
 
 	checkForPowerHitTiles() {
@@ -2027,7 +2107,7 @@ export class Game extends Scene {
 				return;
 			}
 			if (collideTile.data.get("beingPushed")) {
-				this.destroyCreatedTile(tile);
+				this.#destroyCreatedTile(tile);
 			}
 		});
 		this.physics.add.collider(this.hiddenRoomLayer, tile, (collideTile) => {
@@ -2035,7 +2115,7 @@ export class Game extends Scene {
 				return;
 			}
 			if (collideTile.data.get("beingPushed")) {
-				this.destroyCreatedTile(tile);
+				this.#destroyCreatedTile(tile);
 			}
 		});
 		this.physics.add.collider(this.createdDoors, tile, (_, collideTile) => {
@@ -2043,7 +2123,7 @@ export class Game extends Scene {
 				return;
 			}
 			if (collideTile.data.get("beingPushed")) {
-				this.destroyCreatedTile(tile);
+				this.#destroyCreatedTile(tile);
 			}
 		});
 
