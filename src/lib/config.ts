@@ -43,6 +43,8 @@ export const config = {
 	spiritPowerTime: 4000,
 	heartCardHealTime: 10000,
 	playerConfusedTime: 8000,
+	monsterHitBoxSizePercentage: 0.35,
+	monsterHitBoxOffsetY: 8,
 	statusIconOffsetX: 14,
 	statusIconOffsetY: 30,
 	playerHitStopTime: 60,

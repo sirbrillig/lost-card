@@ -35,7 +35,14 @@ export class BaseMonster extends Phaser.Physics.Arcade.Sprite {
 		texture: string,
 		initialFrame: number | string
 	) {
-		super(scene, x, y, texture, initialFrame);
+		super(
+			scene,
+			// Adjust position to account for the hitbox offset below.
+			x + config.monsterHitBoxOffsetY,
+			y - config.monsterHitBoxOffsetY,
+			texture,
+			initialFrame
+		);
 
 		this.#enemyManager = enemyManager;
 		const initialState = this.getInitialState();
@@ -55,8 +62,16 @@ export class BaseMonster extends Phaser.Physics.Arcade.Sprite {
 		});
 
 		this.setDepth(config.playerDepth);
-		this.setSize(this.width * 0.35, this.height * 0.35);
-		this.setOffset(this.body.offset.x, this.body.offset.y + 9);
+		// Set the monster's hitbox to be smaller than its sprite.
+		this.setSize(
+			this.width * config.monsterHitBoxSizePercentage,
+			this.height * config.monsterHitBoxSizePercentage
+		);
+		// Move the monster's hitbox down towards its base to simulate the 3d angle.
+		this.setOffset(
+			this.body.offset.x,
+			this.body.offset.y + config.monsterHitBoxOffsetY
+		);
 		this.setCollideWorldBounds(true);
 		this.setPushable(false);
 		this.setDataEnabled();
