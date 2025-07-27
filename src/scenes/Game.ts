@@ -1808,17 +1808,33 @@ export class Game extends Scene {
 			return;
 		}
 		const originalPosition = new Phaser.Math.Vector2(barrier.x, barrier.y);
-		const newX =
-			barrier.data.get(DataKeys.GateOpenDirection) === SpriteLeft
-				? barrier.x - barrier.width
-				: barrier.x + barrier.width;
+		const newX = (() => {
+			switch (barrier.data.get(DataKeys.GateOpenDirection)) {
+				case SpriteLeft:
+					return barrier.x - barrier.width;
+				case SpriteRight:
+					return barrier.x + barrier.width;
+				default:
+					return barrier.x;
+			}
+		})();
+		const newY = (() => {
+			switch (barrier.data.get(DataKeys.GateOpenDirection)) {
+				case SpriteUp:
+					return barrier.y - barrier.height;
+				case SpriteDown:
+					return barrier.y + barrier.height;
+				default:
+					return barrier.y;
+			}
+		})();
 		barrier.data.set(DataKeys.OriginalPosition, originalPosition);
 		barrier.data.set(DataKeys.OpenGate, true);
 		this.tweens.killTweensOf(barrier);
 		this.tweens.add({
 			targets: barrier,
 			x: newX,
-			y: barrier.y,
+			y: newY,
 			duration: config.barrierMovementSpeed,
 		});
 	}
