@@ -1122,12 +1122,48 @@ export class Game extends Scene {
 		});
 	}
 
+	#renderSwordSwipeEffect(): void {
+		this.anims.create({
+			key: "sword-extra-swipe",
+			frames: this.anims.generateFrameNumbers("slash-effect"),
+			frameRate: 48,
+			showOnStart: true,
+			hideOnComplete: true,
+		});
+		const sword = getPhysicsSpriteOrThrow("sword");
+		const effect = this.add.sprite(
+			sword.body.center.x,
+			sword.body.center.y,
+			"slash-effect",
+			0
+		);
+		effect.setSize(config.rangeCardHitBoxWidth, config.rangeCardHitBoxHeight);
+		if (this.playerDirection === SpriteRight) {
+			effect.setFlipX(true);
+		}
+		if (this.playerDirection === SpriteLeft) {
+			effect.setFlipY(true);
+		}
+		if (this.playerDirection === SpriteUp) {
+			effect.setFlipX(true);
+		}
+		this.physics.add.existing(effect);
+		if (!isDynamicSprite(effect)) {
+			throw new Error("Slash effect is broken");
+		}
+		effect.setDepth(config.effectDepth);
+		effect.anims.play("sword-extra-swipe", true);
+		effect.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
+			effect?.destroy();
+		});
+	}
+
 	activateAttack() {
 		const player = getPlayerOrThrow();
 		player.body.setVelocity(0);
 		const sword = getPhysicsSpriteOrThrow("sword");
 		sword.data.set(DataKeys.SwordAttackActive, true);
-		this.updateSwordHitbox();
+		this.#updateSwordHitBox();
 
 		sword.setRotation(Phaser.Math.DegToRad(0));
 
@@ -1140,18 +1176,31 @@ export class Game extends Scene {
 		attackSprite.setVisible(true);
 		attackSprite.setPosition(player.body.center.x, player.body.center.y);
 		player.setVisible(false);
+		const isRangeCardActive = isAuraActive(this.registry, "RangeCard");
 		switch (this.playerDirection) {
 			case SpriteUp:
 				attackSprite.play("up-attack", true);
+				if (isRangeCardActive) {
+					this.#renderSwordSwipeEffect();
+				}
 				break;
 			case SpriteRight:
 				attackSprite.play("right-attack", true);
+				if (isRangeCardActive) {
+					this.#renderSwordSwipeEffect();
+				}
 				break;
 			case SpriteDown:
 				attackSprite.play("down-attack", true);
+				if (isRangeCardActive) {
+					this.#renderSwordSwipeEffect();
+				}
 				break;
 			case SpriteLeft:
 				attackSprite.play("left-attack", true);
+				if (isRangeCardActive) {
+					this.#renderSwordSwipeEffect();
+				}
 				break;
 		}
 
@@ -1174,7 +1223,7 @@ export class Game extends Scene {
 		player.body.setVelocity(0);
 		player.anims.stop();
 		this.setPlayerIdleFrame();
-		this.updateSwordHitbox();
+		this.#updateSwordHitBox();
 		PowerInUse.set(activePower, true);
 		this.playPowerAnimation();
 		this.playPowerSound();
@@ -2315,38 +2364,19 @@ export class Game extends Scene {
 					);
 					break;
 				case "ClockCard":
-					this.pickUpAura(touchingItem.name);
-					break;
+				case "ClockCard":
 				case "SunCard":
-					this.pickUpAura(touchingItem.name);
-					break;
 				case "MountainCard":
-					this.pickUpAura(touchingItem.name);
-					break;
 				case "SwordCard":
-					this.pickUpAura(touchingItem.name);
-					break;
 				case "FishCard":
-					this.pickUpAura(touchingItem.name);
-					break;
 				case "HeartCard":
 					this.pickUpAura(touchingItem.name);
 					break;
 				case "PlantCard":
-					this.pickUpCard(touchingItem.name);
-					break;
 				case "WindCard":
-					this.pickUpCard(touchingItem.name);
-					break;
 				case "IceCard":
-					this.pickUpCard(touchingItem.name);
-					break;
 				case "FireCard":
-					this.pickUpCard(touchingItem.name);
-					break;
 				case "SpiritCard":
-					this.pickUpCard(touchingItem.name);
-					break;
 				case "CloudCard":
 					this.pickUpCard(touchingItem.name);
 					break;
@@ -2651,10 +2681,15 @@ export class Game extends Scene {
 		return config.characterSpeed;
 	}
 
-	updateSwordHitboxForAttack() {
+	#updateSwordHitboxForAttack() {
 		// Add hitbox for sword in direction of sprite
-		const swordWidth = 36; // for down/up
-		const swordHeight = 22; // for down/up
+		const isRangeCardActive = isAuraActive(this.registry, "RangeCard");
+		const swordWidth = isRangeCardActive
+			? config.rangeCardHitBoxWidth
+			: config.swordHitBoxWidth; // for down/up
+		const swordHeight = isRangeCardActive
+			? config.rangeCardHitBoxHeight
+			: config.swordHitBoxHeight; // for down/up
 		const width = (() => {
 			if (
 				this.playerDirection === SpriteLeft ||
@@ -2677,10 +2712,29 @@ export class Game extends Scene {
 		const sword = getPhysicsSpriteOrThrow("sword");
 		sword.body.setSize(width, height);
 
-		const [xOffset, yOffset] = this.getSwordOffset();
+		const xOffset = (() => {
+			if (this.playerDirection === SpriteLeft) {
+				return -swordHeight / 2;
+			}
+			if (this.playerDirection === SpriteRight) {
+				return swordHeight / 2;
+			}
+			return 0;
+		})();
+		const yOffset = (() => {
+			if (this.playerDirection === SpriteUp) {
+				return -swordHeight / 2;
+			}
+			if (this.playerDirection === SpriteDown) {
+				return swordHeight / 2;
+			}
+			return 0;
+		})();
 		const player = getPlayerOrThrow();
-		sword.x = player.body.center.x + xOffset;
-		sword.y = player.body.center.y + yOffset;
+		sword.setPosition(
+			player.body.center.x + xOffset,
+			player.body.center.y + yOffset
+		);
 	}
 
 	#getPowerOffset() {
@@ -2702,29 +2756,6 @@ export class Game extends Scene {
 			}
 			if (this.playerDirection === SpriteDown) {
 				return config.powerOffsetY;
-			}
-			return 0;
-		})();
-		return [xOffset, yOffset];
-	}
-
-	getSwordOffset(): [number, number] {
-		const player = getPlayerOrThrow();
-		const xOffset = (() => {
-			if (this.playerDirection === SpriteLeft) {
-				return -player.body.height;
-			}
-			if (this.playerDirection === SpriteRight) {
-				return player.body.height;
-			}
-			return 0;
-		})();
-		const yOffset = (() => {
-			if (this.playerDirection === SpriteUp) {
-				return -player.body.height;
-			}
-			if (this.playerDirection === SpriteDown) {
-				return player.body.height;
 			}
 			return 0;
 		})();
@@ -2812,7 +2843,7 @@ export class Game extends Scene {
 		return this.isPlayerAttacking() && attackSprite.anims.hasStarted;
 	}
 
-	updateSwordHitbox() {
+	#updateSwordHitBox() {
 		const sword = getPhysicsSpriteOrThrow("sword");
 		sword.body.debugShowBody = false;
 		const power = getPhysicsSpriteOrThrow("power");
@@ -2827,7 +2858,7 @@ export class Game extends Scene {
 		if (!this.isPlayerSwordActive() && !this.isPlayerUsingPower()) {
 			sword.setVisible(false);
 			power.setVisible(false);
-			this.updateSwordHitboxForAttack();
+			this.#updateSwordHitboxForAttack();
 			this.#updatePowerHitbox();
 			return;
 		}
@@ -3216,7 +3247,7 @@ export class Game extends Scene {
 		power.setDepth(config.powerDepth);
 		PhysicsSpriteComponent.set("power", power);
 
-		this.updateSwordHitbox();
+		this.#updateSwordHitBox();
 
 		player.setCollideWorldBounds(true);
 		this.resetPlayerHitBox();
@@ -4366,7 +4397,7 @@ export class Game extends Scene {
 			getSavedDataPlayerPosition(getMap(), player.x, player.y)
 		);
 
-		this.updateSwordHitbox();
+		this.#updateSwordHitBox();
 		this.#updatePowerHitbox();
 		this.updatePlayerMovement();
 		this.updateHealEffectPosition();

@@ -9719,6 +9719,18 @@
                  "width":16,
                  "x":1400.72,
                  "y":918.021
+                }, 
+                {
+                 "gid":2886,
+                 "height":16,
+                 "id":1488,
+                 "name":"RangeCard",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":16,
+                 "x":2144,
+                 "y":640
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -20053,7 +20065,7 @@
          "y":0
         }],
  "nextlayerid":20,
- "nextobjectid":1488,
+ "nextobjectid":1490,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.1",
@@ -21910,7 +21922,7 @@
                         {
                          "name":"collides",
                          "type":"bool",
-                         "value":false
+                         "value":true
                         }, 
                         {
                          "name":"isHole",

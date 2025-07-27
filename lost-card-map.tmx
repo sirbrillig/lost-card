@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.1" orientation="orthogonal" renderorder="right-down" width="200" height="200" tilewidth="16" tileheight="16" infinite="0" nextlayerid="20" nextobjectid="1488">
+<map version="1.10" tiledversion="1.11.1" orientation="orthogonal" renderorder="right-down" width="200" height="200" tilewidth="16" tileheight="16" infinite="0" nextlayerid="20" nextobjectid="1490">
  <editorsettings>
   <export target="public/assets/lost-card-map.json" format="json"/>
  </editorsettings>
@@ -994,7 +994,7 @@
   </tile>
   <tile id="194">
    <properties>
-    <property name="collides" type="bool" value="false"/>
+    <property name="collides" type="bool" value="true"/>
     <property name="isHole" type="bool" value="true"/>
    </properties>
   </tile>
@@ -9756,6 +9756,7 @@
   <object id="1172" name="FullPotion" gid="2792" x="3152" y="2512" width="16" height="16"/>
   <object id="1194" name="HalfHeart" gid="2810" x="2168.35" y="2300.91" width="16" height="16"/>
   <object id="1399" name="HalfHeart" gid="2810" x="1400.72" y="918.021" width="16" height="16"/>
+  <object id="1488" name="RangeCard" gid="2886" x="2144" y="640" width="16" height="16"/>
  </objectgroup>
  <objectgroup id="11" name="SavePoints">
   <object id="244" gid="2717" x="1600" y="1664" width="16" height="16"/>

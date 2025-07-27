@@ -82,6 +82,7 @@ export type Region = "MK" | "IK" | "CK" | "FK" | "PK" | "SK" | "FB";
 
 export type Auras =
 	| "SunCard"
+	| "RangeCard"
 	| "HeartCard"
 	| "SwordCard"
 	| "MountainCard"
@@ -109,6 +110,7 @@ export const auraOrder: Auras[] = [
 	"HeartCard",
 	"SwordCard",
 	"MountainCard",
+	"RangeCard",
 	"SunCard",
 	"ClockCard",
 	"FishCard",
@@ -156,6 +158,8 @@ export function getPowerEquippedKey(
 			return "hasSwordCard";
 		case "SunCard":
 			return "hasSunCard";
+		case "RangeCard":
+			return "hasRangeCard";
 		case "HeartCard":
 			return "hasHeartCard";
 		case "WindCard":
@@ -186,6 +190,8 @@ export function getIconForPower(power: Powers | Auras): {
 			return { texture: "cards", frame: 68 };
 		case "ClockCard":
 			return { texture: "cards", frame: 43 };
+		case "RangeCard":
+			return { texture: "cards", frame: 33 };
 		case "SunCard":
 			return { texture: "cards", frame: 24 };
 		case "MountainCard":
@@ -895,6 +901,7 @@ export interface SaveDataHasCard {
 	hasMountainCard?: boolean;
 	hasSwordCard?: boolean;
 	hasSunCard?: boolean;
+	hasRangeCard?: boolean;
 	hasHeartCard?: boolean;
 	hasWindCard?: boolean;
 	hasIceCard?: boolean;
@@ -1147,6 +1154,8 @@ export function getCardNameForPower(card: Powers | Auras): string {
 			return "Heart Card";
 		case "SunCard":
 			return "Sun Card";
+		case "RangeCard":
+			return "Range Card";
 		case "IceCard":
 			return "Ice Card";
 		case "PlantCard":
@@ -1176,6 +1185,8 @@ export function getAuraDescription(card: Auras): string {
 			return "Your sword will deal more damage per hit.";
 		case "SunCard":
 			return "You will be invincible for longer after being hit.";
+		case "RangeCard":
+			return "Your attacks will reach further.";
 	}
 }
 
