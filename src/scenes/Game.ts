@@ -1359,6 +1359,8 @@ export class Game extends Scene {
 
 		this.closeGatePillars();
 
+		this.#closeBarriers();
+
 		this.cacheTilesInRoom();
 
 		this.toggleLightsInRoom();
@@ -1750,7 +1752,34 @@ export class Game extends Scene {
 			targets: barrier,
 			x: newX,
 			y: barrier.y,
-			duration: config.gateCloseSpeed * 2,
+			duration: config.barrierMovementSpeed,
+		});
+	}
+
+	#closeBarrier(
+		barrier: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody
+	): void {
+		if (!barrier.data.get(DataKeys.OpenGate)) {
+			return;
+		}
+		const originalPosition = barrier.data.get(DataKeys.OriginalPosition);
+		if (!originalPosition) {
+			return;
+		}
+		barrier.data.remove(DataKeys.OriginalPosition);
+		barrier.data.remove(DataKeys.OpenGate);
+		this.tweens.killTweensOf(barrier);
+		this.tweens.add({
+			targets: barrier,
+			x: originalPosition.x,
+			y: originalPosition.y,
+			duration: config.barrierMovementSpeed,
+		});
+	}
+
+	#closeBarriers(): void {
+		this.createdTiles.forEach((tile) => {
+			this.#closeBarrier(tile);
 		});
 	}
 
