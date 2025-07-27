@@ -1722,6 +1722,12 @@ export class Game extends Scene {
 	}
 
 	#hitSwitch(tile: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody): void {
+		tile.setTint(0x00ff00);
+		this.tweens.add({
+			targets: tile,
+			rotation: Phaser.Math.DegToRad(180),
+			duration: config.barrierMovementSpeed,
+		});
 		const tileId = tile.data.get(DataKeys.ItemObjectId);
 		const switchesPressed =
 			getDataFromRegistry(this.registry, "SwitchesPressed") ?? [];
