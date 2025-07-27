@@ -1359,8 +1359,6 @@ export class Game extends Scene {
 
 		this.closeGatePillars();
 
-		this.#closeBarriers();
-
 		this.cacheTilesInRoom();
 
 		this.toggleLightsInRoom();
@@ -1640,6 +1638,7 @@ export class Game extends Scene {
 				}
 				return isPointInRegion(getMap(), point.x, point.y, region);
 			}) ?? [];
+		this.#closeBarriers();
 	}
 
 	checkForGameOver() {
