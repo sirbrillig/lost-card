@@ -143,7 +143,6 @@ export class Game extends Scene {
 	keyP: Phaser.Input.Keyboard.Key;
 
 	landLayer: Phaser.Tilemaps.TilemapLayer;
-	hiddenRoomLayer: Phaser.Tilemaps.TilemapLayer;
 	aboveLayer: Phaser.Tilemaps.TilemapLayer;
 	stuffLayer: Phaser.Tilemaps.TilemapLayer;
 	createdFinalDoors: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody[] = [];
@@ -227,11 +226,6 @@ export class Game extends Scene {
 			tilesetTile,
 			config.backgroundDepth
 		);
-		this.hiddenRoomLayer = this.createTileLayer(
-			"HiddenRooms",
-			tilesetTile,
-			config.backgroundDepth
-		);
 
 		// Handle tiles that hurt the player
 		this.physics.add.collider(
@@ -270,58 +264,7 @@ export class Game extends Scene {
 				return true;
 			}
 		);
-		this.physics.add.collider(
-			this.hiddenRoomLayer,
-			player,
-			(_, tile) => {
-				if (!isTileWithPropertiesObject(tile)) {
-					return;
-				}
-				if (tile.properties.hurts) {
-					this.enemyHitPlayer();
-				}
-				if (tile.properties.deadly) {
-					this.enemyHitPlayer({ damage: 10 });
-				}
-			},
-			(_, tile) => {
-				if (
-					isTileWithPropertiesObject(tile) &&
-					(tile.properties.isWater || tile.properties.isLava) &&
-					isAuraActive(this.registry, "FishCard")
-				) {
-					return false;
-				}
-				if (
-					isTileWithPropertiesObject(tile) &&
-					tile.properties.affectedBySpiritCard &&
-					this.isPlayerUsingPower() &&
-					this.getActivePower() === "SpiritCard"
-				) {
-					return false;
-				}
-				if (player.data.get("isPlantCardGrappleActive")) {
-					return false;
-				}
-				return true;
-			}
-		);
 
-		this.physics.add.collider(
-			this.hiddenRoomLayer,
-			this.enemyManager.enemies,
-			undefined,
-			(enemy, tile) => {
-				if (!isDynamicSprite(enemy)) {
-					console.error(enemy);
-					throw new Error("Non-sprite ran into something");
-				}
-				if (!isEnemy(enemy)) {
-					throw new Error("Non-enemy ran into something");
-				}
-				return enemy.doesCollideWithTile(tile);
-			}
-		);
 		this.physics.add.collider(
 			this.landLayer,
 			this.enemyManager.enemies,
@@ -503,11 +446,6 @@ export class Game extends Scene {
 			this.playerHitEnemy(enemy);
 		});
 
-		this.physics.add.overlap(power, this.hiddenRoomLayer, (_, tile) => {
-			if (isTilemapTile(tile)) {
-				this.#handlePowerCollideTile(tile);
-			}
-		});
 		this.physics.add.overlap(power, this.landLayer, (_, tile) => {
 			if (isTilemapTile(tile)) {
 				this.#handlePowerCollideTile(tile);
@@ -580,7 +518,6 @@ export class Game extends Scene {
 		return [
 			this.landLayer,
 			this.stuffLayer,
-			this.hiddenRoomLayer,
 			...this.createdDoors,
 			...this.createdTiles,
 			...this.createdFinalDoors,
@@ -934,11 +871,6 @@ export class Game extends Scene {
 			} else {
 				this.debugGraphic = this.physics.world.createDebugGraphic();
 				this.layerDebugGraphic = this.add.graphics();
-				this.hiddenRoomLayer.renderDebug(this.layerDebugGraphic, {
-					tileColor: null,
-					collidingTileColor: new Phaser.Display.Color(243, 134, 48, 200),
-					faceColor: new Phaser.Display.Color(40, 39, 37, 255),
-				});
 				this.landLayer.renderDebug(this.layerDebugGraphic, {
 					tileColor: null,
 					collidingTileColor: new Phaser.Display.Color(243, 134, 48, 200),
@@ -1113,7 +1045,6 @@ export class Game extends Scene {
 			);
 		}
 		this.landLayer.setCollisionByProperty({ collides: true });
-		this.hiddenRoomLayer.setCollisionByProperty({ collides: true });
 	}
 
 	turnOffAllLanterns() {
@@ -2203,14 +2134,6 @@ export class Game extends Scene {
 		// Allow destroying rocks by pushing into walls so you can't block
 		// yourself in a room.
 		this.physics.add.collider(this.landLayer, tile, (collideTile) => {
-			if (!isDynamicSprite(collideTile)) {
-				return;
-			}
-			if (collideTile.data.get("beingPushed")) {
-				this.#destroyCreatedTile(tile);
-			}
-		});
-		this.physics.add.collider(this.hiddenRoomLayer, tile, (collideTile) => {
 			if (!isDynamicSprite(collideTile)) {
 				return;
 			}
