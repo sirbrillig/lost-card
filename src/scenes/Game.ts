@@ -1697,18 +1697,28 @@ export class Game extends Scene {
 		this.checkForSwordHitTiles();
 	}
 
-	#destroyCreatedTile(tile: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody) {
+	#destroyCreatedTile(
+		tile: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody,
+		animation: string = "explode"
+	) {
 		this.cameras.main.shake(200, 0.004);
 		vibrate(this, 1, 200);
 
 		this.rockDestroySound.play();
 		tile.setOrigin(0.6, 0.5);
-		tile.anims.play("explode", true);
-		tile.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
+		const finishDestroyingTile = () => {
 			this.createdTiles = this.createdTiles.filter((tileA) => tileA !== tile);
 			this.stuffLayer.removeTileAtWorldXY(tile.x, tile.y);
 			tile.destroy();
-		});
+		};
+		if (animation) {
+			tile.anims.play("explode", true);
+			tile.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
+				finishDestroyingTile();
+			});
+		} else {
+			finishDestroyingTile();
+		}
 	}
 
 	checkForSwordHitTiles() {
@@ -1722,7 +1732,7 @@ export class Game extends Scene {
 				return;
 			}
 			if (tile.data.get(DataKeys.DestroyedBySword)) {
-				this.#destroyCreatedTile(tile);
+				this.#destroyCreatedTile(tile, "");
 				return;
 			}
 			if (tile.data.get(DataKeys.IsSwitch)) {
