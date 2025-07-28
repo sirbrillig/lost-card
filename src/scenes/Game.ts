@@ -329,6 +329,11 @@ export class Game extends Scene {
 
 		// Enemies collide with doors but players can pass through them.
 		this.physics.add.collider(this.createdDoors, this.enemyManager.enemies);
+		this.physics.add.collider(this.createdDoors, player, (door) => {
+			if (isDynamicSprite(door)) {
+				this.handleCollideDoor(door);
+			}
+		});
 
 		MainEvents.on(Events.EnemyHitPlayer, () => {
 			this.enemyHitPlayer();
@@ -1228,7 +1233,6 @@ export class Game extends Scene {
 			callback: this.recordObjectIdOnSprite.bind(this),
 		}).map((item) => {
 			item.body.pushable = false;
-			item.body.setSize(item.body.width + 1, item.body.height + 1);
 			return item;
 		});
 	}
@@ -1722,7 +1726,11 @@ export class Game extends Scene {
 	}
 
 	#hitSwitch(tile: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody): void {
+		if (tile.data.get(DataKeys.IsSwitchPressed)) {
+			return;
+		}
 		tile.setTint(0x00ff00);
+		tile.data.set(DataKeys.IsSwitchPressed, true);
 		this.tweens.add({
 			targets: tile,
 			rotation: Phaser.Math.DegToRad(180),
@@ -2263,14 +2271,6 @@ export class Game extends Scene {
 			item.setVisible(false);
 			item.data.set("hidden", true);
 		});
-	}
-
-	maybeChangeRoom() {
-		const player = getPlayerOrThrow();
-		const touchingDoor = getItemTouchingPlayer(this.createdDoors, player);
-		if (touchingDoor) {
-			this.handleCollideDoor(touchingDoor);
-		}
 	}
 
 	maybePickUpItem() {
@@ -4354,7 +4354,6 @@ export class Game extends Scene {
 		if (isMoving) {
 			// This differs from PlayerMoved because this is any movement and PlayerMoved is intentional movement.
 			MainEvents.emit(Events.PlayerPositionChanged);
-			this.maybeChangeRoom();
 			this.maybePickUpItem();
 			this.updateStatusIcon();
 		}

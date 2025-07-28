@@ -52,6 +52,7 @@ export const DataKeys = {
 	SwordAttackActive: "attackActive",
 	DestroyedBySword: "affectedBySword",
 	IsSwitch: "isSwitch",
+	IsSwitchPressed: "isSwitchPressed",
 	DoorTarget: "doorto",
 	ControlledBy: "controlledBy",
 	GateOpenDirection: "openDirection",
