@@ -28,7 +28,6 @@ class Aura {
 	image: Phaser.GameObjects.Image;
 	scene: Phaser.Scene;
 	name: string;
-	isSelected: boolean = false;
 
 	constructor(
 		scene: Phaser.Scene,
@@ -49,14 +48,6 @@ class Aura {
 		this.image = image;
 		this.name = name;
 		this.scene = scene;
-	}
-
-	update() {
-		if (!this.isSelected) {
-			this.image.setAlpha(0.5);
-			return;
-		}
-		this.image.clearAlpha();
 	}
 
 	destroy() {
@@ -548,6 +539,9 @@ export class Overlay extends Scene {
 			if (this.auras.some((item) => item.name === aura)) {
 				return;
 			}
+			if (!isAuraActive(this.registry, aura)) {
+				return;
+			}
 			const icon = getIconForPower(aura);
 			const auraObject = new Aura(
 				this,
@@ -556,11 +550,6 @@ export class Overlay extends Scene {
 				icon.frame,
 				aura
 			);
-			if (isAuraActive(this.registry, aura)) {
-				auraObject.isSelected = true;
-			} else {
-				auraObject.isSelected = false;
-			}
 			this.auras.push(auraObject);
 		});
 
@@ -579,7 +568,6 @@ export class Overlay extends Scene {
 
 		this.potions.forEach((item) => item.update());
 		this.items.forEach((item) => item.update());
-		this.auras.forEach((item) => item.update());
 	}
 
 	getBackgroundWidth() {
