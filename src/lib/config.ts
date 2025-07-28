@@ -53,6 +53,8 @@ export const config = {
 	openingTextDelay: 18000,
 	howToPlayDelay: 4000,
 	maxActiveAuras: 2,
+	playerDoorHitBoxWidth: 2, // when facing up
+	playerDoorHitBoxHeight: 8, // when facing up
 	swordHitBoxWidth: 36,
 	swordHitBoxHeight: 22,
 	rangeCardHitBoxWidth: 36,

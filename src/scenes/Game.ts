@@ -316,24 +316,12 @@ export class Game extends Scene {
 			}
 		);
 
-		this.createDoors();
-		this.createFinalDoors();
+		this.#createDoors();
+		this.#createFinalDoors();
 		this.createAppearingTiles();
 		this.createItems();
-		this.createSavePoints();
+		this.#createSavePoints();
 		this.#restoreSwitches();
-
-		this.physics.add.collider(this.createdFinalDoors, player, () => {
-			this.checkFinalDoor();
-		});
-
-		// Enemies collide with doors but players can pass through them.
-		this.physics.add.collider(this.createdDoors, this.enemyManager.enemies);
-		this.physics.add.collider(this.createdDoors, player, (door) => {
-			if (isDynamicSprite(door)) {
-				this.handleCollideDoor(door);
-			}
-		});
 
 		MainEvents.on(Events.EnemyHitPlayer, () => {
 			this.enemyHitPlayer();
@@ -345,42 +333,6 @@ export class Game extends Scene {
 			}
 			this.makePlayerConfused();
 		});
-
-		let isSaving = false;
-		this.physics.add.collider(
-			player,
-			this.createdSavePoints,
-			(_, savePoint) => {
-				if (!isDynamicSprite(savePoint)) {
-					return;
-				}
-				if (isSaving) {
-					return;
-				}
-				const lastSaved = savePoint.data.get("savedAt");
-				if (lastSaved && this.time.now - lastSaved < config.saveCooldown) {
-					return;
-				}
-
-				isSaving = true;
-				savePoint.data.set("savedAt", this.time.now);
-				this.turnOffAllLanterns();
-				const effect = this.add.sprite(
-					savePoint.x,
-					savePoint.y,
-					"light-lantern",
-					0
-				);
-				effect.anims.play("light-lantern", true);
-				savePoint.setTexture("dungeon_tiles_sprites", 1323);
-				effect.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
-					isSaving = false;
-					effect.destroy();
-				});
-				this.saveSound.play();
-				this.saveGame();
-			}
-		);
 
 		this.enemyCollider = this.physics.add.collider(
 			player,
@@ -1201,7 +1153,7 @@ export class Game extends Scene {
 		}
 	}
 
-	createSavePoints() {
+	#createSavePoints() {
 		this.createdSavePoints = createSpritesFromObjectLayer(
 			getMap(),
 			"SavePoints",
@@ -1212,9 +1164,46 @@ export class Game extends Scene {
 			item.body.pushable = false;
 			return item;
 		});
+
+		const player = getPlayerOrThrow();
+		let isSaving = false;
+		this.physics.add.collider(
+			player,
+			this.createdSavePoints,
+			(_, savePoint) => {
+				if (!isDynamicSprite(savePoint)) {
+					return;
+				}
+				if (isSaving) {
+					return;
+				}
+				const lastSaved = savePoint.data.get("savedAt");
+				if (lastSaved && this.time.now - lastSaved < config.saveCooldown) {
+					return;
+				}
+
+				isSaving = true;
+				savePoint.data.set("savedAt", this.time.now);
+				this.turnOffAllLanterns();
+				const effect = this.add.sprite(
+					savePoint.x,
+					savePoint.y,
+					"light-lantern",
+					0
+				);
+				effect.anims.play("light-lantern", true);
+				savePoint.setTexture("dungeon_tiles_sprites", 1323);
+				effect.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
+					isSaving = false;
+					effect.destroy();
+				});
+				this.saveSound.play();
+				this.saveGame();
+			}
+		);
 	}
 
-	createFinalDoors() {
+	#createFinalDoors() {
 		this.createdFinalDoors = createSpritesFromObjectLayer(
 			getMap(),
 			"FinalDoor",
@@ -1225,15 +1214,29 @@ export class Game extends Scene {
 			item.body.pushable = false;
 			return item;
 		});
+
+		const player = getPlayerOrThrow();
+		this.physics.add.collider(this.createdFinalDoors, player, () => {
+			this.checkFinalDoor();
+		});
 	}
 
-	createDoors() {
+	#createDoors() {
 		this.createdDoors = createSpritesFromObjectLayer(getMap(), "Doors", {
 			getTilesetKeyByName: this.getTilesetKeyByName.bind(this),
 			callback: this.recordObjectIdOnSprite.bind(this),
 		}).map((item) => {
 			item.body.pushable = false;
 			return item;
+		});
+
+		// Enemies collide with doors but players can pass through them.
+		this.physics.add.collider(this.createdDoors, this.enemyManager.enemies);
+		const playerDoorHitbox = getPhysicsSpriteOrThrow("playerDoorHitbox");
+		this.physics.add.collider(this.createdDoors, playerDoorHitbox, (door) => {
+			if (isDynamicSprite(door)) {
+				this.handleCollideDoor(door);
+			}
 		});
 	}
 
@@ -1544,6 +1547,9 @@ export class Game extends Scene {
 			return;
 		}
 
+		// Pause the game so we don't have to deal with multiple collisions etc while changing rooms.
+		this.physics.pause();
+
 		const destinationDoor = this.#findSpriteWithMapId(
 			destinationId,
 			"Doors",
@@ -1570,6 +1576,7 @@ export class Game extends Scene {
 
 		const room = getRoomForPoint(getMap(), destinationX, destinationY);
 		if (room.name === getActiveRoom()?.name) {
+			this.physics.resume();
 			return;
 		}
 
@@ -1608,6 +1615,7 @@ export class Game extends Scene {
 					if (shouldDoorLockAfterExit && destinationDoor) {
 						this.#lockDoor(destinationDoor.sprite);
 					}
+					this.physics.resume();
 					MainEvents.emit(Events.EnteredRoom);
 				}
 			}
@@ -2309,7 +2317,7 @@ export class Game extends Scene {
 					);
 					break;
 				case "ClockCard":
-				case "ClockCard":
+				case "RangeCard":
 				case "SunCard":
 				case "MountainCard":
 				case "SwordCard":
@@ -2820,6 +2828,55 @@ export class Game extends Scene {
 		}
 	}
 
+	#updatePlayerDoorHitBox() {
+		const playerDoorHitbox = getPhysicsSpriteOrThrow("playerDoorHitbox");
+		const width = (() => {
+			if (
+				this.playerDirection === SpriteLeft ||
+				this.playerDirection === SpriteRight
+			) {
+				return config.playerDoorHitBoxHeight;
+			}
+			return config.playerDoorHitBoxWidth;
+		})();
+		const height = (() => {
+			if (
+				this.playerDirection === SpriteUp ||
+				this.playerDirection === SpriteDown
+			) {
+				return config.playerDoorHitBoxHeight;
+			}
+			return config.playerDoorHitBoxWidth;
+		})();
+
+		playerDoorHitbox.body.setSize(width, height);
+
+		const xOffset = (() => {
+			if (this.playerDirection === SpriteLeft) {
+				return -width / 2;
+			}
+			if (this.playerDirection === SpriteRight) {
+				return width / 2;
+			}
+			return 0;
+		})();
+		const yOffset = (() => {
+			if (this.playerDirection === SpriteUp) {
+				return -height / 2;
+			}
+			if (this.playerDirection === SpriteDown) {
+				return height / 2;
+			}
+			return 0;
+		})();
+
+		const player = getPlayerOrThrow();
+		playerDoorHitbox.setPosition(
+			player.body.center.x + xOffset,
+			player.body.center.y + yOffset
+		);
+	}
+
 	createOverlay() {
 		if (
 			getDataFromRegistry(this.registry, "playerTotalHitPoints") === undefined
@@ -3157,6 +3214,22 @@ export class Game extends Scene {
 		player.setDebugBodyColor(0x00ff00);
 		player.setDepth(config.playerDepth);
 		PhysicsSpriteComponent.set("player", player);
+
+		const playerDoorHitbox = this.physics.add.sprite(
+			x,
+			y,
+			"character",
+			"idle-down-0.png"
+		);
+		playerDoorHitbox.setVisible(false);
+		playerDoorHitbox.setDebugBodyColor(0x055ff0);
+		playerDoorHitbox.setDepth(config.swordDepth);
+		playerDoorHitbox.setPushable(false);
+		playerDoorHitbox.setSize(
+			config.playerDoorHitBoxWidth,
+			config.playerDoorHitBoxHeight
+		);
+		PhysicsSpriteComponent.set("playerDoorHitbox", playerDoorHitbox);
 
 		this.restorePlayerHitPoints();
 
@@ -4344,6 +4417,7 @@ export class Game extends Scene {
 
 		this.#updateSwordHitBox();
 		this.#updatePowerHitbox();
+		this.#updatePlayerDoorHitBox();
 		this.updatePlayerMovement();
 		this.updateHealEffectPosition();
 		this.updateHeartCard();
