@@ -2,6 +2,7 @@ import { Scene } from "phaser";
 import { config } from "../lib/config";
 import { MainEvents } from "../lib/MainEvents";
 import { EnemyManager } from "../lib/EnemyManager";
+import { PotionBar } from "../lib/PotionBar";
 import {
 	Powers,
 	Events,
@@ -284,6 +285,7 @@ export interface OverlayData {
 
 export class Overlay extends Scene {
 	potions: PotionItem[] = [];
+	potionBar: PotionBar | undefined;
 	items: Card[] = [];
 	auras: Aura[] = [];
 	hearts: Heart[] = [];
@@ -342,6 +344,15 @@ export class Overlay extends Scene {
 			.image(this.cameras.main.x + 2, this.cameras.main.y, "side_portrait", 0)
 			.setScale(0.5)
 			.setOrigin(0);
+		this.potionBar = new PotionBar(
+			this,
+			this.cameras.main.x + this.cameras.main.width - 6,
+			this.cameras.main.y + 70,
+			10,
+			this.#getPotionBarHeight(),
+			0
+		);
+
 		this.createHearts();
 		this.updateItems();
 		this.updateSelectedItem();
@@ -627,6 +638,7 @@ export class Overlay extends Scene {
 			this.updateKeys();
 		}
 		this.updateSelectedItem();
+		this.#updatePotionBar();
 	}
 
 	createHearts() {
@@ -637,5 +649,27 @@ export class Overlay extends Scene {
 		for (let x = 0; x < this.totalHearts; x++) {
 			this.hearts.push(new Heart(this, x));
 		}
+	}
+
+	#getPotionBarHeight(): number {
+		const totalPotions =
+			getDataFromRegistry(this.registry, "potionTotalCount") ?? 0;
+		const pixelsPerPotion = 4;
+		return pixelsPerPotion * totalPotions;
+	}
+
+	#updatePotionBar() {
+		if (!this.potionBar) {
+			return;
+		}
+
+		const totalPotions =
+			getDataFromRegistry(this.registry, "potionTotalCount") ?? 0;
+		const currentPotions =
+			getDataFromRegistry(this.registry, "potionCount") ?? 0;
+
+		this.potionBar.setHeight(this.#getPotionBarHeight());
+		this.potionBar.setMaxPotions(totalPotions);
+		this.potionBar.setPotions(currentPotions);
 	}
 }
