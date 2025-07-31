@@ -127,6 +127,7 @@ export class Game extends Scene {
 	isPlayerAppearingInvincible: boolean = false;
 	isPlayerBeingHitInvincible: boolean = false;
 	heartCardTimer: Phaser.Time.TimerEvent | undefined;
+	healTimer: Phaser.Time.TimerEvent | undefined;
 	cachedTilesInRoom: Phaser.Tilemaps.Tile[] | undefined;
 
 	keyLeft: Phaser.Input.Keyboard.Key;
@@ -755,6 +756,28 @@ export class Game extends Scene {
 		this.setUpDebugMode();
 	}
 
+	#startHealTimer(): void {
+		if (this.healTimer) {
+			return;
+		}
+
+		this.healTimer = this.time.addEvent({
+			repeat: -1,
+			delay: config.healTimeDelay,
+			callback: () => {
+				this.usePotion();
+			},
+		});
+	}
+
+	#stopHealTimer(): void {
+		if (!this.healTimer) {
+			return;
+		}
+		this.healTimer.remove();
+		this.healTimer = undefined;
+	}
+
 	setUpControls() {
 		if (!this.input.keyboard) {
 			throw new Error("No keyboard controls could be found");
@@ -772,10 +795,10 @@ export class Game extends Scene {
 			}
 		});
 		this.keyP.on("down", () => {
-			this.usePotion();
+			this.#startHealTimer();
 		});
 		this.keyR.on("down", () => {
-			this.usePotion();
+			this.#startHealTimer();
 		});
 
 		this.input.gamepad?.on("down", () => {
@@ -790,7 +813,7 @@ export class Game extends Scene {
 				}
 			}
 			if (this.input.gamepad?.pad1?.Y) {
-				this.usePotion();
+				this.#startHealTimer();
 			}
 		});
 	}
@@ -921,7 +944,6 @@ export class Game extends Scene {
 			return;
 		}
 
-		// Use Potion
 		this.healSound.play();
 		if (this.healEffect) {
 			this.healEffect.destroy();
@@ -952,7 +974,7 @@ export class Game extends Scene {
 		});
 
 		this.setPotionCount(potionCount - 1);
-		this.restorePlayerHitPoints();
+		this.restorePlayerHitPoints(1);
 	}
 
 	freezeWaterTile(tile: Phaser.Tilemaps.Tile) {
@@ -2541,9 +2563,22 @@ export class Game extends Scene {
 		});
 	}
 
-	restorePlayerHitPoints() {
+	restorePlayerHitPoints(count?: number | undefined) {
 		const playerTotalHitPoints = this.getPlayerTotalHitPoints();
-		this.setPlayerHitPoints(playerTotalHitPoints);
+		if (count && count > playerTotalHitPoints) {
+			count = playerTotalHitPoints;
+		}
+		if (count) {
+			this.setPlayerHitPoints(
+				Phaser.Math.Clamp(
+					this.getPlayerHitPoints() + count,
+					0,
+					playerTotalHitPoints
+				)
+			);
+		} else {
+			this.setPlayerHitPoints(playerTotalHitPoints);
+		}
 		this.heartCardTimer?.remove();
 		this.heartCardTimer = undefined;
 	}
@@ -4203,6 +4238,13 @@ export class Game extends Scene {
 		return true;
 	}
 
+	#isPressingHeal(): boolean {
+		if (this.keyP.isDown || this.keyR.isDown) {
+			return true;
+		}
+		return false;
+	}
+
 	isPressingLeft(): boolean {
 		if (
 			this.keyLeft.isDown ||
@@ -4421,6 +4463,14 @@ export class Game extends Scene {
 		this.updatePlayerMovement();
 		this.updateHealEffectPosition();
 		this.updateHeartCard();
+
+		if (this.#isPressingHeal()) {
+			// FIXME: prevent movement
+			// FIXME: do some sort of healing animation
+		}
+		if (!this.#isPressingHeal() && this.healTimer) {
+			this.#stopHealTimer();
+		}
 
 		// Keep in mind that the player may be moving unintentionally (eg: via knockback).
 		const isMoving =

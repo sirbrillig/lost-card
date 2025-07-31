@@ -42,6 +42,7 @@ export const config = {
 	finalBossDoorInside: 738,
 	spiritPowerTime: 4000,
 	heartCardHealTime: 10000,
+	healTimeDelay: 2000,
 	playerConfusedTime: 8000,
 	monsterHitBoxSizePercentage: 0.35,
 	monsterHitBoxOffsetY: 8,
