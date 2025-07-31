@@ -421,6 +421,7 @@ export class Game extends Scene {
 		this.hideAllTransientTiles();
 		this.hideHiddenItems();
 
+		this.#createHitPoints();
 		this.createOverlay();
 
 		MainEvents.on(Events.StunPlayer, (setting: boolean) =>
@@ -881,7 +882,7 @@ export class Game extends Scene {
 			this.equipPower("SpiritCard");
 			this.equipPower("CloudCard");
 			this.setPotionTotalCount(10);
-			this.setPotionCount(10);
+			this.setPotionCount(8);
 			this.setKeyCount(6);
 		});
 
@@ -2408,18 +2409,13 @@ export class Game extends Scene {
 	getPlayerTotalHitPoints(): number {
 		return (
 			getDataFromRegistry(this.registry, "playerTotalHitPoints") ??
-			config.playerInitialHitPoints
+			config.playerInitialTotalHitPoints
 		);
 	}
 
 	setPlayerHitPoints(hitPoints: number) {
 		const playerTotalHitPoints = this.getPlayerTotalHitPoints();
-		if (hitPoints > playerTotalHitPoints) {
-			hitPoints = playerTotalHitPoints;
-		}
-		if (hitPoints < 0) {
-			hitPoints = 0;
-		}
+		hitPoints = Phaser.Math.Clamp(hitPoints, 0, playerTotalHitPoints);
 		saveDataToRegistry(this.registry, "playerHitPoints", hitPoints);
 	}
 
@@ -2912,19 +2908,22 @@ export class Game extends Scene {
 		);
 	}
 
-	createOverlay() {
+	#createHitPoints() {
 		if (
 			getDataFromRegistry(this.registry, "playerTotalHitPoints") === undefined
 		) {
 			saveDataToRegistry(
 				this.registry,
 				"playerTotalHitPoints",
-				config.playerInitialHitPoints
+				config.playerInitialTotalHitPoints
 			);
 		}
 		if (getDataFromRegistry(this.registry, "playerHitPoints") === undefined) {
 			this.setPlayerHitPoints(config.playerInitialHitPoints);
 		}
+	}
+
+	createOverlay() {
 		this.scene.launch("Overlay", { enemyManager: this.enemyManager });
 	}
 
@@ -3266,7 +3265,7 @@ export class Game extends Scene {
 		);
 		PhysicsSpriteComponent.set("playerDoorHitbox", playerDoorHitbox);
 
-		this.restorePlayerHitPoints();
+		this.setPlayerHitPoints(config.playerInitialHitPoints);
 
 		const sword = this.physics.add.sprite(player.x, player.y, "wind-power", 4);
 		sword.setDataEnabled();
@@ -4239,7 +4238,7 @@ export class Game extends Scene {
 	}
 
 	#isPressingHeal(): boolean {
-		if (this.keyP.isDown || this.keyR.isDown) {
+		if (this.keyP.isDown || this.keyR.isDown || this.input.gamepad?.pad1?.Y) {
 			return true;
 		}
 		return false;

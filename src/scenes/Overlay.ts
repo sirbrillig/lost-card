@@ -318,9 +318,11 @@ export class Overlay extends Scene {
 		this.halfHearts =
 			getDataFromRegistry(this.registry, "playerHalfHearts") ?? 0;
 		this.totalHearts =
-			getDataFromRegistry(this.registry, "playerTotalHitPoints") ?? 0;
+			getDataFromRegistry(this.registry, "playerTotalHitPoints") ??
+			config.playerInitialTotalHitPoints;
 		this.activeHearts =
-			getDataFromRegistry(this.registry, "playerHitPoints") ?? 0;
+			getDataFromRegistry(this.registry, "playerHitPoints") ??
+			config.playerInitialHitPoints;
 		this.bg = this.add
 			.nineslice(
 				this.cameras.main.x,
@@ -582,9 +584,11 @@ export class Overlay extends Scene {
 
 	update() {
 		const totalHearts =
-			getDataFromRegistry(this.registry, "playerTotalHitPoints") ?? 0;
+			getDataFromRegistry(this.registry, "playerTotalHitPoints") ??
+			config.playerInitialTotalHitPoints;
 		const activeHearts =
-			getDataFromRegistry(this.registry, "playerHitPoints") ?? 0;
+			getDataFromRegistry(this.registry, "playerHitPoints") ??
+			config.playerInitialHitPoints;
 		const keyCount = this.getKeyCount();
 		const halfHearts =
 			getDataFromRegistry(this.registry, "playerHalfHearts") ?? 0;
