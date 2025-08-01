@@ -5,6 +5,8 @@ export const PhysicsSpriteComponent = new Map<
 
 export const SpriteComponent = new Map<string, Phaser.GameObjects.Sprite>();
 
+export const TweenComponent = new Map<string, Phaser.Tweens.Tween>();
+
 export const MapComponent = new Map<string, Phaser.Tilemaps.Tilemap>();
 
 export const ActiveRoomComponent = new Map<

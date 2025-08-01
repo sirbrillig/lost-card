@@ -73,6 +73,7 @@ import { MonsterCreator } from "../lib/MonsterCreator";
 import {
 	PhysicsSpriteComponent,
 	SpriteComponent,
+	TweenComponent,
 	MapComponent,
 	ItemComponent,
 	DashingComponent,
@@ -769,12 +770,35 @@ export class Game extends Scene {
 				this.usePotion();
 			},
 		});
+		const player = getPlayerOrThrow();
+		const healTimerEffect = this.add.sprite(
+			player.body.center.x + 1,
+			player.body.center.y - 1,
+			"use-potion",
+			0
+		);
+		SpriteComponent.set("healTimerEffect", healTimerEffect);
+		const healTimerTween = this.tweens.add({
+			targets: healTimerEffect,
+			rotation: Phaser.Math.DegToRad(90),
+			ease: "Exponential.InOut",
+			yoyo: true,
+			repeat: -1,
+		});
+		TweenComponent.set("healTimerTween", healTimerTween);
+		healTimerEffect.anims.play({ key: "use-potion", repeat: -1 });
 	}
 
 	#stopHealTimer(): void {
 		if (!this.healTimer) {
 			return;
 		}
+		const healTimerEffect = SpriteComponent.get("healTimerEffect");
+		const healTimerTween = TweenComponent.get("healTimerTween");
+		healTimerTween?.destroy();
+		healTimerEffect?.destroy();
+		SpriteComponent.delete("healTimerEffect");
+		TweenComponent.delete("healTimerTween");
 		this.healTimer.remove();
 		this.healTimer = undefined;
 	}
@@ -3680,6 +3704,7 @@ export class Game extends Scene {
 			this.getPlayerHitPoints() > 0 &&
 			this.doesPlayerHaveSword() &&
 			!this.isPlayerFrozen() &&
+			!this.#isPressingHeal() &&
 			!this.isPlayerStunned() &&
 			!this.isPlayerAttacking() &&
 			this.getTimeSinceLastAttack() > config.postAttackCooldown &&
@@ -3731,6 +3756,7 @@ export class Game extends Scene {
 			this.getPlayerHitPoints() > 0 &&
 			this.doesPlayerHavePower() &&
 			!this.isPlayerFrozen() &&
+			!this.#isPressingHeal() &&
 			!this.isPlayerStunned() &&
 			!this.isPlayerAttacking() &&
 			this.getTimeSinceLastPower() > postPowerCooldown &&
@@ -4231,6 +4257,9 @@ export class Game extends Scene {
 		if (this.isPlayerFrozen()) {
 			return false;
 		}
+		if (this.#isPressingHeal()) {
+			return false;
+		}
 		if (this.getPlayerHitPoints() <= 0) {
 			return false;
 		}
@@ -4464,8 +4493,9 @@ export class Game extends Scene {
 		this.updateHeartCard();
 
 		if (this.#isPressingHeal()) {
-			// FIXME: prevent movement
-			// FIXME: do some sort of healing animation
+			player.body.setVelocity(0);
+			player.anims.stop();
+			this.setPlayerIdleFrame();
 		}
 		if (!this.#isPressingHeal() && this.healTimer) {
 			this.#stopHealTimer();
