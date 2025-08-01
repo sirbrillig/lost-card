@@ -1434,7 +1434,10 @@ export const tilePropertiesThatDoNotBlockFire = [
 ];
 
 export function doesTileBlockFire(
-	tile: Phaser.Tilemaps.Tile | Phaser.Types.Physics.Arcade.SpriteWithDynamicBody
+	tile:
+		| Phaser.Tilemaps.Tile
+		| Phaser.Types.Physics.Arcade.SpriteWithDynamicBody
+		| Phaser.Types.Physics.Arcade.GameObjectWithBody
 ): boolean {
 	let properties = isTileWithPropertiesObject(tile) ? tile.properties : {};
 	if (isDynamicSprite(tile)) {

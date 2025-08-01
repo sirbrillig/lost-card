@@ -19,6 +19,7 @@ import {
 	jumpToTileWithArc,
 	createShadowSprite,
 	getLimitedEndPoint,
+	doesTileBlockFire,
 } from "./shared";
 import { EnemyManager } from "./EnemyManager";
 import { TeleportSystem } from "./TeleportSystem";
@@ -2112,7 +2113,10 @@ export class RangedFireBall implements Behavior {
 		}
 
 		if (this.#hitsWalls) {
-			// FIXME: hit walls in the background too, but not pits, water, or lava
+			const landLayer = getMap().getLayer("Background");
+			if (!landLayer) {
+				throw new Error("Could not find bg layer for RangedFireBall");
+			}
 			const stuffLayer = getMap().getLayer("Stuff");
 			if (!stuffLayer) {
 				throw new Error("Could not find stuff layer for RangedFireBall");
@@ -2121,6 +2125,18 @@ export class RangedFireBall implements Behavior {
 				fireSound?.stop();
 				effect?.destroy();
 			});
+			// FIXME: this does nothing somehow?
+			sprite.scene.physics.add.collider(
+				effect,
+				landLayer.tilemapLayer,
+				() => {
+					fireSound?.stop();
+					effect?.destroy();
+				},
+				(_, tile) => {
+					return doesTileBlockFire(tile);
+				}
+			);
 		}
 
 		sprite.scene.physics.add.overlap(player, effect, () => {
