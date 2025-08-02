@@ -3542,17 +3542,15 @@ export class Game extends Scene {
 		enemy.emit(Events.MonsterHit, damage);
 
 		// Knock the player back a bit when they hit an enemy.
-		if (!isAuraActive(this.registry, "MountainCard")) {
-			const player = getPlayerOrThrow();
-			knockBack(
-				this,
-				player.body,
-				config.postHitEnemyKnockback,
-				config.playerKnockBackSpeed,
-				invertSpriteDirection(this.playerDirection),
-				() => {}
-			);
-		}
+		const player = getPlayerOrThrow();
+		knockBack(
+			this,
+			player.body,
+			config.postHitEnemyKnockback,
+			config.playerKnockBackSpeed,
+			invertSpriteDirection(this.playerDirection),
+			() => {}
+		);
 	}
 
 	gameOver() {
@@ -3676,22 +3674,23 @@ export class Game extends Scene {
 			},
 		});
 
-		if (!isAuraActive(this.registry, "MountainCard")) {
-			this.setPlayerStunned(true);
-			this.isPlayerBeingKnockedBack = true;
-			const player = getPlayerOrThrow();
-			knockBack(
-				this,
-				player.body,
-				config.postHitPlayerKnockback,
-				config.playerKnockBackSpeed,
-				invertSpriteDirection(this.playerDirection),
-				() => {
-					this.setPlayerStunned(false);
-					this.isPlayerBeingKnockedBack = false;
-				}
-			);
-		}
+		const isMountainCardActive = isAuraActive(this.registry, "MountainCard");
+		this.setPlayerStunned(true);
+		this.isPlayerBeingKnockedBack = true;
+		const player = getPlayerOrThrow();
+		knockBack(
+			this,
+			player.body,
+			isMountainCardActive
+				? config.mountainCardPostHitPlayerKnockback
+				: config.postHitPlayerKnockback,
+			config.playerKnockBackSpeed,
+			invertSpriteDirection(this.playerDirection),
+			() => {
+				this.setPlayerStunned(false);
+				this.isPlayerBeingKnockedBack = false;
+			}
+		);
 
 		this.setPlayerBeingHit(true);
 	}

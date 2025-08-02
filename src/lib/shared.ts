@@ -1192,7 +1192,7 @@ export function getAuraDescription(card: Auras): string {
 		case "HeartCard":
 			return "Your hearts will slowly restore on their own.";
 		case "MountainCard":
-			return "You can no longer be pushed by attacks.";
+			return "You are not pushed as far when hit.";
 		case "SwordCard":
 			return "Your sword will deal more damage per hit.";
 		case "SunCard":

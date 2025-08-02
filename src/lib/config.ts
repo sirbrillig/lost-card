@@ -5,6 +5,7 @@ export const config = {
 	postPowerCooldown: 600,
 	clockCardCooldown: 150,
 	postHitPlayerKnockback: 200,
+	mountainCardPostHitPlayerKnockback: 100,
 	postHitEnemyKnockback: 50,
 	postHitInvincibilityTime: 800,
 	sunCardInvincibilityTime: 3000,
