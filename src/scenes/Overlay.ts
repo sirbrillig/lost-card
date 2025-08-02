@@ -19,9 +19,11 @@ import { PowerInUse } from "../lib/components";
 const heartSize: number = 18;
 const itemSize: number = 17;
 const portraitPadding = 22;
+
 const halfHeartFrame = 21;
-const inactiveFrame = 13;
-const activeFrame = 29;
+const emptyHeartFrame = 13;
+const fullHeartFrame = 29;
+
 const itemTopMargin = 35;
 const itemLeftMargin = itemSize;
 
@@ -209,8 +211,8 @@ class PotionItem {
 
 class Heart {
 	scene: Phaser.Scene;
-	isActive: boolean = false;
-	isImageActive: boolean = false;
+	value: "empty" | "half" | "full" = "empty";
+	imageValue: "empty" | "half" | "full" = "empty";
 	image: Phaser.GameObjects.Image;
 
 	constructor(scene: Phaser.Scene, count: number) {
@@ -220,7 +222,7 @@ class Heart {
 				portraitPadding + scene.cameras.main.x + heartSize * count,
 				scene.cameras.main.y,
 				"icons3",
-				inactiveFrame
+				emptyHeartFrame
 			)
 			.setOrigin(0);
 		heart.setDisplaySize(heartSize, heartSize);
@@ -228,16 +230,60 @@ class Heart {
 		this.showEffectForGainedHeart();
 	}
 
-	update() {
-		if (this.isActive && !this.isImageActive) {
-			this.image.setFrame(activeFrame);
-			this.isImageActive = true;
-			this.showEffectForGainedHeart();
+	addValue(): void {
+		if (this.value === "empty") {
+			this.value = "half";
+			return;
 		}
-		if (!this.isActive && this.isImageActive) {
-			this.image.setFrame(inactiveFrame);
-			this.isImageActive = false;
-			this.showParticlesForLostHeart();
+		if (this.value === "half") {
+			this.value = "full";
+			return;
+		}
+	}
+
+	isFull(): boolean {
+		if (this.value === "full") {
+			return true;
+		}
+		return false;
+	}
+
+	getFrameForValue() {
+		switch (this.value) {
+			case "empty":
+				return emptyHeartFrame;
+			case "half":
+				return halfHeartFrame;
+			case "full":
+				return fullHeartFrame;
+		}
+	}
+
+	didGainHeart(): boolean {
+		if (this.value !== "empty" && this.imageValue === "empty") {
+			return true;
+		}
+		return false;
+	}
+
+	didLoseHeart(): boolean {
+		if (this.value === "empty" && this.imageValue !== "empty") {
+			return true;
+		}
+		return false;
+	}
+
+	update() {
+		if (this.value !== this.imageValue) {
+			const frame = this.getFrameForValue();
+			this.image.setFrame(frame);
+			if (this.didGainHeart()) {
+				this.showEffectForGainedHeart();
+			}
+			if (this.didLoseHeart()) {
+				this.showParticlesForLostHeart();
+			}
+			this.imageValue = this.value;
 		}
 	}
 
@@ -322,9 +368,7 @@ export class Overlay extends Scene {
 		this.totalHearts =
 			getDataFromRegistry(this.registry, "playerTotalHitPoints") ??
 			config.playerInitialTotalHitPoints;
-		this.activeHearts =
-			getDataFromRegistry(this.registry, "playerHitPoints") ??
-			config.playerInitialHitPoints;
+		this.activeHearts = 0;
 		this.bg = this.add
 			.nineslice(
 				this.cameras.main.x,
@@ -614,15 +658,21 @@ export class Overlay extends Scene {
 			this.createHearts();
 		}
 
-		this.activeHearts = activeHearts;
-		for (let x = 1; x <= this.totalHearts; x++) {
-			if (!this.hearts[x - 1]) {
-				throw new Error("Insufficient hearts");
-			}
-			if (x > this.activeHearts) {
-				this.hearts[x - 1].isActive = false;
-			} else {
-				this.hearts[x - 1].isActive = true;
+		if (this.activeHearts !== activeHearts) {
+			this.hearts.forEach((heart) => (heart.value = "empty"));
+			this.activeHearts = activeHearts;
+			let currentHeart = 0;
+			for (let x = 0; x < this.activeHearts; x++) {
+				if (this.hearts[currentHeart].isFull()) {
+					currentHeart += 1;
+				}
+				if (currentHeart + 1 > this.hearts.length) {
+					console.error(
+						`Tried to mark ${activeHearts} hearts but failed at ${currentHeart}`
+					);
+					break;
+				}
+				this.hearts[currentHeart].addValue();
 			}
 		}
 
@@ -646,7 +696,8 @@ export class Overlay extends Scene {
 			heart.destroy();
 		});
 		this.hearts = [];
-		for (let x = 0; x < this.totalHearts; x++) {
+		// Divide by 2 because each heart holds two hit points
+		for (let x = 0; x < Math.ceil(this.totalHearts / 2); x++) {
 			this.hearts.push(new Heart(this, x));
 		}
 	}
