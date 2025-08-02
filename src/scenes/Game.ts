@@ -4272,6 +4272,14 @@ export class Game extends Scene {
 	}
 
 	#isPressingHeal(): boolean {
+		// Cannot heal when already at full
+		if (this.getPlayerHitPoints() === this.getPlayerTotalHitPoints()) {
+			return false;
+		}
+		// Cannot heal without potions
+		if (this.getPotionCount() === 0) {
+			return false;
+		}
 		if (this.keyP.isDown || this.keyR.isDown || this.input.gamepad?.pad1?.Y) {
 			return true;
 		}
