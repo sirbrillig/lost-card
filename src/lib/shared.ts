@@ -85,6 +85,7 @@ export type Auras =
 	| "SunCard"
 	| "RangeCard"
 	| "HeartCard"
+	| "PotionCard"
 	| "SwordCard"
 	| "MountainCard"
 	| "ClockCard"
@@ -109,6 +110,7 @@ export const powerOrder: Powers[] = [
 
 export const auraOrder: Auras[] = [
 	"HeartCard",
+	"PotionCard",
 	"SwordCard",
 	"MountainCard",
 	"RangeCard",
@@ -161,6 +163,8 @@ export function getPowerEquippedKey(
 			return "hasSunCard";
 		case "RangeCard":
 			return "hasRangeCard";
+		case "PotionCard":
+			return "hasPotionCard";
 		case "HeartCard":
 			return "hasHeartCard";
 		case "WindCard":
@@ -201,6 +205,8 @@ export function getIconForPower(power: Powers | Auras): {
 			return { texture: "cards", frame: 29 };
 		case "HeartCard":
 			return { texture: "cards", frame: 17 };
+		case "PotionCard":
+			return { texture: "cards", frame: 48 };
 		case "WindCard":
 			return { texture: "cards", frame: 44 };
 		case "IceCard":
@@ -904,6 +910,7 @@ export interface SaveDataHasCard {
 	hasSunCard?: boolean;
 	hasRangeCard?: boolean;
 	hasHeartCard?: boolean;
+	hasPotionCard?: boolean;
 	hasWindCard?: boolean;
 	hasIceCard?: boolean;
 	hasPlantCard?: boolean;
@@ -1151,6 +1158,8 @@ export function getCardNameForPower(card: Powers | Auras): string {
 			return "Clock Card";
 		case "SwordCard":
 			return "Sword Card";
+		case "PotionCard":
+			return "Potion Card";
 		case "HeartCard":
 			return "Heart Card";
 		case "SunCard":
@@ -1178,6 +1187,8 @@ export function getAuraDescription(card: Auras): string {
 			return "You can walk through water or lava safely.";
 		case "ClockCard":
 			return "Your powers can be used more frequently.";
+		case "PotionCard":
+			return "Your potions will act faster.";
 		case "HeartCard":
 			return "Your hearts will slowly restore on their own.";
 		case "MountainCard":

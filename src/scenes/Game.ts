@@ -763,9 +763,13 @@ export class Game extends Scene {
 			return;
 		}
 
+		const isPotionCardActive = isAuraActive(this.registry, "PotionCard");
+		const delay = isPotionCardActive
+			? config.potionCardTimeDelay
+			: config.healTimeDelay;
 		this.healTimer = this.time.addEvent({
 			repeat: -1,
-			delay: config.healTimeDelay,
+			delay,
 			callback: () => {
 				this.usePotion();
 			},
@@ -2370,6 +2374,7 @@ export class Game extends Scene {
 				case "SwordCard":
 				case "FishCard":
 				case "HeartCard":
+				case "PotionCard":
 					this.pickUpAura(touchingItem.name);
 					break;
 				case "PlantCard":
