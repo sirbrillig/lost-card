@@ -18,7 +18,7 @@ export const config = {
 	enemyKnockBackSpeed: 200,
 	playerKnockBackSpeed: 210,
 	distanceToActivateTransient: 30,
-	playerInitialHitPoints: 6,
+	playerInitialHitPoints: 2, // FIXME: just for testin
 	playerInitialTotalHitPoints: 6,
 	saveCooldown: 30000,
 	preGameOverTime: 1000,
