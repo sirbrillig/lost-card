@@ -84,6 +84,7 @@ import {
 	getPlayerOrThrow,
 	getPhysicsSpriteOrThrow,
 	getSpriteOrThrow,
+	componentManager,
 } from "../lib/components";
 
 export class Game extends Scene {
@@ -158,6 +159,7 @@ export class Game extends Scene {
 	}
 
 	create(saveData: SaveData | undefined) {
+		componentManager.clear();
 		this.hasPlayerMovedSinceAppearing = false;
 		this.lastAttackedAt = 0;
 		this.lastPowerAt = 0;
