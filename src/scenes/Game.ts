@@ -764,6 +764,9 @@ export class Game extends Scene {
 		if (this.healTimer) {
 			return;
 		}
+		if (!this.#canPlayerHeal()) {
+			return;
+		}
 
 		const isPotionCardActive = isAuraActive(this.registry, "PotionCard");
 		const delay = isPotionCardActive
@@ -3703,6 +3706,16 @@ export class Game extends Scene {
 
 	getTimeSinceLastPower(): number {
 		return this.time.now - this.lastPowerAt;
+	}
+
+	#canPlayerHeal(): boolean {
+		return (
+			this.getPlayerHitPoints() > 0 &&
+			!this.isPlayerFrozen() &&
+			!this.isPlayerStunned() &&
+			!this.isPlayerAttacking() &&
+			!this.isPlayerUsingPower()
+		);
 	}
 
 	canPlayerAttack(): boolean {
