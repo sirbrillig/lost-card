@@ -31,6 +31,11 @@ export class PotionBar {
 	}
 
 	private create(): void {
+		this.reset();
+	}
+
+	private reset() {
+		this.destroy();
 		// Create background (empty bar)
 		this.background = this.scene.add.rectangle(
 			this.x,
@@ -66,6 +71,8 @@ export class PotionBar {
 
 	public setHeight(height: number): void {
 		this.height = height;
+		this.reset();
+		this.updateBar();
 	}
 
 	public usePotions(amount: number = 1): void {
@@ -122,8 +129,8 @@ export class PotionBar {
 	}
 
 	public destroy(): void {
-		this.background.destroy();
-		this.fill.destroy();
-		this.mask.destroy();
+		this.background?.destroy();
+		this.fill?.destroy();
+		this.mask?.destroy();
 	}
 }

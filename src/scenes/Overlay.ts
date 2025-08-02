@@ -388,11 +388,12 @@ export class Overlay extends Scene {
 			.image(this.cameras.main.x + 2, this.cameras.main.y, "side_portrait", 0)
 			.setScale(0.5)
 			.setOrigin(0);
+		const potionBarWidth = 10;
 		this.potionBar = new PotionBar(
 			this,
 			this.cameras.main.x + this.cameras.main.width - 6,
 			this.cameras.main.y + 70,
-			10,
+			potionBarWidth,
 			this.#getPotionBarHeight(),
 			0
 		);
@@ -705,7 +706,7 @@ export class Overlay extends Scene {
 	#getPotionBarHeight(): number {
 		const totalPotions =
 			getDataFromRegistry(this.registry, "potionTotalCount") ?? 0;
-		const pixelsPerPotion = 4;
+		const pixelsPerPotion = 5;
 		return pixelsPerPotion * totalPotions;
 	}
 
