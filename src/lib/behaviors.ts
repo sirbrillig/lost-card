@@ -1754,6 +1754,115 @@ export class DashTowardPlayer implements Behavior {
 	}
 }
 
+export class FireBeam implements Behavior {
+	#speed = 50;
+	#postAttackTime = 1000;
+	#telegraphDelay = 1400;
+	#maxLength = 500;
+	#minLength = 100;
+	#width: number = 10;
+	#color = 0xff0000;
+	name: string;
+
+	constructor(
+		name: string,
+		options?: {
+			speed?: number;
+			postAttackTime?: number;
+			color?: number;
+			maxLength?: number;
+			minLength?: number;
+			width?: number;
+		}
+	) {
+		this.name = name;
+		this.#speed = options?.speed ?? this.#speed;
+		this.#postAttackTime = options?.postAttackTime ?? this.#postAttackTime;
+		this.#color = options?.color ?? this.#color;
+		this.#maxLength = options?.maxLength ?? this.#maxLength;
+		this.#minLength = options?.minLength ?? this.#minLength;
+		this.#width = options?.width ?? this.#width;
+	}
+
+	init(
+		sprite: Phaser.GameObjects.Sprite,
+		goToNextState: BehaviorCompleteCallback
+	): void {
+		const player = getPlayerOrThrow();
+		if (!sprite.body || !isDynamicSprite(sprite)) {
+			throw new Error("Could not update monster");
+		}
+		if (!player.body) {
+			throw new Error("Could not update monster");
+		}
+		const start = {
+			x: sprite.body.center.x,
+			y: sprite.body.center.y,
+		};
+		const originalTarget = {
+			x: player.body.center.x,
+			y: player.body.center.y,
+		};
+		const target = getLimitedEndPoint({
+			startX: start.x,
+			startY: start.y,
+			endX: originalTarget.x,
+			endY: originalTarget.y,
+			maxLength: this.#maxLength,
+			minLength: this.#minLength,
+		});
+
+		const effect = sprite.scene.add.line(
+			0,
+			0,
+			start.x,
+			start.y,
+			target.x,
+			target.y,
+			this.#color
+		);
+		effect.setOrigin(0);
+		effect.setLineWidth(this.#width);
+		effect.setAlpha(0.1);
+
+		sprite.scene.tweens.add({
+			targets: effect,
+			alpha: 1,
+			duration: this.#telegraphDelay,
+			onComplete: () => {
+				// This cannot test collision with the line because we cannot use a
+				// diagonal line in physics. We need to move something along the line
+				// fast instead.
+				const physicsObject = sprite.scene.add.circle(
+					start.x,
+					start.y,
+					this.#width / 2
+				);
+				physicsObject.setVisible(false);
+				sprite.scene.physics.add.existing(physicsObject);
+				sprite.scene.tweens.add({
+					targets: physicsObject,
+					x: target.x,
+					y: target.y,
+					duration: 100,
+				});
+				sprite?.scene.physics.add.overlap(player, physicsObject, () => {
+					MainEvents.emit(Events.EnemyHitPlayer, true);
+				});
+
+				sprite.scene.time.addEvent({
+					delay: this.#postAttackTime,
+					callback: () => {
+						effect?.destroy();
+						physicsObject?.destroy();
+						goToNextState();
+					},
+				});
+			},
+		});
+	}
+}
+
 export class LaserSight implements Behavior {
 	#speed = 50;
 	#postAttackTime = 1000;
@@ -1805,6 +1914,7 @@ export class LaserSight implements Behavior {
 			endX: originalTarget.x,
 			endY: originalTarget.y,
 			maxLength: this.#maxLength,
+			minLength: 1,
 		});
 		if (!this.#isHidden) {
 			effect = sprite.scene.add.line(

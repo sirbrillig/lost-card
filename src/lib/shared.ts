@@ -1359,26 +1359,36 @@ export function getLimitedEndPoint({
 	endX,
 	endY,
 	maxLength,
+	minLength,
 }: {
 	startX: number;
 	startY: number;
 	endX: number;
 	endY: number;
 	maxLength: number;
+	minLength: number;
 }) {
 	const dx = endX - startX;
 	const dy = endY - startY;
 	const distance = Math.sqrt(dx * dx + dy * dy);
 
-	if (distance <= maxLength) {
-		return { x: endX, y: endY };
+	const normalizedX = dx / distance;
+	const normalizedY = dy / distance;
+
+	let finalLength;
+
+	if (distance < minLength) {
+		finalLength = minLength;
+	} else if (distance > maxLength) {
+		finalLength = maxLength;
 	} else {
-		const ratio = maxLength / distance;
-		return {
-			x: startX + dx * ratio,
-			y: startY + dy * ratio,
-		};
+		finalLength = distance;
 	}
+
+	return {
+		x: startX + normalizedX * finalLength,
+		y: startY + normalizedY * finalLength,
+	};
 }
 
 export function createPromiseTimer(scene: Phaser.Scene, delay: number) {
