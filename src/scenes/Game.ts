@@ -2638,7 +2638,7 @@ export class Game extends Scene {
 			this.restorePlayerPotions();
 			this.showDialog({
 				heading: "A magic potion bottle!",
-				text: `Press ${
+				text: `Hold ${
 					getButtonNames(this).heal
 				} to restore your health. You can refill the bottle using potion vials found around the kingdoms.`,
 			});

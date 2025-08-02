@@ -34,12 +34,22 @@ export class PotionBar {
 		this.reset();
 	}
 
+	private setVisible(isVisible: boolean): void {
+		this.background?.setVisible(isVisible);
+		this.fill?.setVisible(isVisible);
+	}
+
 	private reset() {
 		this.destroy();
+
+		// Calculate center positions for rectangles (since they use center origin by default)
+		const centerX = this.x + this.width / 2;
+		const centerY = this.y + this.height / 2;
+
 		// Create background (empty bar)
 		this.background = this.scene.add.rectangle(
-			this.x,
-			this.y,
+			centerX,
+			centerY,
 			this.width,
 			this.height,
 			0x333333
@@ -48,8 +58,8 @@ export class PotionBar {
 
 		// Create the fill (potion liquid)
 		this.fill = this.scene.add.rectangle(
-			this.x,
-			this.y,
+			centerX,
+			centerY,
 			this.width - 4,
 			this.height - 4,
 			0x8e44ad
@@ -57,8 +67,8 @@ export class PotionBar {
 
 		// Create mask for the fill
 		this.mask = this.scene.add.rectangle(
-			this.x,
-			this.y,
+			centerX,
+			centerY,
 			this.width - 4,
 			this.height - 4,
 			0xffffff
@@ -111,12 +121,16 @@ export class PotionBar {
 		const percentage: number = this.currentPotions / this.maxPotions;
 		const newHeight: number = (this.height - 4) * percentage;
 
+		// Calculate center positions
+		const centerX = this.x + this.width / 2;
+
 		// Update mask height and position (depletes from top)
 		this.mask.setSize(this.width - 4, newHeight);
 
 		// Adjust Y position so it depletes from top to bottom
-		const offsetY: number = (this.height - 4 - newHeight) / 2;
-		this.mask.setPosition(this.x, this.y + offsetY);
+		// The mask should be positioned so its bottom aligns with the bottom of the bar
+		const maskCenterY = this.y + this.height - 2 - newHeight / 2;
+		this.mask.setPosition(centerX, maskCenterY);
 
 		// Change color based on potion level
 		if (percentage > 0.6) {
@@ -126,6 +140,8 @@ export class PotionBar {
 		} else {
 			this.fill.setFillStyle(0xe74c3c); // Red
 		}
+
+		this.setVisible(this.maxPotions !== 0);
 	}
 
 	public destroy(): void {

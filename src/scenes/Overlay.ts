@@ -117,6 +117,8 @@ class Card {
 	}
 }
 
+const potionIconTopPadding = 40;
+
 class PotionItem {
 	image: Phaser.GameObjects.Image;
 	selectedItemMarker: Phaser.GameObjects.Image;
@@ -124,7 +126,6 @@ class PotionItem {
 	name: string;
 	isSelected: boolean = false;
 	totalPotions: number = 0;
-	countLabel: Phaser.GameObjects.BitmapText;
 
 	constructor(
 		scene: Phaser.Scene,
@@ -136,7 +137,7 @@ class PotionItem {
 		const image = scene.add
 			.image(
 				scene.cameras.main.x + scene.cameras.main.width - itemSize * count,
-				scene.cameras.main.y + 20,
+				scene.cameras.main.y + potionIconTopPadding,
 				texture,
 				frame
 			)
@@ -144,16 +145,6 @@ class PotionItem {
 		this.image = image;
 		this.name = name;
 		this.scene = scene;
-		this.countLabel = scene.add
-			.bitmapText(
-				this.image.x - this.image.width + 2,
-				this.image.y - 4,
-				"RetroGamingWhiteSmall",
-				`${this.totalPotions}`,
-				12
-			)
-			.setDepth(config.overlayLabelDepth)
-			.setOrigin(0.5);
 	}
 
 	playUsePotionEffect() {
@@ -192,20 +183,11 @@ class PotionItem {
 				this.playUsePotionEffect();
 			}
 			this.totalPotions = totalPotions;
-			try {
-				this.countLabel.setText(`${this.totalPotions}`);
-			} catch (err) {
-				console.error(err);
-				console.error(
-					"Something went wrong updating the number of potions. Hopefully it works during the next frame."
-				);
-			}
 		}
 	}
 
 	destroy() {
 		this.image.destroy();
-		this.countLabel.destroy();
 	}
 }
 
@@ -389,12 +371,18 @@ export class Overlay extends Scene {
 			.setScale(0.5)
 			.setOrigin(0);
 		const potionBarWidth = 10;
+		const potionBarRightPadding = 4;
+		const potionBarTopPaddding = 4;
+		const potionBarHeight = this.#getPotionBarHeight();
 		this.potionBar = new PotionBar(
 			this,
-			this.cameras.main.x + this.cameras.main.width - 6,
-			this.cameras.main.y + 70,
+			this.cameras.main.x +
+				this.cameras.main.width -
+				potionBarWidth -
+				potionBarRightPadding,
+			this.cameras.main.y + potionIconTopPadding + potionBarTopPaddding,
 			potionBarWidth,
-			this.#getPotionBarHeight(),
+			potionBarHeight,
 			0
 		);
 
@@ -552,7 +540,7 @@ export class Overlay extends Scene {
 
 	updateKeys() {
 		const x = this.cameras.main.x + this.cameras.main.width - itemSize / 2;
-		const y = this.cameras.main.y + 30;
+		const y = this.cameras.main.y + 10;
 		if (!this.keyCountIcon) {
 			this.keyCountIcon = this.add.image(x, y, "icons3", 28).setOrigin(0.5);
 			this.keyCountIcon.setPosition(x, y);
@@ -586,7 +574,12 @@ export class Overlay extends Scene {
 	}
 
 	updateItems() {
-		if (!this.potions.some((item) => item.name === "Potion")) {
+		const totalPotions =
+			getDataFromRegistry(this.registry, "potionTotalCount") ?? 0;
+		if (
+			totalPotions > 0 &&
+			!this.potions.some((item) => item.name === "Potion")
+		) {
 			this.potions.push(new PotionItem(this, 0, "icons3", 2, "Potion"));
 		}
 
@@ -706,7 +699,7 @@ export class Overlay extends Scene {
 	#getPotionBarHeight(): number {
 		const totalPotions =
 			getDataFromRegistry(this.registry, "potionTotalCount") ?? 0;
-		const pixelsPerPotion = 5;
+		const pixelsPerPotion = config.pixelsPerPotion;
 		return pixelsPerPotion * totalPotions;
 	}
 

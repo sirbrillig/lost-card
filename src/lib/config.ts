@@ -1,4 +1,5 @@
 export const config = {
+	pixelsPerPotion: 8,
 	characterSpeed: 100,
 	cloudCardSpeed: 450,
 	postAttackCooldown: 150,
