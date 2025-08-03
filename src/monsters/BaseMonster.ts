@@ -33,7 +33,10 @@ export class BaseMonster extends Phaser.Physics.Arcade.Sprite {
 		x: number,
 		y: number,
 		texture: string,
-		initialFrame: number | string
+		initialFrame: number | string,
+		options?: {
+			shouldCenterHitbox?: boolean;
+		}
 	) {
 		super(
 			scene,
@@ -62,16 +65,6 @@ export class BaseMonster extends Phaser.Physics.Arcade.Sprite {
 		});
 
 		this.setDepth(config.playerDepth);
-		// Set the monster's hitbox to be smaller than its sprite.
-		this.setSize(
-			this.width * config.monsterHitBoxSizePercentage,
-			this.height * config.monsterHitBoxSizePercentage
-		);
-		// Move the monster's hitbox down towards its base to simulate the 3d angle.
-		this.setOffset(
-			this.body.offset.x,
-			this.body.offset.y + config.monsterHitBoxOffsetY
-		);
 		this.setCollideWorldBounds(true);
 		this.setPushable(false);
 		this.setDataEnabled();
@@ -93,6 +86,7 @@ export class BaseMonster extends Phaser.Physics.Arcade.Sprite {
 		});
 
 		this.initSprites();
+		this.initHitbox(options ?? {});
 	}
 
 	isInActiveRoom(): boolean {
@@ -101,6 +95,24 @@ export class BaseMonster extends Phaser.Physics.Arcade.Sprite {
 			return false;
 		}
 		return isPointInRoom(this.body.center.x, this.body.center.y, activeRoom);
+	}
+
+	initHitbox({ shouldCenterHitbox }: { shouldCenterHitbox?: boolean }): void {
+		// Set the monster's hitbox to be smaller than its sprite.
+		this.setSize(
+			this.width * config.monsterHitBoxSizePercentage,
+			this.height * config.monsterHitBoxSizePercentage
+		);
+		if (!this.body) {
+			return;
+		}
+		// Move the monster's hitbox down towards its base to simulate the 3d angle.
+		if (!shouldCenterHitbox) {
+			this.setOffset(
+				this.body.offset.x,
+				this.body.offset.y + config.monsterHitBoxOffsetY
+			);
+		}
 	}
 
 	getInitialState(): string {

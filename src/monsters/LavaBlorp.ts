@@ -16,7 +16,9 @@ export class LavaBlorp extends BaseMonster {
 		x: number,
 		y: number
 	) {
-		super(scene, enemyManager, x, y, "light-lantern", 11);
+		super(scene, enemyManager, x, y, "light-lantern", 11, {
+			shouldCenterHitbox: true,
+		});
 		this.data.set(DataKeys.Pushable, false);
 		this.data.set(DataKeys.IsHarmless, true);
 		this.data.set(DataKeys.Hittable, false);
