@@ -178,8 +178,10 @@ export class Preloader extends Scene {
 		});
 		this.load.image("bones", "bones_transparent.png");
 		this.load.spritesheet("monsters1", "Monsters1.png", {
-			frameWidth: 32,
-			frameHeight: 32,
+			frameWidth: 28,
+			frameHeight: 28,
+			margin: 0,
+			spacing: 4,
 		});
 		this.load.spritesheet("monsters2", "Monsters2.png", {
 			frameWidth: 32,
