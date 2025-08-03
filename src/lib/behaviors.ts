@@ -1756,7 +1756,7 @@ export class DashTowardPlayer implements Behavior {
 
 export class FireBeam implements Behavior {
 	#speed = 50;
-	#postAttackTime = 1000;
+	#postAttackTime = 400;
 	#telegraphDelay = 1400;
 	#maxLength = 500;
 	#minLength = 100;
@@ -1822,40 +1822,72 @@ export class FireBeam implements Behavior {
 			this.#color
 		);
 		effect.setOrigin(0);
-		effect.setLineWidth(this.#width);
 		effect.setAlpha(0.1);
 
-		sprite.scene.tweens.add({
+		const scene = sprite.scene;
+
+		scene.tweens.add({
 			targets: effect,
 			alpha: 1,
 			duration: this.#telegraphDelay,
+			onUpdate: (tween) => {
+				// Scale the beam width as it builds strength.
+				effect.setLineWidth(this.#width * tween.totalProgress);
+			},
 			onComplete: () => {
+				// Flash line at full power.
+				scene.tweens.add({
+					targets: effect,
+					strokeColor: 0xffffff,
+					duration: 30,
+					yoyo: true,
+					repeat: 1,
+				});
+
 				// This cannot test collision with the line because we cannot use a
-				// diagonal line in physics. We need to move something along the line
-				// fast instead.
-				const physicsObject = sprite.scene.add.circle(
+				// diagonal line in arcade physics. We need to move something along the
+				// line back and forth very fast instead.
+				const physicsObject = scene.add.circle(
 					start.x,
 					start.y,
 					this.#width / 2
 				);
 				physicsObject.setVisible(false);
-				sprite.scene.physics.add.existing(physicsObject);
-				sprite.scene.tweens.add({
+				scene.physics.add.existing(physicsObject);
+				scene.tweens.add({
 					targets: physicsObject,
 					x: target.x,
 					y: target.y,
 					duration: 100,
+					yoyo: true,
+					repeat: -1,
 				});
 				sprite?.scene.physics.add.overlap(player, physicsObject, () => {
 					MainEvents.emit(Events.EnemyHitPlayer, true);
 				});
 
-				sprite.scene.time.addEvent({
-					delay: this.#postAttackTime,
+				scene.time.addEvent({
+					delay: 300,
 					callback: () => {
-						effect?.destroy();
-						physicsObject?.destroy();
-						goToNextState();
+						// Fade the beam out again.
+						scene.tweens.add({
+							targets: effect,
+							alpha: 0,
+							onUpdate: (tween) => {
+								effect?.setLineWidth(this.#width * (1 - tween.totalProgress));
+							},
+							duration: 150,
+							onComplete: () => {
+								effect?.destroy();
+								physicsObject?.destroy();
+								sprite.scene.time.addEvent({
+									delay: this.#postAttackTime,
+									callback: () => {
+										goToNextState();
+									},
+								});
+							},
+						});
 					},
 				});
 			},
