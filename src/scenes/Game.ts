@@ -1289,6 +1289,8 @@ export class Game extends Scene {
 		// Enemies collide with doors but players can pass through them.
 		this.physics.add.collider(this.createdDoors, this.enemyManager.enemies);
 		const playerDoorHitbox = getPhysicsSpriteOrThrow("playerDoorHitbox");
+		const player = getPhysicsSpriteOrThrow("player");
+		this.physics.add.collider(this.createdDoors, player);
 		this.physics.add.collider(this.createdDoors, playerDoorHitbox, (door) => {
 			if (isDynamicSprite(door)) {
 				this.handleCollideDoor(door);
