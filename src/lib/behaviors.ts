@@ -1759,9 +1759,10 @@ export class FireBeam implements Behavior {
 	#postAttackTime = 400;
 	#telegraphDelay = 1400;
 	#maxLength = 500;
-	#minLength = 100;
+	#minLength: number | undefined = undefined;
 	#width: number = 10;
-	#color = 0xff0000;
+	#glowColor = 0xf71000;
+	#color = 0xf54e42;
 	name: string;
 
 	constructor(
@@ -1812,6 +1813,21 @@ export class FireBeam implements Behavior {
 			minLength: this.#minLength,
 		});
 
+		// Make an outer glow
+		const outerGlow = sprite.scene.add.line(
+			0,
+			0,
+			start.x,
+			start.y,
+			target.x,
+			target.y,
+			this.#glowColor
+		);
+		outerGlow.setOrigin(0);
+		outerGlow.setAlpha(0);
+		const outerGlowAdjustment = 1.7;
+		outerGlow.setLineWidth(this.#width * outerGlowAdjustment);
+
 		const effect = sprite.scene.add.line(
 			0,
 			0,
@@ -1822,17 +1838,20 @@ export class FireBeam implements Behavior {
 			this.#color
 		);
 		effect.setOrigin(0);
-		effect.setAlpha(0.1);
+		effect.setAlpha(0);
 
 		const scene = sprite.scene;
 
 		scene.tweens.add({
-			targets: effect,
+			targets: [effect, outerGlow],
 			alpha: 1,
 			duration: this.#telegraphDelay,
 			onUpdate: (tween) => {
 				// Scale the beam width as it builds strength.
 				effect.setLineWidth(this.#width * tween.totalProgress);
+				outerGlow.setLineWidth(
+					this.#width * tween.totalProgress * outerGlowAdjustment
+				);
 			},
 			onComplete: () => {
 				// Flash line at full power.
@@ -1858,7 +1877,7 @@ export class FireBeam implements Behavior {
 					targets: physicsObject,
 					x: target.x,
 					y: target.y,
-					duration: 100,
+					duration: 120,
 					yoyo: true,
 					repeat: -1,
 				});
@@ -1871,14 +1890,18 @@ export class FireBeam implements Behavior {
 					callback: () => {
 						// Fade the beam out again.
 						scene.tweens.add({
-							targets: effect,
+							targets: [effect, outerGlow],
 							alpha: 0,
 							onUpdate: (tween) => {
 								effect?.setLineWidth(this.#width * (1 - tween.totalProgress));
+								outerGlow?.setLineWidth(
+									this.#width * (1 - tween.totalProgress)
+								);
 							},
 							duration: 150,
 							onComplete: () => {
 								effect?.destroy();
+								outerGlow?.destroy();
 								physicsObject?.destroy();
 								sprite.scene.time.addEvent({
 									delay: this.#postAttackTime,

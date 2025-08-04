@@ -1366,7 +1366,7 @@ export function getLimitedEndPoint({
 	endX: number;
 	endY: number;
 	maxLength: number;
-	minLength: number;
+	minLength?: number;
 }) {
 	const dx = endX - startX;
 	const dy = endY - startY;
@@ -1377,7 +1377,7 @@ export function getLimitedEndPoint({
 
 	let finalLength;
 
-	if (distance < minLength) {
+	if (minLength && distance < minLength) {
 		finalLength = minLength;
 	} else if (distance > maxLength) {
 		finalLength = maxLength;
