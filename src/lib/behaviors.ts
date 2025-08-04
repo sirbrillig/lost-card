@@ -20,6 +20,7 @@ import {
 	createShadowSprite,
 	getLimitedEndPoint,
 	doesTileBlockFire,
+	distanceToLine,
 } from "./shared";
 import { EnemyManager } from "./EnemyManager";
 import { TeleportSystem } from "./TeleportSystem";
@@ -1864,26 +1865,35 @@ export class FireBeam implements Behavior {
 				});
 
 				// This cannot test collision with the line because we cannot use a
-				// diagonal line in arcade physics. We need to move something along the
-				// line back and forth very fast instead.
-				const physicsObject = scene.add.circle(
+				// diagonal line in arcade physics.
+				const distance = distanceToLine(
+					{ x: player.x, y: player.y },
+					start,
+					target
+				);
+				const angle = Phaser.Math.Angle.Between(
 					start.x,
 					start.y,
-					this.#width / 2
+					target.x,
+					target.y
 				);
-				physicsObject.setVisible(false);
-				scene.physics.add.existing(physicsObject);
-				scene.tweens.add({
-					targets: physicsObject,
-					x: target.x,
-					y: target.y,
-					duration: 120,
-					yoyo: true,
-					repeat: -1,
-				});
-				sprite?.scene.physics.add.overlap(player, physicsObject, () => {
-					MainEvents.emit(Events.EnemyHitPlayer, true);
-				});
+				// If player is close enough to the laser line...
+				if (distance < 25) {
+					// Check if player is actually in the beam's path (and not behind the source).
+					const playerAngle = Phaser.Math.Angle.Between(
+						start.x,
+						start.y,
+						player.x,
+						player.y
+					);
+					const angleDiff = Math.abs(
+						Phaser.Math.Angle.Wrap(playerAngle - angle)
+					);
+
+					if (angleDiff < Math.PI / 2) {
+						MainEvents.emit(Events.EnemyHitPlayer, true);
+					}
+				}
 
 				scene.time.addEvent({
 					delay: 300,
@@ -1902,7 +1912,6 @@ export class FireBeam implements Behavior {
 							onComplete: () => {
 								effect?.destroy();
 								outerGlow?.destroy();
-								physicsObject?.destroy();
 								sprite.scene.time.addEvent({
 									delay: this.#postAttackTime,
 									callback: () => {
