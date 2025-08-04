@@ -3,11 +3,9 @@ import { DataKeys } from "../lib/shared";
 import { EnemyManager } from "../lib/EnemyManager";
 import { BaseMonster } from "./BaseMonster";
 
-type AllStates = "wait" | "lava-bubble" | "lava-explode";
-
 export class LavaBlorp extends BaseMonster {
 	hitPoints = 2;
-	timeBeforeBubble = 100;
+	timeBeforeBubble = 500;
 	timeBeforeExplode = 600;
 
 	constructor(
@@ -22,14 +20,13 @@ export class LavaBlorp extends BaseMonster {
 		this.data.set(DataKeys.Pushable, false);
 		this.data.set(DataKeys.IsHarmless, true);
 		this.data.set(DataKeys.Hittable, false);
-		this.timeBeforeBubble = Phaser.Math.Between(800, 2500);
 	}
 
 	isHittable(): boolean {
 		return false;
 	}
 
-	getInitialState(): AllStates {
+	getInitialState() {
 		return "wait";
 	}
 
