@@ -2,15 +2,24 @@ import {
 	WaitForActive,
 	RandomlyWalk,
 	FireBeam,
+	PowerUp,
+	SpawnEnemies,
 	DashTowardPlayer,
 } from "../lib/behaviors";
-import { DataKeys, isTileWithPropertiesObject } from "../lib/shared";
+import {
+	DataKeys,
+	isTileWithPropertiesObject,
+	getTilesInRoom,
+} from "../lib/shared";
+import { getActiveRoom, getMap } from "../lib/components";
 import { EnemyManager } from "../lib/EnemyManager";
+import { LavaBlorp } from "./LavaBlorp";
 import { BaseMonster } from "./BaseMonster";
 
 export class FireGiant extends BaseMonster {
 	hitPoints: number = 10;
 	primaryColor = 0xb80000;
+	#enemyManager: EnemyManager;
 
 	constructor(
 		scene: Phaser.Scene,
@@ -21,6 +30,7 @@ export class FireGiant extends BaseMonster {
 		super(scene, enemyManager, x, y, "monsters1", 57, { isMiniBoss: true });
 		this.data.set(DataKeys.Pushable, false);
 		this.setScale(2);
+		this.#enemyManager = enemyManager;
 	}
 
 	initSprites() {
@@ -79,6 +89,28 @@ export class FireGiant extends BaseMonster {
 	}
 
 	constructNewBehaviorFor(state: string) {
+		const createMonster = () => {
+			const activeRoom = getActiveRoom();
+			if (!activeRoom) {
+				throw new Error("No current room when creating monster");
+			}
+			const tiles = getTilesInRoom(getMap(), activeRoom).filter((tile) => {
+				return isTileWithPropertiesObject(tile) && tile.properties.isLava;
+			});
+			if (tiles.length < 1) {
+				throw new Error("No tiles in current room when creating monster");
+			}
+			// Choose tile at random
+			const targetTile = tiles[Phaser.Math.Between(0, tiles.length - 1)];
+			const enemy = new LavaBlorp(
+				this.scene,
+				this.#enemyManager,
+				targetTile.pixelX,
+				targetTile.pixelY + targetTile.height
+			);
+			enemy.timeBeforeBubble = 100;
+			return enemy;
+		};
 		switch (state) {
 			case "wait":
 				this.nextState = "walk";
@@ -100,10 +132,20 @@ export class FireGiant extends BaseMonster {
 					postAttackTime: 400,
 				});
 			case "dash":
-				this.nextState = "walk";
+				this.nextState = "charge";
 				return new DashTowardPlayer(state, {
-					speed: 200,
+					speed: 225,
 					postAttackTime: 1000,
+				});
+			case "charge":
+				this.nextState = "summon";
+				return new PowerUp(state, {});
+			case "summon":
+				this.nextState = "walk";
+				return new SpawnEnemies(state, {
+					enemiesToSpawn: 10,
+					maxSpawnedEnemies: 10,
+					createMonster,
 				});
 		}
 	}
