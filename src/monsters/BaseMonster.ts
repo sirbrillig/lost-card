@@ -21,6 +21,7 @@ export class BaseMonster extends Phaser.Physics.Arcade.Sprite {
 	#freeTimeAfterHit: number = 600;
 	#healthBar: HealthBar | undefined;
 	#maxHitPoints: number;
+	#activationStatus: "not-started" | "waiting" | "ready" = "not-started";
 	isDying = false;
 	isStunned = false;
 
@@ -29,6 +30,7 @@ export class BaseMonster extends Phaser.Physics.Arcade.Sprite {
 	primaryColor: number = 0xc7a486;
 	isBoss: boolean = false;
 	doNotRespawn: boolean = false;
+	timeBeforeActivate: number = 0;
 
 	constructor(
 		scene: Phaser.Scene,
@@ -179,6 +181,19 @@ export class BaseMonster extends Phaser.Physics.Arcade.Sprite {
 			this.anims.pause();
 			return;
 		}
+		if (this.#activationStatus === "not-started") {
+			this.#activationStatus = "waiting";
+			this.scene.time.addEvent({
+				delay: this.timeBeforeActivate,
+				callback: () => {
+					this.#activationStatus = "ready";
+				},
+			});
+		}
+		if (this.#activationStatus !== "ready") {
+			return;
+		}
+
 		this.updateBeforeBehavior();
 		if (this.isStunned) {
 			return;

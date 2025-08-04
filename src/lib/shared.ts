@@ -1401,6 +1401,7 @@ export function createPromiseTimer(scene: Phaser.Scene, delay: number) {
 
 export interface MapMonsterProperties {
 	doNotRespawn?: boolean;
+	timeBeforeActivate?: number;
 }
 
 export interface TiledObjectProperty {
@@ -1419,6 +1420,9 @@ export function getPropertiesFromPoint(
 	point.properties.forEach((property: TiledObjectProperty) => {
 		if (property.name === "doNotRespawn") {
 			result.doNotRespawn = Boolean(property.value);
+		}
+		if (property.name === "timeBeforeActivate") {
+			result.timeBeforeActivate = parseInt(String(property.value));
 		}
 	});
 	return result;

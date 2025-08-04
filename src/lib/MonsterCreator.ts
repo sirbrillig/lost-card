@@ -142,6 +142,9 @@ export class MonsterCreator {
 		if (properties?.doNotRespawn) {
 			monster.doNotRespawn = properties.doNotRespawn;
 		}
+		if (properties?.timeBeforeActivate) {
+			monster.timeBeforeActivate = properties.timeBeforeActivate;
+		}
 		monster.once(Events.MonsterDefeated, () => {
 			if (monster.doNotRespawn) {
 				this.#rememberMonsterDefeated(name);

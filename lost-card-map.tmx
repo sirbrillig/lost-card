@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.1" orientation="orthogonal" renderorder="right-down" width="300" height="200" tilewidth="16" tileheight="16" infinite="0" nextlayerid="20" nextobjectid="1628">
+<map version="1.10" tiledversion="1.11.1" orientation="orthogonal" renderorder="right-down" width="300" height="200" tilewidth="16" tileheight="16" infinite="0" nextlayerid="20" nextobjectid="1630">
  <editorsettings>
   <export target="public/assets/lost-card-map.json" format="json"/>
  </editorsettings>
@@ -9597,18 +9597,56 @@
   <object id="1525" name="MountainMonster" gid="1319" x="2240" y="1024" width="16" height="16"/>
   <object id="1526" name="MountainMonster" gid="2713" x="2192" y="672" width="16" height="16"/>
   <object id="1527" name="MountainMonster" gid="2713" x="2208" y="688" width="16" height="16"/>
-  <object id="1528" name="LavaBlorp" gid="2713" x="3904" y="2032" width="16" height="16"/>
-  <object id="1530" name="LavaBlorp" gid="2713" x="3968" y="2032" width="16" height="16"/>
-  <object id="1531" name="LavaBlorp" gid="2713" x="3952" y="2080" width="16" height="16"/>
-  <object id="1532" name="LavaBlorp" gid="2713" x="3920" y="2064" width="16" height="16"/>
-  <object id="1533" name="LavaBlorp" gid="2713" x="3904" y="2128" width="16" height="16"/>
-  <object id="1534" name="LavaBlorp" gid="2713" x="3968" y="2128" width="16" height="16"/>
-  <object id="1535" name="LavaBlorp" gid="2713" x="3952" y="2176" width="16" height="16"/>
-  <object id="1536" name="LavaBlorp" gid="2713" x="3920" y="2192" width="16" height="16"/>
-  <object id="1537" name="LavaBlorp" gid="2713" x="3920" y="2304" width="16" height="16"/>
-  <object id="1538" name="LavaBlorp" gid="2713" x="3952" y="2304" width="16" height="16"/>
-  <object id="1540" name="LavaBlorp" gid="2713" x="3968" y="2416" width="16" height="16"/>
-  <object id="1541" name="LavaBlorp" gid="2713" x="3936" y="2416" width="16" height="16"/>
+  <object id="1528" name="LavaBlorp" gid="2713" x="3904" y="2032" width="16" height="16">
+   <properties>
+    <property name="timeBeforeActivate" type="int" value="3000"/>
+   </properties>
+  </object>
+  <object id="1530" name="LavaBlorp" gid="2713" x="3968" y="2032" width="16" height="16">
+   <properties>
+    <property name="timeBeforeActivate" type="int" value="4000"/>
+   </properties>
+  </object>
+  <object id="1531" name="LavaBlorp" gid="2713" x="3952" y="2080" width="16" height="16">
+   <properties>
+    <property name="timeBeforeActivate" type="int" value="5000"/>
+   </properties>
+  </object>
+  <object id="1532" name="LavaBlorp" gid="2713" x="3920" y="2064" width="16" height="16">
+   <properties>
+    <property name="timeBeforeActivate" type="int" value="2000"/>
+   </properties>
+  </object>
+  <object id="1533" name="LavaBlorp" gid="2713" x="3904" y="2128" width="16" height="16">
+   <properties>
+    <property name="timeBeforeActivate" type="int" value="1000"/>
+   </properties>
+  </object>
+  <object id="1534" name="LavaBlorp" gid="2713" x="3968" y="2128" width="16" height="16">
+   <properties>
+    <property name="timeBeforeActivate" type="int" value="6000"/>
+   </properties>
+  </object>
+  <object id="1535" name="LavaBlorp" gid="2713" x="3952" y="2176" width="16" height="16">
+   <properties>
+    <property name="timeBeforeActivate" type="int" value="7000"/>
+   </properties>
+  </object>
+  <object id="1536" name="LavaBlorp" gid="2713" x="3920" y="2192" width="16" height="16">
+   <properties>
+    <property name="timeBeforeActivate" type="int" value="0"/>
+   </properties>
+  </object>
+  <object id="1537" name="LavaBlorp" gid="2713" x="3920" y="2304" width="16" height="16">
+   <properties>
+    <property name="timeBeforeActivate" type="int" value="100"/>
+   </properties>
+  </object>
+  <object id="1541" name="LavaBlorp" gid="2713" x="3936" y="2416" width="16" height="16">
+   <properties>
+    <property name="timeBeforeActivate" type="int" value="500"/>
+   </properties>
+  </object>
   <object id="1584" name="FireSpout" gid="2713" x="3408" y="2048" width="16" height="16"/>
   <object id="1585" name="FireSpout" gid="2713" x="3552" y="1920" width="16" height="16"/>
   <object id="1586" name="FireSpout" gid="2713" x="3456" y="1808" width="16" height="16"/>
@@ -9628,7 +9666,21 @@
   <object id="1624" name="PoisonShroom" gid="1319" x="1600" y="2544" width="16" height="16"/>
   <object id="1625" name="PlantBug" gid="1319" x="2224" y="2400" width="16" height="16"/>
   <object id="1626" name="PlantBug" gid="1319" x="2224" y="2528" width="16" height="16"/>
-  <object id="1627" name="FireGiant" gid="2713" x="4112" y="2320" width="16" height="16"/>
+  <object id="1627" name="FireGiant" gid="2713" x="4112" y="2320" width="16" height="16">
+   <properties>
+    <property name="doNotRespawn" type="bool" value="true"/>
+   </properties>
+  </object>
+  <object id="1628" name="LavaBlorp" gid="2713" x="3952" y="2304" width="16" height="16">
+   <properties>
+    <property name="timeBeforeActivate" type="int" value="100"/>
+   </properties>
+  </object>
+  <object id="1629" name="LavaBlorp" gid="2713" x="3968" y="2416" width="16" height="16">
+   <properties>
+    <property name="timeBeforeActivate" type="int" value="500"/>
+   </properties>
+  </object>
  </objectgroup>
  <objectgroup id="10" name="Rooms">
   <object id="15" name="MK1" x="2880" y="800" width="192" height="144">
