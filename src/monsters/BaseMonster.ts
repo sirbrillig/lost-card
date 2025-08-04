@@ -217,8 +217,8 @@ export class BaseMonster extends Phaser.Physics.Arcade.Sprite {
 			this.scene,
 			position.x,
 			position.y,
-			this.width + 10,
-			5,
+			this.width + 14,
+			8,
 			0 // We can't use hitPoints because it doesn't exist yet; we are still in the constructor.
 		);
 	}
@@ -232,7 +232,7 @@ export class BaseMonster extends Phaser.Physics.Arcade.Sprite {
 			return;
 		}
 		const position = this.#getHealthBarPosition();
-		this.#healthBar.setPosition(position.x, position.y);
+		this.#healthBar?.setPosition(position.x, position.y);
 		this.#healthBar?.setMaxHealth(this.#maxHitPoints);
 		this.#healthBar?.setHealth(this.hitPoints);
 	}
@@ -569,6 +569,7 @@ export class BaseMonster extends Phaser.Physics.Arcade.Sprite {
 		this.setStunned(true);
 		this.emit(Events.MonsterDying);
 		this.#healthBar?.destroy();
+		this.#healthBar = undefined;
 
 		MainEvents.emit(Events.MonsterDying, this);
 		if (this.isBoss) {
