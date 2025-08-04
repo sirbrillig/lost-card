@@ -5,6 +5,7 @@ import {
 	isPointInRoom,
 	knockBack,
 } from "../lib/shared";
+import { HealthBar } from "../lib/HealthBar";
 import { EnemyManager } from "../lib/EnemyManager";
 import { MainEvents } from "../lib/MainEvents";
 import { config } from "../lib/config";
@@ -18,6 +19,8 @@ export class BaseMonster extends Phaser.Physics.Arcade.Sprite {
 	#enemyManager: EnemyManager;
 	#isBeingHit: boolean = false;
 	#freeTimeAfterHit: number = 600;
+	#healthBar: HealthBar | undefined;
+	#maxHitPoints: number;
 	isDying = false;
 	isStunned = false;
 
@@ -36,6 +39,7 @@ export class BaseMonster extends Phaser.Physics.Arcade.Sprite {
 		initialFrame: number | string,
 		options?: {
 			shouldCenterHitbox?: boolean;
+			isMiniBoss?: boolean;
 		}
 	) {
 		super(
@@ -87,6 +91,7 @@ export class BaseMonster extends Phaser.Physics.Arcade.Sprite {
 
 		this.initSprites();
 		this.initHitbox(options ?? {});
+		this.#initHealthBar(options ?? {});
 	}
 
 	isInActiveRoom(): boolean {
@@ -161,6 +166,11 @@ export class BaseMonster extends Phaser.Physics.Arcade.Sprite {
 	}
 
 	update() {
+		if (!this.#maxHitPoints) {
+			this.#maxHitPoints = this.hitPoints;
+		}
+
+		this.#updateHealthBar();
 		if (!this.body || !isDynamicSprite(this)) {
 			throw new Error("Could not update monster");
 		}
@@ -196,6 +206,35 @@ export class BaseMonster extends Phaser.Physics.Arcade.Sprite {
 		);
 
 		this.updateAfterBehavior(this.#currentActiveBehavior?.name);
+	}
+
+	#initHealthBar(options: { isMiniBoss?: boolean }): void {
+		if (!options.isMiniBoss) {
+			return;
+		}
+		const position = this.#getHealthBarPosition();
+		this.#healthBar = new HealthBar(
+			this.scene,
+			position.x,
+			position.y,
+			this.width + 10,
+			5,
+			0 // We can't use hitPoints because it doesn't exist yet; we are still in the constructor.
+		);
+	}
+
+	#getHealthBarPosition(): { x: number; y: number } {
+		return { x: this.x - this.width / 2, y: this.y - 14 };
+	}
+
+	#updateHealthBar(): void {
+		if (!this.#healthBar) {
+			return;
+		}
+		const position = this.#getHealthBarPosition();
+		this.#healthBar.setPosition(position.x, position.y);
+		this.#healthBar?.setMaxHealth(this.#maxHitPoints);
+		this.#healthBar?.setHealth(this.hitPoints);
 	}
 
 	updateAfterHit() {}
@@ -529,6 +568,7 @@ export class BaseMonster extends Phaser.Physics.Arcade.Sprite {
 		this.#currentState = undefined;
 		this.setStunned(true);
 		this.emit(Events.MonsterDying);
+		this.#healthBar?.destroy();
 
 		MainEvents.emit(Events.MonsterDying, this);
 		if (this.isBoss) {

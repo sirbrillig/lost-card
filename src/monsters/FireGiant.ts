@@ -9,7 +9,7 @@ import { EnemyManager } from "../lib/EnemyManager";
 import { BaseMonster } from "./BaseMonster";
 
 export class FireGiant extends BaseMonster {
-	hitPoints: number = 8;
+	hitPoints: number = 10;
 	primaryColor = 0xb80000;
 
 	constructor(
@@ -18,7 +18,7 @@ export class FireGiant extends BaseMonster {
 		x: number,
 		y: number
 	) {
-		super(scene, enemyManager, x, y, "monsters1", 57);
+		super(scene, enemyManager, x, y, "monsters1", 57, { isMiniBoss: true });
 		this.data.set(DataKeys.Pushable, false);
 		this.setScale(2);
 	}
@@ -94,9 +94,10 @@ export class FireGiant extends BaseMonster {
 			case "fireBeam":
 				this.nextState = "dash";
 				return new FireBeam(state, {
-					width: 30,
-					maxLength: 300,
-					minLength: 200,
+					width: 20,
+					maxLength: 2500,
+					minLength: 2500,
+					postAttackTime: 400,
 				});
 			case "dash":
 				this.nextState = "walk";
