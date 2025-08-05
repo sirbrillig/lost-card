@@ -1399,9 +1399,12 @@ export function createPromiseTimer(scene: Phaser.Scene, delay: number) {
 	});
 }
 
+// NOTE: when adding to this, also add to getPropertiesFromPoint and
+// createMonster.
 export interface MapMonsterProperties {
 	doNotRespawn?: boolean;
 	timeBeforeActivate?: number;
+	isMiniBoss?: boolean;
 }
 
 export interface TiledObjectProperty {
@@ -1423,6 +1426,9 @@ export function getPropertiesFromPoint(
 		}
 		if (property.name === "timeBeforeActivate") {
 			result.timeBeforeActivate = parseInt(String(property.value));
+		}
+		if (property.name === "isMiniBoss") {
+			result.isMiniBoss = Boolean(property.value);
 		}
 	});
 	return result;

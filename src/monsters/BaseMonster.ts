@@ -29,6 +29,7 @@ export class BaseMonster extends Phaser.Physics.Arcade.Sprite {
 	hitPoints: number = 1;
 	primaryColor: number = 0xc7a486;
 	isBoss: boolean = false;
+	isMiniBoss: boolean = false;
 	doNotRespawn: boolean = false;
 	timeBeforeActivate: number = 0;
 
@@ -41,7 +42,6 @@ export class BaseMonster extends Phaser.Physics.Arcade.Sprite {
 		initialFrame: number | string,
 		options?: {
 			shouldCenterHitbox?: boolean;
-			isMiniBoss?: boolean;
 		}
 	) {
 		super(
@@ -93,7 +93,6 @@ export class BaseMonster extends Phaser.Physics.Arcade.Sprite {
 
 		this.initSprites();
 		this.initHitbox(options ?? {});
-		this.#initHealthBar(options ?? {});
 	}
 
 	isInActiveRoom(): boolean {
@@ -171,6 +170,7 @@ export class BaseMonster extends Phaser.Physics.Arcade.Sprite {
 		if (!this.#maxHitPoints) {
 			this.#maxHitPoints = this.hitPoints;
 		}
+		this.#initHealthBar();
 
 		this.#updateHealthBar();
 		if (!this.body || !isDynamicSprite(this)) {
@@ -223,8 +223,11 @@ export class BaseMonster extends Phaser.Physics.Arcade.Sprite {
 		this.updateAfterBehavior(this.#currentActiveBehavior?.name);
 	}
 
-	#initHealthBar(options: { isMiniBoss?: boolean }): void {
-		if (!options.isMiniBoss) {
+	#initHealthBar(): void {
+		if (this.#activationStatus !== "not-started") {
+			return;
+		}
+		if (!this.isMiniBoss) {
 			return;
 		}
 		const position = this.#getHealthBarPosition();

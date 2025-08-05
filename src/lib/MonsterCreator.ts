@@ -145,6 +145,9 @@ export class MonsterCreator {
 		if (properties?.timeBeforeActivate) {
 			monster.timeBeforeActivate = properties.timeBeforeActivate;
 		}
+		if (properties?.isMiniBoss) {
+			monster.isMiniBoss = properties.isMiniBoss;
+		}
 		monster.once(Events.MonsterDefeated, () => {
 			if (monster.doNotRespawn) {
 				this.#rememberMonsterDefeated(name);

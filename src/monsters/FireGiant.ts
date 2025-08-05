@@ -27,7 +27,7 @@ export class FireGiant extends BaseMonster {
 		x: number,
 		y: number
 	) {
-		super(scene, enemyManager, x, y, "monsters1", 57, { isMiniBoss: true });
+		super(scene, enemyManager, x, y, "monsters1", 57);
 		this.data.set(DataKeys.Pushable, false);
 		this.setScale(2);
 		this.#enemyManager = enemyManager;
