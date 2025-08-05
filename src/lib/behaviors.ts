@@ -190,7 +190,7 @@ export class Roar implements Behavior {
 }
 
 export class SpawnEnemies implements Behavior {
-	#maxSpawnedEnemies: number = 18;
+	#maxSpawnedEnemies: number | undefined = undefined;
 	#enemiesToSpawn: number = 6;
 	#postSpawnTime: number = 1000;
 	#createMonster: (
@@ -266,7 +266,10 @@ export class SpawnEnemies implements Behavior {
 		}
 
 		const spawnedEnemyCount = sprite.data.get("spawnedEnemyCount") ?? 0;
-		if (spawnedEnemyCount >= this.#maxSpawnedEnemies) {
+		if (
+			this.#maxSpawnedEnemies &&
+			spawnedEnemyCount >= this.#maxSpawnedEnemies
+		) {
 			return;
 		}
 
@@ -1684,6 +1687,7 @@ export class DashTowardPlayer implements Behavior {
 	#speed = 90;
 	#postAttackTime = 900;
 	#previousDistance: number;
+	#doNotStop: boolean = false;
 	#targetPosition: { x: number; y: number } | undefined = undefined;
 	name: string;
 
@@ -1692,6 +1696,7 @@ export class DashTowardPlayer implements Behavior {
 		options?: {
 			speed?: number;
 			postAttackTime?: number;
+			doNotStop?: boolean;
 			targetPosition?: { x: number; y: number };
 		}
 	) {
@@ -1699,6 +1704,7 @@ export class DashTowardPlayer implements Behavior {
 		this.#speed = options?.speed ?? this.#speed;
 		this.#postAttackTime = options?.postAttackTime ?? this.#postAttackTime;
 		this.#targetPosition = options?.targetPosition;
+		this.#doNotStop = options?.doNotStop ?? false;
 	}
 
 	init(
@@ -1722,6 +1728,7 @@ export class DashTowardPlayer implements Behavior {
 		sprite.scene.time.addEvent({
 			delay: this.#postAttackTime,
 			callback: () => {
+				sprite.body.stop();
 				goToNextState();
 			},
 		});
@@ -1740,13 +1747,17 @@ export class DashTowardPlayer implements Behavior {
 		// If you hit a wall, the direction will change as moveToObject tries to
 		// slide around it. We want to stop in that case so we check to see if the
 		// distance isn't getting closer.
-		if (this.#previousDistance && distance > this.#previousDistance) {
+		if (
+			!this.#doNotStop &&
+			this.#previousDistance &&
+			distance > this.#previousDistance
+		) {
 			sprite.body.stop();
 			return;
 		}
 
 		// If you reach the target, stop.
-		if (distance < 5) {
+		if (distance < 5 && !this.#doNotStop) {
 			sprite.body.stop();
 			return;
 		}

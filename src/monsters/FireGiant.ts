@@ -20,6 +20,7 @@ export class FireGiant extends BaseMonster {
 	hitPoints: number = 10;
 	primaryColor = 0xb80000;
 	#enemyManager: EnemyManager;
+	#previouslySummonedTiles: Phaser.Tilemaps.Tile[] = [];
 
 	constructor(
 		scene: Phaser.Scene,
@@ -89,19 +90,29 @@ export class FireGiant extends BaseMonster {
 	}
 
 	constructNewBehaviorFor(state: string) {
+		const activeRoom = getActiveRoom();
+		if (!activeRoom) {
+			throw new Error("No current room when creating monster");
+		}
+		const tiles = getTilesInRoom(getMap(), activeRoom).filter((tile) => {
+			return isTileWithPropertiesObject(tile) && tile.properties.isLava;
+		});
+		if (tiles.length < 1) {
+			throw new Error("No tiles in current room when creating monster");
+		}
 		const createMonster = () => {
-			const activeRoom = getActiveRoom();
-			if (!activeRoom) {
-				throw new Error("No current room when creating monster");
-			}
-			const tiles = getTilesInRoom(getMap(), activeRoom).filter((tile) => {
-				return isTileWithPropertiesObject(tile) && tile.properties.isLava;
-			});
-			if (tiles.length < 1) {
-				throw new Error("No tiles in current room when creating monster");
-			}
 			// Choose tile at random
-			const targetTile = tiles[Phaser.Math.Between(0, tiles.length - 1)];
+			let targetTile = tiles[Phaser.Math.Between(0, tiles.length - 1)];
+			const maxTries = 8;
+			let tries = 0;
+			while (this.#previouslySummonedTiles.includes(targetTile)) {
+				if (tries > maxTries) {
+					break;
+				}
+				tries += 1;
+				targetTile = tiles[Phaser.Math.Between(0, tiles.length - 1)];
+			}
+			this.#previouslySummonedTiles.push(targetTile);
 			const enemy = new LavaBlorp(
 				this.scene,
 				this.#enemyManager,
@@ -109,6 +120,12 @@ export class FireGiant extends BaseMonster {
 				targetTile.pixelY + targetTile.height
 			);
 			enemy.timeBeforeBubble = 100;
+			this.scene.time.addEvent({
+				delay: 8_000,
+				callback: () => {
+					enemy.destroy();
+				},
+			});
 			return enemy;
 		};
 		switch (state) {
@@ -132,19 +149,20 @@ export class FireGiant extends BaseMonster {
 					postAttackTime: 400,
 				});
 			case "dash":
-				this.nextState = "charge";
+				this.nextState = "powerup";
 				return new DashTowardPlayer(state, {
 					speed: 225,
 					postAttackTime: 1000,
+					doNotStop: true,
 				});
-			case "charge":
+			case "powerup":
 				this.nextState = "summon";
 				return new PowerUp(state, {});
 			case "summon":
+				this.#previouslySummonedTiles = [];
 				this.nextState = "walk";
 				return new SpawnEnemies(state, {
 					enemiesToSpawn: 10,
-					maxSpawnedEnemies: 10,
 					createMonster,
 				});
 		}
