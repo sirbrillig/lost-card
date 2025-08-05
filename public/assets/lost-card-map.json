@@ -6366,34 +6366,6 @@
          "objects":[
                 {
                  "height":0,
-                 "id":47,
-                 "name":"MountainBoss",
-                 "point":true,
-                 "properties":[
-                        {
-                         "name":"doNotRespawn",
-                         "type":"bool",
-                         "value":true
-                        }, 
-                        {
-                         "name":"isBoss",
-                         "type":"bool",
-                         "value":true
-                        }, 
-                        {
-                         "name":"isMonster",
-                         "type":"bool",
-                         "value":true
-                        }],
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":0,
-                 "x":2265.25,
-                 "y":67.6412
-                }, 
-                {
-                 "height":0,
                  "id":103,
                  "name":"MountainMonster",
                  "point":true,
@@ -6658,24 +6630,6 @@
                 }, 
                 {
                  "height":0,
-                 "id":372,
-                 "name":"IceBoss",
-                 "point":true,
-                 "properties":[
-                        {
-                         "name":"doNotRespawn",
-                         "type":"bool",
-                         "value":true
-                        }],
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":0,
-                 "x":2728.69,
-                 "y":2725.99
-                }, 
-                {
-                 "height":0,
                  "id":562,
                  "name":"FireMonster",
                  "point":true,
@@ -6796,24 +6750,6 @@
                 }, 
                 {
                  "height":0,
-                 "id":584,
-                 "name":"FireBoss",
-                 "point":true,
-                 "properties":[
-                        {
-                         "name":"doNotRespawn",
-                         "type":"bool",
-                         "value":true
-                        }],
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":0,
-                 "x":3529.36,
-                 "y":2609.73
-                }, 
-                {
-                 "height":0,
                  "id":596,
                  "name":"PlantSpitter",
                  "point":true,
@@ -6847,24 +6783,6 @@
                  "width":0,
                  "x":1791.23,
                  "y":1878.09
-                }, 
-                {
-                 "height":0,
-                 "id":613,
-                 "name":"PlantBoss",
-                 "point":true,
-                 "properties":[
-                        {
-                         "name":"doNotRespawn",
-                         "type":"bool",
-                         "value":true
-                        }],
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":0,
-                 "x":1789.27,
-                 "y":2919.89
                 }, 
                 {
                  "height":0,
@@ -7030,24 +6948,6 @@
                 }, 
                 {
                  "height":0,
-                 "id":666,
-                 "name":"CloudBoss",
-                 "point":true,
-                 "properties":[
-                        {
-                         "name":"doNotRespawn",
-                         "type":"bool",
-                         "value":true
-                        }],
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":0,
-                 "x":1350.65,
-                 "y":1308.43
-                }, 
-                {
-                 "height":0,
                  "id":676,
                  "name":"Ghost",
                  "point":true,
@@ -7093,24 +6993,6 @@
                  "width":0,
                  "x":3056.95,
                  "y":1517.62
-                }, 
-                {
-                 "height":0,
-                 "id":681,
-                 "name":"SpiritBoss",
-                 "point":true,
-                 "properties":[
-                        {
-                         "name":"doNotRespawn",
-                         "type":"bool",
-                         "value":true
-                        }],
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":0,
-                 "x":3355.13,
-                 "y":1471.62
                 }, 
                 {
                  "height":0,
@@ -8780,6 +8662,174 @@
                  "width":16,
                  "x":3648,
                  "y":880
+                }, 
+                {
+                 "gid":2713,
+                 "height":16,
+                 "id":1632,
+                 "name":"SpiritBoss",
+                 "properties":[
+                        {
+                         "name":"doNotRespawn",
+                         "type":"bool",
+                         "value":true
+                        }, 
+                        {
+                         "name":"isBoss",
+                         "type":"bool",
+                         "value":true
+                        }, 
+                        {
+                         "name":"isMiniBoss",
+                         "type":"bool",
+                         "value":false
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":16,
+                 "x":3344,
+                 "y":1472
+                }, 
+                {
+                 "gid":2713,
+                 "height":16,
+                 "id":1633,
+                 "name":"IceBoss",
+                 "properties":[
+                        {
+                         "name":"doNotRespawn",
+                         "type":"bool",
+                         "value":true
+                        }, 
+                        {
+                         "name":"isBoss",
+                         "type":"bool",
+                         "value":true
+                        }, 
+                        {
+                         "name":"isMiniBoss",
+                         "type":"bool",
+                         "value":false
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":16,
+                 "x":2720,
+                 "y":2720
+                }, 
+                {
+                 "gid":2713,
+                 "height":16,
+                 "id":1634,
+                 "name":"CloudBoss",
+                 "properties":[
+                        {
+                         "name":"doNotRespawn",
+                         "type":"bool",
+                         "value":true
+                        }, 
+                        {
+                         "name":"isBoss",
+                         "type":"bool",
+                         "value":true
+                        }, 
+                        {
+                         "name":"isMiniBoss",
+                         "type":"bool",
+                         "value":false
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":16,
+                 "x":1344,
+                 "y":1312
+                }, 
+                {
+                 "gid":2713,
+                 "height":16,
+                 "id":1635,
+                 "name":"PlantBoss",
+                 "properties":[
+                        {
+                         "name":"doNotRespawn",
+                         "type":"bool",
+                         "value":true
+                        }, 
+                        {
+                         "name":"isBoss",
+                         "type":"bool",
+                         "value":true
+                        }, 
+                        {
+                         "name":"isMiniBoss",
+                         "type":"bool",
+                         "value":false
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":16,
+                 "x":1776,
+                 "y":2928
+                }, 
+                {
+                 "gid":2713,
+                 "height":16,
+                 "id":1636,
+                 "name":"MountainBoss",
+                 "properties":[
+                        {
+                         "name":"doNotRespawn",
+                         "type":"bool",
+                         "value":true
+                        }, 
+                        {
+                         "name":"isBoss",
+                         "type":"bool",
+                         "value":true
+                        }, 
+                        {
+                         "name":"isMiniBoss",
+                         "type":"bool",
+                         "value":false
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":16,
+                 "x":2256,
+                 "y":80
+                }, 
+                {
+                 "gid":2713,
+                 "height":16,
+                 "id":1637,
+                 "name":"FireBoss",
+                 "properties":[
+                        {
+                         "name":"doNotRespawn",
+                         "type":"bool",
+                         "value":true
+                        }, 
+                        {
+                         "name":"isBoss",
+                         "type":"bool",
+                         "value":true
+                        }, 
+                        {
+                         "name":"isMiniBoss",
+                         "type":"bool",
+                         "value":false
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":16,
+                 "x":3520,
+                 "y":2624
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -21544,7 +21594,7 @@
          "y":0
         }],
  "nextlayerid":20,
- "nextobjectid":1632,
+ "nextobjectid":1638,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.1",
