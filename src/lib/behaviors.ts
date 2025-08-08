@@ -2433,133 +2433,141 @@ export class RangedIceBall implements Behavior {
 }
 
 export class WalkWithFire implements Behavior {
+	#enemySpeed = 12;
+	#minWalkTime = 10_000;
+	#maxWalkTime = 15_000;
 	name: string;
-	#effect: Phaser.GameObjects.Sprite;
-	#enemySpeed = 50;
-	#endAfter = 1000;
-	#rotateDistance = 25;
+	#walkSound: Sound;
+	#walkBehavior: Behavior;
+	#dropFireTimer: Phaser.Time.TimerEvent;
+	#effects: Phaser.GameObjects.Sprite[] = [];
 
 	constructor(
 		name: string,
-		config?: { speed?: number; endAfter?: number; rotateDistance?: number }
+		config?: {
+			speed?: number;
+			minWalkTime?: number;
+			maxWalkTime?: number;
+			walkSound?: Sound;
+		}
 	) {
 		this.name = name;
 		if (config?.speed) {
 			this.#enemySpeed = config.speed;
 		}
-		if (config?.endAfter) {
-			this.#endAfter = config.endAfter;
+		if (config?.minWalkTime) {
+			this.#minWalkTime = config.minWalkTime;
 		}
-		if (config?.rotateDistance) {
-			this.#rotateDistance = config.rotateDistance;
+		if (config?.maxWalkTime) {
+			this.#maxWalkTime = config.maxWalkTime;
+		}
+		if (config?.walkSound) {
+			this.#walkSound = config.walkSound;
 		}
 	}
 
 	init(
 		sprite: Phaser.GameObjects.Sprite,
-		goToNextState: BehaviorCompleteCallback
+		goToNextState: BehaviorCompleteCallback,
+		enemyManager: EnemyManager
 	): void {
-		if (!sprite.body || !isDynamicSprite(sprite)) {
-			throw new Error("Could not update monster");
-		}
-		const direction = getWalkingDirection(sprite);
-		this.#walkInDirection(sprite, direction);
-		const walkSound = sprite.scene.sound.add("enemy-walk", {
-			loop: true,
-			rate: 1.5,
-			volume: 0.5,
+		this.#walkBehavior = new RandomlyWalk("walk-in-WalkWithFire", {
+			speed: this.#enemySpeed,
+			minWalkTime: this.#maxWalkTime,
+			maxWalkTime: this.#maxWalkTime,
+			walkSound: this.#walkSound,
 		});
-		walkSound.play();
+		this.#walkBehavior.init(sprite, () => ({}), enemyManager);
 
-		sprite.scene.anims.create({
-			key: "fire-power",
-			frames: sprite.anims.generateFrameNumbers("fire-power"),
-			frameRate: 24,
-			showOnStart: true,
-			hideOnComplete: true,
-			repeat: 2,
-		});
-		this.#effect = sprite.scene.add.sprite(
-			sprite.body.center.x,
-			sprite.body.center.y,
-			"fire-power",
-			0
-		);
-		sprite.scene.physics.add.existing(this.#effect);
-		this.#effect.setDepth(config.effectDepth);
-		this.#effect.anims.play(
-			{
-				key: "fire-power",
-				repeat: 3,
-			},
-			true
-		);
-		if (!isDynamicSprite(this.#effect)) {
-			throw new Error("Could not update fire ball");
-		}
-		this.#effect.setDisplaySize(
-			this.#effect.body.width * 0.8,
-			this.#effect.body.height * 0.8
-		);
-		this.#effect.body.setSize(
-			this.#effect.body.width * 0.5,
-			this.#effect.body.height * 0.5
-		);
-		const player = getPlayerOrThrow();
-		sprite.scene.physics.add.overlap(player, this.#effect, () => {
-			walkSound.stop();
-			MainEvents.emit(Events.EnemyHitPlayer, true);
-			this.#effect.destroy();
-
-			goToNextState();
-		});
-
-		sprite.once(Events.MonsterDying, () => {
-			walkSound.stop();
-			this.#effect?.destroy();
-		});
-		MainEvents.once(Events.LeavingRoom, () => {
-			walkSound.stop();
-			this.#effect?.destroy();
-
-			goToNextState();
-		});
-		sprite.scene.time.addEvent({
-			delay: this.#endAfter,
+		this.#dropFireTimer = sprite.scene.time.addEvent({
+			delay: 1000,
+			repeat: -1,
 			callback: () => {
-				walkSound?.stop();
-				this.#effect?.destroy();
+				const effect = this.#dropFire(sprite);
+				if (effect) {
+					this.#effects.push(effect);
+				}
+			},
+		});
 
+		sprite.scene.time.addEvent({
+			delay: this.#getWalkingTime(),
+			callback: () => {
+				this.#effects.forEach((effect) => {
+					effect?.destroy();
+				});
+				this.#dropFireTimer.remove();
 				goToNextState();
 			},
 		});
 	}
 
-	#walkInDirection(
-		sprite: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody,
-		direction: SpriteDirection
-	) {
-		sprite.data.set("direction", direction);
-		const velocity = createVelocityForDirection(this.#enemySpeed, direction);
-		sprite.body.setVelocity(velocity.x, velocity.y);
-		sprite.anims.play(getWalkAnimationKeyForDirection(direction), true);
-	}
-
-	update(sprite: Phaser.GameObjects.Sprite): void {
+	#dropFire(
+		sprite: Phaser.GameObjects.Sprite
+	): Phaser.GameObjects.Sprite | undefined {
 		if (!isDynamicSprite(sprite)) {
+			return undefined;
+		}
+		const effect = sprite.scene.add.sprite(
+			sprite.body.center.x,
+			sprite.body.center.y,
+			"fire-power",
+			0
+		);
+		sprite.scene.physics.add.existing(effect);
+		effect.setDepth(config.effectDepth);
+		sprite.scene.anims.create({
+			key: "fire-power",
+			frames: sprite.anims.generateFrameNumbers("fire-power"),
+			frameRate: 50,
+			showOnStart: true,
+			hideOnComplete: true,
+		});
+		effect.anims.play(
+			{
+				key: "fire-power",
+				repeat: -1,
+			},
+			true
+		);
+		if (!isDynamicSprite(effect)) {
 			throw new Error("Could not update fire ball");
 		}
-		// If you hit a wall, change direction.
-		if (sprite.body?.velocity.x === 0 && sprite.body.velocity.y === 0) {
-			const direction = getWalkingDirection(sprite);
-			this.#walkInDirection(sprite, direction);
+		effect.setDisplaySize(effect.body.width * 0.5, effect.body.height * 0.5);
+		effect.body.setSize(effect.body.width * 0.4, effect.body.height * 0.4);
+
+		const player = getPlayerOrThrow();
+
+		sprite.scene.physics.add.overlap(player, effect, () => {
+			MainEvents.emit(Events.EnemyHitPlayer, true);
+		});
+
+		sprite.once(Events.MonsterDying, () => {
+			effect?.destroy();
+		});
+		MainEvents.once(Events.LeavingRoom, () => {
+			effect?.destroy();
+		});
+		return effect;
+	}
+
+	#getWalkingTime(): number {
+		return Phaser.Math.Between(this.#minWalkTime, this.#maxWalkTime);
+	}
+
+	update(
+		sprite: Phaser.GameObjects.Sprite,
+		_goToNextState: BehaviorCompleteCallback,
+		enemyManager: EnemyManager
+	) {
+		if (!isDynamicSprite(sprite)) {
+			throw new Error("invalid sprite");
 		}
-		Phaser.Actions.RotateAroundDistance(
-			[this.#effect],
-			sprite.body.center,
-			Phaser.Math.DegToRad(5),
-			this.#rotateDistance
-		);
+		this.#walkBehavior?.update?.(sprite, () => ({}), enemyManager);
+	}
+
+	cleanUp(sprite: Phaser.GameObjects.Sprite, enemyManager: EnemyManager) {
+		this.#walkBehavior?.cleanUp?.(sprite, enemyManager);
 	}
 }
 

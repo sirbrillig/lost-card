@@ -1,10 +1,8 @@
-import { RandomlyWalk, WalkWithFire } from "../lib/behaviors";
+import { WalkWithFire } from "../lib/behaviors";
 import { EnemyManager } from "../lib/EnemyManager";
 import { BaseMonster } from "./BaseMonster";
 
-type AllStates = "randomwalk1" | "walkwithfire";
-
-export class FireMonster extends BaseMonster {
+export class FireSlug extends BaseMonster {
 	hitPoints: number = 3;
 	primaryColor = 0xb80000;
 
@@ -14,49 +12,53 @@ export class FireMonster extends BaseMonster {
 		x: number,
 		y: number
 	) {
-		super(scene, enemyManager, x, y, "monsters1", 57);
+		super(scene, enemyManager, x, y, "monsters4", 6);
 	}
 
 	initSprites() {
 		this.anims.create({
 			key: "down",
-			frames: this.anims.generateFrameNumbers("monsters1", {
-				start: 57,
-				end: 59,
+			frames: this.anims.generateFrameNumbers("monsters4", {
+				start: 6,
+				end: 8,
 			}),
 			frameRate: 10,
 			repeat: -1,
+			yoyo: true,
 		});
 		this.anims.create({
 			key: "left",
-			frames: this.anims.generateFrameNumbers("monsters1", {
-				start: 69,
-				end: 71,
+			frames: this.anims.generateFrameNumbers("monsters4", {
+				start: 18,
+				end: 20,
 			}),
 			frameRate: 10,
 			repeat: -1,
+			yoyo: true,
 		});
 		this.anims.create({
 			key: "right",
-			frames: this.anims.generateFrameNumbers("monsters1", {
-				start: 81,
-				end: 83,
+			frames: this.anims.generateFrameNumbers("monsters4", {
+				start: 30,
+				end: 32,
 			}),
 			frameRate: 10,
 			repeat: -1,
+			yoyo: true,
 		});
 		this.anims.create({
 			key: "up",
-			frames: this.anims.generateFrameNumbers("monsters1", {
-				start: 93,
-				end: 95,
+			frames: this.anims.generateFrameNumbers("monsters4", {
+				start: 42,
+				end: 44,
 			}),
 			frameRate: 10,
 			repeat: -1,
+			yoyo: true,
 		});
 	}
 
-	getInitialState(): AllStates {
+	getInitialState() {
 		return "randomwalk1";
 	}
 
@@ -64,7 +66,7 @@ export class FireMonster extends BaseMonster {
 		switch (state) {
 			case "randomwalk1":
 				this.nextState = "walkwithfire";
-				return new RandomlyWalk(state);
+				return new WalkWithFire(state);
 			case "walkwithfire":
 				this.nextState = "randomwalk1";
 				return new WalkWithFire(state);
