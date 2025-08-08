@@ -73,6 +73,8 @@ export class WaitForActive implements Behavior {
 
 		if (this.#waitAnimationKey) {
 			sprite.anims.play(this.#waitAnimationKey, true);
+		} else {
+			sprite.anims.stop();
 		}
 
 		if (this.#maxWaitTime) {
@@ -982,6 +984,7 @@ export class TeleportToWater implements Behavior {
 export class PowerUp implements Behavior {
 	#chargeTime = 1300;
 	#scale = 1;
+	#effect: Phaser.GameObjects.Sprite;
 	name: string;
 
 	constructor(
@@ -1028,6 +1031,7 @@ export class PowerUp implements Behavior {
 		effect.setDepth(config.effectDepth);
 		effect.setAlpha(0.7);
 		effect.anims.play("powerup", true);
+		this.#effect = effect;
 		sprite.scene.sound.play("ice-charge");
 		sprite.once(Events.MonsterDying, () => {
 			sprite.scene?.sound.stopByKey("ice-charge");
@@ -1047,6 +1051,16 @@ export class PowerUp implements Behavior {
 				goToNextState();
 			},
 		});
+	}
+
+	update(sprite: Phaser.GameObjects.Sprite): void {
+		if (!sprite?.body) {
+			return;
+		}
+		if (!isDynamicSprite(sprite)) {
+			return;
+		}
+		this.#effect?.setPosition(sprite.body.center.x, sprite.body.center.y);
 	}
 }
 
@@ -2851,6 +2865,7 @@ export class FollowPlayer implements Behavior {
 	name: string;
 	#followTime: number | undefined;
 	#awareDistance: number | undefined;
+	#stopWhenCloseDistance: number | undefined;
 	#speed: number = 30;
 
 	constructor(
@@ -2859,6 +2874,7 @@ export class FollowPlayer implements Behavior {
 			speed?: number;
 			followTime?: number;
 			awareDistance?: number;
+			stopWhenCloseDistance?: number;
 		}
 	) {
 		this.name = name;
@@ -2870,6 +2886,9 @@ export class FollowPlayer implements Behavior {
 		}
 		if (config?.speed) {
 			this.#speed = config.speed;
+		}
+		if (config?.stopWhenCloseDistance) {
+			this.#stopWhenCloseDistance = config.stopWhenCloseDistance;
 		}
 	}
 
@@ -2923,6 +2942,13 @@ export class FollowPlayer implements Behavior {
 		}
 
 		// If we are extremely close we don't need to change course.
+		if (this.#stopWhenCloseDistance && distance < this.#stopWhenCloseDistance) {
+			sprite.scene?.sound.stopByKey("water-walk");
+			sprite.body.stop();
+
+			goToNextState();
+			return;
+		}
 		if (distance < 10) {
 			return;
 		}
@@ -3234,5 +3260,28 @@ export class ThrowRocks implements Behavior {
 		if (this.#rockCount === 0) {
 			this.waitAndEnd(goToNextState);
 		}
+	}
+}
+
+export class Decide implements Behavior {
+	name: string;
+	#decider: () => void;
+
+	constructor(
+		name: string,
+		config: {
+			decider: () => void;
+		}
+	) {
+		this.name = name;
+		this.#decider = config.decider;
+	}
+
+	init(
+		_: Phaser.GameObjects.Sprite,
+		goToNextState: BehaviorCompleteCallback
+	): void {
+		this.#decider();
+		goToNextState();
 	}
 }
