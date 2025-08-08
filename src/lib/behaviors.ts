@@ -2434,13 +2434,13 @@ export class RangedIceBall implements Behavior {
 
 export class WalkWithFire implements Behavior {
 	#enemySpeed = 12;
-	#minWalkTime = 10_000;
-	#maxWalkTime = 15_000;
+	#minWalkTime = 20_000;
+	#maxWalkTime = 25_000;
+	#fireLifetime = 5_000;
 	name: string;
 	#walkSound: Sound;
 	#walkBehavior: Behavior;
 	#dropFireTimer: Phaser.Time.TimerEvent;
-	#effects: Phaser.GameObjects.Sprite[] = [];
 
 	constructor(
 		name: string,
@@ -2483,19 +2483,13 @@ export class WalkWithFire implements Behavior {
 			delay: 1000,
 			repeat: -1,
 			callback: () => {
-				const effect = this.#dropFire(sprite);
-				if (effect) {
-					this.#effects.push(effect);
-				}
+				this.#dropFire(sprite);
 			},
 		});
 
 		sprite.scene.time.addEvent({
 			delay: this.#getWalkingTime(),
 			callback: () => {
-				this.#effects.forEach((effect) => {
-					effect?.destroy();
-				});
 				this.#dropFireTimer.remove();
 				goToNextState();
 			},
@@ -2542,12 +2536,17 @@ export class WalkWithFire implements Behavior {
 			MainEvents.emit(Events.EnemyHitPlayer, true);
 		});
 
-		sprite.once(Events.MonsterDying, () => {
-			effect?.destroy();
-		});
 		MainEvents.once(Events.LeavingRoom, () => {
 			effect?.destroy();
 		});
+
+		sprite.scene.time.addEvent({
+			delay: this.#fireLifetime,
+			callback: () => {
+				effect?.destroy();
+			},
+		});
+
 		return effect;
 	}
 
