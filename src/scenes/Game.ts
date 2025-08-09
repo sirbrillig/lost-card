@@ -3,6 +3,7 @@ import { soundKeys, musicKeys } from "../lib/sound";
 import { config } from "../lib/config";
 import { MainEvents } from "../lib/MainEvents";
 import { EnemyManager } from "../lib/EnemyManager";
+import { ProgressWheel } from "../lib/ProgressWheel";
 import { BaseMonster } from "../monsters/BaseMonster";
 import {
 	Auras,
@@ -91,6 +92,7 @@ export class Game extends Scene {
 	debugGraphic: Phaser.GameObjects.Graphics | undefined;
 	layerDebugGraphic: Phaser.GameObjects.Graphics | undefined;
 	healEffect: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody | undefined;
+	#healProgressCircle: ProgressWheel;
 	statusIcon: Phaser.GameObjects.Sprite | undefined;
 	statusBounce: Phaser.Tweens.Tween | undefined;
 	enemyManager: EnemyManager;
@@ -796,6 +798,16 @@ export class Game extends Scene {
 		});
 		TweenComponent.set("healTimerTween", healTimerTween);
 		healTimerEffect.anims.play({ key: "use-potion", repeat: -1 });
+		this.#healProgressCircle?.destroy();
+		this.#healProgressCircle = new ProgressWheel(
+			this,
+			player.body.center.x,
+			player.body.center.y,
+			player.body.height / 6
+		);
+		this.#healProgressCircle.setDepth(config.effectDepth);
+		this.#healProgressCircle.setOpacity(0.7);
+		this.#healProgressCircle.setColor(0xed2dd9);
 	}
 
 	#stopHealTimer(): void {
@@ -4521,13 +4533,15 @@ export class Game extends Scene {
 		this.updateHealEffectPosition();
 		this.updateHeartCard();
 
-		if (this.#isPressingHeal()) {
+		if (this.#isPressingHeal() && this.healTimer) {
 			player.body.setVelocity(0);
 			player.anims.stop();
 			this.setPlayerIdleFrame();
+			this.#healProgressCircle?.setProgress(this.healTimer.getProgress());
 		}
 		if (!this.#isPressingHeal() && this.healTimer) {
 			this.#stopHealTimer();
+			this.#healProgressCircle?.destroy();
 		}
 
 		// Keep in mind that the player may be moving unintentionally (eg: via knockback).
