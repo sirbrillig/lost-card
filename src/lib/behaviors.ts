@@ -433,7 +433,10 @@ export class Burrow implements Behavior {
 								return;
 							}
 							sprite?.scene.physics.add.overlap(player, shadow, () => {
-								MainEvents.emit(Events.EnemyHitPlayer, true);
+								MainEvents.emit(Events.EnemyHitPlayer, {
+									source: sprite,
+									damage: 1,
+								});
 							});
 						}
 						shadow?.destroy();
@@ -1125,7 +1128,7 @@ export class SlashTowardPlayer implements Behavior {
 		sprite.scene.sound.play("attack");
 
 		sprite.scene.physics.add.overlap(player, this.#effect, () => {
-			MainEvents.emit(Events.EnemyHitPlayer, true);
+			MainEvents.emit(Events.EnemyHitPlayer, { source: sprite, damage: 1 });
 		});
 
 		sprite.once(Events.MonsterDying, () => {
@@ -1196,7 +1199,7 @@ export class BigSwing implements Behavior {
 
 		const player = getPlayerOrThrow();
 		sprite.scene.physics.add.overlap(player, effect, () => {
-			MainEvents.emit(Events.EnemyHitPlayer, true);
+			MainEvents.emit(Events.EnemyHitPlayer, { source: sprite, damage: 1 });
 		});
 
 		sprite.once(Events.MonsterDying, () => {
@@ -1312,7 +1315,7 @@ export class StickyPoison implements Behavior {
 			delay: this.#poisonHitDelay,
 			callback: () => {
 				if (this.#isStuck) {
-					MainEvents.emit(Events.EnemyHitPlayer, true);
+					MainEvents.emit(Events.EnemyHitPlayer, { source: sprite, damage: 1 });
 					return;
 				}
 
@@ -1479,7 +1482,7 @@ export class LavaExplode implements Behavior {
 		circle.body.setOffset(-this.#hitboxRadius, -this.#hitboxRadius);
 		const player = getPlayerOrThrow();
 		sprite.scene.physics.add.overlap(player, circle, () => {
-			MainEvents.emit(Events.EnemyHitPlayer, true);
+			MainEvents.emit(Events.EnemyHitPlayer, { source: sprite, damage: 1 });
 			if (!this.#isConstant) {
 				circle?.destroy();
 			}
@@ -1547,6 +1550,7 @@ export class SeekingVine implements Behavior {
 		}
 		this.#effect = new Seeker(
 			sprite.scene,
+			sprite,
 			sprite.body.center.x,
 			sprite.body.center.y,
 			"green-ball",
@@ -1736,7 +1740,7 @@ export class DashTowardPlayer implements Behavior {
 		);
 
 		sprite.scene.physics.add.overlap(player, sprite, () => {
-			MainEvents.emit(Events.EnemyHitPlayer, true);
+			MainEvents.emit(Events.EnemyHitPlayer, { source: sprite, damage: 1 });
 		});
 
 		sprite.scene.time.addEvent({
@@ -1916,7 +1920,10 @@ export class FireBeam implements Behavior {
 					);
 
 					if (angleDiff < Math.PI / 2) {
-						MainEvents.emit(Events.EnemyHitPlayer, true);
+						MainEvents.emit(Events.EnemyHitPlayer, {
+							source: sprite,
+							damage: 1,
+						});
 					}
 				}
 
@@ -2073,7 +2080,7 @@ export class BlackOrbAttack implements Behavior {
 		sprite.scene.physics.moveToObject(enemy, player, this.#speed);
 
 		sprite.scene.physics.add.overlap(player, enemy, () => {
-			MainEvents.emit(Events.EnemyHitPlayer, true);
+			MainEvents.emit(Events.EnemyHitPlayer, { source: sprite, damage: 1 });
 			enemy.emit(Events.MonsterKillRequest);
 		});
 		MainEvents.once(Events.LeavingRoom, () => {
@@ -2202,7 +2209,7 @@ export class RangedRockBall implements Behavior {
 
 		const player = getPlayerOrThrow();
 		sprite.scene.physics.add.overlap(player, effect, () => {
-			MainEvents.emit(Events.EnemyHitPlayer, true);
+			MainEvents.emit(Events.EnemyHitPlayer, { source: sprite, damage: 1 });
 			onDestroy();
 		});
 
@@ -2340,7 +2347,7 @@ export class RangedFireBall implements Behavior {
 
 		sprite.scene.physics.add.overlap(player, effect, () => {
 			fireSound?.stop();
-			MainEvents.emit(Events.EnemyHitPlayer, true);
+			MainEvents.emit(Events.EnemyHitPlayer, { source: sprite, damage: 1 });
 			effect.destroy();
 		});
 
@@ -2419,7 +2426,7 @@ export class RangedIceBall implements Behavior {
 
 		sprite.scene.physics.add.overlap(player, effect, () => {
 			sprite?.scene?.sound.stopByKey("ice");
-			MainEvents.emit(Events.EnemyHitPlayer, true);
+			MainEvents.emit(Events.EnemyHitPlayer, { source: sprite, damage: 1 });
 			effect.destroy();
 		});
 
@@ -2547,7 +2554,7 @@ export class WalkWithFire implements Behavior {
 		const player = getPlayerOrThrow();
 
 		sprite.scene.physics.add.overlap(player, effect, () => {
-			MainEvents.emit(Events.EnemyHitPlayer, true);
+			MainEvents.emit(Events.EnemyHitPlayer, { source: sprite, damage: 1 });
 		});
 
 		MainEvents.once(Events.LeavingRoom, () => {
@@ -2651,7 +2658,7 @@ export class IceBeam implements Behavior {
 
 		sprite.scene.physics.add.overlap(player, effect, () => {
 			sprite.scene?.sound.stopByKey("freeze");
-			MainEvents.emit(Events.EnemyHitPlayer, true);
+			MainEvents.emit(Events.EnemyHitPlayer, { source: sprite, damage: 1 });
 			effect.destroy();
 
 			goToNextState();
@@ -3023,6 +3030,7 @@ class Seeker extends Phaser.Physics.Arcade.Sprite {
 
 	constructor(
 		scene: Phaser.Scene,
+		sprite: Phaser.GameObjects.Sprite,
 		x: number,
 		y: number,
 		texture: string,
@@ -3031,12 +3039,12 @@ class Seeker extends Phaser.Physics.Arcade.Sprite {
 	) {
 		super(scene, x, y, texture, initialFrame);
 		this.#speed = speed;
-		this.init();
+		this.init(sprite);
 		this.addToDisplayList();
 		this.addToUpdateList();
 	}
 
-	init(): void {
+	init(sprite: Phaser.GameObjects.Sprite): void {
 		this.scene.anims.create({
 			key: "green-ball",
 			frames: this.anims.generateFrameNumbers("green-ball"),
@@ -3064,7 +3072,7 @@ class Seeker extends Phaser.Physics.Arcade.Sprite {
 		const player = getPlayerOrThrow();
 		this.scene.physics.add.overlap(player, this, () => {
 			this.scene?.sound?.stopByKey("fire-loop");
-			MainEvents.emit(Events.EnemyHitPlayer, true);
+			MainEvents.emit(Events.EnemyHitPlayer, { source: sprite, damage: 1 });
 			this.destroy();
 		});
 		MainEvents.once(Events.LeavingRoom, () => {
@@ -3219,7 +3227,10 @@ export class ThrowRocks implements Behavior {
 
 		const player = getPlayerOrThrow();
 		if (this.#sprite.scene?.physics.overlap(player, tile)) {
-			MainEvents.emit(Events.EnemyHitPlayer, true);
+			MainEvents.emit(Events.EnemyHitPlayer, {
+				source: this.#sprite,
+				damage: 1,
+			});
 		}
 		this.#sprite.scene?.physics.add.collider(player, tile);
 		this.#sprite.scene?.physics.add.collider(this.#enemyManager.enemies, tile);

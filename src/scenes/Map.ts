@@ -1,7 +1,7 @@
 import { Scene } from "phaser";
 import {
-	getEquippedAuras,
-	getIconForPower,
+	getFoundAuras,
+	getIconForCard,
 	getActiveAuras,
 	activateAura,
 	deactivateAura,
@@ -115,12 +115,12 @@ export class GameMap extends Scene {
 			aura.destroy();
 		});
 		this.auras = [];
-		const auras = getEquippedAuras(this.registry);
+		const auras = getFoundAuras(this.registry);
 		if (auras.length < 1) {
 			return;
 		}
-		getEquippedAuras(this.registry).forEach((aura) => {
-			const icon = getIconForPower(aura);
+		getFoundAuras(this.registry).forEach((aura) => {
+			const icon = getIconForCard(aura);
 			const auraObject = new Aura(
 				this,
 				this.auras.length,
@@ -280,7 +280,7 @@ export class GameMap extends Scene {
 
 	getMapOffset(): { x: number; y: number } {
 		const mapOffset = { x: 100, y: topPadding + 30 };
-		const auras = getEquippedAuras(this.registry);
+		const auras = getFoundAuras(this.registry);
 		if (auras.length < 1) {
 			mapOffset.x = 50;
 			mapOffset.y = 50;

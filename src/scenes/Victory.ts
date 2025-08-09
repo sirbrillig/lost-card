@@ -2,7 +2,8 @@ import { Scene } from "phaser";
 import {
 	powerOrder,
 	auraOrder,
-	getPowerEquippedKey,
+	getFoundPowers,
+	getFoundAuras,
 	getDataFromRegistry,
 } from "../lib/shared";
 
@@ -26,12 +27,10 @@ export class Victory extends Scene {
 
 		// The +1 is the CrownCard which came from the final boss.
 		const totalCardsCount = 1 + [...powerOrder, ...auraOrder].length;
-		let cardCount = 1;
-		[...powerOrder, ...auraOrder].forEach((card) => {
-			if (getDataFromRegistry(this.registry, getPowerEquippedKey(card))) {
-				cardCount += 1;
-			}
-		});
+		let cardCount =
+			1 +
+			getFoundAuras(this.registry).length +
+			getFoundPowers(this.registry).length;
 
 		const secretRooms =
 			getDataFromRegistry(this.registry, "SecretRoomsFound")?.length ?? 0;

@@ -35,7 +35,6 @@ import {
 	SaveData,
 	isEnemy,
 	isTileWithPropertiesObject,
-	getPowerEquippedKey,
 	getRegionFromRoomName,
 	getRegionName,
 	Region,
@@ -69,6 +68,8 @@ import {
 	LockableDoorSpriteIndices,
 	doesTileBlockFire,
 	makeFireExplosion,
+	addFoundAura,
+	addFoundPower,
 } from "../lib/shared";
 import { MonsterCreator } from "../lib/MonsterCreator";
 import {
@@ -242,10 +243,10 @@ export class Game extends Scene {
 					return;
 				}
 				if (tile.properties.hurts) {
-					this.enemyHitPlayer();
+					this.enemyHitPlayer({ source: undefined, damage: 1 });
 				}
 				if (tile.properties.deadly) {
-					this.enemyHitPlayer({ damage: 10 });
+					this.enemyHitPlayer({ source: undefined, damage: 15 });
 				}
 			},
 			(_, tile) => {
@@ -329,9 +330,18 @@ export class Game extends Scene {
 		this.#createSavePoints();
 		this.#restoreSwitches();
 
-		MainEvents.on(Events.EnemyHitPlayer, () => {
-			this.enemyHitPlayer();
-		});
+		MainEvents.on(
+			Events.EnemyHitPlayer,
+			(args: {
+				source: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody | undefined;
+				damage: number;
+			}) => {
+				if (!args?.damage) {
+					throw new Error("EnemyHitPlayer must have a damage amount");
+				}
+				this.enemyHitPlayer(args);
+			}
+		);
 
 		MainEvents.on(Events.ConfusePlayer, () => {
 			if (this.isPlayerInvincible() || this.isPlayerHiddenInvincible()) {
@@ -353,7 +363,7 @@ export class Game extends Scene {
 					this.#endPowerUse();
 					return;
 				}
-				this.enemyHitPlayer();
+				this.enemyHitPlayer({ source: enemy, damage: 1 });
 			},
 			(_, enemy) => {
 				if (!isDynamicSprite(enemy)) {
@@ -1983,7 +1993,7 @@ export class Game extends Scene {
 
 					// If the player ends up inside a wall, hurt them and expel them.
 					if (isSpriteInsideSolidTile(player, this.landLayer)) {
-						this.enemyHitPlayer();
+						this.enemyHitPlayer({ source: undefined, damage: 1 });
 						player.setPosition(lastSafePosition.x, lastSafePosition.y);
 					}
 				}
@@ -2243,7 +2253,7 @@ export class Game extends Scene {
 		});
 
 		if (this.physics.overlap(player, tile)) {
-			this.enemyHitPlayer();
+			this.enemyHitPlayer({ source: undefined, damage: 1 });
 		}
 
 		this.createdTiles.push(tile);
@@ -2394,6 +2404,7 @@ export class Game extends Scene {
 				case "FishCard":
 				case "HeartCard":
 				case "PotionCard":
+				case "HurtCard":
 					this.pickUpAura(touchingItem.name);
 					break;
 				case "PlantCard":
@@ -3651,7 +3662,10 @@ export class Game extends Scene {
 		vibrate(this, 2, 300);
 	}
 
-	enemyHitPlayer(args?: { damage?: number }): void {
+	enemyHitPlayer(args: {
+		source: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody | undefined;
+		damage: number;
+	}): void {
 		if (
 			this.isPlayerBeingHit() ||
 			this.isPlayerInvincible() ||
@@ -3671,6 +3685,10 @@ export class Game extends Scene {
 
 		if (this.getPlayerHitPoints() <= 0) {
 			return;
+		}
+
+		if (args.source && isAuraActive(this.registry, "HurtCard")) {
+			this.sendHitToEnemy(args.source, 1);
 		}
 
 		this.time.addEvent({
@@ -3766,17 +3784,15 @@ export class Game extends Scene {
 	}
 
 	equipAura(card: Auras): void {
-		saveDataToRegistry(this.registry, getPowerEquippedKey(card), true);
-
+		addFoundAura(this.registry, card);
 		if (getActiveAuras(this.registry).length < config.maxActiveAuras) {
 			activateAura(this.registry, card);
 		}
-
 		MainEvents.emit(Events.AuraEquipped);
 	}
 
 	equipPower(power: Powers): void {
-		saveDataToRegistry(this.registry, getPowerEquippedKey(power), true);
+		addFoundPower(this.registry, power);
 		this.setActivePower(power);
 		MainEvents.emit(Events.PowerEquipped);
 	}
@@ -3787,25 +3803,12 @@ export class Game extends Scene {
 			: config.postPowerCooldown;
 		return (
 			this.getPlayerHitPoints() > 0 &&
-			this.doesPlayerHavePower() &&
 			!this.isPlayerFrozen() &&
 			!this.#isPressingHeal() &&
 			!this.isPlayerStunned() &&
 			!this.isPlayerAttacking() &&
 			this.getTimeSinceLastPower() > postPowerCooldown &&
 			!this.isPlayerUsingPower()
-		);
-	}
-
-	doesPlayerHavePower(): boolean {
-		return (
-			getDataFromRegistry(this.registry, "hasWindCard") === true ||
-			getDataFromRegistry(this.registry, "hasIceCard") === true ||
-			getDataFromRegistry(this.registry, "hasIceCard") === true ||
-			getDataFromRegistry(this.registry, "hasFireCard") === true ||
-			getDataFromRegistry(this.registry, "hasSpiritCard") === true ||
-			getDataFromRegistry(this.registry, "hasCloudCard") === true ||
-			getDataFromRegistry(this.registry, "hasPlantCard") === true
 		);
 	}
 

@@ -85,6 +85,7 @@ export type Auras =
 	| "SunCard"
 	| "RangeCard"
 	| "HeartCard"
+	| "HurtCard"
 	| "PotionCard"
 	| "SwordCard"
 	| "MountainCard"
@@ -110,6 +111,7 @@ export const powerOrder: Powers[] = [
 
 export const auraOrder: Auras[] = [
 	"HeartCard",
+	"HurtCard",
 	"PotionCard",
 	"SwordCard",
 	"MountainCard",
@@ -119,10 +121,30 @@ export const auraOrder: Auras[] = [
 	"FishCard",
 ];
 
-export function getEquippedAuras(registry: Phaser.Data.DataManager): Auras[] {
-	return auraOrder.filter((aura) => {
-		return getDataFromRegistry(registry, getPowerEquippedKey(aura)) ?? false;
-	});
+export function getFoundAuras(registry: Phaser.Data.DataManager): Auras[] {
+	return getDataFromRegistry(registry, "AurasFound") ?? [];
+}
+
+export function getFoundPowers(registry: Phaser.Data.DataManager): Powers[] {
+	return getDataFromRegistry(registry, "PowersFound") ?? [];
+}
+
+export function addFoundPower(
+	registry: Phaser.Data.DataManager,
+	power: Powers
+): void {
+	const powers = getFoundPowers(registry);
+	powers.push(power);
+	saveDataToRegistry(registry, "PowersFound", powers);
+}
+
+export function addFoundAura(
+	registry: Phaser.Data.DataManager,
+	aura: Auras
+): void {
+	const auras = getFoundAuras(registry);
+	auras.push(aura);
+	saveDataToRegistry(registry, "AurasFound", auras);
 }
 
 export function isAuraActive(
@@ -149,44 +171,7 @@ export function getActiveAuras(registry: Phaser.Data.DataManager): Auras[] {
 	return getDataFromRegistry(registry, "ActiveAuras") ?? [];
 }
 
-export function getPowerEquippedKey(
-	power: Powers | Auras
-): keyof SaveDataHasCard {
-	switch (power) {
-		case "ClockCard":
-			return "hasClockCard";
-		case "MountainCard":
-			return "hasMountainCard";
-		case "SwordCard":
-			return "hasSwordCard";
-		case "SunCard":
-			return "hasSunCard";
-		case "RangeCard":
-			return "hasRangeCard";
-		case "PotionCard":
-			return "hasPotionCard";
-		case "HeartCard":
-			return "hasHeartCard";
-		case "WindCard":
-			return "hasWindCard";
-		case "IceCard":
-			return "hasIceCard";
-		case "PlantCard":
-			return "hasPlantCard";
-		case "FireCard":
-			return "hasFireCard";
-		case "SpiritCard":
-			return "hasSpiritCard";
-		case "CloudCard":
-			return "hasCloudCard";
-		case "FishCard":
-			return "hasFishCard";
-		default:
-			throw new Error(`Unknown power ${power}`);
-	}
-}
-
-export function getIconForPower(power: Powers | Auras): {
+export function getIconForCard(power: Powers | Auras): {
 	texture: string;
 	frame: number;
 } {
@@ -205,6 +190,8 @@ export function getIconForPower(power: Powers | Auras): {
 			return { texture: "cards", frame: 29 };
 		case "HeartCard":
 			return { texture: "cards", frame: 17 };
+		case "HurtCard":
+			return { texture: "cards", frame: 27 };
 		case "PotionCard":
 			return { texture: "cards", frame: 48 };
 		case "WindCard":
@@ -903,23 +890,6 @@ function setSpritePropertiesFromJSON(
 	}
 }
 
-export interface SaveDataHasCard {
-	hasClockCard?: boolean;
-	hasMountainCard?: boolean;
-	hasSwordCard?: boolean;
-	hasSunCard?: boolean;
-	hasRangeCard?: boolean;
-	hasHeartCard?: boolean;
-	hasPotionCard?: boolean;
-	hasWindCard?: boolean;
-	hasIceCard?: boolean;
-	hasPlantCard?: boolean;
-	hasFireCard?: boolean;
-	hasSpiritCard?: boolean;
-	hasCloudCard?: boolean;
-	hasFishCard?: boolean;
-}
-
 export interface SaveDataPlayerPosition {
 	playerActiveRoom?: string;
 	playerRoomX?: number;
@@ -936,6 +906,8 @@ export type SaveData = {
 	itemsRevealed?: number[];
 	SecretRoomsFound?: string[];
 	SecretRoomsTotal?: number;
+	PowersFound?: Powers[];
+	AurasFound?: Auras[];
 	ActiveAuras?: Auras[];
 	RoomsVisited?: string[];
 	SwitchesPressed?: string[];
@@ -943,8 +915,7 @@ export type SaveData = {
 	playerTotalHitPoints?: number;
 	playerHitPoints?: number;
 	hasSword?: boolean;
-} & SaveDataHasCard &
-	SaveDataPlayerPosition;
+} & SaveDataPlayerPosition;
 
 export function getDataFromRegistry<K extends keyof SaveData>(
 	registry: Phaser.Data.DataManager,
@@ -1162,6 +1133,8 @@ export function getCardNameForPower(card: Powers | Auras): string {
 			return "Potion Card";
 		case "HeartCard":
 			return "Heart Card";
+		case "HurtCard":
+			return "Hurt Card";
 		case "SunCard":
 			return "Sun Card";
 		case "RangeCard":
@@ -1191,6 +1164,8 @@ export function getAuraDescription(card: Auras): string {
 			return "Your potions will act faster.";
 		case "HeartCard":
 			return "Your hearts will slowly restore on their own.";
+		case "HurtCard":
+			return "When an enemy hurts you, they will take damage also.";
 		case "MountainCard":
 			return "You are not pushed as far when hit.";
 		case "SwordCard":

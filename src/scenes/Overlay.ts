@@ -8,8 +8,9 @@ import {
 	Events,
 	powerOrder,
 	auraOrder,
-	getPowerEquippedKey,
-	getIconForPower,
+	getFoundAuras,
+	getFoundPowers,
+	getIconForCard,
 	isAuraActive,
 	getDataFromRegistry,
 	saveDataToRegistry,
@@ -512,9 +513,7 @@ export class Overlay extends Scene {
 	}
 
 	isPowerEquipped(power: Powers): boolean {
-		return (
-			getDataFromRegistry(this.registry, getPowerEquippedKey(power)) ?? false
-		);
+		return getFoundPowers(this.registry).includes(power);
 	}
 
 	getActivePower(): Powers | undefined {
@@ -584,7 +583,8 @@ export class Overlay extends Scene {
 		}
 
 		auraOrder.forEach((aura) => {
-			if (!getDataFromRegistry(this.registry, getPowerEquippedKey(aura))) {
+			const isCardFound = getFoundAuras(this.registry).includes(aura);
+			if (!isCardFound) {
 				return;
 			}
 			if (this.auras.some((item) => item.name === aura)) {
@@ -593,7 +593,7 @@ export class Overlay extends Scene {
 			if (!isAuraActive(this.registry, aura)) {
 				return;
 			}
-			const icon = getIconForPower(aura);
+			const icon = getIconForCard(aura);
 			const auraObject = new Aura(
 				this,
 				this.auras.length,
@@ -605,13 +605,14 @@ export class Overlay extends Scene {
 		});
 
 		powerOrder.forEach((power) => {
-			if (!getDataFromRegistry(this.registry, getPowerEquippedKey(power))) {
+			const isCardFound = getFoundPowers(this.registry).includes(power);
+			if (!isCardFound) {
 				return;
 			}
 			if (this.items.some((item) => item.name === power)) {
 				return;
 			}
-			const icon = getIconForPower(power);
+			const icon = getIconForCard(power);
 			this.items.push(
 				new Card(this, this.items.length, icon.texture, icon.frame, power)
 			);
