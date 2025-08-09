@@ -10078,7 +10078,7 @@
   </object>
   <object id="1665" gid="1519" x="3264" y="2672" width="16" height="16">
    <properties>
-    <property name="doordirection" type="int" value="3"/>
+    <property name="doordirection" type="int" value="2"/>
     <property name="doorto" type="object" value="1666"/>
    </properties>
   </object>

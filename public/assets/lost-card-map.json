@@ -8735,7 +8735,7 @@
                         {
                          "name":"doordirection",
                          "type":"int",
-                         "value":3
+                         "value":2
                         }, 
                         {
                          "name":"doorto",
