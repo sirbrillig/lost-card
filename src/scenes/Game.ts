@@ -350,6 +350,13 @@ export class Game extends Scene {
 			this.makePlayerConfused();
 		});
 
+		MainEvents.on(Events.MakeRoomDark, () => {
+			this.enableDarkRoom();
+		});
+		MainEvents.on(Events.MakeRoomLight, () => {
+			this.disableDarkRoom();
+		});
+
 		this.enemyCollider = this.physics.add.collider(
 			player,
 			this.enemyManager.enemies,

@@ -239,6 +239,12 @@ export class BaseMonster extends Phaser.Physics.Arcade.Sprite {
 			8,
 			0 // We can't use hitPoints because it doesn't exist yet; we are still in the constructor.
 		);
+		MainEvents.on(Events.MakeRoomDark, () => {
+			this.#healthBar?.setVisible(false);
+		});
+		MainEvents.on(Events.MakeRoomLight, () => {
+			this.#healthBar?.setVisible(true);
+		});
 	}
 
 	#getHealthBarPosition(): { x: number; y: number } {

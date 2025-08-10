@@ -3382,3 +3382,23 @@ export class Decide implements Behavior {
 		goToNextState();
 	}
 }
+
+export class ToggleRoomDark implements Behavior {
+	name: string;
+	#shouldBeDark: boolean;
+
+	constructor(name: string, shouldBeDark: boolean) {
+		this.name = name;
+		this.#shouldBeDark = shouldBeDark;
+	}
+
+	init(
+		_sprite: Phaser.GameObjects.Sprite,
+		goToNextState: BehaviorCompleteCallback
+	): void {
+		MainEvents.emit(
+			this.#shouldBeDark ? Events.MakeRoomDark : Events.MakeRoomLight
+		);
+		goToNextState();
+	}
+}

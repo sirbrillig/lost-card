@@ -1,54 +1,25 @@
-import { DataKeys } from "../lib/shared";
-import { Skeleton } from "./Skeleton";
+import { DataKeys, hasXandY, ObjectWithXandY } from "../lib/shared";
+import { getMap, getActiveRoom } from "../lib/components";
 import { EnemyManager } from "../lib/EnemyManager";
 import {
 	WaitForActive,
 	Roar,
 	RandomlyWalk,
 	SlashTowardPlayer,
-	TeleportToPlatform,
+	RandomTeleport,
 	Idle,
-	SpawnEnemies,
 	RangedFireBall,
-	PowerUp,
+	Leap,
+	FollowPlayer,
+	ToggleRoomDark,
 } from "../lib/behaviors";
 import { BaseMonster } from "./BaseMonster";
 
-type AllStates =
-	| "initial"
-	| "roar1"
-	| "spawn"
-	| "walk"
-	| "idle"
-	| "charge"
-	| "fireball1"
-	| "fireball2"
-	| "fireball3"
-	| "fireball4"
-	| "fireball5"
-	| "fireball6"
-	| "fireball7"
-	| "fireball8"
-	| "fireball9"
-	| "fireball10"
-	| "fireball11"
-	| "fireball12"
-	| "fireball13"
-	| "fireball14"
-	| "fireball15"
-	| "fireball16"
-	| "teleport"
-	| "attack1"
-	| "attack2"
-	| "attack3";
-
 export class SpiritBoss extends BaseMonster {
-	hitPoints: number = 10;
+	hitPoints: number = 20;
 	primaryColor = 0x23a487;
 	isBoss = true;
-	#enemyManager;
-	#minSpawnDistance = -40;
-	#maxSpawnDistance = 40;
+	#previousPosition: ObjectWithXandY;
 
 	constructor(
 		scene: Phaser.Scene,
@@ -62,14 +33,13 @@ export class SpiritBoss extends BaseMonster {
 			throw new Error("Could not create monster");
 		}
 
-		this.#enemyManager = enemyManager;
 		this.setSize(this.width * 0.6, this.height * 0.65);
 		this.setOffset(this.body.offset.x, this.body.offset.y + 10);
 		this.setOrigin(0.5, 0.75);
 		this.data.set(DataKeys.Freezable, false);
 	}
 
-	getInitialState(): AllStates {
+	getInitialState() {
 		return "initial";
 	}
 
@@ -122,99 +92,89 @@ export class SpiritBoss extends BaseMonster {
 		});
 	}
 
-	constructNewBehaviorFor(state: AllStates) {
+	constructNewBehaviorFor(state: string) {
 		switch (state) {
 			case "initial":
 				this.nextState = "roar1";
 				return new WaitForActive(state);
 			case "roar1":
-				this.nextState = "spawn";
+				this.nextState = "walk";
 				return new Roar(state);
-			case "spawn":
-				this.nextState = "teleport";
-				return new SpawnEnemies(state, {
-					createMonster: () => {
-						const x =
-							this.x +
-							Phaser.Math.Between(
-								this.#minSpawnDistance,
-								this.#maxSpawnDistance
-							);
-						const y =
-							this.y +
-							Phaser.Math.Between(
-								this.#minSpawnDistance,
-								this.#maxSpawnDistance
-							);
-						return new Skeleton(this.scene, this.#enemyManager, x, y);
-					},
-				});
 			case "walk":
-				this.nextState = "teleport";
+				this.nextState = "jumpOut";
 				return new RandomlyWalk(state, {
 					speed: 60,
 					minWalkTime: 1000,
 					maxWalkTime: 4000,
 				});
-			case "charge":
-				this.nextState = "fireball1";
-				return new PowerUp(state, {
-					scale: 3,
-					chargeTime: 1000,
-				});
-			case "fireball1":
-			case "fireball2":
-			case "fireball3":
-			case "fireball4":
-			case "fireball5":
-			case "fireball6":
-			case "fireball7":
-			case "fireball8":
-			case "fireball9":
-			case "fireball10":
-			case "fireball11":
-			case "fireball12":
-			case "fireball13":
-			case "fireball14":
-			case "fireball15":
-			case "fireball16":
-				const fireballNumber = parseInt(state.match(/(\d+)/)?.[1] ?? "0");
-				if (!fireballNumber) {
-					throw new Error("Could not determine fireballNumber");
+			case "jumpOut":
+				this.nextState = "fireWall";
+				this.#previousPosition = { x: this.x, y: this.y };
+				const activeRoom = getActiveRoom();
+				if (!activeRoom) {
+					throw new Error("No active room");
 				}
-				this.nextState =
-					fireballNumber === 16
-						? "attack1"
-						: (`fireball${fireballNumber + 1}` as AllStates);
-				return new RangedFireBall(state, {
-					speed: 115,
-					postAttackTime: fireballNumber === 16 ? 1350 : 0,
-					hitsWalls: true,
-					forceDirectionDegree: (360 / 16) * fireballNumber,
-					colorTint: 0xa4ee00,
+				const map = getMap();
+				const jumpTarget = map.findObject(
+					"MetaObjects",
+					(obj) => obj.name === "SKJumpTarget"
+				);
+				if (!jumpTarget || !hasXandY(jumpTarget)) {
+					throw new Error("cannot find jump target");
+				}
+				return new Leap(state, {
+					targetPosition: jumpTarget,
 				});
+			case "fireWall":
+				this.nextState = "jumpIn";
+				// FIXME: make this a wall of fireballs moving across
+				return new RangedFireBall(state, {
+					count: 4,
+					postAttackTime: 2000,
+				});
+			case "jumpIn":
+				this.nextState = "darkness";
+				return new Leap(state, {
+					targetPosition: this.#previousPosition,
+				});
+			case "darkness":
+				this.nextState = "teleport";
+				return new ToggleRoomDark(state, true);
 			case "teleport":
-				this.nextState = "charge";
-				return new TeleportToPlatform(state, 450);
+				this.nextState = "moveToward";
+				return new RandomTeleport(state);
+			case "moveToward":
+				this.nextState = "idleBeforeAttack";
+				return new FollowPlayer(state, {
+					stopWhenCloseDistance: 35,
+					speed: 20,
+				});
+			case "idleBeforeAttack":
+				this.nextState = "attack1";
+				return new Idle(state, "down", 2200);
 			case "attack1":
 				this.nextState = "attack2";
-				return new SlashTowardPlayer(state, 180);
+				return new SlashTowardPlayer(state, 140);
 			case "attack2":
-				this.nextState = "idle";
-				return new SlashTowardPlayer(state, 180);
-			case "idle":
+				this.nextState = "idleBeforeLastAttack";
+				return new SlashTowardPlayer(state, 140);
+			case "idleBeforeLastAttack":
 				this.nextState = "attack3";
-				return new Idle(state, "right", 500);
+				return new Idle(state, "down", 600);
 			case "attack3":
+				this.nextState = "darknessUndo";
+				return new SlashTowardPlayer(state, 140);
+			case "darknessUndo":
+				this.nextState = "idleAfterDarkness";
+				return new ToggleRoomDark(state, false);
+			case "idleAfterDarkness":
 				this.nextState = "walk";
-				return new SlashTowardPlayer(state, 180);
+				return new Idle(state, "down", 3200);
 		}
 	}
 
 	isHittable(): boolean {
-		return (
-			this.getCurrentState() !== "initial" &&
-			!this.getCurrentState()?.includes("roar")
-		);
+		const invincibleStates = ["initial", "roar", "fireWall"];
+		return !invincibleStates.includes(this.getCurrentState() ?? "");
 	}
 }

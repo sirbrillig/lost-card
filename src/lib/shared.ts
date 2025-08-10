@@ -39,6 +39,8 @@ export const Events = {
 	EnteredRoom: "EnteredRoom",
 	PlayerMoved: "PlayerMoved",
 	PlayerPositionChanged: "PlayerPositionChanged",
+	MakeRoomDark: "MakeRoomDark",
+	MakeRoomLight: "MakeRoomLight",
 };
 
 export const DataKeys = {

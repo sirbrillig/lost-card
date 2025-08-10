@@ -66,6 +66,11 @@ export class HealthBar {
 		this.fill.setMask(this.mask.createBitmapMask());
 	}
 
+	public setVisible(isVisible: boolean): void {
+		this.background?.setVisible(isVisible);
+		this.fill?.setVisible(isVisible);
+	}
+
 	private getPositionForRectangles(): { x: number; y: number } {
 		const centerX = this.x + this.width / 2;
 		const centerY = this.y + this.height / 2;
