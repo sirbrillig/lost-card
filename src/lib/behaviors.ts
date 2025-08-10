@@ -2308,6 +2308,167 @@ export class FireBallRing implements Behavior {
 	}
 }
 
+export class FireWall implements Behavior {
+	#speed = 5000;
+	#fireHeight = 16;
+	#direction: "left" | "right" = "right";
+	#postAttackTime = 1000;
+	#hitsWalls = false;
+	#colorTint: number | undefined;
+	#count: number | undefined;
+	name: string;
+
+	constructor(
+		name: string,
+		config?: {
+			speed?: number;
+			direction?: "left" | "right";
+			postAttackTime?: number;
+			hitsWalls?: boolean;
+			colorTint?: number;
+			count?: number;
+		}
+	) {
+		this.name = name;
+		this.#speed = config?.speed ?? this.#speed;
+		this.#postAttackTime = config?.postAttackTime ?? this.#postAttackTime;
+		this.#hitsWalls = config?.hitsWalls ?? this.#hitsWalls;
+		this.#direction = config?.direction ?? this.#direction;
+		this.#colorTint = config?.colorTint;
+		this.#count = config?.count;
+	}
+
+	init(
+		sprite: Phaser.GameObjects.Sprite,
+		goToNextState: BehaviorCompleteCallback
+	): void {
+		sprite.scene.anims.create({
+			key: "fire-power",
+			frames: sprite.anims.generateFrameNumbers("fire-power"),
+			frameRate: 50,
+			showOnStart: true,
+			hideOnComplete: true,
+			yoyo: true,
+		});
+		const activeRoom = getActiveRoom();
+		if (!activeRoom?.width || !activeRoom.height) {
+			throw new Error("Cannot work outside of room");
+		}
+		const count = this.#count ?? activeRoom.height / this.#fireHeight;
+		for (let i = 0; i < count; i++) {
+			this.#shootFire(sprite, i);
+		}
+		sprite.scene.time.addEvent({
+			delay: this.#postAttackTime,
+			callback: () => {
+				goToNextState();
+			},
+		});
+	}
+
+	#shootFire(sprite: Phaser.GameObjects.Sprite, count: number): void {
+		if (!sprite.body || !isDynamicSprite(sprite)) {
+			throw new Error("Could not update monster");
+		}
+		const activeRoom = getActiveRoom();
+		if (
+			!activeRoom?.x ||
+			!activeRoom.y ||
+			!activeRoom.width ||
+			!activeRoom.height
+		) {
+			throw new Error("Cannot work outside of room");
+		}
+		const position = {
+			x:
+				this.#direction === "right"
+					? activeRoom.x
+					: activeRoom.x + activeRoom.width,
+			y: activeRoom.y + count * this.#fireHeight,
+		};
+		const effect = sprite.scene.add.sprite(
+			position.x,
+			position.y,
+			"fire-power",
+			0
+		);
+		sprite.scene.physics.add.existing(effect);
+		effect.setDepth(config.effectDepth);
+		effect.anims.play(
+			{
+				key: "fire-power",
+				repeat: -1,
+			},
+			true
+		);
+		const fireSound = sprite.scene.sound.add("fire", { volume: 0.4 });
+		fireSound.play();
+		if (!isDynamicSprite(effect)) {
+			throw new Error("Could not update fire ball");
+		}
+		effect.setDisplaySize(effect.body.width * 0.8, effect.body.height * 0.8);
+		effect.body.setSize(effect.body.width * 0.5, effect.body.height * 0.5);
+		if (this.#colorTint) {
+			effect.setTint(this.#colorTint);
+		}
+
+		// Move effect
+		sprite.scene.tweens.add({
+			targets: effect,
+			x:
+				this.#direction === "right"
+					? activeRoom.x + activeRoom.width
+					: activeRoom.x,
+			duration: this.#speed,
+			onComplete: () => {
+				fireSound?.stop();
+				effect?.destroy();
+			},
+		});
+
+		const player = getPlayerOrThrow();
+		if (this.#hitsWalls) {
+			const landLayer = getMap().getLayer("Background");
+			if (!landLayer) {
+				throw new Error("Could not find bg layer for RangedFireBall");
+			}
+			const stuffLayer = getMap().getLayer("Stuff");
+			if (!stuffLayer) {
+				throw new Error("Could not find stuff layer for RangedFireBall");
+			}
+			sprite.scene.physics.add.collider(effect, stuffLayer.tilemapLayer, () => {
+				fireSound?.stop();
+				effect?.destroy();
+			});
+			// FIXME: this does nothing somehow?
+			sprite.scene.physics.add.collider(
+				effect,
+				landLayer.tilemapLayer,
+				() => {
+					fireSound?.stop();
+					effect?.destroy();
+				},
+				(_, tile) => {
+					return doesTileBlockFire(tile);
+				}
+			);
+		}
+
+		sprite.scene.physics.add.overlap(player, effect, () => {
+			MainEvents.emit(Events.EnemyHitPlayer, { source: sprite, damage: 1 });
+		});
+
+		sprite.once(Events.MonsterDying, () => {
+			fireSound?.stop();
+			effect?.destroy();
+		});
+		MainEvents.once(Events.LeavingRoom, () => {
+			fireSound?.stop();
+			effect?.destroy();
+		});
+	}
+}
+
 export class RangedFireBall implements Behavior {
 	#speed = 50;
 	#postAttackTime = 1000;

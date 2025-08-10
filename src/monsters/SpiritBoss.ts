@@ -8,7 +8,7 @@ import {
 	SlashTowardPlayer,
 	RandomTeleport,
 	Idle,
-	RangedFireBall,
+	FireWall,
 	Leap,
 	FollowPlayer,
 	ToggleRoomDark,
@@ -108,7 +108,7 @@ export class SpiritBoss extends BaseMonster {
 					maxWalkTime: 4000,
 				});
 			case "jumpOut":
-				this.nextState = "fireWall";
+				this.nextState = "fireWall1";
 				this.#previousPosition = { x: this.x, y: this.y };
 				const activeRoom = getActiveRoom();
 				if (!activeRoom) {
@@ -125,12 +125,17 @@ export class SpiritBoss extends BaseMonster {
 				return new Leap(state, {
 					targetPosition: jumpTarget,
 				});
-			case "fireWall":
+			case "fireWall1":
+				this.nextState = "fireWall2";
+				return new FireWall(state, {
+					postAttackTime: 1000,
+					direction: "right",
+				});
+			case "fireWall2":
 				this.nextState = "jumpIn";
-				// FIXME: make this a wall of fireballs moving across
-				return new RangedFireBall(state, {
-					count: 4,
-					postAttackTime: 2000,
+				return new FireWall(state, {
+					postAttackTime: 4000,
+					direction: "left",
 				});
 			case "jumpIn":
 				this.nextState = "darkness";
