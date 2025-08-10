@@ -227,7 +227,7 @@ export class BaseMonster extends Phaser.Physics.Arcade.Sprite {
 		if (this.#activationStatus !== "not-started") {
 			return;
 		}
-		if (!this.isMiniBoss) {
+		if (!this.isMiniBoss && !this.isBoss) {
 			return;
 		}
 		const position = this.#getHealthBarPosition();

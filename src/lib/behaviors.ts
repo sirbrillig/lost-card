@@ -2235,12 +2235,86 @@ export class RangedRockBall implements Behavior {
 	}
 }
 
+export class FireBallRing implements Behavior {
+	#speed = 50;
+	#postAttackTime = 1000;
+	#hitsWalls = false;
+	#colorTint: number | undefined;
+	#count: number = 1;
+	#fireballs: Behavior[] = [];
+	name: string;
+
+	constructor(
+		name: string,
+		config?: {
+			speed?: number;
+			postAttackTime?: number;
+			hitsWalls?: boolean;
+			colorTint?: number;
+			count?: number;
+		}
+	) {
+		this.name = name;
+		this.#speed = config?.speed ?? this.#speed;
+		this.#postAttackTime = config?.postAttackTime ?? this.#postAttackTime;
+		this.#hitsWalls = config?.hitsWalls ?? this.#hitsWalls;
+		this.#colorTint = config?.colorTint;
+		this.#count = config?.count ?? this.#count;
+	}
+
+	init(
+		sprite: Phaser.GameObjects.Sprite,
+		goToNextState: BehaviorCompleteCallback,
+		enemyManager: EnemyManager
+	) {
+		for (let i = 0; i < this.#count; i++) {
+			this.#shootFire(i, sprite, enemyManager);
+		}
+		sprite.scene.time.addEvent({
+			delay: this.#postAttackTime,
+			callback: () => {
+				goToNextState();
+			},
+		});
+	}
+
+	#shootFire(
+		fireballNumber: number,
+		sprite: Phaser.GameObjects.Sprite,
+		enemyManager: EnemyManager
+	) {
+		const fireball: Behavior = new RangedFireBall(
+			"fireball-" + fireballNumber,
+			{
+				speed: this.#speed,
+				postAttackTime: 0,
+				hitsWalls: this.#hitsWalls,
+				forceDirectionDegree: (360 / this.#count) * fireballNumber,
+				colorTint: this.#colorTint,
+			}
+		);
+		fireball.init(sprite, () => ({}), enemyManager);
+		this.#fireballs.push(fireball);
+	}
+
+	update(
+		sprite: Phaser.GameObjects.Sprite,
+		_goToNextState: BehaviorCompleteCallback,
+		enemyManager: EnemyManager
+	) {
+		this.#fireballs.forEach((fireball) => {
+			fireball.update?.(sprite, () => ({}), enemyManager);
+		});
+	}
+}
+
 export class RangedFireBall implements Behavior {
 	#speed = 50;
 	#postAttackTime = 1000;
 	#hitsWalls = false;
 	#forceDirectionDegree: number | undefined = undefined;
 	#colorTint: number | undefined;
+	#count: number = 1;
 	name: string;
 
 	constructor(
@@ -2251,6 +2325,7 @@ export class RangedFireBall implements Behavior {
 			hitsWalls?: boolean;
 			forceDirectionDegree?: number;
 			colorTint?: number;
+			count?: number;
 		}
 	) {
 		this.name = name;
@@ -2259,12 +2334,30 @@ export class RangedFireBall implements Behavior {
 		this.#hitsWalls = config?.hitsWalls ?? this.#hitsWalls;
 		this.#forceDirectionDegree = config?.forceDirectionDegree;
 		this.#colorTint = config?.colorTint;
+		this.#count = config?.count ?? this.#count;
 	}
 
 	init(
 		sprite: Phaser.GameObjects.Sprite,
 		goToNextState: BehaviorCompleteCallback
 	): void {
+		for (let i = 0; i < this.#count; i++) {
+			sprite.scene.time.addEvent({
+				delay: this.#postAttackTime * i,
+				callback: () => {
+					this.#shootFire(sprite);
+				},
+			});
+		}
+		sprite.scene.time.addEvent({
+			delay: this.#postAttackTime * this.#count,
+			callback: () => {
+				goToNextState();
+			},
+		});
+	}
+
+	#shootFire(sprite: Phaser.GameObjects.Sprite): void {
 		if (!sprite.body || !isDynamicSprite(sprite)) {
 			throw new Error("Could not update monster");
 		}
@@ -2358,13 +2451,6 @@ export class RangedFireBall implements Behavior {
 		MainEvents.once(Events.LeavingRoom, () => {
 			fireSound?.stop();
 			effect?.destroy();
-		});
-
-		sprite.scene.time.addEvent({
-			delay: this.#postAttackTime,
-			callback: () => {
-				goToNextState();
-			},
 		});
 
 		effect.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {

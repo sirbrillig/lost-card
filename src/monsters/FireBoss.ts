@@ -1,27 +1,21 @@
-import { DataKeys } from "../lib/shared";
+import { DataKeys, ObjectWithXandY } from "../lib/shared";
 import { EnemyManager } from "../lib/EnemyManager";
 import {
 	WaitForActive,
 	Roar,
 	RandomlyWalk,
 	RangedFireBall,
+	FireBallRing,
+	Leap,
 } from "../lib/behaviors";
 import { BaseMonster } from "./BaseMonster";
 
-type AllStates =
-	| "initial"
-	| "roar1"
-	| "walk"
-	| "attack1"
-	| "attack2"
-	| "attack3"
-	| "attack4"
-	| "attack5";
-
 export class FireBoss extends BaseMonster {
-	hitPoints: number = 10;
+	hitPoints: number = 20;
 	primaryColor = 0xb80000;
 	isBoss = true;
+	#regularAttackCounter: number = 0;
+	#originalPosition: ObjectWithXandY;
 
 	constructor(
 		scene: Phaser.Scene,
@@ -41,7 +35,7 @@ export class FireBoss extends BaseMonster {
 		this.data.set(DataKeys.Freezable, false);
 	}
 
-	getInitialState(): AllStates {
+	getInitialState() {
 		return "initial";
 	}
 
@@ -94,7 +88,7 @@ export class FireBoss extends BaseMonster {
 		});
 	}
 
-	constructNewBehaviorFor(state: AllStates) {
+	constructNewBehaviorFor(state: string) {
 		const isBloodied = this.hitPoints < 5;
 		const fireSpeed = isBloodied ? 200 : 180;
 		switch (state) {
@@ -105,42 +99,35 @@ export class FireBoss extends BaseMonster {
 				this.nextState = "walk";
 				return new Roar(state);
 			case "walk":
-				this.nextState = "attack1";
+				this.nextState = this.#regularAttackCounter >= 3 ? "leap" : "attack";
 				return new RandomlyWalk(state, {
 					speed: 60,
 					minWalkTime: 2000,
 					maxWalkTime: 5000,
 				});
-			case "attack1":
-				this.nextState = "attack2";
-				return new RangedFireBall(state, {
-					speed: fireSpeed,
-					postAttackTime: 350,
-				});
-			case "attack2":
-				this.nextState = "attack3";
-				return new RangedFireBall(state, {
-					speed: fireSpeed,
-					postAttackTime: 350,
-				});
-			case "attack3":
-				this.nextState = "attack4";
-				return new RangedFireBall(state, {
-					speed: fireSpeed,
-					postAttackTime: 350,
-				});
-			case "attack4":
-				this.nextState = "attack5";
-				return new RangedFireBall(state, {
-					speed: fireSpeed,
-					postAttackTime: 350,
-				});
-			case "attack5":
+			case "attack":
+				this.#regularAttackCounter++;
 				this.nextState = "walk";
 				return new RangedFireBall(state, {
 					speed: fireSpeed,
 					postAttackTime: 350,
+					count: 5,
 				});
+			case "leap":
+				this.#originalPosition = { x: this.x, y: this.y };
+				this.#regularAttackCounter = 0;
+				this.nextState = "fireRing";
+				return new Leap(state, {});
+			case "fireRing":
+				this.nextState = "leapBack";
+				return new FireBallRing(state, {
+					speed: 70,
+					postAttackTime: 2400,
+					count: 14,
+				});
+			case "leapBack":
+				this.nextState = "walk";
+				return new Leap(state, { targetPosition: this.#originalPosition });
 		}
 	}
 
