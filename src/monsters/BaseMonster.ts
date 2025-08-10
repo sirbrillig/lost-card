@@ -242,7 +242,7 @@ export class BaseMonster extends Phaser.Physics.Arcade.Sprite {
 	}
 
 	#getHealthBarPosition(): { x: number; y: number } {
-		return { x: this.x - this.width / 2, y: this.y - 14 };
+		return { x: this.x - this.width / 2, y: this.y - this.height / 2 - 15 };
 	}
 
 	#updateHealthBar(): void {
