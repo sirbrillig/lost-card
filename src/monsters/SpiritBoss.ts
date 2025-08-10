@@ -130,18 +130,23 @@ export class SpiritBoss extends BaseMonster {
 				return new FireWall(state, {
 					postAttackTime: 1000,
 					direction: "right",
+					colorTint: this.primaryColor,
 				});
 			case "fireWall2":
 				this.nextState = "jumpIn";
 				return new FireWall(state, {
-					postAttackTime: 4000,
+					postAttackTime: 6000,
 					direction: "left",
+					colorTint: this.primaryColor,
 				});
 			case "jumpIn":
-				this.nextState = "darkness";
+				this.nextState = "idleBeforeDark";
 				return new Leap(state, {
 					targetPosition: this.#previousPosition,
 				});
+			case "idleBeforeDark":
+				this.nextState = "darkness";
+				return new Idle(state, "down", 1500);
 			case "darkness":
 				this.nextState = "teleport";
 				return new ToggleRoomDark(state, true);
