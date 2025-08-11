@@ -2333,6 +2333,7 @@ export class FireWall implements Behavior {
 			hitsWalls?: boolean;
 			colorTint?: number;
 			count?: number;
+			fireHeight?: number;
 		}
 	) {
 		this.name = name;
@@ -2342,6 +2343,7 @@ export class FireWall implements Behavior {
 		this.#direction = config?.direction ?? this.#direction;
 		this.#colorTint = config?.colorTint;
 		this.#count = config?.count;
+		this.#fireHeight = config?.fireHeight ?? this.#fireHeight;
 	}
 
 	init(

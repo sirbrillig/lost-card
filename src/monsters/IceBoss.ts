@@ -6,15 +6,15 @@ import {
 	LeftRightMarch,
 	IceBeam,
 	PowerUp,
+	FireWall,
 } from "../lib/behaviors";
 import { BaseMonster } from "./BaseMonster";
 
-type AllStates = "initial" | "roar1" | "leftrightmarch" | "powerup" | "icebeam";
-
 export class IceBoss extends BaseMonster {
-	hitPoints: number = 10;
+	hitPoints: number = 20;
 	primaryColor: number = 0x39b7e0;
 	isBoss = true;
+	#iceAttackCount: number = 0;
 
 	constructor(
 		scene: Phaser.Scene,
@@ -35,7 +35,7 @@ export class IceBoss extends BaseMonster {
 		this.data.set(DataKeys.Pushable, false);
 	}
 
-	getInitialState(): AllStates {
+	getInitialState() {
 		return "initial";
 	}
 
@@ -82,8 +82,13 @@ export class IceBoss extends BaseMonster {
 		return true;
 	}
 
-	constructNewBehaviorFor(state: AllStates) {
+	constructNewBehaviorFor(state: string) {
 		const isBloodied = this.hitPoints < 5;
+		const waveSpeed = 7000;
+		const waveDelay = 3000;
+		const waveHeightA = 36;
+		const waveHeightB = 40;
+		const waveColor = 0x0800ff;
 		switch (state) {
 			case "initial":
 				this.nextState = "roar1";
@@ -97,11 +102,49 @@ export class IceBoss extends BaseMonster {
 					speed: isBloodied ? 90 : 70,
 				});
 			case "powerup":
-				this.nextState = "icebeam";
+				this.nextState = this.#iceAttackCount >= 2 ? "waves1" : "icebeam";
 				return new PowerUp(state);
 			case "icebeam":
+				this.#iceAttackCount++;
 				this.nextState = "leftrightmarch";
 				return new IceBeam(state, isBloodied ? 200 : 150);
+			case "waves1":
+				this.#iceAttackCount = 0;
+				this.nextState = "waves2";
+				return new FireWall(state, {
+					speed: waveSpeed,
+					count: 16,
+					colorTint: waveColor,
+					postAttackTime: waveDelay,
+					fireHeight: waveHeightA,
+				});
+			case "waves2":
+				this.nextState = "waves3";
+				return new FireWall(state, {
+					speed: waveSpeed,
+					count: 10,
+					colorTint: waveColor,
+					postAttackTime: waveDelay,
+					fireHeight: waveHeightB,
+				});
+			case "waves3":
+				this.nextState = "waves4";
+				return new FireWall(state, {
+					speed: waveSpeed,
+					count: 16,
+					colorTint: waveColor,
+					postAttackTime: waveDelay,
+					fireHeight: waveHeightA,
+				});
+			case "waves4":
+				this.nextState = "leftrightmarch";
+				return new FireWall(state, {
+					speed: waveSpeed,
+					count: 10,
+					colorTint: waveColor,
+					postAttackTime: waveDelay,
+					fireHeight: waveHeightB,
+				});
 		}
 	}
 
