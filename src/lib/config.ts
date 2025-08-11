@@ -67,7 +67,7 @@ export const config = {
 	normalSwordDamage: 1,
 	swordCardDamage: 2,
 	maxBossDamageTakenPerHit: 1.2,
-	darkRoomSpotlightRadius: 26,
+	darkRoomSpotlightRadius: 28,
 	targetSpotlightRadius: 38,
 	playerHitBoxWidth: 8,
 	playerHitBoxHeight: 10,
