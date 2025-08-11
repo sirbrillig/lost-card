@@ -454,6 +454,7 @@ export class Burrow implements Behavior {
 export class Leap implements Behavior {
 	#jumpTime = 900;
 	#jumpHeight = 30;
+	#shakeOnLand: boolean = false;
 	#targetPosition: { x: number; y: number } | undefined = undefined;
 	name: string;
 
@@ -462,6 +463,7 @@ export class Leap implements Behavior {
 		options?: {
 			jumpTime?: number;
 			jumpHeight?: number;
+			shakeOnLand?: boolean;
 			targetPosition?: { x: number; y: number };
 		}
 	) {
@@ -469,6 +471,7 @@ export class Leap implements Behavior {
 		this.#jumpTime = options?.jumpTime ?? this.#jumpTime;
 		this.#jumpHeight = options?.jumpHeight ?? this.#jumpHeight;
 		this.#targetPosition = options?.targetPosition;
+		this.#shakeOnLand = options?.shakeOnLand ?? this.#shakeOnLand;
 	}
 
 	init(
@@ -506,6 +509,9 @@ export class Leap implements Behavior {
 		sprite.scene.time.addEvent({
 			delay: this.#jumpTime,
 			callback: () => {
+				if (this.#shakeOnLand) {
+					sprite.scene?.cameras.main.shake(200, 0.004);
+				}
 				shadow?.destroy();
 				sprite?.data?.set(DataKeys.IsHarmless, harmless);
 				sprite?.data?.set(DataKeys.Hittable, hittable);

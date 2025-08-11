@@ -117,7 +117,7 @@ export class FireBoss extends BaseMonster {
 				this.#originalPosition = { x: this.x, y: this.y };
 				this.#regularAttackCounter = 0;
 				this.nextState = "fireRing";
-				return new Leap(state, {});
+				return new Leap(state, { shakeOnLand: true });
 			case "fireRing":
 				this.nextState = "leapBack";
 				return new FireBallRing(state, {
@@ -127,7 +127,10 @@ export class FireBoss extends BaseMonster {
 				});
 			case "leapBack":
 				this.nextState = "walk";
-				return new Leap(state, { targetPosition: this.#originalPosition });
+				return new Leap(state, {
+					targetPosition: this.#originalPosition,
+					shakeOnLand: true,
+				});
 		}
 	}
 
