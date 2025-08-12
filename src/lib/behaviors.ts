@@ -1951,7 +1951,7 @@ export class FireBeam implements Behavior {
 							onComplete: () => {
 								effect?.destroy();
 								outerGlow?.destroy();
-								sprite.scene.time.addEvent({
+								scene.time.addEvent({
 									delay: this.#postAttackTime,
 									callback: () => {
 										goToNextState();
