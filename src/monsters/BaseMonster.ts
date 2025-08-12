@@ -379,6 +379,36 @@ export class BaseMonster extends Phaser.Physics.Arcade.Sprite {
 		}
 	}
 
+	showMiniBossExplosion() {
+		if (!this.body) {
+			throw new Error("Could not update monster");
+		}
+		const bossX = this.body.center.x;
+		const bossY = this.body.center.y;
+		const explosionPoints = [
+			{ x: bossX - this.width / 2, y: bossY - this.height / 2 },
+			{ x: bossX + this.width / 2, y: bossY - this.height / 2 },
+			{ x: bossX, y: bossY - this.height / 2 },
+			{ x: bossX - this.width / 2, y: bossY },
+			{ x: bossX + this.width / 2, y: bossY },
+			{ x: bossX, y: bossY + this.height / 2 },
+			{ x: bossX - this.width / 4, y: bossY - this.height / 3 },
+			{ x: bossX + this.width / 4, y: bossY - this.height / 3 },
+			{ x: bossX, y: bossY },
+		];
+		const delay = 300;
+		explosionPoints.forEach((point, i) => {
+			this.scene.time.delayedCall(i * delay, () => {
+				this.#makeExplosion(point);
+			});
+		});
+		this.scene.time.delayedCall(explosionPoints.length * delay, () => {
+			if (this.shouldRemovePostKill()) {
+				this.removeDeadMonster();
+			}
+		});
+	}
+
 	showBossExplosion() {
 		this.scene.cameras.main.flash();
 		if (!this.body?.center?.x) {
@@ -540,23 +570,26 @@ export class BaseMonster extends Phaser.Physics.Arcade.Sprite {
 		});
 	}
 
+	#makeExplosion(point: { x: number; y: number }): Promise<void> {
+		return new Promise((resolve) => {
+			const effect = this.scene.add.sprite(point.x, point.y, "explode", 0);
+			effect.setDepth(config.effectDepth);
+			effect.setTint(this.primaryColor);
+			effect.anims.play("explode");
+			this.playDestroySound();
+			effect.on(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
+				effect.destroy();
+				resolve();
+			});
+		});
+	}
+
 	showRegularExplosion() {
 		this.setVisible(false);
 		if (!this.body?.center?.x) {
 			return;
 		}
-		const effect = this.scene.add.sprite(
-			this.body.center.x + 1,
-			this.body.center.y - 1,
-			"explode",
-			0
-		);
-		effect.setDepth(config.effectDepth);
-		effect.setTint(this.primaryColor);
-		effect.anims.play("explode");
-		this.playDestroySound();
-		effect.on(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
-			effect.destroy();
+		this.#makeExplosion(this.body.center).then(() => {
 			if (this.shouldRemovePostKill()) {
 				this.removeDeadMonster();
 			}
@@ -598,6 +631,8 @@ export class BaseMonster extends Phaser.Physics.Arcade.Sprite {
 		MainEvents.emit(Events.MonsterDying, this);
 		if (this.isBoss) {
 			this.showBossExplosion();
+		} else if (this.isMiniBoss) {
+			this.showMiniBossExplosion();
 		} else {
 			this.showRegularExplosion();
 		}
