@@ -61,6 +61,7 @@ export class FireSpout extends BaseMonster {
 				return new RangedFireBall(state, {
 					speed: 60,
 					postAttackTime: randomNumber,
+					hitsWalls: true,
 				});
 			}
 			case "idle2": {

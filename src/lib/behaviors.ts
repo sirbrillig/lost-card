@@ -21,6 +21,7 @@ import {
 	getLimitedEndPoint,
 	doesTileBlockFire,
 	distanceToLine,
+	makeFireExplosion,
 } from "./shared";
 import { EnemyManager } from "./EnemyManager";
 import { TeleportSystem } from "./TeleportSystem";
@@ -2436,6 +2437,16 @@ export class FireWall implements Behavior {
 
 		const player = getPlayerOrThrow();
 		if (this.#hitsWalls) {
+			// Often the sprite will be right next to a wall and the effect will hit
+			// the wall immediately, so we make it ignore walls for a brief moment
+			// after launch.
+			let allowHitWalls = false;
+			sprite.scene.time.addEvent({
+				delay: 1000,
+				callback: () => {
+					allowHitWalls = true;
+				},
+			});
 			const landLayer = getMap().getLayer("Background");
 			if (!landLayer) {
 				throw new Error("Could not find bg layer for RangedFireBall");
@@ -2444,20 +2455,28 @@ export class FireWall implements Behavior {
 			if (!stuffLayer) {
 				throw new Error("Could not find stuff layer for RangedFireBall");
 			}
-			sprite.scene.physics.add.collider(effect, stuffLayer.tilemapLayer, () => {
-				fireSound?.stop();
-				effect?.destroy();
-			});
-			// FIXME: this does nothing somehow?
+			sprite.scene.physics.add.collider(
+				effect,
+				stuffLayer.tilemapLayer,
+				() => {
+					makeFireExplosion(sprite.scene, effect.body.center);
+					fireSound?.stop();
+					effect?.destroy();
+				},
+				() => {
+					return allowHitWalls;
+				}
+			);
 			sprite.scene.physics.add.collider(
 				effect,
 				landLayer.tilemapLayer,
 				() => {
+					makeFireExplosion(sprite.scene, effect.body.center);
 					fireSound?.stop();
 					effect?.destroy();
 				},
 				(_, tile) => {
-					return doesTileBlockFire(tile);
+					return allowHitWalls && doesTileBlockFire(tile);
 				}
 			);
 		}
@@ -2581,6 +2600,16 @@ export class RangedFireBall implements Behavior {
 		}
 
 		if (this.#hitsWalls) {
+			// Often the sprite will be right next to a wall and the effect will hit
+			// the wall immediately, so we make it ignore walls for a brief moment
+			// after launch.
+			let allowHitWalls = false;
+			sprite.scene.time.addEvent({
+				delay: 1000,
+				callback: () => {
+					allowHitWalls = true;
+				},
+			});
 			const landLayer = getMap().getLayer("Background");
 			if (!landLayer) {
 				throw new Error("Could not find bg layer for RangedFireBall");
@@ -2589,20 +2618,28 @@ export class RangedFireBall implements Behavior {
 			if (!stuffLayer) {
 				throw new Error("Could not find stuff layer for RangedFireBall");
 			}
-			sprite.scene.physics.add.collider(effect, stuffLayer.tilemapLayer, () => {
-				fireSound?.stop();
-				effect?.destroy();
-			});
-			// FIXME: this does nothing somehow?
+			sprite.scene.physics.add.collider(
+				effect,
+				stuffLayer.tilemapLayer,
+				() => {
+					makeFireExplosion(sprite.scene, effect.body.center);
+					fireSound?.stop();
+					effect?.destroy();
+				},
+				() => {
+					return allowHitWalls;
+				}
+			);
 			sprite.scene.physics.add.collider(
 				effect,
 				landLayer.tilemapLayer,
 				() => {
+					makeFireExplosion(sprite.scene, effect.body.center);
 					fireSound?.stop();
 					effect?.destroy();
 				},
 				(_, tile) => {
-					return doesTileBlockFire(tile);
+					return allowHitWalls && doesTileBlockFire(tile);
 				}
 			);
 		}
