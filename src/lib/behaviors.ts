@@ -456,6 +456,7 @@ export class Leap implements Behavior {
 	#jumpTime = 900;
 	#jumpHeight = 30;
 	#shakeOnLand: boolean = false;
+	#postAttackTime: number = 0;
 	#targetPosition: { x: number; y: number } | undefined = undefined;
 	name: string;
 
@@ -465,6 +466,7 @@ export class Leap implements Behavior {
 			jumpTime?: number;
 			jumpHeight?: number;
 			shakeOnLand?: boolean;
+			postAttackTime?: number;
 			targetPosition?: { x: number; y: number };
 		}
 	) {
@@ -473,6 +475,7 @@ export class Leap implements Behavior {
 		this.#jumpHeight = options?.jumpHeight ?? this.#jumpHeight;
 		this.#targetPosition = options?.targetPosition;
 		this.#shakeOnLand = options?.shakeOnLand ?? this.#shakeOnLand;
+		this.#postAttackTime = options?.postAttackTime ?? this.#postAttackTime;
 	}
 
 	init(
@@ -512,12 +515,19 @@ export class Leap implements Behavior {
 			callback: () => {
 				if (this.#shakeOnLand) {
 					sprite.scene?.cameras.main.shake(200, 0.004);
+					vibrate(sprite.scene, 1, 200);
 				}
 				shadow?.destroy();
 				sprite?.data?.set(DataKeys.IsHarmless, harmless);
 				sprite?.data?.set(DataKeys.Hittable, hittable);
 				sprite?.data?.set(DataKeys.Pushable, pushable);
-				goToNextState();
+
+				sprite?.scene?.time.addEvent({
+					delay: this.#postAttackTime,
+					callback: () => {
+						goToNextState();
+					},
+				});
 			},
 		});
 	}
@@ -3586,6 +3596,73 @@ export class Decide implements Behavior {
 	): void {
 		this.#decider();
 		goToNextState();
+	}
+}
+
+export class Repeat implements Behavior {
+	name: string;
+	#count: number;
+	#currentBehaviorCount: number = 0;
+	#createBehavior: () => Behavior;
+	#behavior: Behavior;
+	#goToNextState: () => void;
+	#sprite: Phaser.GameObjects.Sprite;
+	#enemyManager: EnemyManager;
+
+	constructor(
+		name: string,
+		config: {
+			count: number;
+			createBehavior: () => Behavior;
+		}
+	) {
+		this.name = name;
+		this.#count = config.count;
+		this.#createBehavior = config.createBehavior;
+	}
+
+	init(
+		sprite: Phaser.GameObjects.Sprite,
+		goToNextState: BehaviorCompleteCallback,
+		enemyManager: EnemyManager
+	): void {
+		this.#sprite = sprite;
+		this.#enemyManager = enemyManager;
+		this.#goToNextState = goToNextState;
+		this.#behavior = this.#createBehavior();
+		this.#startBehavior();
+	}
+
+	#startBehavior(): void {
+		this.#behavior.init(
+			this.#sprite,
+			this.#behaviorFinished.bind(this),
+			this.#enemyManager
+		);
+	}
+
+	#behaviorFinished(): void {
+		this.#currentBehaviorCount += 1;
+		if (this.#currentBehaviorCount < this.#count) {
+			this.#behavior.cleanUp?.(this.#sprite, this.#enemyManager);
+			this.#behavior = this.#createBehavior();
+			this.#startBehavior();
+			return;
+		}
+		this.#goToNextState();
+		return;
+	}
+
+	update(): void {
+		this.#behavior.update?.(
+			this.#sprite,
+			this.#behaviorFinished.bind(this),
+			this.#enemyManager
+		);
+	}
+
+	cleanUp(): void {
+		this.#behavior.cleanUp?.(this.#sprite, this.#enemyManager);
 	}
 }
 

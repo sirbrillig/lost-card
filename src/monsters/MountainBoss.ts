@@ -6,23 +6,17 @@ import {
 	LeftRightMarch,
 	ThrowRocks,
 	PowerUp,
+	Leap,
+	Repeat,
 } from "../lib/behaviors";
 import { BaseMonster } from "./BaseMonster";
 import { MountainMonster } from "./MountainMonster";
 
-type AllStates =
-	| "initial"
-	| "roar1"
-	| "spawn1"
-	| "spawn2"
-	| "preparethrow"
-	| "leftrightmarch"
-	| "throwrocks";
-
 export class MountainBoss extends BaseMonster {
-	hitPoints: number = 14;
+	hitPoints: number = 16;
 	isBoss = true;
 	enemyManager: EnemyManager;
+	#attackCount: number = 0;
 
 	constructor(
 		scene: Phaser.Scene,
@@ -42,7 +36,7 @@ export class MountainBoss extends BaseMonster {
 		this.setOrigin(0.5, 0.75);
 	}
 
-	getInitialState(): AllStates {
+	getInitialState() {
 		return "initial";
 	}
 
@@ -93,7 +87,7 @@ export class MountainBoss extends BaseMonster {
 		});
 	}
 
-	constructNewBehaviorFor(state: AllStates) {
+	constructNewBehaviorFor(state: string) {
 		const isBloodied = this.hitPoints < 5;
 		const createMonster = () => {
 			if (!this.body) {
@@ -116,13 +110,6 @@ export class MountainBoss extends BaseMonster {
 				this.nextState = "spawn1";
 				return new Roar(state);
 			case "spawn1":
-				this.nextState = "spawn2";
-				return new SpawnEnemies(state, {
-					enemiesToSpawn: 4,
-					maxSpawnedEnemies: 18,
-					createMonster,
-				});
-			case "spawn2":
 				this.nextState = "leftrightmarch";
 				return new SpawnEnemies(state, {
 					enemiesToSpawn: 4,
@@ -130,7 +117,7 @@ export class MountainBoss extends BaseMonster {
 					createMonster,
 				});
 			case "leftrightmarch":
-				this.nextState = "preparethrow";
+				this.nextState = this.#attackCount % 2 === 0 ? "preparethrow" : "jump1";
 				return new LeftRightMarch(state, {
 					speed: isBloodied ? 100 : 80,
 				});
@@ -138,12 +125,21 @@ export class MountainBoss extends BaseMonster {
 				this.nextState = "throwrocks";
 				return new PowerUp(state, { scale: 3 });
 			case "throwrocks":
+				this.#attackCount++;
 				this.nextState = "roar1";
 				return new ThrowRocks(state, {
 					speed: 500,
 					rockCount: isBloodied ? 5 : 3,
 					delayBeforeEnd: 1200,
 					delayBetweenRocks: isBloodied ? 450 : 600,
+				});
+			case "jump1":
+				this.nextState = "roar1";
+				return new Repeat(state, {
+					count: 3,
+					createBehavior: () => {
+						return new Leap(state, { shakeOnLand: true, postAttackTime: 700 });
+					},
 				});
 		}
 	}
