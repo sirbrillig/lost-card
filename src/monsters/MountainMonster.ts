@@ -1,8 +1,6 @@
-import { RandomlyWalk } from "../lib/behaviors";
+import { RandomlyWalk, Sequence } from "../lib/behaviors";
 import { EnemyManager } from "../lib/EnemyManager";
 import { BaseMonster } from "./BaseMonster";
-
-type AllStates = "randomwalk1" | "randomwalk2";
 
 export class MountainMonster extends BaseMonster {
 	hitPoints = 2;
@@ -16,8 +14,8 @@ export class MountainMonster extends BaseMonster {
 		super(scene, enemyManager, x, y, "monsters1", 54);
 	}
 
-	getInitialState(): AllStates {
-		return "randomwalk1";
+	getInitialState() {
+		return "all";
 	}
 
 	initSprites() {
@@ -59,14 +57,10 @@ export class MountainMonster extends BaseMonster {
 		});
 	}
 
-	constructNewBehaviorFor(state: string) {
-		switch (state) {
-			case "randomwalk1":
-				this.nextState = "randomwalk2";
-				return new RandomlyWalk(state);
-			case "randomwalk2":
-				this.nextState = "randomwalk1";
-				return new RandomlyWalk(state);
-		}
+	constructNewBehaviorFor() {
+		return new Sequence("all", {
+			loop: true,
+			creators: [() => new RandomlyWalk("a")],
+		});
 	}
 }

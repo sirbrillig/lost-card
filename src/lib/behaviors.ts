@@ -622,6 +622,13 @@ export class RandomlyWalk implements Behavior {
 			this.#walkInDirection(sprite, direction);
 		}
 	}
+
+	cleanUp(sprite: Phaser.GameObjects.Sprite) {
+		if (isDynamicSprite(sprite)) {
+			sprite?.body.stop();
+			sprite?.anims.stop();
+		}
+	}
 }
 
 export class LeftRightMarch implements Behavior {
@@ -3596,6 +3603,92 @@ export class Decide implements Behavior {
 	): void {
 		this.#decider();
 		goToNextState();
+	}
+}
+
+export class Sequence implements Behavior {
+	name: string;
+	#currentCreatorIndex: number = 0;
+	#creators: Array<() => Behavior>;
+	#loop: boolean = false;
+	#behavior: Behavior | undefined;
+	#goToNextState: () => void;
+	#sprite: Phaser.GameObjects.Sprite;
+	#enemyManager: EnemyManager;
+
+	constructor(
+		name: string,
+		config: {
+			creators: Array<() => Behavior>;
+			loop?: boolean;
+		}
+	) {
+		this.name = name;
+		this.#creators = config.creators;
+		this.#loop = config.loop ?? this.#loop;
+	}
+
+	init(
+		sprite: Phaser.GameObjects.Sprite,
+		goToNextState: BehaviorCompleteCallback,
+		enemyManager: EnemyManager
+	): void {
+		this.#sprite = sprite;
+		this.#enemyManager = enemyManager;
+		this.#goToNextState = goToNextState;
+		this.#progressBehaviors();
+	}
+
+	#progressBehaviors(): void {
+		let creator =
+			this.#currentCreatorIndex < this.#creators.length
+				? this.#creators[this.#currentCreatorIndex]
+				: undefined;
+		this.#currentCreatorIndex += 1;
+		if (!creator && this.#loop) {
+			this.#currentCreatorIndex = 0;
+			creator = this.#creators[this.#currentCreatorIndex];
+		}
+		if (!creator) {
+			this.#goToNextState();
+			return;
+		}
+		this.#behavior = creator();
+		this.#startBehavior();
+	}
+
+	#startBehavior(): void {
+		if (!this.#behavior) {
+			throw new Error("Behavior was not set in Sequence startBehavior");
+		}
+		this.#behavior.init(
+			this.#sprite,
+			this.#behaviorFinished.bind(this),
+			this.#enemyManager
+		);
+	}
+
+	#behaviorFinished(): void {
+		if (!this.#behavior) {
+			throw new Error("Behavior was not set in Sequence behaviorFinished");
+		}
+		this.#behavior.cleanUp?.(this.#sprite, this.#enemyManager);
+		this.#behavior = undefined;
+		this.#progressBehaviors();
+	}
+
+	update(): void {
+		this.#behavior?.update?.(
+			this.#sprite,
+			this.#behaviorFinished.bind(this),
+			this.#enemyManager
+		);
+	}
+
+	cleanUp(): void {
+		this.#behavior?.cleanUp?.(this.#sprite, this.#enemyManager);
+		this.#creators = [];
+		this.#currentCreatorIndex = 0;
 	}
 }
 

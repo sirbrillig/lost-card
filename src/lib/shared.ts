@@ -28,6 +28,7 @@ export const Events = {
 	MonsterHit: "hit",
 	MonsterStun: "stun",
 	MonsterKillRequest: "kill",
+	MonsterSilentRemoveRequest: "silentKill",
 	EnemyHitPlayer: "enemyHitPlayer",
 	ConfusePlayer: "confusePlayer",
 	StunPlayer: "stunPlayer",
@@ -614,7 +615,7 @@ export function hideAllRoomsExcept(
 				) {
 					spawnPoints.push(newSpawnPoint);
 				}
-				enemy.destroy(true);
+				enemy.emit(Events.MonsterSilentRemoveRequest);
 			});
 			getItemsInRoom(items, room).forEach((item) => {
 				item.visible = false;

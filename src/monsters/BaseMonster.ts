@@ -81,9 +81,12 @@ export class BaseMonster extends Phaser.Physics.Arcade.Sprite {
 		this.on(Events.MonsterHit, (damage: number) => this.hit(damage));
 		this.on(Events.MonsterStun, this.setStunned);
 		this.on(Events.MonsterKillRequest, this.kill);
+		this.on(Events.MonsterSilentRemoveRequest, this.silentKill);
 
 		MainEvents.on(Events.LeavingRoom, () => {
 			this.active = false;
+			this.#currentActiveBehavior?.cleanUp?.(this, this.#enemyManager);
+			this.#currentActiveBehavior = undefined;
 		});
 		MainEvents.on(Events.EnteredRoom, () => {
 			if (this.isInActiveRoom()) {
@@ -93,6 +96,19 @@ export class BaseMonster extends Phaser.Physics.Arcade.Sprite {
 
 		this.initSprites();
 		this.initHitbox(options ?? {});
+	}
+
+	silentKill() {
+		this.#currentActiveBehavior?.cleanUp?.(this, this.#enemyManager);
+		this.#currentActiveBehavior = undefined;
+		this.body?.stop();
+		this.anims?.stop();
+		this.#currentState = undefined;
+		this.setStunned(true);
+		this.emit(Events.MonsterDying);
+		this.#healthBar?.destroy();
+		this.#healthBar = undefined;
+		this.destroy();
 	}
 
 	isInActiveRoom(): boolean {
@@ -620,6 +636,8 @@ export class BaseMonster extends Phaser.Physics.Arcade.Sprite {
 		}
 		this.isDying = true;
 
+		this.#currentActiveBehavior?.cleanUp?.(this, this.#enemyManager);
+		this.#currentActiveBehavior = undefined;
 		this.body.stop();
 		this.anims.stop();
 		this.#currentState = undefined;
