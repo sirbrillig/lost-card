@@ -90,7 +90,6 @@ export class MountainBoss extends BaseMonster {
 	}
 
 	constructNewBehaviorFor(state: string) {
-		const isBloodied = this.hitPoints < 5;
 		const createMonster = () => {
 			if (!this.body) {
 				throw new Error("monster is invalid");
@@ -121,7 +120,7 @@ export class MountainBoss extends BaseMonster {
 			case "leftrightmarch":
 				this.nextState = "attack";
 				return new LeftRightMarch(state, {
-					speed: isBloodied ? 100 : 80,
+					speed: 80,
 				});
 			case "attack":
 				this.nextState = "roar1";
@@ -133,11 +132,21 @@ export class MountainBoss extends BaseMonster {
 							creators: [
 								() => new PowerUp(state, { scale: 3 }),
 								() =>
+									new Leap(state, {
+										jumpTime: 800,
+										jumpHeight: 40,
+										shakeOnLand: true,
+										postAttackTime: 800,
+										targetPosition: this.body?.center
+											? { x: this.body.center.x, y: this.body.center.y }
+											: { x: 0, y: 0 },
+									}),
+								() =>
 									new ThrowRocks(state, {
 										speed: 500,
-										rockCount: isBloodied ? 5 : 3,
+										rockCount: 4,
 										delayBeforeEnd: 1200,
-										delayBetweenRocks: isBloodied ? 450 : 600,
+										delayBetweenRocks: 600,
 									}),
 							],
 						}),

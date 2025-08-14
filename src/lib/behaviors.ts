@@ -514,8 +514,8 @@ export class Leap implements Behavior {
 			delay: this.#jumpTime,
 			callback: () => {
 				if (this.#shakeOnLand) {
-					sprite.scene?.cameras.main.shake(200, 0.004);
-					vibrate(sprite.scene, 1, 200);
+					sprite.scene?.cameras.main.shake(500, 0.02);
+					vibrate(sprite.scene, 2, 500);
 				}
 				shadow?.destroy();
 				sprite?.data?.set(DataKeys.IsHarmless, harmless);
