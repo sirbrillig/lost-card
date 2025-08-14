@@ -114,7 +114,7 @@ export class MountainBoss extends BaseMonster {
 				this.nextState = "leftrightmarch";
 				return new SpawnEnemies(state, {
 					enemiesToSpawn: 4,
-					maxSpawnedEnemies: 18,
+					maxSpawnedEnemies: 8,
 					createMonster,
 				});
 			case "leftrightmarch":
@@ -130,7 +130,7 @@ export class MountainBoss extends BaseMonster {
 					onSuccess: () =>
 						new Sequence(state, {
 							creators: [
-								() => new PowerUp(state, { scale: 3 }),
+								() => new PowerUp(state, { scale: 3, chargeTime: 800 }),
 								() =>
 									new Leap(state, {
 										jumpTime: 800,

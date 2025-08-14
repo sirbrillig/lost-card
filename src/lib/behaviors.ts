@@ -284,7 +284,8 @@ export class SpawnEnemies implements Behavior {
 			sprite.body.x + 5,
 			sprite.body.y + sprite.body.height
 		);
-		monster.once(Phaser.GameObjects.Events.DESTROY, () => {
+		monster.once(Events.MonsterDying, () => {
+			const spawnedEnemyCount = sprite.data.get("spawnedEnemyCount") ?? 0;
 			sprite?.data?.set("spawnedEnemyCount", spawnedEnemyCount - 1);
 		});
 		enemyManager.enemies.add(monster);
