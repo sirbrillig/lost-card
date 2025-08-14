@@ -107,6 +107,7 @@ export class SlowPunch extends BaseMonster {
 			case "punch":
 				this.nextState = "wait";
 				return new LavaExplode(state, {
+					damage: 2,
 					hitboxRadius: 34,
 					particleLifeSpan: 450,
 				});

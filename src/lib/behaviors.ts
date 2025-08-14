@@ -1464,6 +1464,7 @@ export class LavaExplode implements Behavior {
 	#particleLifeSpan = 300;
 	#hitboxRadius = 25;
 	#isConstant = false;
+	#damage: number = 1;
 	name: string;
 
 	constructor(
@@ -1473,6 +1474,7 @@ export class LavaExplode implements Behavior {
 			particleLifeSpan?: number;
 			hitboxRadius?: number;
 			isConstant?: boolean;
+			damage?: number;
 		}
 	) {
 		this.name = name;
@@ -1481,6 +1483,7 @@ export class LavaExplode implements Behavior {
 			options?.particleLifeSpan ?? this.#particleLifeSpan;
 		this.#hitboxRadius = options?.hitboxRadius ?? this.#hitboxRadius;
 		this.#isConstant = options?.isConstant ?? this.#isConstant;
+		this.#damage = options?.damage ?? this.#damage;
 	}
 
 	init(
@@ -1507,7 +1510,10 @@ export class LavaExplode implements Behavior {
 		circle.body.setOffset(-this.#hitboxRadius, -this.#hitboxRadius);
 		const player = getPlayerOrThrow();
 		sprite.scene.physics.add.overlap(player, circle, () => {
-			MainEvents.emit(Events.EnemyHitPlayer, { source: sprite, damage: 1 });
+			MainEvents.emit(Events.EnemyHitPlayer, {
+				source: sprite,
+				damage: this.#damage,
+			});
 			if (!this.#isConstant) {
 				circle?.destroy();
 			}
@@ -1818,6 +1824,7 @@ export class FireBeam implements Behavior {
 	#width: number = 10;
 	#glowColor = 0xf71000;
 	#color = 0xf54e42;
+	#damage: number = 2;
 	name: string;
 
 	#fadeOutTimer: Phaser.Time.TimerEvent | undefined;
@@ -1835,6 +1842,7 @@ export class FireBeam implements Behavior {
 			maxLength?: number;
 			minLength?: number;
 			width?: number;
+			damage?: number;
 		}
 	) {
 		this.name = name;
@@ -1844,6 +1852,7 @@ export class FireBeam implements Behavior {
 		this.#maxLength = options?.maxLength ?? this.#maxLength;
 		this.#minLength = options?.minLength ?? this.#minLength;
 		this.#width = options?.width ?? this.#width;
+		this.#damage = options?.damage ?? this.#damage;
 	}
 
 	init(
@@ -1954,7 +1963,7 @@ export class FireBeam implements Behavior {
 					if (angleDiff < Math.PI / 2) {
 						MainEvents.emit(Events.EnemyHitPlayer, {
 							source: sprite,
-							damage: 1,
+							damage: this.#damage,
 						});
 					}
 				}
