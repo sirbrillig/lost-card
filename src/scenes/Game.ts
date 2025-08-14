@@ -370,7 +370,8 @@ export class Game extends Scene {
 					this.#endPowerUse();
 					return;
 				}
-				this.enemyHitPlayer({ source: enemy, damage: 1 });
+				const damage = enemy.data.get(DataKeys.EnemyTouchDamage) ?? 1;
+				this.enemyHitPlayer({ source: enemy, damage });
 			},
 			(_, enemy) => {
 				if (!isDynamicSprite(enemy)) {

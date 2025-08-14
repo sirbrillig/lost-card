@@ -89,6 +89,7 @@ export class FireBoss extends BaseMonster {
 	}
 
 	constructNewBehaviorFor(state: string) {
+		this.data.set(DataKeys.EnemyTouchDamage, 1);
 		const isBloodied = this.hitPoints < 5;
 		const fireSpeed = isBloodied ? 200 : 180;
 		switch (state) {
@@ -116,6 +117,7 @@ export class FireBoss extends BaseMonster {
 			case "leap":
 				this.#originalPosition = { x: this.x, y: this.y };
 				this.#regularAttackCounter = 0;
+				this.data.set(DataKeys.EnemyTouchDamage, 2);
 				this.nextState = "fireRing";
 				return new Leap(state, { shakeOnLand: true });
 			case "fireRing":

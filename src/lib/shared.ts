@@ -65,6 +65,7 @@ export const DataKeys = {
 	PlayerDirection: "PlayerDirection",
 	DefeatedMonsters: "DefeatedBosses",
 	LockedDoor: "LockedDoor",
+	EnemyTouchDamage: "EnemyTouchDamage",
 } as const;
 
 export const MapMetaKeys = {
