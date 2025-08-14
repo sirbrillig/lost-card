@@ -3610,7 +3610,7 @@ export class Sequence implements Behavior {
 	name: string;
 	#currentCreatorIndex: number = 0;
 	#creators: Array<() => Behavior>;
-	#loop: boolean = false;
+	#loopIf?: () => boolean;
 	#behavior: Behavior | undefined;
 	#goToNextState: () => void;
 	#sprite: Phaser.GameObjects.Sprite;
@@ -3620,12 +3620,12 @@ export class Sequence implements Behavior {
 		name: string,
 		config: {
 			creators: Array<() => Behavior>;
-			loop?: boolean;
+			loopIf?: () => boolean;
 		}
 	) {
 		this.name = name;
 		this.#creators = config.creators;
-		this.#loop = config.loop ?? this.#loop;
+		this.#loopIf = config.loopIf;
 	}
 
 	init(
@@ -3645,7 +3645,7 @@ export class Sequence implements Behavior {
 				? this.#creators[this.#currentCreatorIndex]
 				: undefined;
 		this.#currentCreatorIndex += 1;
-		if (!creator && this.#loop) {
+		if (!creator && this.#loopIf?.()) {
 			this.#currentCreatorIndex = 0;
 			creator = this.#creators[this.#currentCreatorIndex];
 		}

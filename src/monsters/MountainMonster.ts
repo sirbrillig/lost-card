@@ -59,7 +59,7 @@ export class MountainMonster extends BaseMonster {
 
 	constructNewBehaviorFor() {
 		return new Sequence("all", {
-			loop: true,
+			loopIf: () => true,
 			creators: [() => new RandomlyWalk("a")],
 		});
 	}
