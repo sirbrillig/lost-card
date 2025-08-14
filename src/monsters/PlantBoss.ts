@@ -14,6 +14,7 @@ import {
 	SeekingVine,
 	SpawnEnemies,
 	TeleportToPlatform,
+	Repeat,
 } from "../lib/behaviors";
 import { Flower } from "./Flower";
 import { BaseMonster } from "./BaseMonster";
@@ -169,25 +170,26 @@ export class PlantBoss extends BaseMonster {
 					maxWalkTime: 3000,
 				});
 			case "attack1":
-				this.nextState = "attack2";
-				return new SeekingVine(state, vineSpeed, 550);
-			case "attack2":
-				this.nextState = "attack3";
-				return new SeekingVine(state, vineSpeed, 900);
-			case "attack3":
 				this.nextState = "teleport";
-				return new SeekingVine(state, vineSpeed * 2, 1000);
+				return new Repeat(state, {
+					count: 3,
+					createBehavior: () => {
+						return new SeekingVine(state, vineSpeed, 550);
+					},
+				});
 			case "teleport":
-				this.monsters.forEach((monster) => monster.destroy());
+				this.monsters.forEach((monster) => monster.silentKill());
 				this.currentSide = this.currentSide === "left" ? "right" : "left";
 				this.nextState = "poof1";
 				return new TeleportToPlatform(state, 2000);
 			case "poof1":
-				this.nextState = "poof2";
-				return new Poof(state, { particleLifeSpan: 1500 });
-			case "poof2":
 				this.nextState = "summon";
-				return new Poof(state, { particleLifeSpan: 1500 });
+				return new Repeat(state, {
+					count: 2,
+					createBehavior: () => {
+						return new Poof(state, { particleLifeSpan: 1500 });
+					},
+				});
 			case "summon":
 				previousMonsterPositions.length = 0;
 				this.nextState = "walk";
