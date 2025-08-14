@@ -1819,6 +1819,12 @@ export class FireBeam implements Behavior {
 	#color = 0xf54e42;
 	name: string;
 
+	#fadeOutTimer: Phaser.Time.TimerEvent | undefined;
+	#fadeInTween: Phaser.Tweens.Tween | undefined;
+	#outerGlow: Phaser.GameObjects.Line | undefined;
+	#effect: Phaser.GameObjects.Line | undefined;
+	#scene: Phaser.Scene;
+
 	constructor(
 		name: string,
 		options?: {
@@ -1843,6 +1849,7 @@ export class FireBeam implements Behavior {
 		sprite: Phaser.GameObjects.Sprite,
 		goToNextState: BehaviorCompleteCallback
 	): void {
+		this.#scene = sprite.scene;
 		const player = getPlayerOrThrow();
 		if (!sprite.body || !isDynamicSprite(sprite)) {
 			throw new Error("Could not update monster");
@@ -1868,7 +1875,7 @@ export class FireBeam implements Behavior {
 		});
 
 		// Make an outer glow
-		const outerGlow = sprite.scene.add.line(
+		this.#outerGlow = sprite.scene.add.line(
 			0,
 			0,
 			start.x,
@@ -1877,12 +1884,12 @@ export class FireBeam implements Behavior {
 			target.y,
 			this.#glowColor
 		);
-		outerGlow.setOrigin(0);
-		outerGlow.setAlpha(0);
+		this.#outerGlow.setOrigin(0);
+		this.#outerGlow.setAlpha(0);
 		const outerGlowAdjustment = 1.7;
-		outerGlow.setLineWidth(this.#width * outerGlowAdjustment);
+		this.#outerGlow.setLineWidth(this.#width * outerGlowAdjustment);
 
-		const effect = sprite.scene.add.line(
+		this.#effect = sprite.scene.add.line(
 			0,
 			0,
 			start.x,
@@ -1891,26 +1898,26 @@ export class FireBeam implements Behavior {
 			target.y,
 			this.#color
 		);
-		effect.setOrigin(0);
-		effect.setAlpha(0);
+		this.#effect.setOrigin(0);
+		this.#effect.setAlpha(0);
 
 		const scene = sprite.scene;
 
-		scene.tweens.add({
-			targets: [effect, outerGlow],
+		this.#fadeInTween = scene.tweens.add({
+			targets: [this.#effect, this.#outerGlow],
 			alpha: 1,
 			duration: this.#telegraphDelay,
 			onUpdate: (tween) => {
 				// Scale the beam width as it builds strength.
-				effect.setLineWidth(this.#width * tween.totalProgress);
-				outerGlow.setLineWidth(
+				this.#effect?.setLineWidth(this.#width * tween.totalProgress);
+				this.#outerGlow?.setLineWidth(
 					this.#width * tween.totalProgress * outerGlowAdjustment
 				);
 			},
 			onComplete: () => {
 				// Flash line at full power.
 				scene.tweens.add({
-					targets: effect,
+					targets: this.#effect,
 					strokeColor: 0xffffff,
 					duration: 30,
 					yoyo: true,
@@ -1951,34 +1958,45 @@ export class FireBeam implements Behavior {
 					}
 				}
 
-				scene.time.addEvent({
+				this.#fadeOutTimer = scene.time.addEvent({
 					delay: 300,
 					callback: () => {
-						// Fade the beam out again.
-						scene.tweens.add({
-							targets: [effect, outerGlow],
-							alpha: 0,
-							onUpdate: (tween) => {
-								effect?.setLineWidth(this.#width * (1 - tween.totalProgress));
-								outerGlow?.setLineWidth(
-									this.#width * (1 - tween.totalProgress)
-								);
-							},
-							duration: 150,
-							onComplete: () => {
-								effect?.destroy();
-								outerGlow?.destroy();
-								scene.time.addEvent({
-									delay: this.#postAttackTime,
-									callback: () => {
-										goToNextState();
-									},
-								});
-							},
+						this.#endBeam(() => {
+							this.#effect?.destroy();
+							this.#outerGlow?.destroy();
+							this.#scene.time.addEvent({
+								delay: this.#postAttackTime,
+								callback: () => {
+									goToNextState();
+								},
+							});
 						});
 					},
 				});
 			},
+		});
+	}
+
+	#endBeam(onComplete: () => void) {
+		// Fade the beam out again.
+		this.#scene.tweens.add({
+			targets: [this.#effect, this.#outerGlow],
+			alpha: 0,
+			onUpdate: (tween) => {
+				this.#effect?.setLineWidth(this.#width * (1 - tween.totalProgress));
+				this.#outerGlow?.setLineWidth(this.#width * (1 - tween.totalProgress));
+			},
+			duration: 150,
+			onComplete,
+		});
+	}
+
+	cleanUp() {
+		this.#fadeInTween?.destroy();
+		this.#fadeOutTimer?.destroy();
+		this.#endBeam(() => {
+			this.#effect?.destroy();
+			this.#outerGlow?.destroy();
 		});
 	}
 }
@@ -3842,5 +3860,9 @@ export class ToggleRoomDark implements Behavior {
 			this.#shouldBeDark ? Events.MakeRoomDark : Events.MakeRoomLight
 		);
 		goToNextState();
+	}
+
+	cleanUp() {
+		MainEvents.emit(Events.MakeRoomLight);
 	}
 }
