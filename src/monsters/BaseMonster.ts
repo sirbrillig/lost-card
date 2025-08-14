@@ -178,8 +178,6 @@ export class BaseMonster extends Phaser.Physics.Arcade.Sprite {
 			this.goToNextState.bind(this),
 			this.#enemyManager
 		);
-		this.updateAfterBehaviorInit(this.#currentActiveBehavior.name);
-		this.updateAfterBehavior(this.#currentActiveBehavior.name);
 	}
 
 	update() {
@@ -210,7 +208,6 @@ export class BaseMonster extends Phaser.Physics.Arcade.Sprite {
 			return;
 		}
 
-		this.updateBeforeBehavior();
 		if (this.isStunned) {
 			return;
 		}
@@ -236,8 +233,10 @@ export class BaseMonster extends Phaser.Physics.Arcade.Sprite {
 			this.#enemyManager
 		);
 
-		this.updateAfterBehavior(this.#currentActiveBehavior?.name);
+		this.updateAfterBehavior();
 	}
+
+	updateAfterBehavior(): void {}
 
 	#initHealthBar(): void {
 		if (this.#activationStatus !== "not-started") {
@@ -278,12 +277,6 @@ export class BaseMonster extends Phaser.Physics.Arcade.Sprite {
 	}
 
 	updateAfterHit() {}
-
-	updateBeforeBehavior(): void {}
-
-	updateAfterBehavior(_: string | undefined) {}
-
-	updateAfterBehaviorInit(_: string | undefined) {}
 
 	playHitSound() {
 		this.scene.sound.play("hit", { volume: 0.7 });
