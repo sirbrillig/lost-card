@@ -3692,6 +3692,72 @@ export class Sequence implements Behavior {
 	}
 }
 
+export class Condition implements Behavior {
+	name: string;
+	#condition: () => boolean;
+	#onSuccess: () => Behavior;
+	#onFailure: () => Behavior;
+	#behavior: Behavior;
+	#goToNextState: () => void;
+	#sprite: Phaser.GameObjects.Sprite;
+	#enemyManager: EnemyManager;
+
+	constructor(
+		name: string,
+		config: {
+			condition: () => boolean;
+			onSuccess: () => Behavior;
+			onFailure: () => Behavior;
+		}
+	) {
+		this.name = name;
+		this.#condition = config.condition;
+		this.#onSuccess = config.onSuccess;
+		this.#onFailure = config.onFailure;
+	}
+
+	init(
+		sprite: Phaser.GameObjects.Sprite,
+		goToNextState: BehaviorCompleteCallback,
+		enemyManager: EnemyManager
+	): void {
+		this.#sprite = sprite;
+		this.#enemyManager = enemyManager;
+		this.#goToNextState = goToNextState;
+		if (this.#condition()) {
+			this.#behavior = this.#onSuccess();
+		} else {
+			this.#behavior = this.#onFailure();
+		}
+		this.#startBehavior();
+	}
+
+	#startBehavior(): void {
+		this.#behavior.init(
+			this.#sprite,
+			this.#behaviorFinished.bind(this),
+			this.#enemyManager
+		);
+	}
+
+	#behaviorFinished(): void {
+		this.#behavior.cleanUp?.(this.#sprite, this.#enemyManager);
+		this.#goToNextState();
+	}
+
+	update(): void {
+		this.#behavior?.update?.(
+			this.#sprite,
+			this.#behaviorFinished.bind(this),
+			this.#enemyManager
+		);
+	}
+
+	cleanUp(): void {
+		this.#behavior?.cleanUp?.(this.#sprite, this.#enemyManager);
+	}
+}
+
 export class Repeat implements Behavior {
 	name: string;
 	#count: number;

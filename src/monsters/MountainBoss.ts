@@ -8,6 +8,8 @@ import {
 	PowerUp,
 	Leap,
 	Repeat,
+	Condition,
+	Sequence,
 } from "../lib/behaviors";
 import { BaseMonster } from "./BaseMonster";
 import { MountainMonster } from "./MountainMonster";
@@ -117,29 +119,38 @@ export class MountainBoss extends BaseMonster {
 					createMonster,
 				});
 			case "leftrightmarch":
-				this.nextState = this.#attackCount % 2 === 0 ? "preparethrow" : "jump1";
+				this.nextState = "attack";
 				return new LeftRightMarch(state, {
 					speed: isBloodied ? 100 : 80,
 				});
-			case "preparethrow":
-				this.nextState = "throwrocks";
-				return new PowerUp(state, { scale: 3 });
-			case "throwrocks":
+			case "attack":
+				this.nextState = "roar1";
 				this.#attackCount++;
-				this.nextState = "roar1";
-				return new ThrowRocks(state, {
-					speed: 500,
-					rockCount: isBloodied ? 5 : 3,
-					delayBeforeEnd: 1200,
-					delayBetweenRocks: isBloodied ? 450 : 600,
-				});
-			case "jump1":
-				this.nextState = "roar1";
-				return new Repeat(state, {
-					count: 3,
-					createBehavior: () => {
-						return new Leap(state, { shakeOnLand: true, postAttackTime: 700 });
-					},
+				return new Condition(state, {
+					condition: () => this.#attackCount % 2 !== 0,
+					onSuccess: () =>
+						new Sequence(state, {
+							creators: [
+								() => new PowerUp(state, { scale: 3 }),
+								() =>
+									new ThrowRocks(state, {
+										speed: 500,
+										rockCount: isBloodied ? 5 : 3,
+										delayBeforeEnd: 1200,
+										delayBetweenRocks: isBloodied ? 450 : 600,
+									}),
+							],
+						}),
+					onFailure: () =>
+						new Repeat(state, {
+							count: 3,
+							createBehavior: () => {
+								return new Leap(state, {
+									shakeOnLand: true,
+									postAttackTime: 700,
+								});
+							},
+						}),
 				});
 		}
 	}
