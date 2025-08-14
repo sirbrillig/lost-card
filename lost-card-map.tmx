@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.1" orientation="orthogonal" renderorder="right-down" width="300" height="200" tilewidth="16" tileheight="16" infinite="0" nextlayerid="20" nextobjectid="1841">
+<map version="1.10" tiledversion="1.11.1" orientation="orthogonal" renderorder="right-down" width="300" height="200" tilewidth="16" tileheight="16" infinite="0" nextlayerid="20" nextobjectid="1880">
  <editorsettings>
   <export target="public/assets/lost-card-map.json" format="json"/>
  </editorsettings>
@@ -10256,81 +10256,6 @@
   <object id="1767" name="SKJumpTarget" x="3344" y="1376" width="16" height="16"/>
  </objectgroup>
  <objectgroup id="12" name="Creatures">
-  <object id="103" name="MountainMonster" x="2081.42" y="1120">
-   <properties>
-    <property name="isMonster" type="bool" value="true"/>
-   </properties>
-   <point/>
-  </object>
-  <object id="104" name="MountainMonster" x="2117" y="1197.75">
-   <properties>
-    <property name="isMonster" type="bool" value="true"/>
-   </properties>
-   <point/>
-  </object>
-  <object id="322" name="MountainMonster" x="2231.45" y="1130.87">
-   <properties>
-    <property name="isMonster" type="bool" value="true"/>
-   </properties>
-   <point/>
-  </object>
-  <object id="326" name="MountainMonster" x="2231.09" y="1210.63">
-   <properties>
-    <property name="isMonster" type="bool" value="true"/>
-   </properties>
-   <point/>
-  </object>
-  <object id="328" name="MountainMonster" x="2185.67" y="1227.43">
-   <properties>
-    <property name="isMonster" type="bool" value="true"/>
-   </properties>
-   <point/>
-  </object>
-  <object id="106" name="MountainMonster" x="2060.63" y="1230.61">
-   <properties>
-    <property name="isMonster" type="bool" value="true"/>
-   </properties>
-   <point/>
-  </object>
-  <object id="306" name="IceMonster" x="2513.69" y="1785.16">
-   <point/>
-  </object>
-  <object id="307" name="IceMonster" x="2672" y="1744">
-   <point/>
-  </object>
-  <object id="308" name="IceMonster" x="2655.58" y="1851.7">
-   <point/>
-  </object>
-  <object id="313" name="IceMonster" x="2724.17" y="1850.98">
-   <point/>
-  </object>
-  <object id="312" name="IceMonster" x="2679.97" y="1850.33">
-   <point/>
-  </object>
-  <object id="309" name="IceMonster" x="2765.53" y="2043.15">
-   <point/>
-  </object>
-  <object id="360" name="IceMonster" x="2741.59" y="2249.05">
-   <point/>
-  </object>
-  <object id="704" name="IceMonster" x="2779.43" y="2245.9">
-   <point/>
-  </object>
-  <object id="361" name="IceMonster" x="2819.51" y="2249.92">
-   <point/>
-  </object>
-  <object id="310" name="IceMonster" x="2644.68" y="2065.83">
-   <point/>
-  </object>
-  <object id="311" name="IceMonster" x="2704.34" y="2042.61">
-   <point/>
-  </object>
-  <object id="314" name="MountainMonster" x="1993.2" y="1448.94">
-   <point/>
-  </object>
-  <object id="708" name="MountainMonster" x="1993.2" y="1581.74">
-   <point/>
-  </object>
   <object id="631" name="CloudGoblin" x="1750.81" y="1512.01">
    <point/>
   </object>
@@ -10371,60 +10296,6 @@
    <point/>
   </object>
   <object id="656" name="CloudGoblin" x="1161.48" y="1767.08">
-   <point/>
-  </object>
-  <object id="683" name="Ghost" x="3129.69" y="1780.57">
-   <point/>
-  </object>
-  <object id="736" name="FinalBoss" x="3296" y="192">
-   <point/>
-  </object>
-  <object id="1077" name="Snakey" x="1992.44" y="2662.99">
-   <point/>
-  </object>
-  <object id="1090" name="Snakey" x="1947" y="2637.54">
-   <point/>
-  </object>
-  <object id="1078" name="Snakey" x="2143.92" y="2642.99">
-   <point/>
-  </object>
-  <object id="1089" name="Snakey" x="2106.35" y="2659.35">
-   <point/>
-  </object>
-  <object id="1079" name="Snakey" x="2125.14" y="2773.27">
-   <point/>
-  </object>
-  <object id="1080" name="Snakey" x="1999.71" y="2774.48">
-   <point/>
-  </object>
-  <object id="1082" name="Snakey" x="2226.93" y="2711.46">
-   <point/>
-  </object>
-  <object id="1108" name="PoisonShroom" x="1796.94" y="2700.59">
-   <point/>
-  </object>
-  <object id="1109" name="PoisonShroom" x="1892.09" y="2770.6">
-   <point/>
-  </object>
-  <object id="1110" name="PoisonShroom" x="1828.94" y="2668.59">
-   <point/>
-  </object>
-  <object id="1111" name="PoisonShroom" x="1892.52" y="2640.39">
-   <point/>
-  </object>
-  <object id="1112" name="PoisonShroom" x="1808" y="2640">
-   <point/>
-  </object>
-  <object id="1114" name="PoisonShroom" x="1776" y="2752">
-   <point/>
-  </object>
-  <object id="1115" name="PoisonShroom" x="1817.5" y="2769.26">
-   <point/>
-  </object>
-  <object id="1225" name="IceHopper" x="2960" y="2032">
-   <point/>
-  </object>
-  <object id="1227" name="IceHopper" x="3151.98" y="2058.07">
    <point/>
   </object>
   <object id="1509" name="IceMonster" gid="1319" x="2368" y="1792" width="16" height="16"/>
@@ -10667,6 +10538,43 @@
   <object id="1814" name="Spike" gid="1319" x="1952" y="2496" width="16" height="16"/>
   <object id="1816" name="PlantSpitter" gid="1319" x="1904" y="1888" width="16" height="16"/>
   <object id="1817" name="PlantSpitter" gid="1319" x="1792" y="1888" width="16" height="16"/>
+  <object id="1841" name="Snakey" gid="1319" x="2000" y="2672" width="16" height="16"/>
+  <object id="1842" name="Snakey" gid="1319" x="1936" y="2640" width="16" height="16"/>
+  <object id="1843" name="Snakey" gid="1319" x="1984" y="2784" width="16" height="16"/>
+  <object id="1844" name="Snakey" gid="1319" x="2128" y="2784" width="16" height="16"/>
+  <object id="1845" name="Snakey" gid="1319" x="2112" y="2672" width="16" height="16"/>
+  <object id="1846" name="Snakey" gid="1319" x="2176" y="2640" width="16" height="16"/>
+  <object id="1847" name="Snakey" gid="1319" x="2224" y="2720" width="16" height="16"/>
+  <object id="1849" name="PoisonShroom" gid="1319" x="1888" y="2640" width="16" height="16"/>
+  <object id="1850" name="PoisonShroom" gid="1319" x="1808" y="2640" width="16" height="16"/>
+  <object id="1851" name="PoisonShroom" gid="1319" x="1824" y="2672" width="16" height="16"/>
+  <object id="1852" name="PoisonShroom" gid="1319" x="1792" y="2704" width="16" height="16"/>
+  <object id="1853" name="PoisonShroom" gid="1319" x="1776" y="2752" width="16" height="16"/>
+  <object id="1854" name="PoisonShroom" gid="1319" x="1808" y="2768" width="16" height="16"/>
+  <object id="1855" name="PoisonShroom" gid="1319" x="1872" y="2768" width="16" height="16"/>
+  <object id="1856" name="Ghost" gid="2713" x="3120" y="1792" width="16" height="16"/>
+  <object id="1857" name="IceHopper" gid="2713" x="3136" y="2064" width="16" height="16"/>
+  <object id="1858" name="IceHopper" gid="2713" x="2944" y="2032" width="16" height="16"/>
+  <object id="1859" name="IceMonster" gid="2713" x="2752" y="2048" width="16" height="16"/>
+  <object id="1860" name="IceMonster" gid="2713" x="2688" y="2048" width="16" height="16"/>
+  <object id="1861" name="IceMonster" gid="2713" x="2640" y="2064" width="16" height="16"/>
+  <object id="1862" name="IceMonster" gid="2713" x="2736" y="2256" width="16" height="16"/>
+  <object id="1863" name="IceMonster" gid="2713" x="2768" y="2240" width="16" height="16"/>
+  <object id="1864" name="IceMonster" gid="2713" x="2816" y="2256" width="16" height="16"/>
+  <object id="1866" name="IceMonster" gid="2713" x="2672" y="1856" width="16" height="16"/>
+  <object id="1867" name="IceMonster" gid="2713" x="2640" y="1856" width="16" height="16"/>
+  <object id="1868" name="IceMonster" gid="2713" x="2720" y="1856" width="16" height="16"/>
+  <object id="1869" name="IceMonster" gid="2713" x="2640" y="1712" width="16" height="16"/>
+  <object id="1870" name="IceMonster" gid="2713" x="2512" y="1792" width="16" height="16"/>
+  <object id="1871" name="MountainMonster" gid="1319" x="2064" y="1120" width="16" height="16"/>
+  <object id="1872" name="MountainMonster" gid="1319" x="2224" y="1136" width="16" height="16"/>
+  <object id="1873" name="MountainMonster" gid="1319" x="2224" y="1216" width="16" height="16"/>
+  <object id="1874" name="MountainMonster" gid="1319" x="2176" y="1232" width="16" height="16"/>
+  <object id="1875" name="MountainMonster" gid="1319" x="2112" y="1200" width="16" height="16"/>
+  <object id="1876" name="MountainMonster" gid="1319" x="2048" y="1232" width="16" height="16"/>
+  <object id="1877" name="FinalBoss" gid="1319" x="3287.76" y="195.053" width="16" height="16"/>
+  <object id="1878" name="MountainMonster" gid="1319" x="1984" y="1456" width="16" height="16"/>
+  <object id="1879" name="MountainMonster" gid="1319" x="1984" y="1584" width="16" height="16"/>
  </objectgroup>
  <objectgroup id="10" name="Rooms">
   <object id="15" name="MK1" x="2880" y="800" width="192" height="144">
