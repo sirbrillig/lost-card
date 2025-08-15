@@ -104,7 +104,6 @@ export class BaseMonster extends Phaser.Physics.Arcade.Sprite {
 		this.body?.stop();
 		this.anims?.stop();
 		this.#currentState = undefined;
-		this.setStunned(true);
 		this.emit(Events.MonsterDying);
 		this.#healthBar?.destroy();
 		this.#healthBar = undefined;
@@ -617,7 +616,9 @@ export class BaseMonster extends Phaser.Physics.Arcade.Sprite {
 	setStunned(setting: boolean) {
 		this.isStunned = setting;
 		this.data?.set(DataKeys.Stunned, setting);
-		this.setVelocity(0);
+		if (this.body) {
+			this.setVelocity(0);
+		}
 	}
 
 	kill() {
