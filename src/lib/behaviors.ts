@@ -3611,29 +3611,6 @@ export class ThrowRocks implements Behavior {
 	}
 }
 
-export class Decide implements Behavior {
-	name: string;
-	#decider: () => void;
-
-	constructor(
-		name: string,
-		config: {
-			decider: () => void;
-		}
-	) {
-		this.name = name;
-		this.#decider = config.decider;
-	}
-
-	init(
-		_: Phaser.GameObjects.Sprite,
-		goToNextState: BehaviorCompleteCallback
-	): void {
-		this.#decider();
-		goToNextState();
-	}
-}
-
 export class Sequence implements Behavior {
 	name: string;
 	#currentCreatorIndex: number = 0;
@@ -3724,8 +3701,8 @@ export class Condition implements Behavior {
 	name: string;
 	#condition: () => boolean;
 	#onSuccess: () => Behavior;
-	#onFailure: () => Behavior;
-	#behavior: Behavior;
+	#onFailure?: () => Behavior;
+	#behavior?: Behavior;
 	#goToNextState: () => void;
 	#sprite: Phaser.GameObjects.Sprite;
 	#enemyManager: EnemyManager;
@@ -3735,7 +3712,7 @@ export class Condition implements Behavior {
 		config: {
 			condition: () => boolean;
 			onSuccess: () => Behavior;
-			onFailure: () => Behavior;
+			onFailure?: () => Behavior;
 		}
 	) {
 		this.name = name;
@@ -3755,13 +3732,17 @@ export class Condition implements Behavior {
 		if (this.#condition()) {
 			this.#behavior = this.#onSuccess();
 		} else {
-			this.#behavior = this.#onFailure();
+			this.#behavior = this.#onFailure?.();
+		}
+		if (!this.#behavior) {
+			this.#behaviorFinished();
+			return;
 		}
 		this.#startBehavior();
 	}
 
 	#startBehavior(): void {
-		this.#behavior.init(
+		this.#behavior?.init(
 			this.#sprite,
 			this.#behaviorFinished.bind(this),
 			this.#enemyManager
@@ -3769,7 +3750,7 @@ export class Condition implements Behavior {
 	}
 
 	#behaviorFinished(): void {
-		this.#behavior.cleanUp?.(this.#sprite, this.#enemyManager);
+		this.#behavior?.cleanUp?.(this.#sprite, this.#enemyManager);
 		this.#goToNextState();
 	}
 

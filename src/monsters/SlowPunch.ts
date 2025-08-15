@@ -2,7 +2,8 @@ import {
 	WaitForActive,
 	FollowPlayer,
 	LavaExplode,
-	Decide,
+	Sequence,
+	Condition,
 	PowerUp,
 } from "../lib/behaviors";
 import { EnemyManager } from "../lib/EnemyManager";
@@ -70,47 +71,46 @@ export class SlowPunch extends BaseMonster {
 
 	constructNewBehaviorFor(state: string) {
 		const closeDistance = 28;
-		switch (state) {
-			case "wait":
-				this.nextState = "follow";
-				return new WaitForActive(state, {
-					distance: this.awareDistance,
-				});
-			case "follow":
-				this.nextState = "decide";
-				return new FollowPlayer(state, {
-					speed: this.speed,
-					awareDistance: this.awareDistance,
-					stopWhenCloseDistance: closeDistance,
-				});
-			case "decide":
-				return new Decide(state, {
-					decider: () => {
-						const player = getPlayerOrThrow();
-						if (!this.body) {
-							throw new Error("Could not update monster");
-						}
-						const distance = Phaser.Math.Distance.BetweenPoints(
-							this.body.center,
-							player.body.center
-						);
-						if (distance < closeDistance) {
-							this.nextState = "windup";
-						} else {
-							this.nextState = "wait";
-						}
-					},
-				});
-			case "windup":
-				this.nextState = "punch";
-				return new PowerUp(state, { chargeTime: 700 });
-			case "punch":
-				this.nextState = "wait";
-				return new LavaExplode(state, {
-					damage: 2,
-					hitboxRadius: 34,
-					particleLifeSpan: 450,
-				});
-		}
+		return new Sequence(state, {
+			loopIf: () => true,
+			creators: [
+				() =>
+					new WaitForActive(state, {
+						distance: this.awareDistance,
+					}),
+				() =>
+					new FollowPlayer(state, {
+						speed: this.speed,
+						awareDistance: this.awareDistance,
+						stopWhenCloseDistance: closeDistance,
+					}),
+				() =>
+					new Condition(state, {
+						condition: () => {
+							const player = getPlayerOrThrow();
+							if (!this.body) {
+								throw new Error("Could not update monster");
+							}
+							const distance = Phaser.Math.Distance.BetweenPoints(
+								this.body.center,
+								player.body.center
+							);
+							return distance < closeDistance;
+						},
+						onSuccess: () =>
+							new Sequence(state, {
+								creators: [
+									() => new PowerUp(state, { chargeTime: 700 }),
+									() =>
+										new LavaExplode(state, {
+											damage: 2,
+											hitboxRadius: 34,
+											particleLifeSpan: 450,
+										}),
+								],
+							}),
+					}),
+			],
+		});
 	}
 }
