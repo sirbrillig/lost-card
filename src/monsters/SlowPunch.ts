@@ -10,10 +10,10 @@ import {
 } from "../lib/behaviors";
 import { EnemyManager } from "../lib/EnemyManager";
 import { BaseMonster } from "./BaseMonster";
-import { getPlayerOrThrow } from "../lib/components";
 
 export class SlowPunch extends BaseMonster {
 	awareDistance: number = 90;
+	closeDistance: number = 28;
 	speed: number = 15;
 	hitPoints = 7;
 	primaryColor = 0xb80000;
@@ -72,7 +72,6 @@ export class SlowPunch extends BaseMonster {
 	}
 
 	constructNewBehaviorFor(state: string) {
-		const closeDistance = 28;
 		return new Sequence(state, {
 			loopIf: () => true,
 			creators: [
@@ -84,7 +83,7 @@ export class SlowPunch extends BaseMonster {
 					new FollowPlayer(state, {
 						speed: this.speed,
 						awareDistance: this.awareDistance,
-						stopWhenCloseDistance: closeDistance,
+						stopWhenCloseDistance: this.closeDistance,
 					}),
 				() =>
 					new Selector(state, {
@@ -92,7 +91,7 @@ export class SlowPunch extends BaseMonster {
 							() =>
 								new Inverter(
 									state,
-									() => new IsNearPlayer(state, closeDistance)
+									() => new IsNearPlayer(state, this.closeDistance)
 								),
 							() =>
 								new Sequence(state, {
