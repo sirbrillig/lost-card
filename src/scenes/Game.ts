@@ -218,7 +218,11 @@ export class Game extends Scene {
 			if (!point) {
 				return;
 			}
+			this.respawnRegion(getRegionFromRoomName(roomName));
+			MainEvents.emit(Events.LeavingRoom);
 			this.#movePlayerToPoint(point.x, point.y);
+			MainEvents.emit(Events.EnteredRoom);
+			this.playMusicForRegion(getRegionFromRoomName(roomName));
 		});
 
 		MainEvents.on(

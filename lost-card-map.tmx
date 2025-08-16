@@ -7462,6 +7462,35 @@
     <wangtile tileid="552" wangid="1,2,2,2,2,2,1,1"/>
     <wangtile tileid="553" wangid="2,2,2,2,2,2,2,2"/>
    </wangset>
+   <wangset name="CK Dark" type="mixed" tile="-1">
+    <wangcolor name="Outside" color="#ff0000" tile="-1" probability="1"/>
+    <wangcolor name="Inside" color="#00ff00" tile="-1" probability="1"/>
+    <wangtile tileid="400" wangid="1,1,1,1,1,1,1,1"/>
+    <wangtile tileid="401" wangid="1,1,2,2,2,1,1,1"/>
+    <wangtile tileid="402" wangid="1,1,2,2,2,2,2,1"/>
+    <wangtile tileid="403" wangid="1,1,1,1,2,2,2,1"/>
+    <wangtile tileid="404" wangid="1,1,1,1,1,1,1,1"/>
+    <wangtile tileid="438" wangid="2,2,2,2,2,2,2,2"/>
+    <wangtile tileid="441" wangid="1,1,2,2,2,1,1,1"/>
+    <wangtile tileid="442" wangid="2,2,2,2,2,2,2,1"/>
+    <wangtile tileid="444" wangid="2,1,2,2,2,2,2,2"/>
+    <wangtile tileid="445" wangid="1,1,1,1,2,2,2,1"/>
+    <wangtile tileid="478" wangid="2,2,2,2,2,2,2,2"/>
+    <wangtile tileid="479" wangid="2,2,2,2,2,2,2,2"/>
+    <wangtile tileid="480" wangid="2,2,2,2,2,2,2,2"/>
+    <wangtile tileid="482" wangid="2,2,2,2,2,1,1,1"/>
+    <wangtile tileid="486" wangid="2,1,1,1,2,2,2,2"/>
+    <wangtile tileid="520" wangid="2,2,2,2,2,2,2,2"/>
+    <wangtile tileid="523" wangid="2,2,2,1,1,1,1,1"/>
+    <wangtile tileid="524" wangid="2,2,2,2,2,1,2,2"/>
+    <wangtile tileid="526" wangid="2,2,2,1,2,2,2,0"/>
+    <wangtile tileid="527" wangid="2,1,1,1,1,1,2,2"/>
+    <wangtile tileid="564" wangid="1,1,1,1,1,1,1,1"/>
+    <wangtile tileid="565" wangid="2,2,2,1,1,1,1,1"/>
+    <wangtile tileid="566" wangid="2,2,2,1,1,1,2,2"/>
+    <wangtile tileid="567" wangid="2,1,1,1,1,1,2,2"/>
+    <wangtile tileid="568" wangid="1,1,1,1,1,1,1,1"/>
+   </wangset>
   </wangsets>
  </tileset>
  <tileset firstgid="1395" name="Dungeon_Tiles_Sprites" tilewidth="16" tileheight="16" tilecount="1394" columns="41">
@@ -10583,7 +10612,12 @@
   <object id="1890" name="SkyBlob" gid="1319" x="1408" y="2048" width="16" height="16"/>
   <object id="1891" name="SkyBlob" gid="1319" x="1488" y="2096" width="16" height="16"/>
   <object id="1892" name="SkyBlob" gid="1319" x="1408" y="2160" width="16" height="16"/>
-  <object id="1893" name="SkyBlobSpitter" gid="1319" x="1573.37" y="1537.34" width="16" height="16"/>
+  <object id="1893" name="SkyBlobSpitter" gid="1319" x="1573.37" y="1537.34" width="16" height="16">
+   <properties>
+    <property name="doNotRespawn" type="bool" value="true"/>
+    <property name="isMiniBoss" type="bool" value="true"/>
+   </properties>
+  </object>
  </objectgroup>
  <objectgroup id="10" name="Rooms">
   <object id="15" name="MK1" x="2880" y="800" width="192" height="144">
