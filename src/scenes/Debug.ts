@@ -1,30 +1,13 @@
 import { Scene } from "phaser";
 import {
 	Events,
-	getRoomForPoint,
-	isValueTruthy,
 	Region,
+	getLanternRooms,
 	getRoomsInRegion,
 	getRegionName,
 } from "../lib/shared";
 import { MainEvents } from "../lib/MainEvents";
 import { getMap } from "../lib/components";
-
-function getLanternRooms(): string[] {
-	const map = getMap();
-	return (
-		map
-			?.getObjectLayer("SavePoints")
-			?.objects.map((lantern) => {
-				if (!lantern.x || !lantern.y) {
-					return undefined;
-				}
-				return getRoomForPoint(map, lantern.x, lantern.y);
-			})
-			.map((room) => room?.name)
-			.filter(isValueTruthy) ?? []
-	);
-}
 
 const lineHeight = 14;
 const startHeight = 12;
@@ -168,7 +151,8 @@ export class Debug extends Scene {
 	#getTeleportMenuForRegion(region: Region): Menu {
 		const rooms = getRoomsInRegion(getMap(), region);
 		const roomNames = rooms.map((room) => room.name);
-		const items = getLanternRooms()
+		const items = getLanternRooms(getMap())
+			.map((room) => room?.name)
 			.filter((room) => {
 				return roomNames.includes(room);
 			})

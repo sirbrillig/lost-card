@@ -1577,3 +1577,17 @@ export function getLanternRespawnPosition(
 	})();
 	return { x: destinationX, y: destinationY };
 }
+
+export function getLanternRooms(map: Phaser.Tilemaps.Tilemap) {
+	return (
+		map
+			?.getObjectLayer("SavePoints")
+			?.objects.map((lantern) => {
+				if (!lantern.x || !lantern.y) {
+					return undefined;
+				}
+				return getRoomForPoint(map, lantern.x, lantern.y);
+			})
+			.filter(isValueTruthy) ?? []
+	);
+}
