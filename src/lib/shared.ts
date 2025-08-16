@@ -42,6 +42,8 @@ export const Events = {
 	PlayerPositionChanged: "PlayerPositionChanged",
 	MakeRoomDark: "MakeRoomDark",
 	MakeRoomLight: "MakeRoomLight",
+	DebugToggleHitboxes: "DebugToggleHitboxes",
+	TeleportToLantern: "TeleportToLantern",
 };
 
 export const DataKeys = {
@@ -66,6 +68,7 @@ export const DataKeys = {
 	DefeatedMonsters: "DefeatedBosses",
 	LockedDoor: "LockedDoor",
 	EnemyTouchDamage: "EnemyTouchDamage",
+	RespawnDirection: "respawnDirection",
 } as const;
 
 export const MapMetaKeys = {
@@ -1508,4 +1511,69 @@ export function distanceToLine(
 	const dx = point.x - xx;
 	const dy = point.y - yy;
 	return Math.sqrt(dx * dx + dy * dy);
+}
+
+export function isValueTruthy<T>(
+	value: T
+): value is Exclude<T, null | undefined | false | 0 | ""> {
+	return !!value;
+}
+
+export function findLanternInRoom(
+	map: Phaser.Tilemaps.Tilemap,
+	roomName: string
+): Phaser.Types.Tilemaps.TiledObject | undefined {
+	const lanterns = map.getObjectLayer("SavePoints")?.objects;
+	return lanterns?.find((lantern) => {
+		if (!lantern.x || !lantern.y) {
+			return undefined;
+		}
+		return getRoomForPoint(map, lantern.x, lantern.y)?.name === roomName;
+	});
+}
+
+export function getLanternRespawnPosition(
+	map: Phaser.Tilemaps.Tilemap,
+	roomName: string
+): { x: number; y: number } | undefined {
+	const lantern = findLanternInRoom(map, roomName);
+	if (!lantern) {
+		return;
+	}
+	const property: TiledObjectProperty | undefined = lantern.properties?.find(
+		(property: TiledObjectProperty) =>
+			property.name === DataKeys.RespawnDirection
+	);
+	const direction = property?.value;
+	if (typeof direction === "undefined") {
+		return;
+	}
+	if (!lantern.x || !lantern.y || !lantern.width || !lantern.height) {
+		return;
+	}
+	const destinationX: number = (() => {
+		if (!lantern.x || !lantern.y || !lantern.width || !lantern.height) {
+			return 0;
+		}
+		if (direction === SpriteLeft) {
+			return lantern.x - lantern.width / 2;
+		}
+		if (direction === SpriteRight) {
+			return lantern.x + lantern.width + lantern.width / 2;
+		}
+		return lantern.x + lantern.width / 2;
+	})();
+	const destinationY: number = (() => {
+		if (!lantern.x || !lantern.y || !lantern.width || !lantern.height) {
+			return 0;
+		}
+		if (direction === SpriteUp) {
+			return lantern.y - lantern.height * 2;
+		}
+		if (direction === SpriteDown) {
+			return lantern.y + lantern.height / 2;
+		}
+		return lantern.y - lantern.height / 2;
+	})();
+	return { x: destinationX, y: destinationY };
 }

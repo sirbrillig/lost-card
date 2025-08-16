@@ -70,6 +70,7 @@ import {
 	makeFireExplosion,
 	addFoundAura,
 	addFoundPower,
+	getLanternRespawnPosition,
 } from "../lib/shared";
 import { MonsterCreator } from "../lib/MonsterCreator";
 import {
@@ -211,6 +212,14 @@ export class Game extends Scene {
 			this.enemyManager,
 			this.saveGame.bind(this)
 		);
+
+		MainEvents.on(Events.TeleportToLantern, (roomName: string) => {
+			const point = getLanternRespawnPosition(getMap(), roomName);
+			if (!point) {
+				return;
+			}
+			this.#movePlayerToPoint(point.x, point.y);
+		});
 
 		MainEvents.on(
 			Events.MonsterDying,
@@ -973,6 +982,7 @@ export class Game extends Scene {
 				return;
 			}
 			this.scene.pause("Game");
+			this.scene.pause("Overlay");
 			this.scene.launch("Debug");
 		});
 		this.input.keyboard.on("keydown-SEVEN", () => {
