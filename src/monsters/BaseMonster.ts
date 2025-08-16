@@ -162,7 +162,7 @@ export class BaseMonster extends Phaser.Physics.Arcade.Sprite {
 		return this.#currentState;
 	}
 
-	goToNextState(): void {
+	goToNextState(_success: boolean = true): void {
 		this.#currentActiveBehavior?.cleanUp?.(this, this.#enemyManager);
 		this.#changeCurrentPlayingState(this.nextState);
 	}

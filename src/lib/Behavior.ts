@@ -1,6 +1,6 @@
 import { EnemyManager } from "./EnemyManager";
 
-export type BehaviorCompleteCallback = () => void;
+export type BehaviorCompleteCallback = (success?: boolean) => void;
 
 export interface Behavior {
 	name: string;

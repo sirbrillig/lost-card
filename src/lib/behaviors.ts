@@ -3611,13 +3611,98 @@ export class ThrowRocks implements Behavior {
 	}
 }
 
+export class Selector implements Behavior {
+	name: string;
+	#currentCreatorIndex: number = 0;
+	#creators: Array<() => Behavior>;
+	#behavior: Behavior | undefined;
+	#goToNextState: BehaviorCompleteCallback;
+	#sprite: Phaser.GameObjects.Sprite;
+	#enemyManager: EnemyManager;
+
+	constructor(
+		name: string,
+		config: {
+			creators: Array<() => Behavior>;
+		}
+	) {
+		this.name = name;
+		this.#creators = config.creators;
+	}
+
+	init(
+		sprite: Phaser.GameObjects.Sprite,
+		goToNextState: BehaviorCompleteCallback,
+		enemyManager: EnemyManager
+	): void {
+		this.#sprite = sprite;
+		this.#enemyManager = enemyManager;
+		this.#goToNextState = goToNextState;
+		this.#progressBehaviors();
+	}
+
+	#progressBehaviors(): void {
+		let creator =
+			this.#currentCreatorIndex < this.#creators.length
+				? this.#creators[this.#currentCreatorIndex]
+				: undefined;
+		this.#currentCreatorIndex += 1;
+		if (!creator) {
+			// We only get here if all children have failed, which means the Selector failed.
+			this.#goToNextState(false);
+			return;
+		}
+		this.#behavior = creator();
+		this.#startBehavior();
+	}
+
+	#startBehavior(): void {
+		if (!this.#behavior) {
+			throw new Error("Behavior was not set in Selector startBehavior");
+		}
+		this.#behavior.init(
+			this.#sprite,
+			this.#behaviorFinished.bind(this),
+			this.#enemyManager
+		);
+	}
+
+	#behaviorFinished(success: boolean = true): void {
+		if (!this.#behavior) {
+			throw new Error("Behavior was not set in Selector behaviorFinished");
+		}
+		this.#behavior.cleanUp?.(this.#sprite, this.#enemyManager);
+		this.#behavior = undefined;
+		if (success) {
+			// A child succeeded, which means the Selector suceeded and we stop.
+			this.#goToNextState(true);
+			return;
+		}
+		this.#progressBehaviors();
+	}
+
+	update(): void {
+		this.#behavior?.update?.(
+			this.#sprite,
+			this.#behaviorFinished.bind(this),
+			this.#enemyManager
+		);
+	}
+
+	cleanUp(): void {
+		this.#behavior?.cleanUp?.(this.#sprite, this.#enemyManager);
+		this.#creators = [];
+		this.#currentCreatorIndex = 0;
+	}
+}
+
 export class Sequence implements Behavior {
 	name: string;
 	#currentCreatorIndex: number = 0;
 	#creators: Array<() => Behavior>;
 	#loopIf?: () => boolean;
 	#behavior: Behavior | undefined;
-	#goToNextState: () => void;
+	#goToNextState: BehaviorCompleteCallback;
 	#sprite: Phaser.GameObjects.Sprite;
 	#enemyManager: EnemyManager;
 
@@ -3655,7 +3740,7 @@ export class Sequence implements Behavior {
 			creator = this.#creators[this.#currentCreatorIndex];
 		}
 		if (!creator) {
-			this.#goToNextState();
+			this.#goToNextState(true);
 			return;
 		}
 		this.#behavior = creator();
@@ -3673,12 +3758,21 @@ export class Sequence implements Behavior {
 		);
 	}
 
-	#behaviorFinished(): void {
+	#behaviorFinished(success: boolean = true): void {
 		if (!this.#behavior) {
 			throw new Error("Behavior was not set in Sequence behaviorFinished");
 		}
 		this.#behavior.cleanUp?.(this.#sprite, this.#enemyManager);
 		this.#behavior = undefined;
+		if (!success && this.#loopIf?.()) {
+			this.#currentCreatorIndex = 0;
+			this.#progressBehaviors();
+			return;
+		}
+		if (!success) {
+			this.#goToNextState(false);
+			return;
+		}
 		this.#progressBehaviors();
 	}
 
@@ -3703,7 +3797,7 @@ export class Condition implements Behavior {
 	#onSuccess: () => Behavior;
 	#onFailure?: () => Behavior;
 	#behavior?: Behavior;
-	#goToNextState: () => void;
+	#goToNextState: BehaviorCompleteCallback;
 	#sprite: Phaser.GameObjects.Sprite;
 	#enemyManager: EnemyManager;
 
@@ -3773,7 +3867,7 @@ export class Repeat implements Behavior {
 	#currentBehaviorCount: number = 0;
 	#createBehavior: () => Behavior;
 	#behavior: Behavior;
-	#goToNextState: () => void;
+	#goToNextState: BehaviorCompleteCallback;
 	#sprite: Phaser.GameObjects.Sprite;
 	#enemyManager: EnemyManager;
 
@@ -3855,5 +3949,89 @@ export class ToggleRoomDark implements Behavior {
 
 	cleanUp() {
 		MainEvents.emit(Events.MakeRoomLight);
+	}
+}
+
+export class IsNearPlayer implements Behavior {
+	name: string;
+	#distance: number;
+
+	constructor(name: string, distance: number) {
+		this.name = name;
+		this.#distance = distance;
+	}
+
+	init(
+		sprite: Phaser.GameObjects.Sprite,
+		goToNextState: BehaviorCompleteCallback
+	): void {
+		const player = getPlayerOrThrow();
+		if (!isDynamicSprite(sprite)) {
+			throw new Error("Could not update monster");
+		}
+		const distance = Phaser.Math.Distance.BetweenPoints(
+			sprite.body.center,
+			player.body.center
+		);
+		goToNextState(distance <= this.#distance);
+	}
+}
+
+export class Inverter implements Behavior {
+	name: string;
+	#creator: () => Behavior;
+	#behavior: Behavior | undefined;
+	#goToNextState: BehaviorCompleteCallback;
+	#sprite: Phaser.GameObjects.Sprite;
+	#enemyManager: EnemyManager;
+
+	constructor(name: string, creator: () => Behavior) {
+		this.name = name;
+		this.#creator = creator;
+	}
+
+	init(
+		sprite: Phaser.GameObjects.Sprite,
+		goToNextState: BehaviorCompleteCallback,
+		enemyManager: EnemyManager
+	): void {
+		this.#sprite = sprite;
+		this.#enemyManager = enemyManager;
+		this.#goToNextState = goToNextState;
+		this.#behavior = this.#creator();
+		this.#startBehavior();
+	}
+
+	#startBehavior(): void {
+		if (!this.#behavior) {
+			throw new Error("Behavior was not set in Inverter startBehavior");
+		}
+		this.#behavior.init(
+			this.#sprite,
+			this.#behaviorFinished.bind(this),
+			this.#enemyManager
+		);
+	}
+
+	#behaviorFinished(success: boolean = true): void {
+		if (!this.#behavior) {
+			throw new Error("Behavior was not set in Inverter behaviorFinished");
+		}
+		this.#behavior.cleanUp?.(this.#sprite, this.#enemyManager);
+		this.#behavior = undefined;
+		this.#goToNextState(!success);
+	}
+
+	update(): void {
+		this.#behavior?.update?.(
+			this.#sprite,
+			this.#behaviorFinished.bind(this),
+			this.#enemyManager
+		);
+	}
+
+	cleanUp(): void {
+		this.#behavior?.cleanUp?.(this.#sprite, this.#enemyManager);
+		this.#behavior = undefined;
 	}
 }

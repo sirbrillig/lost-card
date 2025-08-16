@@ -3,8 +3,10 @@ import {
 	FollowPlayer,
 	LavaExplode,
 	Sequence,
-	Condition,
+	Selector,
 	PowerUp,
+	IsNearPlayer,
+	Inverter,
 } from "../lib/behaviors";
 import { EnemyManager } from "../lib/EnemyManager";
 import { BaseMonster } from "./BaseMonster";
@@ -85,30 +87,26 @@ export class SlowPunch extends BaseMonster {
 						stopWhenCloseDistance: closeDistance,
 					}),
 				() =>
-					new Condition(state, {
-						condition: () => {
-							const player = getPlayerOrThrow();
-							if (!this.body) {
-								throw new Error("Could not update monster");
-							}
-							const distance = Phaser.Math.Distance.BetweenPoints(
-								this.body.center,
-								player.body.center
-							);
-							return distance < closeDistance;
-						},
-						onSuccess: () =>
-							new Sequence(state, {
-								creators: [
-									() => new PowerUp(state, { chargeTime: 700 }),
-									() =>
-										new LavaExplode(state, {
-											damage: 2,
-											hitboxRadius: 34,
-											particleLifeSpan: 450,
-										}),
-								],
-							}),
+					new Selector(state, {
+						creators: [
+							() =>
+								new Inverter(
+									state,
+									() => new IsNearPlayer(state, closeDistance)
+								),
+							() =>
+								new Sequence(state, {
+									creators: [
+										() => new PowerUp(state, { chargeTime: 700 }),
+										() =>
+											new LavaExplode(state, {
+												damage: 2,
+												hitboxRadius: 34,
+												particleLifeSpan: 450,
+											}),
+									],
+								}),
+						],
 					}),
 			],
 		});
