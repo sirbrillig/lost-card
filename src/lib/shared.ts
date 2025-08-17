@@ -899,8 +899,6 @@ function setSpritePropertiesFromJSON(
 
 export interface SaveDataPlayerPosition {
 	playerActiveRoom?: string;
-	playerRoomX?: number;
-	playerRoomY?: number;
 }
 
 export type SaveData = {
@@ -980,38 +978,17 @@ export function savePlayerPositionToRegistry(
 	position: SaveDataPlayerPosition
 ): void {
 	saveDataToRegistry(registry, "playerActiveRoom", position.playerActiveRoom);
-	saveDataToRegistry(registry, "playerRoomY", position.playerRoomY);
-	saveDataToRegistry(registry, "playerRoomX", position.playerRoomX);
 }
 
 export function getPlayerCoordinates(
 	saveData: SaveDataPlayerPosition,
 	map: Phaser.Tilemaps.Tilemap
 ): { x: number; y: number } | undefined {
-	if (
-		!saveData.playerRoomX ||
-		!saveData.playerRoomY ||
-		!saveData.playerActiveRoom
-	) {
+	if (!saveData.playerActiveRoom) {
 		return undefined;
 	}
-	const playerRoomX = saveData.playerRoomX;
-	const playerRoomY = saveData.playerRoomY;
 	const roomName = saveData.playerActiveRoom;
-	const matchingRoom = getRooms(map).find((room) => room.name === roomName);
-	if (matchingRoom?.x === undefined || matchingRoom.y === undefined) {
-		return undefined;
-	}
-	const globalX = matchingRoom.x + playerRoomX;
-	const globalY = matchingRoom.y + playerRoomY;
-	// Just double-check
-	if (!isPointInRoom(globalX, globalY, matchingRoom)) {
-		return undefined;
-	}
-	return {
-		x: globalX,
-		y: globalY,
-	};
+	return getLanternRespawnPosition(map, roomName);
 }
 
 export function getSavedDataPlayerPosition(
@@ -1025,8 +1002,6 @@ export function getSavedDataPlayerPosition(
 	}
 	return {
 		playerActiveRoom: room.name,
-		playerRoomX: globalPlayerX - room.x,
-		playerRoomY: globalPlayerY - room.y,
 	};
 }
 
