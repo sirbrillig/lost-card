@@ -36,8 +36,7 @@ export class Platform {
 
 	update(): void {
 		const player = getPlayerOrThrow();
-		// FIXME: just the player's feet please
-		if (this.#doSpritesOverlap(player)) {
+		if (this.#isPlayerOnPlatform(player)) {
 			player.setVelocity(
 				player.body.velocity.x + this.sprite.body.velocity.x,
 				player.body.velocity.y + this.sprite.body.velocity.y
@@ -67,10 +66,11 @@ export class Platform {
 		return false;
 	}
 
-	#doSpritesOverlap(
-		target: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody
+	#isPlayerOnPlatform(
+		player: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody
 	): boolean {
-		return this.sprite.scene.physics.overlap(target, this.sprite);
+		const bottomCenter = player.getBottomCenter();
+		return this.sprite.body.hitTest(bottomCenter.x, bottomCenter.y);
 	}
 
 	#getCurrentPoint(): Phaser.Types.Math.Vector2Like | undefined {
