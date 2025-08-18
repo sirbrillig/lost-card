@@ -4,8 +4,10 @@ import { config } from "../lib/config";
 import { MainEvents } from "../lib/MainEvents";
 import { EnemyManager } from "../lib/EnemyManager";
 import { ProgressWheel } from "../lib/ProgressWheel";
+import { Platform } from "../lib/Platform";
 import { BaseMonster } from "../monsters/BaseMonster";
 import {
+	TiledObjectProperty,
 	Auras,
 	Powers,
 	Events,
@@ -75,6 +77,7 @@ import {
 import { MonsterCreator } from "../lib/MonsterCreator";
 import {
 	PhysicsSpriteComponent,
+	MovingPlatform,
 	SpriteComponent,
 	TweenComponent,
 	MapComponent,
@@ -156,6 +159,8 @@ export class Game extends Scene {
 	createdDoors: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody[] = [];
 	createdSavePoints: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody[] = [];
 	createdTiles: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody[] = [];
+	createdMovingPlatforms: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody[] =
+		[];
 	spawnPoints: Phaser.Types.Tilemaps.TiledObject[] = [];
 
 	constructor() {
@@ -261,6 +266,9 @@ export class Game extends Scene {
 				if (tile.properties.deadly) {
 					this.enemyHitPlayer({ source: undefined, damage: 15 });
 				}
+				if (tile.properties.isHole) {
+					// FIXME: have the player fall if all four corners of their sprite are touching this, unless they are on a platform
+				}
 			},
 			(_, tile) => {
 				if (
@@ -279,6 +287,10 @@ export class Game extends Scene {
 					return false;
 				}
 				if (player.data.get("isPlantCardGrappleActive")) {
+					return false;
+				}
+				if (isTileWithPropertiesObject(tile) && tile.properties.isHole) {
+					// FIXME: should I just make
 					return false;
 				}
 				return true;
@@ -339,6 +351,7 @@ export class Game extends Scene {
 		this.#createDoors();
 		this.#createFinalDoors();
 		this.createAppearingTiles();
+		this.#createMovingPlatforms();
 		this.createItems();
 		this.#createSavePoints();
 		this.#restoreSwitches();
@@ -1342,11 +1355,64 @@ export class Game extends Scene {
 		});
 	}
 
+	#createMovingPlatforms() {
+		this.createdMovingPlatforms = createSpritesFromObjectLayer(
+			getMap(),
+			"MovingPlatforms",
+			{
+				getTilesetKeyByName: this.getTilesetKeyByName.bind(this),
+				filterCallback: (layerObject) => {
+					const properties: undefined | TiledObjectProperty[] =
+						layerObject.properties;
+					return (
+						properties?.some(
+							(prop) =>
+								prop.name === DataKeys.IsMovingPlatform && prop.value === true
+						) ?? false
+					);
+				},
+				callback: this.recordObjectIdOnSprite.bind(this),
+			}
+		);
+		this.createdMovingPlatforms.forEach((tile) => {
+			const destinationId = tile.data.get(DataKeys.PlatformDestination);
+			if (!destinationId) {
+				return;
+			}
+			const path = getMap().findObject("MovingPlatforms", (layerObject) => {
+				if (!("polyline" in layerObject) || !("id" in layerObject)) {
+					return false;
+				}
+				return layerObject.id === destinationId;
+			});
+			if (!path) {
+				throw new Error("platform without destination");
+			}
+
+			const platform = new Platform(tile);
+
+			path.polyline?.forEach((point) => {
+				platform.addPoint(point);
+			});
+
+			const objectId = tile.data.get(DataKeys.ItemObjectId);
+			if (!objectId) {
+				throw new Error("platform without object ID");
+			}
+
+			MovingPlatform.set(objectId, platform);
+
+			// FIXME: pause platforms when they are off screen
+			platform.start();
+		});
+	}
+
 	createAppearingTiles() {
 		this.createdTiles = createSpritesFromObjectLayer(getMap(), "Transients", {
 			getTilesetKeyByName: this.getTilesetKeyByName.bind(this),
 			callback: this.recordObjectIdOnSprite.bind(this),
 		}).map((sprite) => {
+			// Make the hitbox of each Transient slightly smaller than its image.
 			sprite.body.setSize(sprite.body.width * 0.75, sprite.body.height * 0.75);
 			return sprite;
 		});
@@ -1782,6 +1848,13 @@ export class Game extends Scene {
 		this.updateRoom();
 		this.updateGatePillars();
 		this.#updateVisibilityMask();
+		this.#updateMovingPlatforms();
+	}
+
+	#updateMovingPlatforms(): void {
+		MovingPlatform.forEach((platform) => {
+			platform.update();
+		});
 	}
 
 	updateRoom() {

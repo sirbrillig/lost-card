@@ -1,4 +1,5 @@
 import { ComponentManager } from "./ComponentManager";
+import { Platform } from "./Platform";
 
 export const componentManager = new ComponentManager();
 
@@ -6,34 +7,37 @@ export const PhysicsSpriteComponent = new Map<
 	string,
 	Phaser.Types.Physics.Arcade.SpriteWithDynamicBody
 >();
-componentManager.register(PhysicsSpriteComponent);
+componentManager.register("PhysicsSprite", PhysicsSpriteComponent);
 
 export const SpriteComponent = new Map<string, Phaser.GameObjects.Sprite>();
-componentManager.register(SpriteComponent);
+componentManager.register("Sprite", SpriteComponent);
 
 export const TweenComponent = new Map<string, Phaser.Tweens.Tween>();
-componentManager.register(TweenComponent);
+componentManager.register("Tween", TweenComponent);
 
 export const MapComponent = new Map<string, Phaser.Tilemaps.Tilemap>();
-componentManager.register(MapComponent);
+componentManager.register("Map", MapComponent);
 
 export const ActiveRoomComponent = new Map<
 	string,
 	Phaser.Types.Tilemaps.TiledObject
 >();
-componentManager.register(ActiveRoomComponent);
+componentManager.register("ActiveRoom", ActiveRoomComponent);
 
 export const ItemComponent = new Map<
 	string,
 	Phaser.Types.Physics.Arcade.SpriteWithDynamicBody
 >();
-componentManager.register(ItemComponent);
+componentManager.register("Item", ItemComponent);
 
 export const DashingComponent = new Map<string, boolean>();
-componentManager.register(DashingComponent);
+componentManager.register("Dashing", DashingComponent);
 
 export const PowerInUse = new Map<string, boolean>();
-componentManager.register(PowerInUse);
+componentManager.register("PowerInUse", PowerInUse);
+
+export const MovingPlatform = new Map<string, Platform>();
+componentManager.register("MovingPlatform", MovingPlatform);
 
 /**********************
  * Helpers ************

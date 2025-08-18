@@ -69,6 +69,8 @@ export const DataKeys = {
 	LockedDoor: "LockedDoor",
 	EnemyTouchDamage: "EnemyTouchDamage",
 	RespawnDirection: "respawnDirection",
+	PlatformDestination: "platformDestination",
+	IsMovingPlatform: "isMovingPlatform",
 } as const;
 
 export const MapMetaKeys = {
@@ -325,6 +327,30 @@ export function getDirectionOfSpriteMovement(body: {
 		return SpriteUp;
 	}
 	return null;
+}
+
+export function getDirectionTowardPoint(
+	target: Phaser.Types.Math.Vector2Like,
+	point: Phaser.Types.Math.Vector2Like
+): SpriteDirection | undefined {
+	const leftRight = point.x - target.x;
+	const topBottom = point.y - target.y;
+	if (Math.abs(leftRight) > Math.abs(topBottom)) {
+		if (point.x > target.x) {
+			return SpriteRight;
+		}
+		if (point.x < target.x) {
+			return SpriteLeft;
+		}
+	} else {
+		if (point.y > target.y) {
+			return SpriteDown;
+		}
+		if (point.y < target.y) {
+			return SpriteUp;
+		}
+	}
+	return undefined;
 }
 
 export function getItemTouchingPlayer(

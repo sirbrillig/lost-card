@@ -1,0 +1,124 @@
+import { config } from "../lib/config";
+import { getPlayerOrThrow } from "../lib/components";
+import {
+	SpriteDirection,
+	createVelocityForDirection,
+	getDirectionTowardPoint,
+} from "./shared";
+
+export class Platform {
+	sprite: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
+	points: Phaser.Types.Math.Vector2Like[] = [];
+	currentPointIndex: number = 0;
+	#isIncreasing: boolean = true;
+	#originalPoint: Phaser.Types.Math.Vector2Like;
+	#currentDirection: SpriteDirection | undefined;
+
+	constructor(sprite: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody) {
+		this.sprite = sprite;
+		this.sprite.setDepth(config.movingPlatformDepth);
+		this.sprite.body.pushable = false;
+		this.#originalPoint = { x: sprite.x, y: sprite.y };
+	}
+
+	addPoint(point: Phaser.Types.Math.Vector2Like): void {
+		this.points.push(point);
+	}
+
+	start(): void {
+		this.#incrementPoint();
+		this.#moveToCurrentPoint();
+	}
+
+	stop(): void {
+		this.sprite.body.setVelocity(0, 0);
+	}
+
+	update(): void {
+		const player = getPlayerOrThrow();
+		// FIXME: just the player's feet please
+		if (this.#doSpritesOverlap(player)) {
+			player.setVelocity(
+				player.body.velocity.x + this.sprite.body.velocity.x,
+				player.body.velocity.y + this.sprite.body.velocity.y
+			);
+		}
+		if (this.#hasReachedPoint()) {
+			this.stop();
+			this.#incrementPoint();
+			this.#moveToCurrentPoint();
+		}
+	}
+
+	#hasReachedPoint(): boolean {
+		const relativePoint = this.#getCurrentPoint();
+		if (!relativePoint) {
+			throw new Error("platform has no current point");
+		}
+		const point = this.#getPointForRelativePoint(relativePoint);
+		const direction = getDirectionTowardPoint(this.sprite, point);
+		if (direction === undefined) {
+			return true;
+		}
+		if (direction !== this.#currentDirection) {
+			// In case we pass the point
+			return true;
+		}
+		return false;
+	}
+
+	#doSpritesOverlap(
+		target: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody
+	): boolean {
+		return this.sprite.scene.physics.overlap(target, this.sprite);
+	}
+
+	#getCurrentPoint(): Phaser.Types.Math.Vector2Like | undefined {
+		// Reverse direction at ends
+		if (this.currentPointIndex >= this.points.length) {
+			this.currentPointIndex -= 2;
+			this.#isIncreasing = false;
+		}
+		if (this.currentPointIndex < 0) {
+			this.currentPointIndex += 2;
+			this.#isIncreasing = true;
+		}
+
+		return this.points[this.currentPointIndex];
+	}
+
+	#incrementPoint(): void {
+		if (this.#isIncreasing) {
+			this.currentPointIndex += 1;
+		} else {
+			this.currentPointIndex -= 1;
+		}
+	}
+
+	#getPointForRelativePoint(
+		relativePoint: Phaser.Types.Math.Vector2Like
+	): Phaser.Types.Math.Vector2Like {
+		return {
+			x: this.#originalPoint.x + relativePoint.x,
+			y: this.#originalPoint.y + relativePoint.y,
+		};
+	}
+
+	#moveToCurrentPoint(): void {
+		const relativePoint = this.#getCurrentPoint();
+		if (!relativePoint) {
+			throw new Error("No point to move platform to");
+		}
+		const point = this.#getPointForRelativePoint(relativePoint);
+		const direction = getDirectionTowardPoint(this.sprite, point);
+		this.#currentDirection = direction;
+		if (direction === undefined) {
+			return;
+		}
+		const velocity = createVelocityForDirection(
+			config.movingPlatformSpeed,
+			direction
+		);
+		this.sprite.body.setVelocity(velocity.x, velocity.y);
+	}
+}

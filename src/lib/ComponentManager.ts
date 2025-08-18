@@ -1,10 +1,14 @@
 export type Component = Map<string, any>;
 
 export class ComponentManager {
-	#components: Component[] = [];
+	#components = new Map<string, Component>();
 
-	register(component: Component): void {
-		this.#components.push(component);
+	register<C extends Component>(key: string, component: C): void {
+		this.#components.set(key, component);
+	}
+
+	get(key: string) {
+		return this.#components.get(key);
 	}
 
 	clear(): void {
