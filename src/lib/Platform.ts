@@ -4,6 +4,7 @@ import {
 	SpriteDirection,
 	createVelocityForDirection,
 	getDirectionTowardPoint,
+	DataKeys,
 } from "./shared";
 
 export class Platform {
@@ -13,6 +14,7 @@ export class Platform {
 	#isIncreasing: boolean = true;
 	#originalPoint: Phaser.Types.Math.Vector2Like;
 	#currentDirection: SpriteDirection | undefined;
+	#pausingTimer: Phaser.Time.TimerEvent | undefined;
 
 	constructor(sprite: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody) {
 		this.sprite = sprite;
@@ -35,17 +37,29 @@ export class Platform {
 	}
 
 	update(): void {
+		if (this.#pausingTimer) {
+			return;
+		}
 		const player = getPlayerOrThrow();
-		if (this.#isPlayerOnPlatform(player)) {
+		if (this.isPlayerOnPlatform()) {
+			player.data.set(DataKeys.IsOnMovingPlatform, true);
 			player.setVelocity(
 				player.body.velocity.x + this.sprite.body.velocity.x,
 				player.body.velocity.y + this.sprite.body.velocity.y
 			);
+		} else {
+			player.data.remove(DataKeys.IsOnMovingPlatform);
 		}
 		if (this.#hasReachedPoint()) {
 			this.stop();
-			this.#incrementPoint();
-			this.#moveToCurrentPoint();
+			this.#pausingTimer = this.sprite.scene.time.addEvent({
+				delay: config.movingPlatformPauseTime,
+				callback: () => {
+					this.#incrementPoint();
+					this.#moveToCurrentPoint();
+					this.#pausingTimer = undefined;
+				},
+			});
 		}
 	}
 
@@ -66,9 +80,13 @@ export class Platform {
 		return false;
 	}
 
-	#isPlayerOnPlatform(
-		player: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody
-	): boolean {
+	isPlayerTouchingPlatform(): boolean {
+		const player = getPlayerOrThrow();
+		return this.sprite.scene.physics.overlap(player, this.sprite);
+	}
+
+	isPlayerOnPlatform(): boolean {
+		const player = getPlayerOrThrow();
 		const bottomCenter = player.getBottomCenter();
 		return this.sprite.body.hitTest(bottomCenter.x, bottomCenter.y);
 	}

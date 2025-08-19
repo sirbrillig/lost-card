@@ -71,6 +71,7 @@ export const DataKeys = {
 	RespawnDirection: "respawnDirection",
 	PlatformDestination: "platformDestination",
 	IsMovingPlatform: "isMovingPlatform",
+	IsOnMovingPlatform: "isOnMovingPlatform",
 } as const;
 
 export const MapMetaKeys = {
@@ -242,6 +243,11 @@ export function isSprite(obj: unknown): obj is Phaser.GameObjects.Sprite {
 export function isTilemapTile(obj: unknown): obj is Phaser.Tilemaps.Tile {
 	const tile = obj as Phaser.Tilemaps.Tile;
 	return hasXandY(obj) && "layer" in tile;
+}
+
+export function isRectangle(obj: unknown): obj is Phaser.Geom.Rectangle {
+	const tile = obj as Phaser.Geom.Rectangle;
+	return "Ceil" in tile;
 }
 
 export function isTileWithPropertiesObject(

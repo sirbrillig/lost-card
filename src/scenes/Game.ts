@@ -73,6 +73,7 @@ import {
 	addFoundAura,
 	addFoundPower,
 	getLanternRespawnPosition,
+	isRectangle,
 } from "../lib/shared";
 import { MonsterCreator } from "../lib/MonsterCreator";
 import {
@@ -266,11 +267,8 @@ export class Game extends Scene {
 				if (tile.properties.deadly) {
 					this.enemyHitPlayer({ source: undefined, damage: 15 });
 				}
-				if (tile.properties.isHole) {
-					// FIXME: have the player fall if all four corners of their sprite are touching this, unless they are on a platform
-				}
 			},
-			(_, tile) => {
+			(source, tile) => {
 				if (
 					isTileWithPropertiesObject(tile) &&
 					(tile.properties.isWater || tile.properties.isLava) &&
@@ -289,13 +287,42 @@ export class Game extends Scene {
 				if (player.data.get("isPlantCardGrappleActive")) {
 					return false;
 				}
-				if (isTileWithPropertiesObject(tile) && tile.properties.isHole) {
-					// FIXME: should I just make
+				if (
+					isTileWithPropertiesObject(tile) &&
+					tile.properties.isHole &&
+					source === player
+				) {
 					return false;
 				}
 				return true;
 			}
 		);
+
+		// Handle holes
+		this.physics.add.overlap(this.landLayer, player, (_, tile) => {
+			if (!isTileWithPropertiesObject(tile)) {
+				return;
+			}
+			if (tile.properties.isHole && isTilemapTile(tile)) {
+				const bottomCenter = player.getBottomCenter();
+				const bounds = tile.getBounds();
+				if (
+					isRectangle(bounds) &&
+					Phaser.Geom.Rectangle.Contains(bounds, bottomCenter.x, bottomCenter.y)
+				) {
+					if (
+						!Array.from(MovingPlatform.values()).some((platform) =>
+							platform.isPlayerOnPlatform()
+						)
+					) {
+						// FIXME: maybe ignore this if the player is attacking? The sprite seems to move a lot for some reason.
+						// FIXME: have the player fall and respawn at the last safe place.
+						this.enemyHitPlayer({ source: undefined, damage: 1 });
+					}
+				}
+				return;
+			}
+		});
 
 		this.physics.add.collider(
 			this.landLayer,
