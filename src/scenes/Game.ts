@@ -80,7 +80,6 @@ import {
 	PhysicsSpriteComponent,
 	MovingPlatform,
 	SpriteComponent,
-	TweenComponent,
 	MapComponent,
 	ItemComponent,
 	DashingComponent,
@@ -853,31 +852,15 @@ export class Game extends Scene {
 			},
 		});
 		const player = getPlayerOrThrow();
-		const healTimerEffect = this.add.sprite(
-			player.body.center.x + 1,
-			player.body.center.y - 1,
-			"use-potion",
-			0
-		);
-		SpriteComponent.set("healTimerEffect", healTimerEffect);
-		const healTimerTween = this.tweens.add({
-			targets: healTimerEffect,
-			rotation: Phaser.Math.DegToRad(90),
-			ease: "Exponential.InOut",
-			yoyo: true,
-			repeat: -1,
-		});
-		TweenComponent.set("healTimerTween", healTimerTween);
-		healTimerEffect.anims.play({ key: "use-potion", repeat: -1 });
 		this.#healProgressCircle?.destroy();
 		this.#healProgressCircle = new ProgressWheel(
 			this,
 			player.body.center.x,
-			player.body.center.y,
-			player.body.height / 6
+			// offset slightly to center on the sprite
+			player.body.center.y - 2,
+			player.body.height + 8
 		);
-		this.#healProgressCircle.setDepth(config.effectDepth);
-		this.#healProgressCircle.setOpacity(0.7);
+		this.#healProgressCircle.setDepth(config.healEffectDepth);
 		this.#healProgressCircle.setColor(0xed2dd9);
 	}
 
@@ -885,12 +868,6 @@ export class Game extends Scene {
 		if (!this.healTimer) {
 			return;
 		}
-		const healTimerEffect = SpriteComponent.get("healTimerEffect");
-		const healTimerTween = TweenComponent.get("healTimerTween");
-		healTimerTween?.destroy();
-		healTimerEffect?.destroy();
-		SpriteComponent.delete("healTimerEffect");
-		TweenComponent.delete("healTimerTween");
 		this.healTimer.remove();
 		this.healTimer = undefined;
 	}

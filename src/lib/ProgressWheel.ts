@@ -7,6 +7,7 @@ export class ProgressWheel {
 	private bgCircle: Phaser.GameObjects.Graphics;
 	private progressCircle: Phaser.GameObjects.Graphics;
 	private progressColor: number = 0x00ff00;
+	private thickness = 4;
 
 	constructor(scene: Phaser.Scene, x: number, y: number, radius: number) {
 		this.scene = scene;
@@ -19,7 +20,7 @@ export class ProgressWheel {
 
 	private createGraphicsWheel(): void {
 		this.bgCircle = this.scene.add.graphics();
-		this.bgCircle.lineStyle(8, 0x555555, 1);
+		this.bgCircle.lineStyle(this.thickness, 0x555555, 1);
 		this.bgCircle.strokeCircle(this.x, this.y, this.radius);
 		this.progressCircle = this.scene.add.graphics();
 	}
@@ -50,7 +51,7 @@ export class ProgressWheel {
 		this.progressCircle.clear();
 
 		if (this.progress > 0) {
-			this.progressCircle.lineStyle(8, this.progressColor, 1);
+			this.progressCircle.lineStyle(this.thickness, this.progressColor, 1);
 
 			// Calculate the arc angle (starting from top, going clockwise)
 			const startAngle = -Math.PI / 2; // Start at top

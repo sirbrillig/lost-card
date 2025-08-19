@@ -83,6 +83,7 @@ export const config = {
 	powerOffsetY: 10,
 	powerDepth: 4,
 	powerDepthUp: 1,
+	healEffectDepth: 1,
 	playerDepth: 2,
 	swordDepth: 4,
 	effectDepth: 5,
