@@ -72,6 +72,7 @@ export const DataKeys = {
 	PlatformDestination: "platformDestination",
 	IsMovingPlatform: "isMovingPlatform",
 	IsOnMovingPlatform: "isOnMovingPlatform",
+	IsFalling: "IsFalling",
 } as const;
 
 export const MapMetaKeys = {

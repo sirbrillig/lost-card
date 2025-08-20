@@ -113,6 +113,9 @@ export class Platform {
 
 	isPlayerOnPlatform(): boolean {
 		const player = getPlayerOrThrow();
+		if (player.data.get(DataKeys.IsFalling)) {
+			return false;
+		}
 		const bottomCenter = player.getBottomCenter();
 		return this.sprite.body.hitTest(bottomCenter.x, bottomCenter.y);
 	}

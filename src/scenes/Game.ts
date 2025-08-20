@@ -135,9 +135,11 @@ export class Game extends Scene {
 	isPlayerCheatInvincible: boolean = false;
 	isPlayerAppearingInvincible: boolean = false;
 	isPlayerBeingHitInvincible: boolean = false;
+	#isPlayerFalling: boolean = false;
 	heartCardTimer: Phaser.Time.TimerEvent | undefined;
 	healTimer: Phaser.Time.TimerEvent | undefined;
 	cachedTilesInRoom: Phaser.Tilemaps.Tile[] | undefined;
+	#lastPlayerPosition: Phaser.Math.Vector2 | undefined;
 
 	keyLeft: Phaser.Input.Keyboard.Key;
 	keyDown: Phaser.Input.Keyboard.Key;
@@ -210,6 +212,7 @@ export class Game extends Scene {
 			playerCoordinates?.y ?? spawnPoint.y
 		);
 		const player = getPlayerOrThrow();
+		this.#lastPlayerPosition = new Phaser.Math.Vector2(player.x, player.y);
 
 		this.enemyManager = new EnemyManager(this);
 		this.monsterCreator = new MonsterCreator(
@@ -291,39 +294,12 @@ export class Game extends Scene {
 					tile.properties.isHole &&
 					source === player
 				) {
+					// Player can walk over holes, but there will be special handling for this.
 					return false;
 				}
 				return true;
 			}
 		);
-
-		// Handle holes
-		this.physics.add.overlap(this.landLayer, player, (_, tile) => {
-			if (!isTileWithPropertiesObject(tile)) {
-				return;
-			}
-			if (!tile.properties.isHole || !isTilemapTile(tile)) {
-				return;
-			}
-			const bottomCenter = player.getBottomCenter();
-			const bounds = tile.getBounds();
-			if (!isRectangle(bounds)) {
-				return;
-			}
-			if (
-				!Phaser.Geom.Rectangle.Contains(bounds, bottomCenter.x, bottomCenter.y)
-			) {
-				return;
-			}
-			const isOnPlatform = Array.from(MovingPlatform.values()).some(
-				(platform) => platform.isPlayerOnPlatform()
-			);
-			if (!isOnPlatform) {
-				// FIXME: maybe ignore this if the player is attacking? The sprite seems to move a lot for some reason.
-				// FIXME: have the player fall and respawn at the last safe place.
-				this.enemyHitPlayer({ source: undefined, damage: 1 });
-			}
-		});
 
 		this.physics.add.collider(
 			this.landLayer,
@@ -518,6 +494,15 @@ export class Game extends Scene {
 		this.recordSecretRoomsTotal();
 	}
 
+	#isPlayerOnPlatform(): boolean {
+		if (this.#isPlayerFalling) {
+			return false;
+		}
+		return Array.from(MovingPlatform.values()).some((platform) =>
+			platform.isPlayerOnPlatform()
+		);
+	}
+
 	#handlePowerCollideTile(
 		tile:
 			| Phaser.Tilemaps.Tile
@@ -659,6 +644,39 @@ export class Game extends Scene {
 			yoyo: true,
 			repeat: -1,
 			duration: 400,
+		});
+	}
+
+	#makePlayerFall(tileBounds: Phaser.Geom.Rectangle): void {
+		if (this.#isPlayerFalling) {
+			return;
+		}
+		const player = getPlayerOrThrow();
+		this.#isPlayerFalling = true;
+		player.data.set(DataKeys.IsFalling, true);
+		player.body.stop();
+		// Move the player to the center of the hole tile so it looks like they are
+		// falling into the hole.
+		const tileCenter = Phaser.Geom.Rectangle.GetCenter(tileBounds);
+		player.setPosition(tileCenter.x, tileCenter.y);
+
+		// Make a falling animation.
+		this.tweens.add({
+			targets: player,
+			scale: 0,
+			duration: 1000,
+			onComplete: () => {
+				if (!this.#lastPlayerPosition) {
+					throw new Error("No last player position");
+				}
+				player.setPosition(
+					this.#lastPlayerPosition.x,
+					this.#lastPlayerPosition.y
+				);
+				player.scale = 1;
+				this.#isPlayerFalling = false;
+				player.data.set(DataKeys.IsFalling, false);
+			},
 		});
 	}
 
@@ -2806,6 +2824,7 @@ export class Game extends Scene {
 	#movePlayerToPoint(x: number, y: number) {
 		const player = getPlayerOrThrow();
 		player.setPosition(x, y);
+		this.#lastPlayerPosition = new Phaser.Math.Vector2(player.x, player.y);
 		const room = getRoomForPoint(getMap(), player.x, player.y);
 		this.#moveCameraToRoom(room);
 	}
@@ -3855,6 +3874,7 @@ export class Game extends Scene {
 			this.doesPlayerHaveSword() &&
 			!this.isPlayerFrozen() &&
 			!this.#isPressingHeal() &&
+			!this.#isPlayerFalling &&
 			!this.isPlayerStunned() &&
 			!this.isPlayerAttacking() &&
 			this.getTimeSinceLastAttack() > config.postAttackCooldown &&
@@ -3904,6 +3924,7 @@ export class Game extends Scene {
 			this.getPlayerHitPoints() > 0 &&
 			!this.isPlayerFrozen() &&
 			!this.#isPressingHeal() &&
+			!this.#isPlayerFalling &&
 			!this.isPlayerStunned() &&
 			!this.isPlayerAttacking() &&
 			this.getTimeSinceLastPower() > postPowerCooldown &&
@@ -4395,6 +4416,9 @@ export class Game extends Scene {
 		if (this.#isPressingHeal()) {
 			return false;
 		}
+		if (this.#isPlayerFalling) {
+			return false;
+		}
 		if (this.getPlayerHitPoints() <= 0) {
 			return false;
 		}
@@ -4537,6 +4561,9 @@ export class Game extends Scene {
 		} else {
 			this.walkSound.stop();
 			this.setPlayerIdleFrame();
+			if (this.canPlayerMove() && !this.#isPlayerOnPlatform()) {
+				this.#lastPlayerPosition = new Phaser.Math.Vector2(player.x, player.y);
+			}
 		}
 		this.resetPlayerHitBox();
 	}
@@ -4618,9 +4645,38 @@ export class Game extends Scene {
 		}
 	}
 
+	#checkForHoles(): void {
+		const player = getPlayerOrThrow();
+		this.physics.overlap(this.landLayer, player, (_, tile) => {
+			if (this.#isPlayerFalling) {
+				return;
+			}
+			if (!isTileWithPropertiesObject(tile)) {
+				return;
+			}
+			if (!tile.properties.isHole || !isTilemapTile(tile)) {
+				return;
+			}
+			const bottomCenter = player.getBottomCenter();
+			const bounds = tile.getBounds();
+			if (!isRectangle(bounds)) {
+				return;
+			}
+			if (
+				!Phaser.Geom.Rectangle.Contains(bounds, bottomCenter.x, bottomCenter.y)
+			) {
+				return;
+			}
+			if (!this.#isPlayerOnPlatform()) {
+				this.#makePlayerFall(bounds);
+			}
+		});
+	}
+
 	updatePlayer(): void {
 		this.updatePlayerTint();
 		this.updatePlayerAlpha();
+		this.#checkForHoles();
 		const player = getPlayerOrThrow();
 
 		savePlayerPositionToRegistry(
