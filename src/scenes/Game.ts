@@ -655,6 +655,7 @@ export class Game extends Scene {
 		this.#isPlayerFalling = true;
 		player.data.set(DataKeys.IsFalling, true);
 		player.body.stop();
+
 		// Move the player to the center of the hole tile so it looks like they are
 		// falling into the hole.
 		const tileCenter = Phaser.Geom.Rectangle.GetCenter(tileBounds);
@@ -4561,7 +4562,11 @@ export class Game extends Scene {
 		} else {
 			this.walkSound.stop();
 			this.setPlayerIdleFrame();
-			if (this.canPlayerMove() && !this.#isPlayerOnPlatform()) {
+			if (
+				this.canPlayerMove() &&
+				!this.#isPlayerOnPlatform() &&
+				!this.#isPlayerInHole()
+			) {
 				this.#lastPlayerPosition = new Phaser.Math.Vector2(player.x, player.y);
 			}
 		}
@@ -4645,32 +4650,45 @@ export class Game extends Scene {
 		}
 	}
 
-	#checkForHoles(): void {
+	#isPlayerInHole(): boolean {
+		if (this.#isPlayerFalling) {
+			return true;
+		}
 		const player = getPlayerOrThrow();
-		this.physics.overlap(this.landLayer, player, (_, tile) => {
-			if (this.#isPlayerFalling) {
-				return;
-			}
-			if (!isTileWithPropertiesObject(tile)) {
-				return;
-			}
-			if (!tile.properties.isHole || !isTilemapTile(tile)) {
-				return;
-			}
+		const bottomCenter = player.getBottomCenter();
+		let tile = this.landLayer.getTileAtWorldXY(bottomCenter.x, bottomCenter.y);
+		if (!tile?.properties.isHole) {
+			return false;
+		}
+		const bounds = tile.getBounds();
+		if (!isRectangle(bounds)) {
+			return false;
+		}
+		if (
+			!Phaser.Geom.Rectangle.Contains(bounds, bottomCenter.x, bottomCenter.y)
+		) {
+			return false;
+		}
+		if (this.#isPlayerOnPlatform()) {
+			return false;
+		}
+		return true;
+	}
+
+	#checkForHoles(): void {
+		if (this.#isPlayerInHole()) {
+			const player = getPlayerOrThrow();
 			const bottomCenter = player.getBottomCenter();
+			let tile = this.landLayer.getTileAtWorldXY(
+				bottomCenter.x,
+				bottomCenter.y
+			);
 			const bounds = tile.getBounds();
 			if (!isRectangle(bounds)) {
 				return;
 			}
-			if (
-				!Phaser.Geom.Rectangle.Contains(bounds, bottomCenter.x, bottomCenter.y)
-			) {
-				return;
-			}
-			if (!this.#isPlayerOnPlatform()) {
-				this.#makePlayerFall(bounds);
-			}
-		});
+			this.#makePlayerFall(bounds);
+		}
 	}
 
 	updatePlayer(): void {
