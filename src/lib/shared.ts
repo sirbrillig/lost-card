@@ -247,7 +247,7 @@ export function isTilemapTile(obj: unknown): obj is Phaser.Tilemaps.Tile {
 
 export function isRectangle(obj: unknown): obj is Phaser.Geom.Rectangle {
 	const tile = obj as Phaser.Geom.Rectangle;
-	return "Ceil" in tile;
+	return hasXandY(obj) && hasWidthAndHeight(obj);
 }
 
 export function isTileWithPropertiesObject(

@@ -302,24 +302,26 @@ export class Game extends Scene {
 			if (!isTileWithPropertiesObject(tile)) {
 				return;
 			}
-			if (tile.properties.isHole && isTilemapTile(tile)) {
-				const bottomCenter = player.getBottomCenter();
-				const bounds = tile.getBounds();
-				if (
-					isRectangle(bounds) &&
-					Phaser.Geom.Rectangle.Contains(bounds, bottomCenter.x, bottomCenter.y)
-				) {
-					if (
-						!Array.from(MovingPlatform.values()).some((platform) =>
-							platform.isPlayerOnPlatform()
-						)
-					) {
-						// FIXME: maybe ignore this if the player is attacking? The sprite seems to move a lot for some reason.
-						// FIXME: have the player fall and respawn at the last safe place.
-						this.enemyHitPlayer({ source: undefined, damage: 1 });
-					}
-				}
+			if (!tile.properties.isHole || !isTilemapTile(tile)) {
 				return;
+			}
+			const bottomCenter = player.getBottomCenter();
+			const bounds = tile.getBounds();
+			if (!isRectangle(bounds)) {
+				return;
+			}
+			if (
+				!Phaser.Geom.Rectangle.Contains(bounds, bottomCenter.x, bottomCenter.y)
+			) {
+				return;
+			}
+			const isOnPlatform = Array.from(MovingPlatform.values()).some(
+				(platform) => platform.isPlayerOnPlatform()
+			);
+			if (!isOnPlatform) {
+				// FIXME: maybe ignore this if the player is attacking? The sprite seems to move a lot for some reason.
+				// FIXME: have the player fall and respawn at the last safe place.
+				this.enemyHitPlayer({ source: undefined, damage: 1 });
 			}
 		});
 
