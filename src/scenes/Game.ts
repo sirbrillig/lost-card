@@ -1405,8 +1405,6 @@ export class Game extends Scene {
 			}
 
 			MovingPlatform.set(objectId, platform);
-
-			// FIXME: pause platforms when they are off screen
 			platform.start();
 		});
 	}

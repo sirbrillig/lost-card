@@ -1,10 +1,13 @@
 import { config } from "../lib/config";
-import { getPlayerOrThrow } from "../lib/components";
+import { MainEvents } from "../lib/MainEvents";
+import { getPlayerOrThrow, getActiveRoom } from "../lib/components";
 import {
 	SpriteDirection,
 	createVelocityForDirection,
 	getDirectionTowardPoint,
+	isPointInRoom,
 	DataKeys,
+	Events,
 } from "./shared";
 
 export class Platform {
@@ -30,10 +33,21 @@ export class Platform {
 	start(): void {
 		this.#incrementPoint();
 		this.#moveToCurrentPoint();
+		MainEvents.on(Events.LeavingRoom, () => {
+			this.stop();
+			this.sprite.setPosition(this.#originalPoint.x, this.#originalPoint.y);
+		});
+		MainEvents.on(Events.EnteredRoom, () => {
+			if (this.#isInActiveRoom()) {
+				this.start();
+			}
+		});
 	}
 
 	stop(): void {
 		this.sprite.body.setVelocity(0, 0);
+		this.#pausingTimer?.remove();
+		this.#pausingTimer = undefined;
 	}
 
 	update(): void {
@@ -61,6 +75,18 @@ export class Platform {
 				},
 			});
 		}
+	}
+
+	#isInActiveRoom(): boolean {
+		const activeRoom = getActiveRoom();
+		if (!activeRoom) {
+			return false;
+		}
+		return isPointInRoom(
+			this.sprite.body.center.x,
+			this.sprite.body.center.y,
+			activeRoom
+		);
 	}
 
 	#hasReachedPoint(): boolean {
