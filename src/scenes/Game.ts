@@ -2105,15 +2105,14 @@ export class Game extends Scene {
 					distance === lastDistance
 				) {
 					player.body.stop();
-					player.data.set("isPlantCardGrappleActive", false);
 					isMoving = false;
-					this.#endPowerUse();
-
 					// If the player ends up inside a wall, hurt them and expel them.
 					if (isSpriteInsideSolidTile(player, this.landLayer)) {
 						this.enemyHitPlayer({ source: undefined, damage: 1 });
 						player.setPosition(lastSafePosition.x, lastSafePosition.y);
 					}
+					this.#endPowerUse();
+					player.data.set("isPlantCardGrappleActive", false);
 				}
 				lastDistance = distance;
 			},
@@ -4655,6 +4654,9 @@ export class Game extends Scene {
 			return true;
 		}
 		const player = getPlayerOrThrow();
+		if (player.data.get("isPlantCardGrappleActive")) {
+			return false;
+		}
 		const bottomCenter = player.getBottomCenter();
 		let tile = this.landLayer.getTileAtWorldXY(bottomCenter.x, bottomCenter.y);
 		if (!tile?.properties.isHole) {
