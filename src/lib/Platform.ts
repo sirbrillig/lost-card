@@ -45,13 +45,16 @@ export class Platform {
 	}
 
 	stop(): void {
-		this.sprite.body.setVelocity(0, 0);
+		this.sprite.body?.setVelocity(0, 0);
 		this.#pausingTimer?.remove();
 		this.#pausingTimer = undefined;
 	}
 
 	update(): void {
 		if (this.#pausingTimer) {
+			return;
+		}
+		if (!this.sprite.body) {
 			return;
 		}
 		const player = getPlayerOrThrow();
@@ -80,6 +83,9 @@ export class Platform {
 	#isInActiveRoom(): boolean {
 		const activeRoom = getActiveRoom();
 		if (!activeRoom) {
+			return false;
+		}
+		if (!this.sprite.body) {
 			return false;
 		}
 		return isPointInRoom(
@@ -112,6 +118,9 @@ export class Platform {
 	}
 
 	isPlayerOnPlatform(): boolean {
+		if (!this.sprite.body) {
+			return false;
+		}
 		const player = getPlayerOrThrow();
 		if (player.data.get(DataKeys.IsFalling)) {
 			return false;
@@ -160,6 +169,9 @@ export class Platform {
 		const direction = getDirectionTowardPoint(this.sprite, point);
 		this.#currentDirection = direction;
 		if (direction === undefined) {
+			return;
+		}
+		if (!this.sprite.body) {
 			return;
 		}
 		const velocity = createVelocityForDirection(
