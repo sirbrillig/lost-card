@@ -2940,7 +2940,13 @@ export class Game extends Scene {
 				return config.firePowerHitBoxWidth;
 			}
 			if (this.getActivePower() === "PlantCard") {
-				return 2;
+				if (
+					this.playerDirection === SpriteLeft ||
+					this.playerDirection === SpriteRight
+				) {
+					return 24;
+				}
+				return 6;
 			}
 			if (
 				this.playerDirection === SpriteLeft ||
@@ -2958,7 +2964,13 @@ export class Game extends Scene {
 				return config.firePowerHitBoxHeight;
 			}
 			if (this.getActivePower() === "PlantCard") {
-				return 2;
+				if (
+					this.playerDirection === SpriteUp ||
+					this.playerDirection === SpriteDown
+				) {
+					return 24;
+				}
+				return 6;
 			}
 			if (
 				this.playerDirection === SpriteUp ||
