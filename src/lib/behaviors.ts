@@ -1934,6 +1934,9 @@ export class FireBeam implements Behavior {
 					repeat: 1,
 				});
 
+				scene.cameras.main.shake(500, 0.02);
+				vibrate(sprite.scene, 2, 500);
+
 				// This cannot test collision with the line because we cannot use a
 				// diagonal line in arcade physics.
 				const distance = distanceToLine(
