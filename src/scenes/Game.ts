@@ -539,6 +539,7 @@ export class Game extends Scene {
 			this.stuffLayer,
 			...this.createdDoors,
 			...this.createdTiles,
+			...this.createdMovingPlatforms,
 			...this.createdFinalDoors,
 			...ItemComponent.values(),
 			...this.enemyManager.enemies.getChildren().filter(isSprite),
@@ -1127,6 +1128,7 @@ export class Game extends Scene {
 				[
 					...ItemComponent.values(),
 					...this.createdTiles,
+					...this.createdMovingPlatforms,
 					...this.createdDoors,
 					...this.createdFinalDoors,
 					...this.createdSavePoints,
@@ -1522,6 +1524,7 @@ export class Game extends Scene {
 			[
 				...ItemComponent.values(),
 				...this.createdTiles,
+				...this.createdMovingPlatforms,
 				...this.createdDoors,
 				...this.createdFinalDoors,
 				...this.createdSavePoints,
@@ -2380,6 +2383,7 @@ export class Game extends Scene {
 				[
 					...ItemComponent.values(),
 					...this.createdTiles,
+					...this.createdMovingPlatforms,
 					...this.createdDoors,
 					...this.createdFinalDoors,
 					...this.createdSavePoints,
