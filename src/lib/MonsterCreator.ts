@@ -4,6 +4,7 @@ import { MountainMonster } from "../monsters/MountainMonster";
 import { HopPot } from "../monsters/HopPot";
 import { RockDigger } from "../monsters/RockDigger";
 import { LavaBlorp } from "../monsters/LavaBlorp";
+import { AirCannon } from "../monsters/AirCannon";
 import { Ghost } from "../monsters/Ghost";
 import { BlackOrb } from "../monsters/BlackOrb";
 import { FinalBoss } from "../monsters/FinalBoss";
@@ -37,6 +38,7 @@ import {
 	Events,
 	getDataFromRegistry,
 	saveDataToRegistry,
+	isSpriteDirection,
 	type MapMonsterProperties,
 } from "../lib/shared";
 
@@ -95,6 +97,7 @@ MonsterRegistry.register("IceHopper", IceHopper);
 MonsterRegistry.register("FireSlug", FireSlug);
 MonsterRegistry.register("FireGiant", FireGiant);
 MonsterRegistry.register("FireSpout", FireSpout);
+MonsterRegistry.register("AirCannon", AirCannon);
 MonsterRegistry.register("WaterDipper", WaterDipper);
 MonsterRegistry.register("PlantSpitter", PlantSpitter);
 MonsterRegistry.register("SlowPunch", SlowPunch);
@@ -149,6 +152,9 @@ export class MonsterCreator {
 		}
 		if (properties?.isMiniBoss) {
 			monster.isMiniBoss = properties.isMiniBoss;
+		}
+		if (properties?.facing && isSpriteDirection(properties.facing)) {
+			monster.facing = properties.facing;
 		}
 		monster.once(Events.MonsterDefeated, () => {
 			if (monster.doNotRespawn) {

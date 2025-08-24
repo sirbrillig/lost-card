@@ -4,6 +4,9 @@ import {
 	DataKeys,
 	isPointInRoom,
 	knockBack,
+	SpriteDirection,
+	SpriteUp,
+	isSpriteDirection,
 } from "../lib/shared";
 import { HealthBar } from "../lib/HealthBar";
 import { EnemyManager } from "../lib/EnemyManager";
@@ -32,6 +35,7 @@ export class BaseMonster extends Phaser.Physics.Arcade.Sprite {
 	isMiniBoss: boolean = false;
 	doNotRespawn: boolean = false;
 	timeBeforeActivate: number = 0;
+	facing: SpriteDirection = SpriteUp;
 
 	constructor(
 		scene: Phaser.Scene,

@@ -36,7 +36,7 @@ export const config = {
 	plantCardAnimationRepeat: 5,
 	firePowerVelocity: 120,
 	barrierMovementSpeed: 680,
-	movingPlatformSpeed: 20,
+	movingPlatformSpeed: 25,
 	movingPlatformPauseTime: 1500,
 	gateCloseSpeed: 340,
 	gateAwareDistance: 60,

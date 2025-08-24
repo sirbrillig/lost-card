@@ -48,6 +48,7 @@ import {
 	auraOrder,
 	isAuraActive,
 	getAuraDescription,
+	getSpriteFeetPosition,
 	getCardNameForPower,
 	getActiveAuras,
 	activateAura,
@@ -131,11 +132,9 @@ export class Game extends Scene {
 	lastDialogData: { heading: string; text?: string } | undefined;
 	playerDirection: SpriteDirection = SpriteDown;
 	enteredRoomAt: number = 0;
-	isPlayerBeingKnockedBack: boolean = false;
 	isPlayerCheatInvincible: boolean = false;
 	isPlayerAppearingInvincible: boolean = false;
 	isPlayerBeingHitInvincible: boolean = false;
-	#isPlayerFalling: boolean = false;
 	heartCardTimer: Phaser.Time.TimerEvent | undefined;
 	healTimer: Phaser.Time.TimerEvent | undefined;
 	cachedTilesInRoom: Phaser.Tilemaps.Tile[] | undefined;
@@ -176,7 +175,6 @@ export class Game extends Scene {
 		this.lastPowerAt = 0;
 		this.playerDirection = SpriteDown;
 		this.enteredRoomAt = 0;
-		this.isPlayerBeingKnockedBack = false;
 		this.isPlayerCheatInvincible = false;
 		this.isPlayerAppearingInvincible = false;
 		this.isPlayerBeingHitInvincible = false;
@@ -495,7 +493,7 @@ export class Game extends Scene {
 	}
 
 	#isPlayerOnPlatform(): boolean {
-		if (this.#isPlayerFalling) {
+		if (this.isPlayerFalling()) {
 			return false;
 		}
 		return Array.from(MovingPlatform.values()).some((platform) =>
@@ -648,11 +646,10 @@ export class Game extends Scene {
 	}
 
 	#makePlayerFall(tileBounds: Phaser.Geom.Rectangle): void {
-		if (this.#isPlayerFalling) {
+		const player = getPlayerOrThrow();
+		if (player.data.get(DataKeys.IsFalling)) {
 			return;
 		}
-		const player = getPlayerOrThrow();
-		this.#isPlayerFalling = true;
 		player.data.set(DataKeys.IsFalling, true);
 		player.body.stop();
 
@@ -675,7 +672,6 @@ export class Game extends Scene {
 					this.#lastPlayerPosition.y
 				);
 				player.scale = 1;
-				this.#isPlayerFalling = false;
 				player.data.set(DataKeys.IsFalling, false);
 			},
 		});
@@ -3843,8 +3839,8 @@ export class Game extends Scene {
 
 		const isMountainCardActive = isAuraActive(this.registry, "MountainCard");
 		this.setPlayerStunned(true);
-		this.isPlayerBeingKnockedBack = true;
 		const player = getPlayerOrThrow();
+		player.data.set(DataKeys.IsBeingKnockedBack, true);
 		knockBack(
 			this,
 			player.body,
@@ -3855,7 +3851,7 @@ export class Game extends Scene {
 			invertSpriteDirection(this.playerDirection),
 			() => {
 				this.setPlayerStunned(false);
-				this.isPlayerBeingKnockedBack = false;
+				player.data.set(DataKeys.IsBeingKnockedBack, false);
 			}
 		);
 
@@ -3886,7 +3882,7 @@ export class Game extends Scene {
 			this.doesPlayerHaveSword() &&
 			!this.isPlayerFrozen() &&
 			!this.#isPressingHeal() &&
-			!this.#isPlayerFalling &&
+			!this.isPlayerFalling() &&
 			!this.isPlayerStunned() &&
 			!this.isPlayerAttacking() &&
 			this.getTimeSinceLastAttack() > config.postAttackCooldown &&
@@ -3936,7 +3932,7 @@ export class Game extends Scene {
 			this.getPlayerHitPoints() > 0 &&
 			!this.isPlayerFrozen() &&
 			!this.#isPressingHeal() &&
-			!this.#isPlayerFalling &&
+			!this.isPlayerFalling() &&
 			!this.isPlayerStunned() &&
 			!this.isPlayerAttacking() &&
 			this.getTimeSinceLastPower() > postPowerCooldown &&
@@ -3999,6 +3995,11 @@ export class Game extends Scene {
 	isPlayerFrozen(): boolean {
 		const player = getPlayerOrThrow();
 		return player.data.get("freezePlayer") === true;
+	}
+
+	isPlayerFalling(): boolean {
+		const player = getPlayerOrThrow();
+		return player.data.get(DataKeys.IsFalling) === true;
 	}
 
 	isPlayerStunned(): boolean {
@@ -4410,7 +4411,11 @@ export class Game extends Scene {
 	}
 
 	canPlayerMove(): boolean {
-		if (this.isPlayerAttacking() || this.isPlayerBeingKnockedBack) {
+		const player = getPlayerOrThrow();
+		if (
+			this.isPlayerAttacking() ||
+			player.data.get(DataKeys.IsBeingKnockedBack)
+		) {
 			return false;
 		}
 		if (
@@ -4428,7 +4433,7 @@ export class Game extends Scene {
 		if (this.#isPressingHeal()) {
 			return false;
 		}
-		if (this.#isPlayerFalling) {
+		if (this.isPlayerFalling()) {
 			return false;
 		}
 		if (this.getPlayerHitPoints() <= 0) {
@@ -4662,14 +4667,14 @@ export class Game extends Scene {
 	}
 
 	#isPlayerInHole(): boolean {
-		if (this.#isPlayerFalling) {
+		if (this.isPlayerFalling()) {
 			return true;
 		}
 		const player = getPlayerOrThrow();
 		if (player.data.get("isPlantCardGrappleActive")) {
 			return false;
 		}
-		const bottomCenter = player.getBottomCenter();
+		const bottomCenter = getSpriteFeetPosition(player);
 		let tile = this.landLayer.getTileAtWorldXY(bottomCenter.x, bottomCenter.y);
 		if (!tile?.properties.isHole) {
 			return false;
@@ -4692,7 +4697,7 @@ export class Game extends Scene {
 	#checkForHoles(): void {
 		if (this.#isPlayerInHole()) {
 			const player = getPlayerOrThrow();
-			const bottomCenter = player.getBottomCenter();
+			const bottomCenter = getSpriteFeetPosition(player);
 			let tile = this.landLayer.getTileAtWorldXY(
 				bottomCenter.x,
 				bottomCenter.y

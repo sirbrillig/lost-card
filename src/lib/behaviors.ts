@@ -22,6 +22,8 @@ import {
 	doesTileBlockFire,
 	distanceToLine,
 	makeFireExplosion,
+	knockBack,
+	getPositionInFrontOfSprite,
 } from "./shared";
 import { EnemyManager } from "./EnemyManager";
 import { TeleportSystem } from "./TeleportSystem";
@@ -335,6 +337,7 @@ export class Nothing implements Behavior {
 export class Idle implements Behavior {
 	#animationKey: string;
 	#idleTime: number;
+	#timer: Phaser.Time.TimerEvent | undefined;
 	name: string;
 
 	constructor(name: string, animationKey: string, idleTime: number) {
@@ -352,12 +355,16 @@ export class Idle implements Behavior {
 		}
 		sprite.body.stop();
 		sprite.anims.play(this.#animationKey, true);
-		sprite.scene.time.addEvent({
+		this.#timer = sprite.scene.time.addEvent({
 			delay: this.#idleTime,
 			callback: () => {
 				goToNextState();
 			},
 		});
+	}
+
+	cleanUp(): void {
+		this.#timer?.destroy();
 	}
 }
 
@@ -1067,8 +1074,6 @@ export class PowerUp implements Behavior {
 		});
 		MainEvents.once(Events.LeavingRoom, () => {
 			effect?.destroy();
-
-			goToNextState();
 		});
 		sprite.scene.time.addEvent({
 			delay: this.#chargeTime,
@@ -1161,8 +1166,6 @@ export class SlashTowardPlayer implements Behavior {
 		});
 		MainEvents.once(Events.LeavingRoom, () => {
 			this.#effect?.destroy();
-
-			goToNextState();
 		});
 		this.#effect.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
 			this.#effect?.destroy();
@@ -1232,8 +1235,6 @@ export class BigSwing implements Behavior {
 		});
 		MainEvents.once(Events.LeavingRoom, () => {
 			effect?.destroy();
-
-			goToNextState();
 		});
 		effect.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
 			effect?.destroy();
@@ -1295,8 +1296,6 @@ export class IceAttack implements Behavior {
 		});
 		MainEvents.once(Events.LeavingRoom, () => {
 			effect?.destroy();
-
-			goToNextState();
 		});
 		effect.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
 			effect?.destroy();
@@ -1455,6 +1454,124 @@ export class Poof implements Behavior {
 			callback: () => {
 				goToNextState();
 			},
+		});
+	}
+}
+
+export class WindBlast implements Behavior {
+	#postAttackTime = 1500;
+	#direction: SpriteDirection;
+	name: string;
+
+	constructor(
+		name: string,
+		options: {
+			postAttackTime?: number;
+			direction: SpriteDirection;
+		}
+	) {
+		this.name = name;
+		this.#postAttackTime = options.postAttackTime ?? this.#postAttackTime;
+		this.#direction = options.direction;
+	}
+
+	init(
+		sprite: Phaser.GameObjects.Sprite,
+		goToNextState: BehaviorCompleteCallback
+	): void {
+		if (!sprite.body || !isDynamicSprite(sprite)) {
+			throw new Error("Could not update monster");
+		}
+		sprite.data.set("direction", this.#direction);
+
+		sprite.scene.anims.create({
+			key: "WindBlast",
+			frames: sprite.scene.anims.generateFrameNumbers("wind-power"),
+			frameRate: 24,
+			showOnStart: true,
+			hideOnComplete: true,
+		});
+		const effectWidth = (() => {
+			switch (this.#direction) {
+				case SpriteUp:
+				case SpriteDown:
+					return 10;
+				case SpriteRight:
+				case SpriteLeft:
+					return 24;
+			}
+		})();
+		const effectHeight = (() => {
+			switch (this.#direction) {
+				case SpriteUp:
+				case SpriteDown:
+					return 24;
+				case SpriteRight:
+				case SpriteLeft:
+					return 10;
+			}
+		})();
+		const effectSpeed = 30;
+		const rotation = (() => {
+			switch (this.#direction) {
+				case SpriteUp:
+					return -90;
+				case SpriteRight:
+					return 0;
+				case SpriteDown:
+					return 90;
+				case SpriteLeft:
+					return -180;
+			}
+		})();
+		const position = getPositionInFrontOfSprite(
+			{ width: effectWidth, height: effectHeight },
+			sprite.body,
+			this.#direction
+		);
+		const effect = sprite.scene.add.sprite(
+			position.x,
+			position.y,
+			"WindBlast",
+			0
+		);
+		effect.setDepth(config.effectDepth);
+		sprite.scene.physics.add.existing(effect);
+		effect.setRotation(Phaser.Math.DegToRad(rotation));
+		const velocity = sprite.scene.physics.velocityFromAngle(
+			rotation,
+			effectSpeed
+		);
+		if (!effect.body || !isDynamicSprite(effect)) {
+			throw new Error("Could not update monster");
+		}
+		effect.body.setSize(effectWidth, effectHeight);
+		effect.setOrigin(0.5, 0.5);
+		effect.anims.play("WindBlast", true);
+		effect.body.setVelocity(velocity.x, velocity.y);
+
+		const player = getPlayerOrThrow();
+		let didHit = false;
+		sprite.scene.physics.add.overlap(player, effect, () => {
+			if (didHit) {
+				return;
+			}
+			didHit = true;
+			player.data.set(DataKeys.IsBeingKnockedBack, true);
+			knockBack(sprite.scene, player.body, 300, 200, this.#direction, () => {
+				player.data.set(DataKeys.IsBeingKnockedBack, false);
+			});
+		});
+
+		sprite.once(Events.MonsterDying, () => {
+			effect?.destroy();
+		});
+		MainEvents.once(Events.LeavingRoom, () => {
+			effect?.destroy();
+		});
+		effect.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
+			effect?.destroy();
+			goToNextState();
 		});
 	}
 }
@@ -3011,8 +3128,6 @@ export class IceBeam implements Behavior {
 		MainEvents.once(Events.LeavingRoom, () => {
 			sprite.scene?.sound.stopByKey("freeze");
 			effect?.destroy();
-
-			goToNextState();
 		});
 		effect.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
 			sprite.scene?.sound.stopByKey("freeze");
@@ -3737,7 +3852,6 @@ export class Sequence implements Behavior {
 			this.#currentCreatorIndex < this.#creators.length
 				? this.#creators[this.#currentCreatorIndex]
 				: undefined;
-		this.#currentCreatorIndex += 1;
 		if (!creator && this.#loopIf?.()) {
 			this.#currentCreatorIndex = 0;
 			creator = this.#creators[this.#currentCreatorIndex];
@@ -3747,6 +3861,7 @@ export class Sequence implements Behavior {
 			return;
 		}
 		this.#behavior = creator();
+		this.#currentCreatorIndex += 1;
 		this.#startBehavior();
 	}
 
@@ -3767,12 +3882,12 @@ export class Sequence implements Behavior {
 		}
 		this.#behavior.cleanUp?.(this.#sprite, this.#enemyManager);
 		this.#behavior = undefined;
-		if (!success && this.#loopIf?.()) {
+		if (success === false && this.#loopIf?.()) {
 			this.#currentCreatorIndex = 0;
 			this.#progressBehaviors();
 			return;
 		}
-		if (!success) {
+		if (success === false) {
 			this.#goToNextState(false);
 			return;
 		}

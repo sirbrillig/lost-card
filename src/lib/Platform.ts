@@ -5,6 +5,7 @@ import {
 	SpriteDirection,
 	createVelocityForDirection,
 	getDirectionTowardPoint,
+	getSpriteFeetPosition,
 	isPointInRoom,
 	DataKeys,
 	Events,
@@ -125,7 +126,7 @@ export class Platform {
 		if (player.data.get(DataKeys.IsFalling)) {
 			return false;
 		}
-		const bottomCenter = player.getBottomCenter();
+		const bottomCenter = getSpriteFeetPosition(player);
 		return this.sprite.body.hitTest(bottomCenter.x, bottomCenter.y);
 	}
 

@@ -73,6 +73,7 @@ export const DataKeys = {
 	IsMovingPlatform: "isMovingPlatform",
 	IsOnMovingPlatform: "isOnMovingPlatform",
 	IsFalling: "IsFalling",
+	IsBeingKnockedBack: "IsBeingKnockedBack",
 } as const;
 
 export const MapMetaKeys = {
@@ -131,6 +132,18 @@ export const auraOrder: Auras[] = [
 	"ClockCard",
 	"FishCard",
 ];
+
+export function isSpriteDirection(
+	direction: unknown
+): direction is SpriteDirection {
+	if (typeof direction !== "number") {
+		return false;
+	}
+	if ([SpriteUp, SpriteRight, SpriteDown, SpriteLeft].includes(direction)) {
+		return true;
+	}
+	return false;
+}
 
 export function getFoundAuras(registry: Phaser.Data.DataManager): Auras[] {
 	return getDataFromRegistry(registry, "AurasFound") ?? [];
@@ -247,7 +260,6 @@ export function isTilemapTile(obj: unknown): obj is Phaser.Tilemaps.Tile {
 }
 
 export function isRectangle(obj: unknown): obj is Phaser.Geom.Rectangle {
-	const tile = obj as Phaser.Geom.Rectangle;
 	return hasXandY(obj) && hasWidthAndHeight(obj);
 }
 
@@ -1395,6 +1407,7 @@ export interface MapMonsterProperties {
 	doNotRespawn?: boolean;
 	timeBeforeActivate?: number;
 	isMiniBoss?: boolean;
+	facing?: number;
 }
 
 export interface TiledObjectProperty {
@@ -1419,6 +1432,9 @@ export function getPropertiesFromPoint(
 		}
 		if (property.name === "isMiniBoss") {
 			result.isMiniBoss = Boolean(property.value);
+		}
+		if (property.name === "facing") {
+			result.facing = parseInt(String(property.value));
 		}
 	});
 	return result;
@@ -1540,6 +1556,43 @@ export function findLanternInRoom(
 	});
 }
 
+// Note that tile objects imported from Tiled have a origin of bottom-left,
+// whereas things in Phaser have an origin of top-left.
+export function correctTiledObjectOrigin(
+	spriteProps: Phaser.Types.Math.RectangleLike
+): Phaser.Types.Math.RectangleLike {
+	return {
+		...spriteProps,
+		y: spriteProps.y - spriteProps.height,
+	};
+}
+
+export function getPositionInFrontOfSprite(
+	target: Pick<Phaser.Types.Math.RectangleLike, "width" | "height">,
+	spriteProps: Phaser.Types.Math.RectangleLike,
+	facingDirection: SpriteDirection
+): Phaser.Types.Math.Vector2Like {
+	const destinationX: number = (() => {
+		if (facingDirection === SpriteLeft) {
+			return spriteProps.x - target.width / 2;
+		}
+		if (facingDirection === SpriteRight) {
+			return spriteProps.x + spriteProps.width + target.width / 2;
+		}
+		return spriteProps.x + spriteProps.width / 2;
+	})();
+	const destinationY: number = (() => {
+		if (facingDirection === SpriteUp) {
+			return spriteProps.y - target.height;
+		}
+		if (facingDirection === SpriteDown) {
+			return spriteProps.y + spriteProps.height + target.height / 2;
+		}
+		return spriteProps.y;
+	})();
+	return { x: destinationX, y: destinationY };
+}
+
 export function getLanternRespawnPosition(
 	map: Phaser.Tilemaps.Tilemap,
 	roomName: string
@@ -1553,37 +1606,25 @@ export function getLanternRespawnPosition(
 			property.name === DataKeys.RespawnDirection
 	);
 	const direction = property?.value;
-	if (typeof direction === "undefined") {
+	if (!isSpriteDirection(direction)) {
 		return;
 	}
-	if (!lantern.x || !lantern.y || !lantern.width || !lantern.height) {
+	if (!isRectangle(lantern)) {
 		return;
 	}
-	const destinationX: number = (() => {
-		if (!lantern.x || !lantern.y || !lantern.width || !lantern.height) {
-			return 0;
-		}
-		if (direction === SpriteLeft) {
-			return lantern.x - lantern.width / 2;
-		}
-		if (direction === SpriteRight) {
-			return lantern.x + lantern.width + lantern.width / 2;
-		}
-		return lantern.x + lantern.width / 2;
-	})();
-	const destinationY: number = (() => {
-		if (!lantern.x || !lantern.y || !lantern.width || !lantern.height) {
-			return 0;
-		}
-		if (direction === SpriteUp) {
-			return lantern.y - lantern.height * 2;
-		}
-		if (direction === SpriteDown) {
-			return lantern.y + lantern.height / 2;
-		}
-		return lantern.y - lantern.height / 2;
-	})();
-	return { x: destinationX, y: destinationY };
+	return getPositionInFrontOfSprite(
+		// Note: It's not really the lantern, it's the player, but this may be
+		// called before we have the player and they should have basically the same
+		// width/height.
+		lantern,
+		correctTiledObjectOrigin({
+			x: lantern.x,
+			y: lantern.y,
+			width: lantern.width,
+			height: lantern.height,
+		}),
+		direction
+	);
 }
 
 export function getLanternRooms(map: Phaser.Tilemaps.Tilemap) {
@@ -1598,4 +1639,15 @@ export function getLanternRooms(map: Phaser.Tilemaps.Tilemap) {
 			})
 			.filter(isValueTruthy) ?? []
 	);
+}
+
+export function getSpriteFeetPosition(
+	player: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody
+): Phaser.Types.Math.Vector2Like {
+	// Only check the player's feet to see if they touch the hole, but go up
+	// a tiny bit because the feet are too close to the next tile down to
+	// tell.
+	const bottomCenter = player.getBottomCenter();
+	bottomCenter.y -= 5;
+	return bottomCenter;
 }
