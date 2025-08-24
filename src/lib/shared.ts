@@ -74,6 +74,9 @@ export const DataKeys = {
 	IsOnMovingPlatform: "isOnMovingPlatform",
 	IsFalling: "IsFalling",
 	IsBeingKnockedBack: "IsBeingKnockedBack",
+	IsPlantCardGrappleActive: "isPlantCardGrappleActive",
+	IgnoredByPlantCard: "ignoredByPlantCard",
+	IsPlantCardTarget: "affectedByPlantCard",
 } as const;
 
 export const MapMetaKeys = {

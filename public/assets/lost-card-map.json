@@ -27884,6 +27884,11 @@
                          "name":"affectedBySword",
                          "type":"bool",
                          "value":true
+                        }, 
+                        {
+                         "name":"ignoredByPlantCard",
+                         "type":"bool",
+                         "value":true
                         }],
                  "rotation":0,
                  "type":"",
@@ -27900,6 +27905,11 @@
                  "properties":[
                         {
                          "name":"affectedBySword",
+                         "type":"bool",
+                         "value":true
+                        }, 
+                        {
+                         "name":"ignoredByPlantCard",
                          "type":"bool",
                          "value":true
                         }],
@@ -27920,6 +27930,11 @@
                          "name":"affectedBySword",
                          "type":"bool",
                          "value":true
+                        }, 
+                        {
+                         "name":"ignoredByPlantCard",
+                         "type":"bool",
+                         "value":true
                         }],
                  "rotation":0,
                  "type":"",
@@ -27936,6 +27951,11 @@
                  "properties":[
                         {
                          "name":"affectedBySword",
+                         "type":"bool",
+                         "value":true
+                        }, 
+                        {
+                         "name":"ignoredByPlantCard",
                          "type":"bool",
                          "value":true
                         }],
@@ -27956,6 +27976,11 @@
                          "name":"affectedBySword",
                          "type":"bool",
                          "value":true
+                        }, 
+                        {
+                         "name":"ignoredByPlantCard",
+                         "type":"bool",
+                         "value":true
                         }],
                  "rotation":0,
                  "type":"",
@@ -27972,6 +27997,11 @@
                  "properties":[
                         {
                          "name":"affectedBySword",
+                         "type":"bool",
+                         "value":true
+                        }, 
+                        {
+                         "name":"ignoredByPlantCard",
                          "type":"bool",
                          "value":true
                         }],
@@ -27992,6 +28022,11 @@
                          "name":"affectedBySword",
                          "type":"bool",
                          "value":true
+                        }, 
+                        {
+                         "name":"ignoredByPlantCard",
+                         "type":"bool",
+                         "value":true
                         }],
                  "rotation":0,
                  "type":"",
@@ -28008,6 +28043,11 @@
                  "properties":[
                         {
                          "name":"affectedBySword",
+                         "type":"bool",
+                         "value":true
+                        }, 
+                        {
+                         "name":"ignoredByPlantCard",
                          "type":"bool",
                          "value":true
                         }],
@@ -28028,6 +28068,11 @@
                          "name":"affectedBySword",
                          "type":"bool",
                          "value":true
+                        }, 
+                        {
+                         "name":"ignoredByPlantCard",
+                         "type":"bool",
+                         "value":true
                         }],
                  "rotation":0,
                  "type":"",
@@ -28044,6 +28089,11 @@
                  "properties":[
                         {
                          "name":"affectedBySword",
+                         "type":"bool",
+                         "value":true
+                        }, 
+                        {
+                         "name":"ignoredByPlantCard",
                          "type":"bool",
                          "value":true
                         }],
@@ -28064,6 +28114,11 @@
                          "name":"affectedBySword",
                          "type":"bool",
                          "value":true
+                        }, 
+                        {
+                         "name":"ignoredByPlantCard",
+                         "type":"bool",
+                         "value":true
                         }],
                  "rotation":0,
                  "type":"",
@@ -28080,6 +28135,11 @@
                  "properties":[
                         {
                          "name":"affectedBySword",
+                         "type":"bool",
+                         "value":true
+                        }, 
+                        {
+                         "name":"ignoredByPlantCard",
                          "type":"bool",
                          "value":true
                         }],
@@ -28100,6 +28160,11 @@
                          "name":"affectedBySword",
                          "type":"bool",
                          "value":true
+                        }, 
+                        {
+                         "name":"ignoredByPlantCard",
+                         "type":"bool",
+                         "value":true
                         }],
                  "rotation":0,
                  "type":"",
@@ -28116,6 +28181,11 @@
                  "properties":[
                         {
                          "name":"affectedBySword",
+                         "type":"bool",
+                         "value":true
+                        }, 
+                        {
+                         "name":"ignoredByPlantCard",
                          "type":"bool",
                          "value":true
                         }],
@@ -28136,6 +28206,11 @@
                          "name":"affectedBySword",
                          "type":"bool",
                          "value":true
+                        }, 
+                        {
+                         "name":"ignoredByPlantCard",
+                         "type":"bool",
+                         "value":true
                         }],
                  "rotation":0,
                  "type":"",
@@ -28152,6 +28227,11 @@
                  "properties":[
                         {
                          "name":"affectedBySword",
+                         "type":"bool",
+                         "value":true
+                        }, 
+                        {
+                         "name":"ignoredByPlantCard",
                          "type":"bool",
                          "value":true
                         }],
@@ -28236,6 +28316,11 @@
                          "name":"affectedBySword",
                          "type":"bool",
                          "value":true
+                        }, 
+                        {
+                         "name":"ignoredByPlantCard",
+                         "type":"bool",
+                         "value":true
                         }],
                  "rotation":0,
                  "type":"",
@@ -28252,6 +28337,11 @@
                  "properties":[
                         {
                          "name":"affectedBySword",
+                         "type":"bool",
+                         "value":true
+                        }, 
+                        {
+                         "name":"ignoredByPlantCard",
                          "type":"bool",
                          "value":true
                         }],
@@ -28272,6 +28362,11 @@
                          "name":"affectedBySword",
                          "type":"bool",
                          "value":true
+                        }, 
+                        {
+                         "name":"ignoredByPlantCard",
+                         "type":"bool",
+                         "value":true
                         }],
                  "rotation":0,
                  "type":"",
@@ -28288,6 +28383,11 @@
                  "properties":[
                         {
                          "name":"affectedBySword",
+                         "type":"bool",
+                         "value":true
+                        }, 
+                        {
+                         "name":"ignoredByPlantCard",
                          "type":"bool",
                          "value":true
                         }],
@@ -28308,6 +28408,11 @@
                          "name":"affectedBySword",
                          "type":"bool",
                          "value":true
+                        }, 
+                        {
+                         "name":"ignoredByPlantCard",
+                         "type":"bool",
+                         "value":true
                         }],
                  "rotation":0,
                  "type":"",
@@ -28324,6 +28429,11 @@
                  "properties":[
                         {
                          "name":"affectedBySword",
+                         "type":"bool",
+                         "value":true
+                        }, 
+                        {
+                         "name":"ignoredByPlantCard",
                          "type":"bool",
                          "value":true
                         }],
@@ -28344,6 +28454,11 @@
                          "name":"affectedBySword",
                          "type":"bool",
                          "value":true
+                        }, 
+                        {
+                         "name":"ignoredByPlantCard",
+                         "type":"bool",
+                         "value":true
                         }],
                  "rotation":0,
                  "type":"",
@@ -28360,6 +28475,11 @@
                  "properties":[
                         {
                          "name":"affectedBySword",
+                         "type":"bool",
+                         "value":true
+                        }, 
+                        {
+                         "name":"ignoredByPlantCard",
                          "type":"bool",
                          "value":true
                         }],
@@ -28380,6 +28500,11 @@
                          "name":"affectedBySword",
                          "type":"bool",
                          "value":true
+                        }, 
+                        {
+                         "name":"ignoredByPlantCard",
+                         "type":"bool",
+                         "value":true
                         }],
                  "rotation":0,
                  "type":"",
@@ -28396,6 +28521,11 @@
                  "properties":[
                         {
                          "name":"affectedBySword",
+                         "type":"bool",
+                         "value":true
+                        }, 
+                        {
+                         "name":"ignoredByPlantCard",
                          "type":"bool",
                          "value":true
                         }],
@@ -28416,6 +28546,11 @@
                          "name":"affectedBySword",
                          "type":"bool",
                          "value":true
+                        }, 
+                        {
+                         "name":"ignoredByPlantCard",
+                         "type":"bool",
+                         "value":true
                         }],
                  "rotation":0,
                  "type":"",
@@ -28432,6 +28567,11 @@
                  "properties":[
                         {
                          "name":"affectedBySword",
+                         "type":"bool",
+                         "value":true
+                        }, 
+                        {
+                         "name":"ignoredByPlantCard",
                          "type":"bool",
                          "value":true
                         }],
@@ -28452,6 +28592,11 @@
                          "name":"affectedBySword",
                          "type":"bool",
                          "value":true
+                        }, 
+                        {
+                         "name":"ignoredByPlantCard",
+                         "type":"bool",
+                         "value":true
                         }],
                  "rotation":0,
                  "type":"",
@@ -28470,6 +28615,11 @@
                          "name":"affectedBySword",
                          "type":"bool",
                          "value":true
+                        }, 
+                        {
+                         "name":"ignoredByPlantCard",
+                         "type":"bool",
+                         "value":true
                         }],
                  "rotation":0,
                  "type":"",
@@ -28486,6 +28636,11 @@
                  "properties":[
                         {
                          "name":"affectedBySword",
+                         "type":"bool",
+                         "value":true
+                        }, 
+                        {
+                         "name":"ignoredByPlantCard",
                          "type":"bool",
                          "value":true
                         }],
@@ -28598,6 +28753,11 @@
                          "name":"affectedBySword",
                          "type":"bool",
                          "value":true
+                        }, 
+                        {
+                         "name":"ignoredByPlantCard",
+                         "type":"bool",
+                         "value":true
                         }],
                  "rotation":0,
                  "type":"",
@@ -28616,6 +28776,11 @@
                          "name":"affectedBySword",
                          "type":"bool",
                          "value":true
+                        }, 
+                        {
+                         "name":"ignoredByPlantCard",
+                         "type":"bool",
+                         "value":true
                         }],
                  "rotation":0,
                  "type":"",
@@ -28627,29 +28792,16 @@
                 {
                  "gid":3019,
                  "height":16,
-                 "id":1596,
+                 "id":1597,
                  "name":"",
                  "properties":[
                         {
                          "name":"affectedBySword",
                          "type":"bool",
                          "value":true
-                        }],
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":16,
-                 "x":2128,
-                 "y":2128
-                }, 
-                {
-                 "gid":3019,
-                 "height":16,
-                 "id":1597,
-                 "name":"",
-                 "properties":[
+                        }, 
                         {
-                         "name":"affectedBySword",
+                         "name":"ignoredByPlantCard",
                          "type":"bool",
                          "value":true
                         }],
@@ -28670,6 +28822,11 @@
                          "name":"affectedBySword",
                          "type":"bool",
                          "value":true
+                        }, 
+                        {
+                         "name":"ignoredByPlantCard",
+                         "type":"bool",
+                         "value":true
                         }],
                  "rotation":0,
                  "type":"",
@@ -28686,6 +28843,11 @@
                  "properties":[
                         {
                          "name":"affectedBySword",
+                         "type":"bool",
+                         "value":true
+                        }, 
+                        {
+                         "name":"ignoredByPlantCard",
                          "type":"bool",
                          "value":true
                         }],
@@ -28706,6 +28868,11 @@
                          "name":"affectedBySword",
                          "type":"bool",
                          "value":true
+                        }, 
+                        {
+                         "name":"ignoredByPlantCard",
+                         "type":"bool",
+                         "value":true
                         }],
                  "rotation":0,
                  "type":"",
@@ -28722,6 +28889,11 @@
                  "properties":[
                         {
                          "name":"affectedBySword",
+                         "type":"bool",
+                         "value":true
+                        }, 
+                        {
+                         "name":"ignoredByPlantCard",
                          "type":"bool",
                          "value":true
                         }],
@@ -28742,6 +28914,11 @@
                          "name":"affectedBySword",
                          "type":"bool",
                          "value":true
+                        }, 
+                        {
+                         "name":"ignoredByPlantCard",
+                         "type":"bool",
+                         "value":true
                         }],
                  "rotation":0,
                  "type":"",
@@ -28758,6 +28935,11 @@
                  "properties":[
                         {
                          "name":"affectedBySword",
+                         "type":"bool",
+                         "value":true
+                        }, 
+                        {
+                         "name":"ignoredByPlantCard",
                          "type":"bool",
                          "value":true
                         }],
@@ -28778,6 +28960,11 @@
                          "name":"affectedBySword",
                          "type":"bool",
                          "value":true
+                        }, 
+                        {
+                         "name":"ignoredByPlantCard",
+                         "type":"bool",
+                         "value":true
                         }],
                  "rotation":0,
                  "type":"",
@@ -28794,6 +28981,11 @@
                  "properties":[
                         {
                          "name":"affectedBySword",
+                         "type":"bool",
+                         "value":true
+                        }, 
+                        {
+                         "name":"ignoredByPlantCard",
                          "type":"bool",
                          "value":true
                         }],
@@ -28814,6 +29006,11 @@
                          "name":"affectedBySword",
                          "type":"bool",
                          "value":true
+                        }, 
+                        {
+                         "name":"ignoredByPlantCard",
+                         "type":"bool",
+                         "value":true
                         }],
                  "rotation":0,
                  "type":"",
@@ -28830,6 +29027,11 @@
                  "properties":[
                         {
                          "name":"affectedBySword",
+                         "type":"bool",
+                         "value":true
+                        }, 
+                        {
+                         "name":"ignoredByPlantCard",
                          "type":"bool",
                          "value":true
                         }],
@@ -29311,6 +29513,11 @@
                          "name":"affectedBySword",
                          "type":"bool",
                          "value":true
+                        }, 
+                        {
+                         "name":"ignoredByPlantCard",
+                         "type":"bool",
+                         "value":true
                         }],
                  "rotation":0,
                  "type":"",
@@ -29327,6 +29534,11 @@
                  "properties":[
                         {
                          "name":"affectedBySword",
+                         "type":"bool",
+                         "value":true
+                        }, 
+                        {
+                         "name":"ignoredByPlantCard",
                          "type":"bool",
                          "value":true
                         }],
@@ -29347,6 +29559,11 @@
                          "name":"affectedBySword",
                          "type":"bool",
                          "value":true
+                        }, 
+                        {
+                         "name":"ignoredByPlantCard",
+                         "type":"bool",
+                         "value":true
                         }],
                  "rotation":0,
                  "type":"",
@@ -29363,6 +29580,11 @@
                  "properties":[
                         {
                          "name":"affectedBySword",
+                         "type":"bool",
+                         "value":true
+                        }, 
+                        {
+                         "name":"ignoredByPlantCard",
                          "type":"bool",
                          "value":true
                         }],
@@ -29383,6 +29605,11 @@
                          "name":"affectedBySword",
                          "type":"bool",
                          "value":true
+                        }, 
+                        {
+                         "name":"ignoredByPlantCard",
+                         "type":"bool",
+                         "value":true
                         }],
                  "rotation":0,
                  "type":"",
@@ -29399,6 +29626,11 @@
                  "properties":[
                         {
                          "name":"affectedBySword",
+                         "type":"bool",
+                         "value":true
+                        }, 
+                        {
+                         "name":"ignoredByPlantCard",
                          "type":"bool",
                          "value":true
                         }],
@@ -29419,6 +29651,11 @@
                          "name":"affectedBySword",
                          "type":"bool",
                          "value":true
+                        }, 
+                        {
+                         "name":"ignoredByPlantCard",
+                         "type":"bool",
+                         "value":true
                         }],
                  "rotation":0,
                  "type":"",
@@ -29435,6 +29672,11 @@
                  "properties":[
                         {
                          "name":"affectedBySword",
+                         "type":"bool",
+                         "value":true
+                        }, 
+                        {
+                         "name":"ignoredByPlantCard",
                          "type":"bool",
                          "value":true
                         }],
@@ -29658,6 +29900,11 @@
                  "properties":[
                         {
                          "name":"affectedBySword",
+                         "type":"bool",
+                         "value":true
+                        }, 
+                        {
+                         "name":"ignoredByPlantCard",
                          "type":"bool",
                          "value":true
                         }],
@@ -48192,6 +48439,11 @@
                  "properties":[
                         {
                          "name":"affectedBySword",
+                         "type":"bool",
+                         "value":true
+                        }, 
+                        {
+                         "name":"ignoredByPlantCard",
                          "type":"bool",
                          "value":true
                         }]

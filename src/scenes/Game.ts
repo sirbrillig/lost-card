@@ -284,7 +284,7 @@ export class Game extends Scene {
 				) {
 					return false;
 				}
-				if (player.data.get("isPlantCardGrappleActive")) {
+				if (player.data.get(DataKeys.IsPlantCardGrappleActive)) {
 					return false;
 				}
 				if (
@@ -329,7 +329,7 @@ export class Game extends Scene {
 			if (this.isPlayerUsingPower() && this.getActivePower() === "SpiritCard") {
 				return false;
 			}
-			if (player.data.get("isPlantCardGrappleActive")) {
+			if (player.data.get(DataKeys.IsPlantCardGrappleActive)) {
 				return false;
 			}
 			return true;
@@ -392,9 +392,9 @@ export class Game extends Scene {
 				if (!isDynamicSprite(player) || !isDynamicSprite(enemy)) {
 					return;
 				}
-				if (enemy.data.get("isPlantCardGrappleActive")) {
+				if (enemy.data.get(DataKeys.IsPlantCardGrappleActive)) {
 					enemy?.emit(Events.MonsterStun, false);
-					enemy.data.set("isPlantCardGrappleActive", false);
+					enemy.data.set(DataKeys.IsPlantCardGrappleActive, false);
 					this.#endPowerUse();
 					return;
 				}
@@ -405,7 +405,7 @@ export class Game extends Scene {
 				if (!isDynamicSprite(enemy)) {
 					return false;
 				}
-				if (enemy.data.get("isPlantCardGrappleActive")) {
+				if (enemy.data.get(DataKeys.IsPlantCardGrappleActive)) {
 					return true;
 				}
 				if (this.isPlayerInvincible() || this.isPlayerHiddenInvincible()) {
@@ -1851,14 +1851,14 @@ export class Game extends Scene {
 			if (!isDynamicSprite(enemy)) {
 				return;
 			}
-			if (enemy.data.get("isPlantCardGrappleActive")) {
+			if (enemy.data.get(DataKeys.IsPlantCardGrappleActive)) {
 				const distance = Phaser.Math.Distance.BetweenPoints(
 					enemy.body.center,
 					player.body.center
 				);
 				if (distance < 30) {
 					enemy.emit(Events.MonsterStun, false);
-					enemy.data.set("isPlantCardGrappleActive", false);
+					enemy.data.set(DataKeys.IsPlantCardGrappleActive, false);
 					this.#endPowerUse();
 				}
 			}
@@ -2056,18 +2056,21 @@ export class Game extends Scene {
 	checkForPlantCardHitTile(
 		tile: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody
 	) {
-		const isAffectedByPower = tile.data.get("affectedByPlantCard");
+		const isAffectedByPower = tile.data.get(DataKeys.IsPlantCardTarget);
 		if (!isAffectedByPower) {
 			return;
 		}
 		const player = getPlayerOrThrow();
 		const power = getPhysicsSpriteOrThrow("power");
-		if (player.data.get("isPlantCardGrappleActive") || power.anims.isPaused) {
+		if (
+			player.data.get(DataKeys.IsPlantCardGrappleActive) ||
+			power.anims.isPaused
+		) {
 			return;
 		}
 
 		// The plant card moves you next to the target, over any land obstacle
-		player.data.set("isPlantCardGrappleActive", true);
+		player.data.set(DataKeys.IsPlantCardGrappleActive, true);
 		power.anims.pause();
 		power.body.stop();
 		this.#movePlayerTowardTileWithPlantCard(tile.body.center);
@@ -2111,7 +2114,7 @@ export class Game extends Scene {
 						player.setPosition(lastSafePosition.x, lastSafePosition.y);
 					}
 					this.#endPowerUse();
-					player.data.set("isPlantCardGrappleActive", false);
+					player.data.set(DataKeys.IsPlantCardGrappleActive, false);
 				}
 				lastDistance = distance;
 			},
@@ -2304,9 +2307,12 @@ export class Game extends Scene {
 			player,
 			tile,
 			() => {
-				if (player.data.get("isPlantCardGrappleActive")) {
+				if (
+					!tile.data?.get(DataKeys.IgnoredByPlantCard) &&
+					player.data.get(DataKeys.IsPlantCardGrappleActive)
+				) {
 					// In case we were being pulled by the PlantCard
-					player.data.set("isPlantCardGrappleActive", false);
+					player.data.set(DataKeys.IsPlantCardGrappleActive, false);
 					this.#endPowerUse();
 				}
 
@@ -2315,6 +2321,12 @@ export class Game extends Scene {
 				}
 			},
 			() => {
+				if (
+					tile.data?.get(DataKeys.IgnoredByPlantCard) &&
+					player.data.get(DataKeys.IsPlantCardGrappleActive)
+				) {
+					return false;
+				}
 				if (
 					tile.data?.get("affectedBySpiritCard") &&
 					this.isPlayerUsingPower() &&
@@ -3676,13 +3688,13 @@ export class Game extends Scene {
 		if (enemy.data.get(DataKeys.Hittable) !== true) {
 			return;
 		}
-		if (enemy.data.get("isPlantCardGrappleActive")) {
+		if (enemy.data.get(DataKeys.IsPlantCardGrappleActive)) {
 			return;
 		}
 		// We can't use MonsterStun event here because it is too slow.
 		enemy.data.set(DataKeys.Stunned, true);
 		enemy.body.stop();
-		enemy.data.set("isPlantCardGrappleActive", true);
+		enemy.data.set(DataKeys.IsPlantCardGrappleActive, true);
 
 		const player = getPlayerOrThrow();
 		this.physics.moveToObject(enemy, player, config.plantCardVelocity);
@@ -4675,7 +4687,7 @@ export class Game extends Scene {
 			return true;
 		}
 		const player = getPlayerOrThrow();
-		if (player.data.get("isPlantCardGrappleActive")) {
+		if (player.data.get(DataKeys.IsPlantCardGrappleActive)) {
 			return false;
 		}
 		const bottomCenter = getSpriteFeetPosition(player);
