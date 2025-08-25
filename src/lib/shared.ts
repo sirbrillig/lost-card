@@ -1654,3 +1654,59 @@ export function getSpriteFeetPosition(
 	bottomCenter.y -= 5;
 	return bottomCenter;
 }
+
+export function getRotationFromDirection(
+	startingDirection: SpriteDirection,
+	direction: SpriteDirection
+): number {
+	switch (startingDirection) {
+		case SpriteUp: {
+			switch (direction) {
+				case SpriteUp:
+					return 0;
+				case SpriteRight:
+					return 90;
+				case SpriteDown:
+					return 180;
+				case SpriteLeft:
+					return 270;
+			}
+		}
+		case SpriteRight: {
+			switch (direction) {
+				case SpriteUp:
+					return 270;
+				case SpriteRight:
+					return 0;
+				case SpriteDown:
+					return 90;
+				case SpriteLeft:
+					return 180;
+			}
+		}
+		case SpriteDown: {
+			switch (direction) {
+				case SpriteUp:
+					return 180;
+				case SpriteRight:
+					return 270;
+				case SpriteDown:
+					return 0;
+				case SpriteLeft:
+					return 90;
+			}
+		}
+		case SpriteLeft: {
+			switch (direction) {
+				case SpriteUp:
+					return 90;
+				case SpriteRight:
+					return 180;
+				case SpriteDown:
+					return 270;
+				case SpriteLeft:
+					return 0;
+			}
+		}
+	}
+}

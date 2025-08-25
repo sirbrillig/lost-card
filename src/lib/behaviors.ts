@@ -2,6 +2,7 @@ import { config } from "../lib/config";
 import {
 	Sound,
 	moveHitboxInFrontOfSprite,
+	getRotationFromDirection,
 	DataKeys,
 	getDirectionOfSpriteMovement,
 	SpriteDirection,
@@ -1512,18 +1513,7 @@ export class WindBlast implements Behavior {
 			}
 		})();
 		const effectSpeed = 30;
-		const rotation = (() => {
-			switch (this.#direction) {
-				case SpriteUp:
-					return -90;
-				case SpriteRight:
-					return 0;
-				case SpriteDown:
-					return 90;
-				case SpriteLeft:
-					return -180;
-			}
-		})();
+		const rotation = getRotationFromDirection(SpriteRight, this.#direction);
 		const position = getPositionInFrontOfSprite(
 			{ width: effectWidth, height: effectHeight },
 			sprite.body,
@@ -4151,5 +4141,23 @@ export class Inverter implements Behavior {
 	cleanUp(): void {
 		this.#behavior?.cleanUp?.(this.#sprite, this.#enemyManager);
 		this.#behavior = undefined;
+	}
+}
+
+export class Rotate implements Behavior {
+	name: string;
+	#angle: number;
+
+	constructor(name: string, angle: number) {
+		this.name = name;
+		this.#angle = angle;
+	}
+
+	init(
+		sprite: Phaser.GameObjects.Sprite,
+		goToNextState: BehaviorCompleteCallback
+	): void {
+		sprite.setRotation(Phaser.Math.DegToRad(this.#angle));
+		goToNextState();
 	}
 }

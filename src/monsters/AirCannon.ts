@@ -1,5 +1,5 @@
-import { Idle, WindBlast, Sequence } from "../lib/behaviors";
-import { DataKeys } from "../lib/shared";
+import { Idle, WindBlast, Sequence, Rotate } from "../lib/behaviors";
+import { DataKeys, getRotationFromDirection, SpriteUp } from "../lib/shared";
 import { EnemyManager } from "../lib/EnemyManager";
 import { BaseMonster } from "./BaseMonster";
 
@@ -60,9 +60,17 @@ export class AirCannon extends BaseMonster {
 		return new Sequence(state, {
 			loopIf: () => true,
 			creators: [
-				() => new Idle(state, "appear", idleTime),
-				() => new WindBlast(state, { direction: this.facing }),
-				() => new Idle(state, "disappear", idleTime),
+				() =>
+					new Rotate(state, getRotationFromDirection(SpriteUp, this.facing)),
+				() =>
+					new Sequence(state, {
+						loopIf: () => true,
+						creators: [
+							() => new Idle(state, "appear", idleTime),
+							() => new WindBlast(state, { direction: this.facing }),
+							() => new Idle(state, "disappear", idleTime),
+						],
+					}),
 			],
 		});
 	}
