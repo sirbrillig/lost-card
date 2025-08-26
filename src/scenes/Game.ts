@@ -411,6 +411,9 @@ export class Game extends Scene {
 				if (this.isPlayerInvincible() || this.isPlayerHiddenInvincible()) {
 					return false;
 				}
+				if (player.data.get(DataKeys.IsPlantCardGrappleActive)) {
+					return false;
+				}
 				if (!enemy.visible || !enemy.active) {
 					return false;
 				}
