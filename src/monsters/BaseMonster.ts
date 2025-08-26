@@ -6,7 +6,6 @@ import {
 	knockBack,
 	SpriteDirection,
 	SpriteUp,
-	isSpriteDirection,
 } from "../lib/shared";
 import { HealthBar } from "../lib/HealthBar";
 import { EnemyManager } from "../lib/EnemyManager";
@@ -212,6 +211,9 @@ export class BaseMonster extends Phaser.Physics.Arcade.Sprite {
 		}
 
 		if (this.isStunned) {
+			return;
+		}
+		if (this.data?.get(DataKeys.Staggered)) {
 			return;
 		}
 		if (this.hitPoints <= 0) {

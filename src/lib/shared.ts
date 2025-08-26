@@ -48,6 +48,7 @@ export const Events = {
 
 export const DataKeys = {
 	Stunned: "stunned",
+	Staggered: "staggered",
 	IsHarmless: "isHarmless",
 	Hittable: "hittable",
 	Pushable: "pushable",

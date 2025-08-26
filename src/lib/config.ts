@@ -31,6 +31,7 @@ export const config = {
 	icePowerVelocity: 80,
 	iceCardFrozenTime: 3000,
 	iceMeltTime: 4000,
+	plantCardStunTime: 2000,
 	plantCardVelocity: 160,
 	plantCardPullVelocity: 300,
 	plantCardAnimationRepeat: 5,

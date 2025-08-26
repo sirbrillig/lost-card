@@ -392,12 +392,6 @@ export class Game extends Scene {
 				if (!isDynamicSprite(player) || !isDynamicSprite(enemy)) {
 					return;
 				}
-				if (enemy.data.get(DataKeys.IsPlantCardGrappleActive)) {
-					enemy?.emit(Events.MonsterStun, false);
-					enemy.data.set(DataKeys.IsPlantCardGrappleActive, false);
-					this.#endPowerUse();
-					return;
-				}
 				const damage = enemy.data.get(DataKeys.EnemyTouchDamage) ?? 1;
 				this.enemyHitPlayer({ source: enemy, damage });
 			},
@@ -406,7 +400,7 @@ export class Game extends Scene {
 					return false;
 				}
 				if (enemy.data.get(DataKeys.IsPlantCardGrappleActive)) {
-					return true;
+					return false;
 				}
 				if (this.isPlayerInvincible() || this.isPlayerHiddenInvincible()) {
 					return false;
@@ -426,6 +420,9 @@ export class Game extends Scene {
 					return false;
 				}
 				if (enemy.data?.get(DataKeys.Stunned)) {
+					return false;
+				}
+				if (enemy.data?.get(DataKeys.Staggered)) {
 					return false;
 				}
 				if (enemy.data?.get(DataKeys.IsHarmless)) {
@@ -1842,14 +1839,8 @@ export class Game extends Scene {
 		}
 	}
 
-	update() {
-		this.checkForGameOver();
-
+	#updateEnemies() {
 		const player = getPlayerOrThrow();
-		const power = getPhysicsSpriteOrThrow("power");
-		if (this.isPlayerUsingPower() && this.getActivePower() === "PlantCard") {
-			this.#drawPlantCardLine(new Phaser.Math.Vector2(power.x, power.y));
-		}
 		this.enemyManager.enemies.getChildren().forEach((enemy) => {
 			if (!isDynamicSprite(enemy)) {
 				return;
@@ -1859,9 +1850,17 @@ export class Game extends Scene {
 					enemy.body.center,
 					player.body.center
 				);
-				if (distance < 30) {
-					enemy.emit(Events.MonsterStun, false);
+				if (distance < 40) {
+					enemy.body.stop();
+					enemy.data.set(DataKeys.Stunned, false);
 					enemy.data.set(DataKeys.IsPlantCardGrappleActive, false);
+					enemy.data.set(DataKeys.Staggered, true);
+					this.time.addEvent({
+						delay: config.plantCardStunTime,
+						callback: () => {
+							enemy?.data?.set(DataKeys.Staggered, false);
+						},
+					});
 					this.#endPowerUse();
 				}
 			}
@@ -1869,6 +1868,16 @@ export class Game extends Scene {
 			// Note that enemies should avoid rendering if they are not active!
 			enemy.update();
 		});
+	}
+
+	update() {
+		this.checkForGameOver();
+
+		const power = getPhysicsSpriteOrThrow("power");
+		if (this.isPlayerUsingPower() && this.getActivePower() === "PlantCard") {
+			this.#drawPlantCardLine(new Phaser.Math.Vector2(power.x, power.y));
+		}
+		this.#updateEnemies();
 		this.updatePlayer();
 		this.updateRoom();
 		this.updateGatePillars();
