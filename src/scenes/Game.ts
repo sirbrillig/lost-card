@@ -1804,6 +1804,10 @@ export class Game extends Scene {
 					this.cameras.main.fadeIn(fadeTime);
 					if (shouldDoorLockAfterExit && destinationDoor) {
 						this.#lockDoor(destinationDoor.sprite);
+						const areAnyMonstersInRoom = areMonstersInRoom(this.enemyManager);
+						if (!areAnyMonstersInRoom) {
+							this.#unlockDoorsInRoom();
+						}
 					}
 					this.physics.resume();
 					MainEvents.emit(Events.EnteredRoom);
