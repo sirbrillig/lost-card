@@ -130,7 +130,6 @@ export class Game extends Scene {
 	lastAttackedAt: number = 0;
 	lastPowerAt: number = 0;
 	lastDialogData: { heading: string; text?: string } | undefined;
-	playerDirection: SpriteDirection = SpriteDown;
 	enteredRoomAt: number = 0;
 	isPlayerCheatInvincible: boolean = false;
 	isPlayerAppearingInvincible: boolean = false;
@@ -173,7 +172,6 @@ export class Game extends Scene {
 		this.hasPlayerMovedSinceAppearing = false;
 		this.lastAttackedAt = 0;
 		this.lastPowerAt = 0;
-		this.playerDirection = SpriteDown;
 		this.enteredRoomAt = 0;
 		this.isPlayerCheatInvincible = false;
 		this.isPlayerAppearingInvincible = false;
@@ -496,8 +494,9 @@ export class Game extends Scene {
 		if (this.isPlayerFalling()) {
 			return false;
 		}
-		return Array.from(MovingPlatform.values()).some((platform) =>
-			platform.isPlayerOnPlatform()
+		return Array.from(MovingPlatform.values()).some(
+			(platform) =>
+				platform.isPlayerOnPlatform() || platform.isPlayerNearPlatform()
 		);
 	}
 
@@ -1162,13 +1161,13 @@ export class Game extends Scene {
 			0
 		);
 		effect.setSize(config.rangeCardHitBoxWidth, config.rangeCardHitBoxHeight);
-		if (this.playerDirection === SpriteRight) {
+		if (this.#getPlayerDirection() === SpriteRight) {
 			effect.setFlipX(true);
 		}
-		if (this.playerDirection === SpriteLeft) {
+		if (this.#getPlayerDirection() === SpriteLeft) {
 			effect.setFlipY(true);
 		}
-		if (this.playerDirection === SpriteUp) {
+		if (this.#getPlayerDirection() === SpriteUp) {
 			effect.setFlipX(true);
 		}
 		this.physics.add.existing(effect);
@@ -1201,7 +1200,7 @@ export class Game extends Scene {
 		attackSprite.setPosition(player.body.center.x, player.body.center.y);
 		player.setVisible(false);
 		const isRangeCardActive = isAuraActive(this.registry, "RangeCard");
-		switch (this.playerDirection) {
+		switch (this.#getPlayerDirection()) {
 			case SpriteUp:
 				attackSprite.play("up-attack", true);
 				if (isRangeCardActive) {
@@ -1727,7 +1726,7 @@ export class Game extends Scene {
 			throw new Error("Door has no destination direction");
 		}
 
-		if (this.playerDirection !== doorDirection) {
+		if (this.#getPlayerDirection() !== doorDirection) {
 			return;
 		}
 
@@ -2098,7 +2097,7 @@ export class Game extends Scene {
 		const lastSafePosition = new Phaser.Math.Vector2(player.x, player.y);
 		const velocity = createVelocityForDirection(
 			config.plantCardPullVelocity,
-			this.playerDirection
+			this.#getPlayerDirection()
 		);
 		player.body.setVelocity(velocity.x, velocity.y);
 		let lastDistance = Phaser.Math.Distance.BetweenPoints(
@@ -2153,7 +2152,7 @@ export class Game extends Scene {
 		// The wind card pushes tiles.
 		const velocity = createVelocityForDirection(
 			config.windCardPushSpeed,
-			this.playerDirection
+			this.#getPlayerDirection()
 		);
 		tile.body.setVelocity(velocity.x, velocity.y);
 		this.time.addEvent({
@@ -2679,8 +2678,12 @@ export class Game extends Scene {
 		});
 	}
 
+	#getPlayerDirection(): SpriteDirection {
+		const player = getPlayerOrThrow();
+		return player.data.get(DataKeys.PlayerDirection) ?? SpriteDown;
+	}
+
 	setPlayerDirection(direction: SpriteDirection) {
-		this.playerDirection = direction;
 		const player = getPlayerOrThrow();
 		player.data.set(DataKeys.PlayerDirection, direction);
 	}
@@ -2881,8 +2884,8 @@ export class Game extends Scene {
 			: config.swordHitBoxHeight; // for down/up
 		const width = (() => {
 			if (
-				this.playerDirection === SpriteLeft ||
-				this.playerDirection === SpriteRight
+				this.#getPlayerDirection() === SpriteLeft ||
+				this.#getPlayerDirection() === SpriteRight
 			) {
 				return swordHeight;
 			}
@@ -2890,8 +2893,8 @@ export class Game extends Scene {
 		})();
 		const height = (() => {
 			if (
-				this.playerDirection === SpriteUp ||
-				this.playerDirection === SpriteDown
+				this.#getPlayerDirection() === SpriteUp ||
+				this.#getPlayerDirection() === SpriteDown
 			) {
 				return swordHeight;
 			}
@@ -2902,19 +2905,19 @@ export class Game extends Scene {
 		sword.body.setSize(width, height);
 
 		const xOffset = (() => {
-			if (this.playerDirection === SpriteLeft) {
+			if (this.#getPlayerDirection() === SpriteLeft) {
 				return -swordHeight / 2;
 			}
-			if (this.playerDirection === SpriteRight) {
+			if (this.#getPlayerDirection() === SpriteRight) {
 				return swordHeight / 2;
 			}
 			return 0;
 		})();
 		const yOffset = (() => {
-			if (this.playerDirection === SpriteUp) {
+			if (this.#getPlayerDirection() === SpriteUp) {
 				return -swordHeight / 2;
 			}
-			if (this.playerDirection === SpriteDown) {
+			if (this.#getPlayerDirection() === SpriteDown) {
 				return swordHeight / 2;
 			}
 			return 0;
@@ -2931,19 +2934,19 @@ export class Game extends Scene {
 			return [0, 0];
 		}
 		const xOffset = (() => {
-			if (this.playerDirection === SpriteLeft) {
+			if (this.#getPlayerDirection() === SpriteLeft) {
 				return -config.powerOffsetX;
 			}
-			if (this.playerDirection === SpriteRight) {
+			if (this.#getPlayerDirection() === SpriteRight) {
 				return config.powerOffsetX;
 			}
 			return 0;
 		})();
 		const yOffset = (() => {
-			if (this.playerDirection === SpriteUp) {
+			if (this.#getPlayerDirection() === SpriteUp) {
 				return -config.powerOffsetY;
 			}
-			if (this.playerDirection === SpriteDown) {
+			if (this.#getPlayerDirection() === SpriteDown) {
 				return config.powerOffsetY;
 			}
 			return 0;
@@ -2969,16 +2972,16 @@ export class Game extends Scene {
 			}
 			if (this.getActivePower() === "PlantCard") {
 				if (
-					this.playerDirection === SpriteLeft ||
-					this.playerDirection === SpriteRight
+					this.#getPlayerDirection() === SpriteLeft ||
+					this.#getPlayerDirection() === SpriteRight
 				) {
 					return 24;
 				}
 				return 6;
 			}
 			if (
-				this.playerDirection === SpriteLeft ||
-				this.playerDirection === SpriteRight
+				this.#getPlayerDirection() === SpriteLeft ||
+				this.#getPlayerDirection() === SpriteRight
 			) {
 				return 24;
 			}
@@ -2993,16 +2996,16 @@ export class Game extends Scene {
 			}
 			if (this.getActivePower() === "PlantCard") {
 				if (
-					this.playerDirection === SpriteUp ||
-					this.playerDirection === SpriteDown
+					this.#getPlayerDirection() === SpriteUp ||
+					this.#getPlayerDirection() === SpriteDown
 				) {
 					return 24;
 				}
 				return 6;
 			}
 			if (
-				this.playerDirection === SpriteUp ||
-				this.playerDirection === SpriteDown
+				this.#getPlayerDirection() === SpriteUp ||
+				this.#getPlayerDirection() === SpriteDown
 			) {
 				return 24;
 			}
@@ -3015,7 +3018,7 @@ export class Game extends Scene {
 		const [xOffset, yOffset] = this.#getPowerOffset();
 		const player = getPlayerOrThrow();
 		power.setDepth(config.powerDepth);
-		if (this.playerDirection === SpriteUp) {
+		if (this.#getPlayerDirection() === SpriteUp) {
 			power.setDepth(config.powerDepthUp);
 		}
 		power.setPosition(
@@ -3080,8 +3083,8 @@ export class Game extends Scene {
 		const playerDoorHitbox = getPhysicsSpriteOrThrow("playerDoorHitbox");
 		const width = (() => {
 			if (
-				this.playerDirection === SpriteLeft ||
-				this.playerDirection === SpriteRight
+				this.#getPlayerDirection() === SpriteLeft ||
+				this.#getPlayerDirection() === SpriteRight
 			) {
 				return config.playerDoorHitBoxHeight;
 			}
@@ -3089,8 +3092,8 @@ export class Game extends Scene {
 		})();
 		const height = (() => {
 			if (
-				this.playerDirection === SpriteUp ||
-				this.playerDirection === SpriteDown
+				this.#getPlayerDirection() === SpriteUp ||
+				this.#getPlayerDirection() === SpriteDown
 			) {
 				return config.playerDoorHitBoxHeight;
 			}
@@ -3100,19 +3103,19 @@ export class Game extends Scene {
 		playerDoorHitbox.body.setSize(width, height);
 
 		const xOffset = (() => {
-			if (this.playerDirection === SpriteLeft) {
+			if (this.#getPlayerDirection() === SpriteLeft) {
 				return -width / 2;
 			}
-			if (this.playerDirection === SpriteRight) {
+			if (this.#getPlayerDirection() === SpriteRight) {
 				return width / 2;
 			}
 			return 0;
 		})();
 		const yOffset = (() => {
-			if (this.playerDirection === SpriteUp) {
+			if (this.#getPlayerDirection() === SpriteUp) {
 				return -height / 2;
 			}
-			if (this.playerDirection === SpriteDown) {
+			if (this.#getPlayerDirection() === SpriteDown) {
 				return height / 2;
 			}
 			return 0;
@@ -3692,7 +3695,7 @@ export class Game extends Scene {
 				enemy.body,
 				config.enemyKnockbackTime,
 				config.enemyKnockBackSpeed,
-				this.playerDirection,
+				this.#getPlayerDirection(),
 				() => {
 					enemy?.data?.set(DataKeys.Stunned, false);
 				}
@@ -3736,7 +3739,7 @@ export class Game extends Scene {
 			player.body,
 			config.postHitEnemyKnockback,
 			config.playerKnockBackSpeed,
-			invertSpriteDirection(this.playerDirection),
+			invertSpriteDirection(this.#getPlayerDirection()),
 			() => {}
 		);
 	}
@@ -3880,7 +3883,7 @@ export class Game extends Scene {
 				? config.mountainCardPostHitPlayerKnockback
 				: config.postHitPlayerKnockback,
 			config.playerKnockBackSpeed,
-			invertSpriteDirection(this.playerDirection),
+			invertSpriteDirection(this.#getPlayerDirection()),
 			() => {
 				this.setPlayerStunned(false);
 				player.data.set(DataKeys.IsBeingKnockedBack, false);
@@ -4192,7 +4195,7 @@ export class Game extends Scene {
 		// line and the player.
 		const player = getPlayerOrThrow();
 		const xOffset = (() => {
-			switch (this.playerDirection) {
+			switch (this.#getPlayerDirection()) {
 				case SpriteLeft:
 					return -player.width / 2;
 				case SpriteRight:
@@ -4202,7 +4205,7 @@ export class Game extends Scene {
 			}
 		})();
 		const yOffset = (() => {
-			switch (this.playerDirection) {
+			switch (this.#getPlayerDirection()) {
 				case SpriteUp:
 					return -player.height / 2;
 				case SpriteDown:
@@ -4254,7 +4257,7 @@ export class Game extends Scene {
 		dashSprite.setPosition(player.body.center.x, player.body.center.y);
 		dashSprite.setFlipX(false);
 		player.setVisible(false);
-		switch (this.playerDirection) {
+		switch (this.#getPlayerDirection()) {
 			case SpriteUp:
 				dashSprite.play("up-dash-start", true);
 				break;
@@ -4277,7 +4280,7 @@ export class Game extends Scene {
 		}
 		const player = getPlayerOrThrow();
 		const dashSprite = getSpriteOrThrow("dash");
-		switch (this.playerDirection) {
+		switch (this.#getPlayerDirection()) {
 			case SpriteUp:
 				dashSprite.play("up-dash-end", true);
 				break;
@@ -4310,7 +4313,7 @@ export class Game extends Scene {
 			return;
 		}
 		const player = getPlayerOrThrow();
-		switch (this.playerDirection) {
+		switch (this.#getPlayerDirection()) {
 			case SpriteUp:
 				switch (activePower) {
 					case "PlantCard":
@@ -4580,7 +4583,7 @@ export class Game extends Scene {
 		// First stop any current movement unless player is on ice. If player is on
 		// ice, change velocity if changing direction.
 		const isChangingDirection =
-			nextDirection && nextDirection !== this.playerDirection;
+			nextDirection && nextDirection !== this.#getPlayerDirection();
 		if (!this.isPlayerOnIce() || isChangingDirection) {
 			player.body.setVelocity(0);
 		}
@@ -4818,7 +4821,7 @@ export class Game extends Scene {
 		const player = getPlayerOrThrow();
 		// If the player stops moving, stop animations and reset the image to an idle frame in the correct direction.
 		player.setFlipX(false);
-		switch (this.playerDirection) {
+		switch (this.#getPlayerDirection()) {
 			case SpriteLeft:
 				player.anims.play("idle-left", true);
 				return;
