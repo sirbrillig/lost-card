@@ -31446,7 +31446,7 @@
                         {
                          "name":"platformSpeed",
                          "type":"int",
-                         "value":30
+                         "value":33
                         }],
                  "rotation":0,
                  "type":"",
@@ -31631,7 +31631,7 @@
                         {
                          "name":"platformSpeed",
                          "type":"int",
-                         "value":40
+                         "value":42
                         }],
                  "rotation":0,
                  "type":"",
@@ -31664,7 +31664,7 @@
                         {
                          "name":"platformSpeed",
                          "type":"int",
-                         "value":50
+                         "value":55
                         }],
                  "rotation":0,
                  "type":"",
@@ -31697,7 +31697,7 @@
                         {
                          "name":"platformSpeed",
                          "type":"int",
-                         "value":30
+                         "value":50
                         }],
                  "rotation":0,
                  "type":"",

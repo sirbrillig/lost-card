@@ -12126,7 +12126,7 @@
    <properties>
     <property name="isMovingPlatform" type="bool" value="true"/>
     <property name="platformDestination" type="object" value="1984"/>
-    <property name="platformSpeed" type="int" value="30"/>
+    <property name="platformSpeed" type="int" value="33"/>
    </properties>
   </object>
   <object id="1980" gid="1879" x="1584" y="1984" width="16" height="16">
@@ -12164,21 +12164,21 @@
    <properties>
     <property name="isMovingPlatform" type="bool" value="true"/>
     <property name="platformDestination" type="object" value="1984"/>
-    <property name="platformSpeed" type="int" value="40"/>
+    <property name="platformSpeed" type="int" value="42"/>
    </properties>
   </object>
   <object id="1986" gid="1879" x="1568" y="1920" width="16" height="16">
    <properties>
     <property name="isMovingPlatform" type="bool" value="true"/>
     <property name="platformDestination" type="object" value="1984"/>
-    <property name="platformSpeed" type="int" value="50"/>
+    <property name="platformSpeed" type="int" value="55"/>
    </properties>
   </object>
   <object id="1987" gid="1879" x="1568" y="1936" width="16" height="16">
    <properties>
     <property name="isMovingPlatform" type="bool" value="true"/>
     <property name="platformDestination" type="object" value="1984"/>
-    <property name="platformSpeed" type="int" value="30"/>
+    <property name="platformSpeed" type="int" value="50"/>
    </properties>
   </object>
   <object id="1988" x="1600" y="1968">
