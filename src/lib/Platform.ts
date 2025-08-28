@@ -5,8 +5,6 @@ import {
 	SpriteDirection,
 	SpriteDown,
 	SpriteUp,
-	SpriteLeft,
-	SpriteRight,
 	createVelocityForDirection,
 	getDirectionTowardPoint,
 	getSpriteFeetPosition,
@@ -21,6 +19,7 @@ export class Platform {
 	currentPointIndex: number = 0;
 	#isIncreasing: boolean = true;
 	#originalPoint: Phaser.Types.Math.Vector2Like;
+	#speed: number = config.movingPlatformSpeed;
 	#currentDirection: SpriteDirection | undefined;
 	#pausingTimer: Phaser.Time.TimerEvent | undefined;
 
@@ -29,6 +28,10 @@ export class Platform {
 		this.sprite.setDepth(config.movingPlatformDepth);
 		this.sprite.body.pushable = false;
 		this.#originalPoint = { x: sprite.x, y: sprite.y };
+		const speed = sprite.data.get(DataKeys.MovingPlatformSpeed);
+		if (speed) {
+			this.#speed = speed;
+		}
 	}
 
 	addPoint(point: Phaser.Types.Math.Vector2Like): void {
@@ -214,10 +217,7 @@ export class Platform {
 		if (!this.sprite.body) {
 			return;
 		}
-		const velocity = createVelocityForDirection(
-			config.movingPlatformSpeed,
-			direction
-		);
+		const velocity = createVelocityForDirection(this.#speed, direction);
 		this.sprite.body.setVelocity(velocity.x, velocity.y);
 	}
 }

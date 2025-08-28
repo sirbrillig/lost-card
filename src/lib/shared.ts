@@ -72,6 +72,7 @@ export const DataKeys = {
 	RespawnDirection: "respawnDirection",
 	PlatformDestination: "platformDestination",
 	IsMovingPlatform: "isMovingPlatform",
+	MovingPlatformSpeed: "platformSpeed",
 	IsOnMovingPlatform: "isOnMovingPlatform",
 	IsFalling: "IsFalling",
 	IsBeingKnockedBack: "IsBeingKnockedBack",
