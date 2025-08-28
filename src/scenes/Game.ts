@@ -4551,12 +4551,6 @@ export class Game extends Scene {
 			return;
 		}
 
-		// First stop any current movement.
-		if (!this.isPlayerOnIce()) {
-			player.body.setVelocity(0);
-		}
-
-		// Set velocity based on key press
 		let isLeft = this.isPressingLeft();
 		let isRight = this.isPressingRight();
 		let isUp = this.isPressingUp();
@@ -4567,56 +4561,92 @@ export class Game extends Scene {
 			isUp = this.isPressingRight();
 			isDown = this.isPressingLeft();
 		}
-		if (isLeft) {
-			player.body.setVelocityX(-this.getPlayerSpeed());
-			this.setPlayerDirection(SpriteLeft);
-		} else if (isRight) {
-			player.body.setVelocityX(this.getPlayerSpeed());
-			this.setPlayerDirection(SpriteRight);
+		const nextDirection = (() => {
+			if (isLeft) {
+				return SpriteLeft;
+			}
+			if (isRight) {
+				return SpriteRight;
+			}
+			if (isUp) {
+				return SpriteUp;
+			}
+			if (isDown) {
+				return SpriteDown;
+			}
+			return undefined;
+		})();
+
+		// First stop any current movement unless player is on ice. If player is on
+		// ice, change velocity if changing direction.
+		const isChangingDirection =
+			nextDirection && nextDirection !== this.playerDirection;
+		if (!this.isPlayerOnIce() || isChangingDirection) {
+			player.body.setVelocity(0);
 		}
-		if (isUp) {
-			player.body.setVelocityY(-this.getPlayerSpeed());
-			this.setPlayerDirection(SpriteUp);
-		} else if (isDown) {
-			player.body.setVelocityY(this.getPlayerSpeed());
-			this.setPlayerDirection(SpriteDown);
+
+		switch (nextDirection) {
+			case SpriteLeft:
+				player.body.setVelocityX(-this.getPlayerSpeed());
+				this.setPlayerDirection(SpriteLeft);
+				break;
+			case SpriteRight:
+				player.body.setVelocityX(this.getPlayerSpeed());
+				this.setPlayerDirection(SpriteRight);
+				break;
+			case SpriteUp:
+				player.body.setVelocityY(-this.getPlayerSpeed());
+				this.setPlayerDirection(SpriteUp);
+				break;
+			case SpriteDown:
+				player.body.setVelocityY(this.getPlayerSpeed());
+				this.setPlayerDirection(SpriteDown);
+				break;
 		}
 
 		player.body.velocity.normalize().scale(this.getPlayerSpeed());
 
 		// Set animation based on direction (if multiple, just pick one)
-		if (isLeft) {
-			player.setFlipX(false);
-			player.anims.play("left-walk", true);
-			this.playWalkSound();
-			this.finishPlayerAppear();
-			MainEvents.emit(Events.PlayerMoved);
-		} else if (isRight) {
-			player.setFlipX(true);
-			player.anims.play("left-walk", true);
-			this.playWalkSound();
-			this.finishPlayerAppear();
-			MainEvents.emit(Events.PlayerMoved);
-		} else if (isUp) {
-			player.anims.play("up-walk", true);
-			this.playWalkSound();
-			this.finishPlayerAppear();
-			MainEvents.emit(Events.PlayerMoved);
-		} else if (isDown) {
-			player.anims.play("down-walk", true);
-			this.playWalkSound();
-			this.finishPlayerAppear();
-			MainEvents.emit(Events.PlayerMoved);
-		} else {
-			this.walkSound.stop();
-			this.setPlayerIdleFrame();
-			if (
-				this.canPlayerMove() &&
-				!this.#isPlayerOnPlatform() &&
-				!this.#isPlayerInHole()
-			) {
-				this.#lastPlayerPosition = new Phaser.Math.Vector2(player.x, player.y);
-			}
+		switch (nextDirection) {
+			case SpriteLeft:
+				player.setFlipX(false);
+				player.anims.play("left-walk", true);
+				this.playWalkSound();
+				this.finishPlayerAppear();
+				MainEvents.emit(Events.PlayerMoved);
+				break;
+			case SpriteRight:
+				player.setFlipX(true);
+				player.anims.play("left-walk", true);
+				this.playWalkSound();
+				this.finishPlayerAppear();
+				MainEvents.emit(Events.PlayerMoved);
+				break;
+			case SpriteUp:
+				player.anims.play("up-walk", true);
+				this.playWalkSound();
+				this.finishPlayerAppear();
+				MainEvents.emit(Events.PlayerMoved);
+				break;
+			case SpriteDown:
+				player.anims.play("down-walk", true);
+				this.playWalkSound();
+				this.finishPlayerAppear();
+				MainEvents.emit(Events.PlayerMoved);
+				break;
+			default:
+				this.walkSound.stop();
+				this.setPlayerIdleFrame();
+				if (
+					this.canPlayerMove() &&
+					!this.#isPlayerOnPlatform() &&
+					!this.#isPlayerInHole()
+				) {
+					this.#lastPlayerPosition = new Phaser.Math.Vector2(
+						player.x,
+						player.y
+					);
+				}
 		}
 		this.resetPlayerHitBox();
 	}
