@@ -1492,27 +1492,27 @@ export class WindBlast implements Behavior {
 			showOnStart: true,
 			hideOnComplete: true,
 		});
+		const thinWidth = 5;
+		const thickWidth = 24;
+		const effectSpeed = 35;
 		const effectWidth = (() => {
 			switch (this.#direction) {
 				case SpriteUp:
 				case SpriteDown:
-					return 10;
-				case SpriteRight:
-				case SpriteLeft:
-					return 24;
+					return thinWidth;
+				default:
+					return thickWidth;
 			}
 		})();
 		const effectHeight = (() => {
 			switch (this.#direction) {
 				case SpriteUp:
 				case SpriteDown:
-					return 24;
-				case SpriteRight:
-				case SpriteLeft:
-					return 10;
+					return thickWidth;
+				default:
+					return thinWidth;
 			}
 		})();
-		const effectSpeed = 30;
 		const rotation = getRotationFromDirection(SpriteRight, this.#direction);
 		const position = getPositionInFrontOfSprite(
 			{ width: effectWidth, height: effectHeight },
@@ -1544,6 +1544,9 @@ export class WindBlast implements Behavior {
 		let didHit = false;
 		sprite.scene.physics.add.overlap(player, effect, () => {
 			if (didHit) {
+				return;
+			}
+			if (player.data.get(DataKeys.IsFalling)) {
 				return;
 			}
 			didHit = true;
