@@ -2,9 +2,11 @@ import { config } from "../lib/config";
 import {
 	Sound,
 	moveHitboxInFrontOfSprite,
+	invertSpriteDirection,
 	getRotationFromDirection,
 	DataKeys,
 	getDirectionOfSpriteMovement,
+	getSpriteFeetPosition,
 	SpriteDirection,
 	isTilemapTile,
 	isDynamicSprite,
@@ -33,6 +35,7 @@ import { MainEvents } from "./MainEvents";
 import { MountainMonster } from "../monsters/MountainMonster";
 import {
 	PhysicsSpriteComponent,
+	TilemapLayer,
 	getPlayerOrThrow,
 	getPhysicsSpriteOrThrow,
 	getMap,
@@ -629,6 +632,45 @@ export class RandomlyWalk implements Behavior {
 		if (sprite.body?.velocity.x === 0 && sprite.body.velocity.y === 0) {
 			const direction = getWalkingDirection(sprite);
 			this.#walkInDirection(sprite, direction);
+		}
+		// If overlapping a hole, reverse direction.
+		const bottomCenter = getSpriteFeetPosition(sprite);
+		const landLayer = TilemapLayer.get("Background");
+
+		const direction = getWalkingDirection(sprite);
+		const longLength = 15;
+		const shortLength = 5;
+		const width = (() => {
+			switch (direction) {
+				case SpriteUp:
+				case SpriteDown:
+					return shortLength;
+				default:
+					return longLength;
+			}
+		})();
+		const height = (() => {
+			switch (direction) {
+				case SpriteUp:
+				case SpriteDown:
+					return longLength;
+				default:
+					return shortLength;
+			}
+		})();
+		const detector = new Phaser.Geom.Rectangle(
+			bottomCenter.x,
+			bottomCenter.y,
+			width,
+			height
+		);
+
+		const tiles = landLayer?.getTilesWithinShape(detector);
+		if (tiles?.some((tile) => tile.properties.isHole)) {
+			const direction = getWalkingDirection(sprite);
+			sprite.body.stop();
+			this.#walkInDirection(sprite, invertSpriteDirection(direction));
+			return;
 		}
 	}
 

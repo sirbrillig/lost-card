@@ -79,6 +79,7 @@ import {
 import { MonsterCreator } from "../lib/MonsterCreator";
 import {
 	PhysicsSpriteComponent,
+	TilemapLayer,
 	MovingPlatform,
 	SpriteComponent,
 	MapComponent,
@@ -1478,6 +1479,7 @@ export class Game extends Scene {
 		}
 		layer.setDepth(depth);
 		layer.setCollisionByProperty({ collides: true });
+		TilemapLayer.set(layerName, layer);
 		return layer;
 	}
 

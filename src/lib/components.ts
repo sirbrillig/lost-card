@@ -18,6 +18,9 @@ componentManager.register("Tween", TweenComponent);
 export const MapComponent = new Map<string, Phaser.Tilemaps.Tilemap>();
 componentManager.register("Map", MapComponent);
 
+export const TilemapLayer = new Map<string, Phaser.Tilemaps.TilemapLayer>();
+componentManager.register("TilemapLayer", MapComponent);
+
 export const ActiveRoomComponent = new Map<
 	string,
 	Phaser.Types.Tilemaps.TiledObject
