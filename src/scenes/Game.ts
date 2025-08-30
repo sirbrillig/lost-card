@@ -286,14 +286,6 @@ export class Game extends Scene {
 				if (player.data.get(DataKeys.IsPlantCardGrappleActive)) {
 					return false;
 				}
-				if (
-					isTileWithPropertiesObject(tile) &&
-					tile.properties.isHole &&
-					source === player
-				) {
-					// Player can walk over holes, but there will be special handling for this.
-					return false;
-				}
 				return true;
 			}
 		);
