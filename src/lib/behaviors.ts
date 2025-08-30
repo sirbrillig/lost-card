@@ -3,6 +3,7 @@ import {
 	Sound,
 	isSpriteDirection,
 	normalizeRectangle,
+	getCardinalDirectionsFromVector,
 	moveHitboxInFrontOfSprite,
 	invertSpriteDirection,
 	getRotationFromDirection,
@@ -1072,7 +1073,7 @@ export class TeleportToWater implements Behavior {
 		}
 		sprite.body.setVelocity(0);
 		// Get all water tiles in room
-		const tiles = getTilesInRoom(getMap(), activeRoom).filter((tile) => {
+		let tiles = getTilesInRoom(getMap(), activeRoom).filter((tile) => {
 			if (isTileWithPropertiesObject(tile) && tile.properties.isWater) {
 				return true;
 			}
@@ -3400,6 +3401,7 @@ export class SwoopAttack implements Behavior {
 }
 
 export class FollowPlayer implements Behavior {
+	#debugGraphics: Phaser.GameObjects.Graphics | undefined;
 	name: string;
 	#followTime: number | undefined;
 	#awareDistance: number | undefined;
@@ -3465,6 +3467,84 @@ export class FollowPlayer implements Behavior {
 			return;
 		}
 
+		// If overlapping a hole, stop.
+		const bottomCenter = getSpriteFeetPosition(sprite);
+		const landLayer = TilemapLayer.get("Background");
+
+		const directions = getCardinalDirectionsFromVector(
+			sprite.body.center.x,
+			sprite.body.center.y,
+			player.body.center.x,
+			player.body.center.y
+		);
+
+		let tiles: Phaser.Tilemaps.Tile[] = [];
+		if (DebugMode.get("hitboxes") && !this.#debugGraphics) {
+			this.#debugGraphics = sprite.scene.add.graphics();
+			this.#debugGraphics.lineStyle(1, 0xff0000);
+			this.#debugGraphics.setDepth(config.effectDepth);
+		}
+		if (!DebugMode.get("hitboxes") && this.#debugGraphics) {
+			this.#debugGraphics.clear();
+			this.#debugGraphics.destroy();
+			this.#debugGraphics = undefined;
+		}
+		this.#debugGraphics?.clear();
+		this.#debugGraphics?.lineStyle(1, 0xff0000);
+		directions.forEach((direction) => {
+			const longLength = 15;
+			const shortLength = 5;
+			const width = (() => {
+				switch (direction) {
+					case SpriteUp:
+						return shortLength;
+					case SpriteDown:
+						return shortLength;
+					case SpriteLeft:
+						return -longLength;
+					case SpriteRight:
+						return longLength;
+					default:
+						return longLength;
+				}
+			})();
+			const height = (() => {
+				switch (direction) {
+					case SpriteUp:
+						return -longLength;
+					case SpriteDown:
+						return longLength;
+					case SpriteLeft:
+						return shortLength;
+					case SpriteRight:
+						return shortLength;
+					default:
+						return shortLength;
+				}
+			})();
+			const detector = normalizeRectangle(
+				new Phaser.Geom.Rectangle(bottomCenter.x, bottomCenter.y, width, height)
+			);
+
+			if (DebugMode.get("hitboxes")) {
+				this.#debugGraphics?.strokeRect(
+					detector.x,
+					detector.y,
+					detector.width,
+					detector.height
+				);
+			}
+			if (landLayer) {
+				tiles = [...tiles, ...landLayer.getTilesWithinShape(detector)];
+			}
+		});
+		const isMoving =
+			sprite.body.velocity.x !== 0 || sprite.body.velocity.y !== 0;
+		if (isMoving && tiles?.some((tile) => tile.properties.isHole)) {
+			sprite.body.stop();
+			return;
+		}
+
 		const distance = Phaser.Math.Distance.BetweenPoints(
 			sprite.body.center,
 			player.body.center
@@ -3505,11 +3585,21 @@ export class FollowPlayer implements Behavior {
 			sprite.scene?.sound.play("water-walk");
 		}
 		const direction = getDirectionOfSpriteMovement(sprite.body);
-		if (!direction) {
+		if (direction === null) {
 			return;
 		}
 		sprite.data.set("direction", direction);
 		sprite.anims.play(getWalkAnimationKeyForDirection(direction), true);
+	}
+
+	cleanUp(sprite: Phaser.GameObjects.Sprite) {
+		this.#debugGraphics?.clear();
+		this.#debugGraphics?.destroy();
+		if (isDynamicSprite(sprite)) {
+			sprite?.scene?.sound.stopByKey("water-walk");
+			sprite?.body.stop();
+			sprite?.anims.stop();
+		}
 	}
 }
 

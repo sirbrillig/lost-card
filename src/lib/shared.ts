@@ -1743,3 +1743,34 @@ export function normalizeRectangle(
 
 	return normalizedRect;
 }
+
+export function getCardinalDirectionsFromVector(
+	fromX: number,
+	fromY: number,
+	toX: number,
+	toY: number,
+	threshold = 0.3
+): SpriteDirection[] {
+	// Calculate direction vector
+	const dx = toX - fromX;
+	const dy = toY - fromY;
+
+	// Normalize the vector
+	const length = Math.sqrt(dx * dx + dy * dy);
+	if (length === 0) return []; // Same point
+
+	const normalizedX = dx / length;
+	const normalizedY = dy / length;
+
+	const directions: SpriteDirection[] = [];
+
+	// Check vertical direction
+	if (normalizedY < -threshold) directions.push(SpriteUp);
+	else if (normalizedY > threshold) directions.push(SpriteDown);
+
+	// Check horizontal direction
+	if (normalizedX < -threshold) directions.push(SpriteLeft);
+	else if (normalizedX > threshold) directions.push(SpriteRight);
+
+	return directions;
+}
