@@ -86,6 +86,7 @@ import {
 	ItemComponent,
 	DashingComponent,
 	PowerInUse,
+	DebugMode,
 	getMap,
 	setActiveRoom,
 	getActiveRoom,
@@ -267,7 +268,7 @@ export class Game extends Scene {
 					this.enemyHitPlayer({ source: undefined, damage: 15 });
 				}
 			},
-			(source, tile) => {
+			(tile) => {
 				if (
 					isTileWithPropertiesObject(tile) &&
 					(tile.properties.isWater || tile.properties.isLava) &&
@@ -948,11 +949,13 @@ export class Game extends Scene {
 			}
 			// Cheat: show hitboxes
 			if (this.debugGraphic) {
+				DebugMode.delete("hitboxes");
 				this.debugGraphic.destroy();
 				this.debugGraphic = undefined;
 				this.layerDebugGraphic?.destroy();
 				this.layerDebugGraphic = undefined;
 			} else {
+				DebugMode.set("hitboxes", true);
 				this.debugGraphic = this.physics.world.createDebugGraphic();
 				this.layerDebugGraphic = this.add.graphics();
 				this.landLayer.renderDebug(this.layerDebugGraphic, {

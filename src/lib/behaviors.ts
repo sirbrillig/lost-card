@@ -1,6 +1,8 @@
 import { config } from "../lib/config";
 import {
 	Sound,
+	isSpriteDirection,
+	normalizeRectangle,
 	moveHitboxInFrontOfSprite,
 	invertSpriteDirection,
 	getRotationFromDirection,
@@ -35,6 +37,7 @@ import { MainEvents } from "./MainEvents";
 import { MountainMonster } from "../monsters/MountainMonster";
 import {
 	PhysicsSpriteComponent,
+	DebugMode,
 	TilemapLayer,
 	getPlayerOrThrow,
 	getPhysicsSpriteOrThrow,
@@ -546,6 +549,7 @@ export class Leap implements Behavior {
 }
 
 export class RandomlyWalk implements Behavior {
+	#debugGraphics: Phaser.GameObjects.Graphics | undefined;
 	#enemySpeed = 50;
 	#minWalkTime = 800;
 	#maxWalkTime = 4000;
@@ -592,7 +596,7 @@ export class RandomlyWalk implements Behavior {
 			});
 		this.#walkSound.play();
 
-		const direction = getWalkingDirection(sprite);
+		const direction = createRandomWalkingDirection(sprite);
 		this.#walkInDirection(sprite, direction);
 
 		sprite.on(Events.MonsterDying, () => {
@@ -630,44 +634,79 @@ export class RandomlyWalk implements Behavior {
 		}
 		// If you hit a wall, change direction.
 		if (sprite.body?.velocity.x === 0 && sprite.body.velocity.y === 0) {
-			const direction = getWalkingDirection(sprite);
+			const direction = createRandomWalkingDirection(sprite);
 			this.#walkInDirection(sprite, direction);
 		}
 		// If overlapping a hole, reverse direction.
 		const bottomCenter = getSpriteFeetPosition(sprite);
 		const landLayer = TilemapLayer.get("Background");
 
-		const direction = getWalkingDirection(sprite);
+		const direction = sprite.data.get("direction");
+		if (!isSpriteDirection(direction)) {
+			throw new Error("not walking in a direction");
+		}
 		const longLength = 15;
 		const shortLength = 5;
 		const width = (() => {
 			switch (direction) {
 				case SpriteUp:
+					return shortLength;
 				case SpriteDown:
 					return shortLength;
-				default:
+				case SpriteLeft:
+					return -longLength;
+				case SpriteRight:
 					return longLength;
 			}
 		})();
 		const height = (() => {
 			switch (direction) {
 				case SpriteUp:
+					return -longLength;
 				case SpriteDown:
 					return longLength;
-				default:
+				case SpriteLeft:
+					return shortLength;
+				case SpriteRight:
 					return shortLength;
 			}
 		})();
-		const detector = new Phaser.Geom.Rectangle(
-			bottomCenter.x,
-			bottomCenter.y,
-			width,
-			height
+		const detector = normalizeRectangle(
+			new Phaser.Geom.Rectangle(bottomCenter.x, bottomCenter.y, width, height)
 		);
 
+		if (DebugMode.get("hitboxes") && !this.#debugGraphics) {
+			this.#debugGraphics = sprite.scene.add.graphics();
+			this.#debugGraphics.lineStyle(1, 0xff0000);
+			this.#debugGraphics.setDepth(config.effectDepth);
+		}
+		if (!DebugMode.get("hitboxes") && this.#debugGraphics) {
+			this.#debugGraphics.clear();
+			this.#debugGraphics.destroy();
+			this.#debugGraphics = undefined;
+		}
+		if (DebugMode.get("hitboxes")) {
+			this.#debugGraphics?.clear();
+			this.#debugGraphics?.lineStyle(1, 0xff0000);
+			this.#debugGraphics?.strokeRect(
+				detector.x,
+				detector.y,
+				detector.width,
+				detector.height
+			);
+		}
+
 		const tiles = landLayer?.getTilesWithinShape(detector);
+		tiles?.forEach((tile) => {
+			this.#debugGraphics?.lineStyle(2, 0xff0000);
+			this.#debugGraphics?.strokeRect(
+				tile.pixelX,
+				tile.pixelY,
+				tile.width,
+				tile.height
+			);
+		});
 		if (tiles?.some((tile) => tile.properties.isHole)) {
-			const direction = getWalkingDirection(sprite);
 			sprite.body.stop();
 			this.#walkInDirection(sprite, invertSpriteDirection(direction));
 			return;
@@ -675,6 +714,8 @@ export class RandomlyWalk implements Behavior {
 	}
 
 	cleanUp(sprite: Phaser.GameObjects.Sprite) {
+		this.#debugGraphics?.clear();
+		this.#debugGraphics?.destroy();
 		if (isDynamicSprite(sprite)) {
 			sprite?.body.stop();
 			sprite?.anims.stop();
@@ -3472,7 +3513,7 @@ export class FollowPlayer implements Behavior {
 	}
 }
 
-function getWalkingDirection(
+function createRandomWalkingDirection(
 	sprite: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody
 ): SpriteDirection {
 	const previousDirection: SpriteDirection | undefined =

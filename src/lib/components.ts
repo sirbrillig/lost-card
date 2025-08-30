@@ -3,6 +3,9 @@ import { Platform } from "./Platform";
 
 export const componentManager = new ComponentManager();
 
+export const DebugMode = new Map<string, boolean>();
+componentManager.register("DebugMode", DebugMode);
+
 export const PhysicsSpriteComponent = new Map<
 	string,
 	Phaser.Types.Physics.Arcade.SpriteWithDynamicBody

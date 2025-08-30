@@ -1712,3 +1712,34 @@ export function getRotationFromDirection(
 		}
 	}
 }
+
+/**
+ * Functions like getTilesWithinShape do not work well when a rectangle has
+ * negative height or width, so we need to reset them to be always from the
+ * top-left down and right.
+ */
+export function normalizeRectangle(
+	rect: Phaser.Types.Math.RectangleLike
+): Phaser.Geom.Rectangle {
+	let normalizedRect = new Phaser.Geom.Rectangle();
+
+	// Handle negative width
+	if (rect.width < 0) {
+		normalizedRect.x = rect.x + rect.width;
+		normalizedRect.width = Math.abs(rect.width);
+	} else {
+		normalizedRect.x = rect.x;
+		normalizedRect.width = rect.width;
+	}
+
+	// Handle negative height
+	if (rect.height < 0) {
+		normalizedRect.y = rect.y + rect.height;
+		normalizedRect.height = Math.abs(rect.height);
+	} else {
+		normalizedRect.y = rect.y;
+		normalizedRect.height = rect.height;
+	}
+
+	return normalizedRect;
+}

@@ -5,10 +5,13 @@ import {
 	SpriteDirection,
 	SpriteDown,
 	SpriteUp,
+	SpriteLeft,
+	SpriteRight,
 	createVelocityForDirection,
 	getDirectionTowardPoint,
 	getSpriteFeetPosition,
 	isPointInRoom,
+	normalizeRectangle,
 	DataKeys,
 	Events,
 } from "./shared";
@@ -135,26 +138,29 @@ export class Platform {
 		const width = (() => {
 			switch (direction) {
 				case SpriteUp:
+					return shortLength;
 				case SpriteDown:
 					return shortLength;
-				default:
+				case SpriteLeft:
+					return -longLength;
+				case SpriteRight:
 					return longLength;
 			}
 		})();
 		const height = (() => {
 			switch (direction) {
 				case SpriteUp:
+					return -longLength;
 				case SpriteDown:
 					return longLength;
-				default:
+				case SpriteLeft:
+					return shortLength;
+				case SpriteRight:
 					return shortLength;
 			}
 		})();
-		const playerRect = new Phaser.Geom.Rectangle(
-			bottomCenter.x,
-			bottomCenter.y,
-			width,
-			height
+		const playerRect = normalizeRectangle(
+			new Phaser.Geom.Rectangle(bottomCenter.x, bottomCenter.y, width, height)
 		);
 		const bounds = this.sprite.getBounds();
 		return Phaser.Geom.Rectangle.Overlaps(playerRect, bounds);
