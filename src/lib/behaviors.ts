@@ -35,6 +35,7 @@ import { EnemyManager } from "./EnemyManager";
 import { TeleportSystem } from "./TeleportSystem";
 import { Behavior, BehaviorCompleteCallback } from "./Behavior";
 import { MainEvents } from "./MainEvents";
+import { Sensor } from "./Sensor";
 import { MountainMonster } from "../monsters/MountainMonster";
 import {
 	PhysicsSpriteComponent,
@@ -3401,12 +3402,12 @@ export class SwoopAttack implements Behavior {
 }
 
 export class FollowPlayer implements Behavior {
-	#debugGraphics: Phaser.GameObjects.Graphics | undefined;
 	name: string;
 	#followTime: number | undefined;
 	#awareDistance: number | undefined;
 	#stopWhenCloseDistance: number | undefined;
 	#speed: number = 30;
+	#sensor: Sensor;
 
 	constructor(
 		name: string,
@@ -3439,6 +3440,7 @@ export class FollowPlayer implements Behavior {
 		if (!isDynamicSprite(sprite)) {
 			throw new Error("invalid sprite");
 		}
+		this.#sensor = new Sensor(sprite);
 
 		if (this.#followTime) {
 			sprite.scene.time.addEvent({
@@ -3467,78 +3469,20 @@ export class FollowPlayer implements Behavior {
 			return;
 		}
 
-		// If overlapping a hole, stop.
-		const bottomCenter = getSpriteFeetPosition(sprite);
-		const landLayer = TilemapLayer.get("Background");
-
-		const directions = getCardinalDirectionsFromVector(
-			sprite.body.center.x,
-			sprite.body.center.y,
-			player.body.center.x,
-			player.body.center.y
+		this.#sensor.setDirections(
+			getCardinalDirectionsFromVector(
+				sprite.body.center.x,
+				sprite.body.center.y,
+				player.body.center.x,
+				player.body.center.y
+			)
 		);
+		this.#sensor.update();
 
-		let tiles: Phaser.Tilemaps.Tile[] = [];
-		if (DebugMode.get("hitboxes") && !this.#debugGraphics) {
-			this.#debugGraphics = sprite.scene.add.graphics();
-			this.#debugGraphics.lineStyle(1, 0xff0000);
-			this.#debugGraphics.setDepth(config.effectDepth);
-		}
-		if (!DebugMode.get("hitboxes") && this.#debugGraphics) {
-			this.#debugGraphics.clear();
-			this.#debugGraphics.destroy();
-			this.#debugGraphics = undefined;
-		}
-		this.#debugGraphics?.clear();
-		this.#debugGraphics?.lineStyle(1, 0xff0000);
-		directions.forEach((direction) => {
-			const longLength = 15;
-			const shortLength = 5;
-			const width = (() => {
-				switch (direction) {
-					case SpriteUp:
-						return shortLength;
-					case SpriteDown:
-						return shortLength;
-					case SpriteLeft:
-						return -longLength;
-					case SpriteRight:
-						return longLength;
-					default:
-						return longLength;
-				}
-			})();
-			const height = (() => {
-				switch (direction) {
-					case SpriteUp:
-						return -longLength;
-					case SpriteDown:
-						return longLength;
-					case SpriteLeft:
-						return shortLength;
-					case SpriteRight:
-						return shortLength;
-					default:
-						return shortLength;
-				}
-			})();
-			const detector = normalizeRectangle(
-				new Phaser.Geom.Rectangle(bottomCenter.x, bottomCenter.y, width, height)
-			);
-
-			if (DebugMode.get("hitboxes")) {
-				this.#debugGraphics?.strokeRect(
-					detector.x,
-					detector.y,
-					detector.width,
-					detector.height
-				);
-			}
-			if (landLayer) {
-				tiles = [...tiles, ...landLayer.getTilesWithinShape(detector)];
-			}
-		});
-		if (tiles?.some((tile) => tile.properties.isHole)) {
+		// If overlapping a hole, stop.
+		const landLayer = TilemapLayer.get("Background");
+		let tiles = landLayer ? this.#sensor.getOverlappingTiles(landLayer) : [];
+		if (tiles.some((tile) => tile.properties.isHole)) {
 			sprite.body.stop();
 			return;
 		}
@@ -3591,8 +3535,7 @@ export class FollowPlayer implements Behavior {
 	}
 
 	cleanUp(sprite: Phaser.GameObjects.Sprite) {
-		this.#debugGraphics?.clear();
-		this.#debugGraphics?.destroy();
+		this.#sensor.destroy();
 		if (isDynamicSprite(sprite)) {
 			sprite?.scene?.sound.stopByKey("water-walk");
 			sprite?.body.stop();

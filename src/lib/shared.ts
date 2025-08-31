@@ -66,6 +66,7 @@ export const DataKeys = {
 	ItemObjectId: "objectId",
 	OpenGate: "openGate",
 	PlayerDirection: "PlayerDirection",
+	FacingDirections: "FacingDirections",
 	DefeatedMonsters: "DefeatedBosses",
 	LockedDoor: "LockedDoor",
 	EnemyTouchDamage: "EnemyTouchDamage",
