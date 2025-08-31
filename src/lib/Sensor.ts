@@ -22,6 +22,11 @@ export class Sensor {
 		this.#sprite = sprite;
 	}
 
+	setDimensions(length: number, width: number): void {
+		this.#length = length;
+		this.#width = width;
+	}
+
 	setDirections(directions: SpriteDirection[]): void {
 		this.#sprite.data.set(DataKeys.FacingDirections, directions);
 	}

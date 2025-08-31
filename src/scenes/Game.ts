@@ -140,6 +140,7 @@ export class Game extends Scene {
 	isPlayerBeingHitInvincible: boolean = false;
 	heartCardTimer: Phaser.Time.TimerEvent | undefined;
 	healTimer: Phaser.Time.TimerEvent | undefined;
+	#cayoteTimer: Phaser.Time.TimerEvent | undefined;
 	cachedTilesInRoom: Phaser.Tilemaps.Tile[] | undefined;
 	#lastPlayerPosition: Phaser.Math.Vector2 | undefined;
 
@@ -212,7 +213,7 @@ export class Game extends Scene {
 			playerCoordinates?.y ?? spawnPoint.y
 		);
 		const player = getPlayerOrThrow();
-		this.#lastPlayerPosition = new Phaser.Math.Vector2(player.x, player.y);
+		this.#saveLastPlayerPosition();
 
 		this.enemyManager = new EnemyManager(this);
 		this.monsterCreator = new MonsterCreator(
@@ -490,14 +491,9 @@ export class Game extends Scene {
 		if (this.isPlayerFalling()) {
 			return false;
 		}
-		return Array.from(MovingPlatform.values()).some(
-			(platform) =>
-				platform.isPlayerOnPlatform() || this.#isPlayerNearPlatform(platform)
+		return Array.from(MovingPlatform.values()).some((platform) =>
+			platform.isPlayerOnPlatform()
 		);
-	}
-
-	#isPlayerNearPlatform(platform: Platform): boolean {
-		return this.#playerSensor.overlaps(platform.sprite.getBounds());
 	}
 
 	#handlePowerCollideTile(
@@ -2855,10 +2851,18 @@ export class Game extends Scene {
 		});
 	}
 
+	#saveLastPlayerPosition(): void {
+		if (this.#cayoteTimer) {
+			return;
+		}
+		const player = getPlayerOrThrow();
+		this.#lastPlayerPosition = new Phaser.Math.Vector2(player.x, player.y);
+	}
+
 	#movePlayerToPoint(x: number, y: number) {
 		const player = getPlayerOrThrow();
 		player.setPosition(x, y);
-		this.#lastPlayerPosition = new Phaser.Math.Vector2(player.x, player.y);
+		this.#saveLastPlayerPosition();
 		const room = getRoomForPoint(getMap(), player.x, player.y);
 		this.#moveCameraToRoom(room);
 	}
@@ -3473,6 +3477,7 @@ export class Game extends Scene {
 		PhysicsSpriteComponent.set("player", player);
 		this.#playerSensor?.destroy();
 		this.#playerSensor = new Sensor(player);
+		this.#playerSensor.setDimensions(20, 5);
 
 		const playerDoorHitbox = this.physics.add.sprite(
 			x,
@@ -4650,10 +4655,7 @@ export class Game extends Scene {
 					!this.#isPlayerOnPlatform() &&
 					!this.#isPlayerInHole()
 				) {
-					this.#lastPlayerPosition = new Phaser.Math.Vector2(
-						player.x,
-						player.y
-					);
+					this.#saveLastPlayerPosition();
 				}
 		}
 		this.resetPlayerHitBox();
@@ -4765,7 +4767,15 @@ export class Game extends Scene {
 	}
 
 	#checkForHoles(): void {
-		if (this.#isPlayerInHole()) {
+		const isInHole = this.#isPlayerInHole();
+		if (!isInHole) {
+			this.#cayoteTimer?.remove();
+			this.#cayoteTimer = undefined;
+		}
+		if (this.#cayoteTimer) {
+			return;
+		}
+		if (isInHole) {
 			const player = getPlayerOrThrow();
 			const bottomCenter = getSpriteFeetPosition(player);
 			let tile = this.landLayer.getTileAtWorldXY(
@@ -4776,7 +4786,12 @@ export class Game extends Scene {
 			if (!isRectangle(bounds)) {
 				return;
 			}
-			this.#makePlayerFall(bounds);
+			this.#cayoteTimer = this.time.addEvent({
+				delay: config.cayoteTime,
+				callback: () => {
+					this.#makePlayerFall(bounds);
+				},
+			});
 		}
 	}
 
