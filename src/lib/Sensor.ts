@@ -15,8 +15,8 @@ export class Sensor {
 	#debugGraphics: Phaser.GameObjects.Graphics | undefined;
 	#sprite: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
 	#detectors: Phaser.Geom.Rectangle[] = [];
-	#length: number = 15;
-	#width: number = 5;
+	#length: number = 5;
+	#width: number = 2;
 
 	constructor(sprite: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody) {
 		this.#sprite = sprite;
@@ -81,7 +81,7 @@ export class Sensor {
 			const width = (() => {
 				switch (direction) {
 					case SpriteUp:
-						return shortLength;
+						return -shortLength;
 					case SpriteDown:
 						return shortLength;
 					case SpriteLeft:
@@ -99,7 +99,7 @@ export class Sensor {
 					case SpriteDown:
 						return longLength;
 					case SpriteLeft:
-						return shortLength;
+						return -shortLength;
 					case SpriteRight:
 						return shortLength;
 					default:
