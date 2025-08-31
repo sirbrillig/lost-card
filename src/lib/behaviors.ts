@@ -1,15 +1,12 @@
 import { config } from "../lib/config";
 import {
 	Sound,
-	isSpriteDirection,
-	normalizeRectangle,
 	getCardinalDirectionsFromVector,
 	moveHitboxInFrontOfSprite,
 	invertSpriteDirection,
 	getRotationFromDirection,
 	DataKeys,
 	getDirectionOfSpriteMovement,
-	getSpriteFeetPosition,
 	SpriteDirection,
 	isTilemapTile,
 	isDynamicSprite,
@@ -39,7 +36,6 @@ import { Sensor } from "./Sensor";
 import { MountainMonster } from "../monsters/MountainMonster";
 import {
 	PhysicsSpriteComponent,
-	DebugMode,
 	TilemapLayer,
 	getPlayerOrThrow,
 	getPhysicsSpriteOrThrow,
@@ -557,6 +553,7 @@ export class RandomlyWalk implements Behavior {
 	#maxWalkTime = 4000;
 	name: string;
 	#walkSound: Sound;
+	#sensor: Sensor;
 
 	constructor(
 		name: string,
@@ -589,6 +586,7 @@ export class RandomlyWalk implements Behavior {
 		if (!isDynamicSprite(sprite)) {
 			throw new Error("invalid sprite");
 		}
+		this.#sensor = new Sensor(sprite);
 		this.#walkSound =
 			this.#walkSound ??
 			sprite.scene.sound.add("enemy-walk", {
@@ -625,6 +623,7 @@ export class RandomlyWalk implements Behavior {
 		direction: SpriteDirection
 	) {
 		sprite.data.set("direction", direction);
+		this.#sensor.setDirections([direction]);
 		const velocity = createVelocityForDirection(this.#enemySpeed, direction);
 		sprite.body.setVelocity(velocity.x, velocity.y);
 		sprite.anims.play(getWalkAnimationKeyForDirection(direction), true);
@@ -634,72 +633,18 @@ export class RandomlyWalk implements Behavior {
 		if (!isDynamicSprite(sprite)) {
 			throw new Error("invalid sprite");
 		}
+		this.#sensor.update();
+
 		// If you hit a wall, change direction.
 		if (sprite.body?.velocity.x === 0 && sprite.body.velocity.y === 0) {
 			const direction = createRandomWalkingDirection(sprite);
 			this.#walkInDirection(sprite, direction);
 		}
+
 		// If overlapping a hole, reverse direction.
-		const bottomCenter = getSpriteFeetPosition(sprite);
 		const landLayer = TilemapLayer.get("Background");
-
-		const direction = sprite.data.get("direction");
-		if (!isSpriteDirection(direction)) {
-			throw new Error("not walking in a direction");
-		}
-		const longLength = 15;
-		const shortLength = 5;
-		const width = (() => {
-			switch (direction) {
-				case SpriteUp:
-					return shortLength;
-				case SpriteDown:
-					return shortLength;
-				case SpriteLeft:
-					return -longLength;
-				case SpriteRight:
-					return longLength;
-			}
-		})();
-		const height = (() => {
-			switch (direction) {
-				case SpriteUp:
-					return -longLength;
-				case SpriteDown:
-					return longLength;
-				case SpriteLeft:
-					return shortLength;
-				case SpriteRight:
-					return shortLength;
-			}
-		})();
-		const detector = normalizeRectangle(
-			new Phaser.Geom.Rectangle(bottomCenter.x, bottomCenter.y, width, height)
-		);
-
-		if (DebugMode.get("hitboxes") && !this.#debugGraphics) {
-			this.#debugGraphics = sprite.scene.add.graphics();
-			this.#debugGraphics.lineStyle(1, 0xff0000);
-			this.#debugGraphics.setDepth(config.effectDepth);
-		}
-		if (!DebugMode.get("hitboxes") && this.#debugGraphics) {
-			this.#debugGraphics.clear();
-			this.#debugGraphics.destroy();
-			this.#debugGraphics = undefined;
-		}
-		if (DebugMode.get("hitboxes")) {
-			this.#debugGraphics?.clear();
-			this.#debugGraphics?.lineStyle(1, 0xff0000);
-			this.#debugGraphics?.strokeRect(
-				detector.x,
-				detector.y,
-				detector.width,
-				detector.height
-			);
-		}
-
-		const tiles = landLayer?.getTilesWithinShape(detector);
-		tiles?.forEach((tile) => {
+		const tiles = landLayer ? this.#sensor.getOverlappingTiles(landLayer) : [];
+		tiles.forEach((tile) => {
 			this.#debugGraphics?.lineStyle(2, 0xff0000);
 			this.#debugGraphics?.strokeRect(
 				tile.pixelX,
@@ -708,14 +653,16 @@ export class RandomlyWalk implements Behavior {
 				tile.height
 			);
 		});
-		if (tiles?.some((tile) => tile.properties.isHole)) {
+		if (tiles.some((tile) => tile.properties.isHole)) {
 			sprite.body.stop();
+			const direction = sprite.data.get("direction");
 			this.#walkInDirection(sprite, invertSpriteDirection(direction));
 			return;
 		}
 	}
 
 	cleanUp(sprite: Phaser.GameObjects.Sprite) {
+		this.#sensor.destroy();
 		this.#debugGraphics?.clear();
 		this.#debugGraphics?.destroy();
 		if (isDynamicSprite(sprite)) {
