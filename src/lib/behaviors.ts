@@ -3538,9 +3538,7 @@ export class FollowPlayer implements Behavior {
 				tiles = [...tiles, ...landLayer.getTilesWithinShape(detector)];
 			}
 		});
-		const isMoving =
-			sprite.body.velocity.x !== 0 || sprite.body.velocity.y !== 0;
-		if (isMoving && tiles?.some((tile) => tile.properties.isHole)) {
+		if (tiles?.some((tile) => tile.properties.isHole)) {
 			sprite.body.stop();
 			return;
 		}
