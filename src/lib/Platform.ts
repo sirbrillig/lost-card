@@ -3,15 +3,10 @@ import { MainEvents } from "../lib/MainEvents";
 import { getPlayerOrThrow, getActiveRoom } from "../lib/components";
 import {
 	SpriteDirection,
-	SpriteDown,
-	SpriteUp,
-	SpriteLeft,
-	SpriteRight,
 	createVelocityForDirection,
 	getDirectionTowardPoint,
 	getSpriteFeetPosition,
 	isPointInRoom,
-	normalizeRectangle,
 	DataKeys,
 	Events,
 } from "./shared";
@@ -121,49 +116,6 @@ export class Platform {
 			return true;
 		}
 		return false;
-	}
-
-	isPlayerNearPlatform(): boolean {
-		if (!this.sprite.body) {
-			return false;
-		}
-		const player = getPlayerOrThrow();
-		if (player.data.get(DataKeys.IsFalling)) {
-			return false;
-		}
-		const bottomCenter = getSpriteFeetPosition(player);
-		const direction = player.data.get(DataKeys.PlayerDirection) ?? SpriteDown;
-		const longLength = 20;
-		const shortLength = 5;
-		const width = (() => {
-			switch (direction) {
-				case SpriteUp:
-					return shortLength;
-				case SpriteDown:
-					return shortLength;
-				case SpriteLeft:
-					return -longLength;
-				case SpriteRight:
-					return longLength;
-			}
-		})();
-		const height = (() => {
-			switch (direction) {
-				case SpriteUp:
-					return -longLength;
-				case SpriteDown:
-					return longLength;
-				case SpriteLeft:
-					return shortLength;
-				case SpriteRight:
-					return shortLength;
-			}
-		})();
-		const playerRect = normalizeRectangle(
-			new Phaser.Geom.Rectangle(bottomCenter.x, bottomCenter.y, width, height)
-		);
-		const bounds = this.sprite.getBounds();
-		return Phaser.Geom.Rectangle.Overlaps(playerRect, bounds);
 	}
 
 	isPlayerOnPlatform(): boolean {

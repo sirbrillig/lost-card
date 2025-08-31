@@ -2,6 +2,7 @@ import { Scene } from "phaser";
 import { soundKeys, musicKeys } from "../lib/sound";
 import { config } from "../lib/config";
 import { MainEvents } from "../lib/MainEvents";
+import { Sensor } from "../lib/Sensor";
 import { EnemyManager } from "../lib/EnemyManager";
 import { ProgressWheel } from "../lib/ProgressWheel";
 import { Platform } from "../lib/Platform";
@@ -110,6 +111,7 @@ export class Game extends Scene {
 	darkness: Phaser.GameObjects.Graphics;
 	mask: Phaser.Display.Masks.GeometryMask;
 	plantCardSegments: Phaser.GameObjects.Image[] = [];
+	#playerSensor: Sensor;
 
 	backgroundMusic: Sound | undefined;
 	attackSound: Sound;
@@ -490,8 +492,12 @@ export class Game extends Scene {
 		}
 		return Array.from(MovingPlatform.values()).some(
 			(platform) =>
-				platform.isPlayerOnPlatform() || platform.isPlayerNearPlatform()
+				platform.isPlayerOnPlatform() || this.#isPlayerNearPlatform(platform)
 		);
+	}
+
+	#isPlayerNearPlatform(platform: Platform): boolean {
+		return this.#playerSensor.overlaps(platform.sprite.getBounds());
 	}
 
 	#handlePowerCollideTile(
@@ -3465,6 +3471,8 @@ export class Game extends Scene {
 		player.setDebugBodyColor(0x00ff00);
 		player.setDepth(config.playerDepth);
 		PhysicsSpriteComponent.set("player", player);
+		this.#playerSensor?.destroy();
+		this.#playerSensor = new Sensor(player);
 
 		const playerDoorHitbox = this.physics.add.sprite(
 			x,
@@ -4787,6 +4795,9 @@ export class Game extends Scene {
 		this.#updatePowerHitbox();
 		this.#updatePlayerDoorHitBox();
 		this.updatePlayerMovement();
+		const direction = player.data.get(DataKeys.PlayerDirection) ?? SpriteDown;
+		this.#playerSensor.setDirections([direction]);
+		this.#playerSensor.update();
 		this.updateHealEffectPosition();
 		this.updateHeartCard();
 
