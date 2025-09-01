@@ -14,10 +14,9 @@ import {
 	getRegionFromRoomName,
 	Auras,
 	getDataFromRegistry,
-	getPlayerCoordinates,
 } from "../lib/shared";
 import { config } from "../lib/config";
-import { getMap } from "../lib/components";
+import { getMap, getPlayerOrThrow } from "../lib/components";
 
 const topPadding = 35;
 const auraTopPadding = 35;
@@ -289,31 +288,19 @@ export class GameMap extends Scene {
 	}
 
 	drawPlayerOnMap(mapScale: number, mapOffset: { x: number; y: number }): void {
-		const playerRoomX = getDataFromRegistry(this.registry, "playerRoomX");
-		const playerRoomY = getDataFromRegistry(this.registry, "playerRoomY");
+		const player = getPlayerOrThrow();
 		const playerActiveRoom = getDataFromRegistry(
 			this.registry,
 			"playerActiveRoom"
 		);
 
-		if (!playerRoomX || !playerRoomY || !playerActiveRoom) {
-			return;
-		}
-		const playerCoordinates = getPlayerCoordinates(
-			{
-				playerRoomX,
-				playerRoomY,
-				playerActiveRoom,
-			},
-			getMap()
-		);
-		if (!playerCoordinates?.x || !playerCoordinates.y) {
+		if (!playerActiveRoom) {
 			return;
 		}
 
 		const playerPositionOnMap = this.mapGamePointToMapPoint(
-			playerCoordinates.x,
-			playerCoordinates.y,
+			player.x,
+			player.y,
 			mapScale,
 			mapOffset
 		);
