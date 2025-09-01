@@ -8,7 +8,7 @@ export const config = {
 	clockCardCooldown: 450,
 	postHitPlayerKnockback: 200,
 	mountainCardPostHitPlayerKnockback: 100,
-	postHitEnemyKnockback: 50,
+	postHitEnemyKnockback: 25,
 	postHitInvincibilityTime: 800,
 	cayoteTime: 150,
 	dashFrameRate: 40,
