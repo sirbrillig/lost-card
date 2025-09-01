@@ -101,7 +101,7 @@ export const LockableDoorSpriteIndices = [
 export type Region = "MK" | "IK" | "CK" | "FK" | "PK" | "SK" | "FB";
 
 export type Auras =
-	| "SunCard"
+	| "ShieldCard"
 	| "RangeCard"
 	| "HeartCard"
 	| "HurtCard"
@@ -135,7 +135,7 @@ export const auraOrder: Auras[] = [
 	"SwordCard",
 	"MountainCard",
 	"RangeCard",
-	"SunCard",
+	"ShieldCard",
 	"ClockCard",
 	"FishCard",
 ];
@@ -213,8 +213,8 @@ export function getIconForCard(power: Powers | Auras): {
 			return { texture: "cards", frame: 43 };
 		case "RangeCard":
 			return { texture: "cards", frame: 33 };
-		case "SunCard":
-			return { texture: "cards", frame: 24 };
+		case "ShieldCard":
+			return { texture: "cards", frame: 34 };
 		case "MountainCard":
 			return { texture: "cards", frame: 26 };
 		case "SwordCard":
@@ -1169,8 +1169,8 @@ export function getCardNameForPower(card: Powers | Auras): string {
 			return "Heart Card";
 		case "HurtCard":
 			return "Hurt Card";
-		case "SunCard":
-			return "Sun Card";
+		case "ShieldCard":
+			return "Shield Card";
 		case "RangeCard":
 			return "Range Card";
 		case "IceCard":
@@ -1204,8 +1204,8 @@ export function getAuraDescription(card: Auras): string {
 			return "You are not pushed as far when hit.";
 		case "SwordCard":
 			return "Your sword will deal more damage per hit.";
-		case "SunCard":
-			return "You will be invincible for longer after being hit.";
+		case "ShieldCard":
+			return "You can block attacks if you stand still.";
 		case "RangeCard":
 			return "Your attacks will reach further.";
 	}

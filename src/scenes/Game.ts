@@ -135,11 +135,13 @@ export class Game extends Scene {
 	lastPowerAt: number = 0;
 	lastDialogData: { heading: string; text?: string } | undefined;
 	enteredRoomAt: number = 0;
+	isPlayerShielded: boolean = false;
 	isPlayerCheatInvincible: boolean = false;
 	isPlayerAppearingInvincible: boolean = false;
 	isPlayerBeingHitInvincible: boolean = false;
 	heartCardTimer: Phaser.Time.TimerEvent | undefined;
 	healTimer: Phaser.Time.TimerEvent | undefined;
+	shieldTimer: Phaser.Time.TimerEvent | undefined;
 	#cayoteTimer: Phaser.Time.TimerEvent | undefined;
 	cachedTilesInRoom: Phaser.Tilemaps.Tile[] | undefined;
 	#lastPlayerPosition: Phaser.Math.Vector2 | undefined;
@@ -178,6 +180,7 @@ export class Game extends Scene {
 		this.lastAttackedAt = 0;
 		this.lastPowerAt = 0;
 		this.enteredRoomAt = 0;
+		this.isPlayerShielded = false;
 		this.isPlayerCheatInvincible = false;
 		this.isPlayerAppearingInvincible = false;
 		this.isPlayerBeingHitInvincible = false;
@@ -846,6 +849,7 @@ export class Game extends Scene {
 	}
 
 	#startHealTimer(): void {
+		this.#resetShield();
 		if (this.healTimer) {
 			return;
 		}
@@ -1180,6 +1184,7 @@ export class Game extends Scene {
 	}
 
 	activateAttack() {
+		this.#resetShield();
 		const player = getPlayerOrThrow();
 		player.body.setVelocity(0);
 		const sword = getPhysicsSpriteOrThrow("sword");
@@ -1236,6 +1241,7 @@ export class Game extends Scene {
 	}
 
 	activatePower() {
+		this.#resetShield();
 		const activePower = this.getActivePower();
 		if (!activePower) {
 			return;
@@ -2541,7 +2547,7 @@ export class Game extends Scene {
 					break;
 				case "ClockCard":
 				case "RangeCard":
-				case "SunCard":
+				case "ShieldCard":
 				case "MountainCard":
 				case "SwordCard":
 				case "FishCard":
@@ -3875,9 +3881,7 @@ export class Game extends Scene {
 			},
 		});
 		this.time.addEvent({
-			delay: isAuraActive(this.registry, "SunCard")
-				? config.sunCardInvincibilityTime
-				: config.postHitInvincibilityTime,
+			delay: config.postHitInvincibilityTime,
 			callback: () => {
 				if (this.getPlayerHitPoints() > 0) {
 					this.isPlayerBeingHitInvincible = false;
@@ -4026,6 +4030,7 @@ export class Game extends Scene {
 			return true;
 		}
 		if (
+			this.isPlayerShielded ||
 			this.isPlayerCheatInvincible ||
 			this.isPlayerAppearingInvincible ||
 			this.isPlayerBeingHitInvincible
@@ -4606,6 +4611,15 @@ export class Game extends Scene {
 			player.body.setVelocity(0);
 		}
 
+		if (!this.shieldTimer && isAuraActive(this.registry, "ShieldCard")) {
+			this.shieldTimer = this.time.addEvent({
+				delay: config.shieldCardChargeTime,
+				callback: () => {
+					this.isPlayerShielded = true;
+				},
+			});
+		}
+
 		switch (nextDirection) {
 			case SpriteLeft:
 				player.body.setVelocityX(-this.getPlayerSpeed());
@@ -4635,6 +4649,7 @@ export class Game extends Scene {
 				this.playWalkSound();
 				this.finishPlayerAppear();
 				MainEvents.emit(Events.PlayerMoved);
+				this.#resetShield();
 				break;
 			case SpriteRight:
 				player.setFlipX(true);
@@ -4642,18 +4657,21 @@ export class Game extends Scene {
 				this.playWalkSound();
 				this.finishPlayerAppear();
 				MainEvents.emit(Events.PlayerMoved);
+				this.#resetShield();
 				break;
 			case SpriteUp:
 				player.anims.play("up-walk", true);
 				this.playWalkSound();
 				this.finishPlayerAppear();
 				MainEvents.emit(Events.PlayerMoved);
+				this.#resetShield();
 				break;
 			case SpriteDown:
 				player.anims.play("down-walk", true);
 				this.playWalkSound();
 				this.finishPlayerAppear();
 				MainEvents.emit(Events.PlayerMoved);
+				this.#resetShield();
 				break;
 			default:
 				this.walkSound.stop();
@@ -4667,6 +4685,12 @@ export class Game extends Scene {
 				}
 		}
 		this.resetPlayerHitBox();
+	}
+
+	#resetShield(): void {
+		this.isPlayerShielded = false;
+		this.shieldTimer?.remove();
+		this.shieldTimer = undefined;
 	}
 
 	playWalkSound() {
@@ -4688,6 +4712,10 @@ export class Game extends Scene {
 		}
 		if (this.isPlayerFrozen()) {
 			player.setTint(0x0000ff);
+			return;
+		}
+		if (this.isPlayerShielded) {
+			player.setTint(0xC0C0C0);
 			return;
 		}
 		player.clearTint();
