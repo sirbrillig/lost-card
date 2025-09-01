@@ -3,7 +3,9 @@ import {
 	Events,
 	DataKeys,
 	isPointInRoom,
+	isRectangle,
 	knockBack,
+	getSpriteFeetPosition,
 	SpriteDirection,
 	SpriteUp,
 } from "../lib/shared";
@@ -11,7 +13,11 @@ import { HealthBar } from "../lib/HealthBar";
 import { EnemyManager } from "../lib/EnemyManager";
 import { MainEvents } from "../lib/MainEvents";
 import { config } from "../lib/config";
-import { getPlayerOrThrow, getActiveRoom } from "../lib/components";
+import {
+	getPlayerOrThrow,
+	getActiveRoom,
+	TilemapLayer,
+} from "../lib/components";
 import type { Behavior } from "../lib/Behavior";
 
 export class BaseMonster extends Phaser.Physics.Arcade.Sprite {
@@ -219,6 +225,13 @@ export class BaseMonster extends Phaser.Physics.Arcade.Sprite {
 		if (this.hitPoints <= 0) {
 			return;
 		}
+		if (!this.isFlying()) {
+			const tile = this.#isInHole();
+			if (tile) {
+				this.#fallDownHole(tile);
+				return;
+			}
+		}
 
 		const state = this.#currentState;
 		if (!state && this.nextState) {
@@ -239,6 +252,52 @@ export class BaseMonster extends Phaser.Physics.Arcade.Sprite {
 		);
 
 		this.updateAfterBehavior();
+	}
+
+	#isInHole(): Phaser.Tilemaps.Tile | false {
+		if (!this.body || !isDynamicSprite(this)) {
+			throw new Error("Could not update monster");
+		}
+		const bottomCenter = getSpriteFeetPosition(this);
+		const landLayer = TilemapLayer.get("Background");
+		let tile = landLayer?.getTileAtWorldXY(bottomCenter.x, bottomCenter.y);
+		if (!tile?.properties.isHole) {
+			return false;
+		}
+		return tile;
+	}
+
+	#fallDownHole(tile: Phaser.Tilemaps.Tile): void {
+		if (!this.body || !isDynamicSprite(this)) {
+			throw new Error("Could not update monster");
+		}
+		this.#currentActiveBehavior?.cleanUp?.(this, this.#enemyManager);
+		this.#currentActiveBehavior = undefined;
+		this.body.stop();
+		this.anims.stop();
+		this.setStunned(true);
+
+		const bounds = tile.getBounds();
+		if (isRectangle(bounds)) {
+			// Move the player to the center of the hole tile so it looks like they are
+			// falling into the hole.
+			const tileCenter = Phaser.Geom.Rectangle.GetCenter(bounds);
+			this.setPosition(tileCenter.x, tileCenter.y);
+		}
+
+		// Make a falling animation.
+		this.scene.tweens.add({
+			targets: this,
+			scale: 0,
+			duration: 1000,
+			onComplete: () => {
+				this.kill();
+			},
+		});
+	}
+
+	isFlying(): boolean {
+		return false;
 	}
 
 	updateAfterBehavior(): void {}

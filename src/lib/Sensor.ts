@@ -15,7 +15,7 @@ export class Sensor {
 	#debugGraphics: Phaser.GameObjects.Graphics | undefined;
 	#sprite: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
 	#detectors: Phaser.Geom.Rectangle[] = [];
-	#length: number = 5;
+	#length: number = 7;
 	#width: number = 2;
 
 	constructor(sprite: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody) {
