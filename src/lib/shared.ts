@@ -53,6 +53,7 @@ export const DataKeys = {
 	Hittable: "hittable",
 	Pushable: "pushable",
 	Freezable: "freezable",
+	Flying: "Flying",
 	MonsterPosition: "monsterPosition",
 	ActivePower: "activePower",
 	SwordAttackActive: "attackActive",

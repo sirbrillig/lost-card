@@ -75,14 +75,20 @@ export class Platform {
 		}
 		if (this.#hasReachedPoint()) {
 			this.stop();
-			this.#pausingTimer = this.sprite.scene.time.addEvent({
-				delay: config.movingPlatformPauseTime,
-				callback: () => {
-					this.#incrementPoint();
-					this.#moveToCurrentPoint();
-					this.#pausingTimer = undefined;
-				},
-			});
+			if (this.#isAtEnd()) {
+				this.#pausingTimer = this.sprite.scene.time.addEvent({
+					delay: config.movingPlatformPauseTime,
+					callback: () => {
+						this.#incrementPoint();
+						this.#moveToCurrentPoint();
+						this.#pausingTimer = undefined;
+					},
+				});
+			} else {
+				this.#incrementPoint();
+				this.#moveToCurrentPoint();
+				this.#pausingTimer = undefined;
+			}
 		}
 	}
 
@@ -128,6 +134,16 @@ export class Platform {
 		}
 		const bottomCenter = getSpriteFeetPosition(player);
 		return this.sprite.body.hitTest(bottomCenter.x, bottomCenter.y);
+	}
+
+	#isAtEnd(): boolean {
+		if (this.currentPointIndex >= this.points.length - 1) {
+			return true;
+		}
+		if (this.currentPointIndex < 1) {
+			return true;
+		}
+		return false;
 	}
 
 	#getCurrentPoint(): Phaser.Types.Math.Vector2Like | undefined {

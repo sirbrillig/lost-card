@@ -653,7 +653,10 @@ export class RandomlyWalk implements Behavior {
 				tile.height
 			);
 		});
-		if (tiles.some((tile) => tile.properties.isHole)) {
+		if (
+			!sprite.data.get(DataKeys.Flying) &&
+			tiles.some((tile) => tile.properties.isHole)
+		) {
 			sprite.body.stop();
 			const direction = sprite.data.get("direction");
 			this.#walkInDirection(sprite, invertSpriteDirection(direction));
@@ -3429,7 +3432,10 @@ export class FollowPlayer implements Behavior {
 		// If overlapping a hole, stop.
 		const landLayer = TilemapLayer.get("Background");
 		let tiles = landLayer ? this.#sensor.getOverlappingTiles(landLayer) : [];
-		if (tiles.some((tile) => tile.properties.isHole)) {
+		if (
+			!sprite.data.get(DataKeys.Flying) &&
+			tiles.some((tile) => tile.properties.isHole)
+		) {
 			sprite.body.stop();
 			return;
 		}

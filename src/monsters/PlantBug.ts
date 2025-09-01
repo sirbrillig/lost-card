@@ -1,3 +1,4 @@
+import { DataKeys } from "../lib/shared";
 import { WaitForActive, FollowPlayer } from "../lib/behaviors";
 import { EnemyManager } from "../lib/EnemyManager";
 import { BaseMonster } from "./BaseMonster";
@@ -17,6 +18,7 @@ export class PlantBug extends BaseMonster {
 		y: number
 	) {
 		super(scene, enemyManager, x, y, "monsters3", 48);
+		this.data.set(DataKeys.Flying, true);
 	}
 
 	getInitialState(): AllStates {

@@ -18,6 +18,7 @@ export class AirCannon extends BaseMonster {
 		this.data.set(DataKeys.Pushable, false);
 		this.data.set(DataKeys.IsHarmless, true);
 		this.data.set(DataKeys.Hittable, false);
+		this.data.set(DataKeys.Flying, true);
 	}
 
 	isHittable(): boolean {

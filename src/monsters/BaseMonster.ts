@@ -225,7 +225,7 @@ export class BaseMonster extends Phaser.Physics.Arcade.Sprite {
 		if (this.hitPoints <= 0) {
 			return;
 		}
-		if (!this.isFlying()) {
+		if (!this.data.get(DataKeys.Flying)) {
 			const tile = this.#isInHole();
 			if (tile) {
 				this.#fallDownHole(tile);

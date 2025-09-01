@@ -3743,6 +3743,9 @@ export class Game extends Scene {
 		enemy.emit(Events.MonsterHit, damage);
 
 		// Knock the player back a bit when they hit an enemy.
+		if (this.#isPlayerOnPlatform()) {
+			return;
+		}
 		const player = getPlayerOrThrow();
 		knockBack(
 			this,
@@ -4457,10 +4460,10 @@ export class Game extends Scene {
 
 	canPlayerMove(): boolean {
 		const player = getPlayerOrThrow();
-		if (
-			this.isPlayerAttacking() ||
-			player.data.get(DataKeys.IsBeingKnockedBack)
-		) {
+		if (this.isPlayerAttacking()) {
+			return false;
+		}
+		if (player.data.get(DataKeys.IsBeingKnockedBack)) {
 			return false;
 		}
 		if (
@@ -4559,7 +4562,12 @@ export class Game extends Scene {
 
 	updatePlayerMovement(): void {
 		const player = getPlayerOrThrow();
-		if (!this.canPlayerMove()) {
+		if (
+			!this.canPlayerMove() &&
+			// I don't fully grok why but if the player can't move while on a
+			// platform, they stop moving with the platform and fall off.
+			!this.#isPlayerOnPlatform()
+		) {
 			this.walkSound.stop();
 			return;
 		}
@@ -4744,6 +4752,9 @@ export class Game extends Scene {
 		}
 		const player = getPlayerOrThrow();
 		if (player.data.get(DataKeys.IsPlantCardGrappleActive)) {
+			return false;
+		}
+		if (player.data.get(DataKeys.SwordAttackActive)) {
 			return false;
 		}
 		const bottomCenter = getSpriteFeetPosition(player);
