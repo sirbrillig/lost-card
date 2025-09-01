@@ -86,6 +86,7 @@ import {
 	MapComponent,
 	ItemComponent,
 	DashingComponent,
+	InvinciblePlayerEffect,
 	PowerInUse,
 	DebugMode,
 	getMap,
@@ -135,10 +136,6 @@ export class Game extends Scene {
 	lastPowerAt: number = 0;
 	lastDialogData: { heading: string; text?: string } | undefined;
 	enteredRoomAt: number = 0;
-	isPlayerShielded: boolean = false;
-	isPlayerCheatInvincible: boolean = false;
-	isPlayerAppearingInvincible: boolean = false;
-	isPlayerBeingHitInvincible: boolean = false;
 	heartCardTimer: Phaser.Time.TimerEvent | undefined;
 	healTimer: Phaser.Time.TimerEvent | undefined;
 	shieldTimer: Phaser.Time.TimerEvent | undefined;
@@ -180,10 +177,6 @@ export class Game extends Scene {
 		this.lastAttackedAt = 0;
 		this.lastPowerAt = 0;
 		this.enteredRoomAt = 0;
-		this.isPlayerShielded = false;
-		this.isPlayerCheatInvincible = false;
-		this.isPlayerAppearingInvincible = false;
-		this.isPlayerBeingHitInvincible = false;
 		this.isGameOver = false;
 
 		this.cameras.main.fadeIn(config.sceneStartFadeTime);
@@ -1014,7 +1007,7 @@ export class Game extends Scene {
 				return;
 			}
 			// Cheat: be invincible
-			this.isPlayerCheatInvincible = true;
+			InvinciblePlayerEffect.set("cheat", !InvinciblePlayerEffect.get("cheat"));
 		});
 
 		this.input.keyboard.on("keydown-SIX", () => {
@@ -3543,7 +3536,7 @@ export class Game extends Scene {
 	}
 
 	makePlayerAppear() {
-		this.isPlayerAppearingInvincible = true;
+		InvinciblePlayerEffect.set("appearing", true);
 		this.setPlayerStunned(true);
 		const player = getPlayerOrThrow();
 		player.setVisible(false);
@@ -3855,7 +3848,7 @@ export class Game extends Scene {
 		}
 		this.hitSound.play();
 
-		this.isPlayerBeingHitInvincible = true;
+		InvinciblePlayerEffect.set("beingHit", true);
 		this.enemyCollider.active = false;
 		this.setPlayerHitPoints(this.getPlayerHitPoints() - (args?.damage ?? 1));
 		this.heartCardTimer?.remove();
@@ -3884,7 +3877,7 @@ export class Game extends Scene {
 			delay: config.postHitInvincibilityTime,
 			callback: () => {
 				if (this.getPlayerHitPoints() > 0) {
-					this.isPlayerBeingHitInvincible = false;
+					InvinciblePlayerEffect.set("beingHit", false);
 				}
 			},
 		});
@@ -4021,8 +4014,7 @@ export class Game extends Scene {
 	// times when the player should just not be able to take damage like a "got
 	// powerup" period.
 	setPlayerHiddenInvincible(setting: boolean) {
-		const player = getPlayerOrThrow();
-		player.data?.set("invinciblePlayerHidden", setting);
+		InvinciblePlayerEffect.set("invinciblePlayerHidden", setting);
 	}
 
 	isPlayerInvincible(): boolean {
@@ -4030,10 +4022,10 @@ export class Game extends Scene {
 			return true;
 		}
 		if (
-			this.isPlayerShielded ||
-			this.isPlayerCheatInvincible ||
-			this.isPlayerAppearingInvincible ||
-			this.isPlayerBeingHitInvincible
+			InvinciblePlayerEffect.get("shielded") ||
+			InvinciblePlayerEffect.get("cheat") ||
+			InvinciblePlayerEffect.get("appearing") ||
+			InvinciblePlayerEffect.get("beingHit")
 		) {
 			return true;
 		}
@@ -4041,8 +4033,7 @@ export class Game extends Scene {
 	}
 
 	isPlayerHiddenInvincible(): boolean {
-		const player = getPlayerOrThrow();
-		return player.data?.get("invinciblePlayerHidden");
+		return InvinciblePlayerEffect.get("invinciblePlayerHidden") ?? false;
 	}
 
 	isPlayerFrozen(): boolean {
@@ -4560,7 +4551,7 @@ export class Game extends Scene {
 		this.time.addEvent({
 			delay: config.postAppearInvincibilityTime,
 			callback: () => {
-				this.isPlayerAppearingInvincible = false;
+				InvinciblePlayerEffect.set("appearing", false);
 			},
 		});
 	}
@@ -4615,7 +4606,7 @@ export class Game extends Scene {
 			this.shieldTimer = this.time.addEvent({
 				delay: config.shieldCardChargeTime,
 				callback: () => {
-					this.isPlayerShielded = true;
+					InvinciblePlayerEffect.set("shielded", true);
 				},
 			});
 		}
@@ -4688,7 +4679,7 @@ export class Game extends Scene {
 	}
 
 	#resetShield(): void {
-		this.isPlayerShielded = false;
+		InvinciblePlayerEffect.set("shielded", false);
 		this.shieldTimer?.remove();
 		this.shieldTimer = undefined;
 	}
@@ -4714,7 +4705,7 @@ export class Game extends Scene {
 			player.setTint(0x0000ff);
 			return;
 		}
-		if (this.isPlayerShielded) {
+		if (InvinciblePlayerEffect.get("shielded")) {
 			player.setTint(0xC0C0C0);
 			return;
 		}

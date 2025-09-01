@@ -22,7 +22,7 @@ export const MapComponent = new Map<string, Phaser.Tilemaps.Tilemap>();
 componentManager.register("Map", MapComponent);
 
 export const TilemapLayer = new Map<string, Phaser.Tilemaps.TilemapLayer>();
-componentManager.register("TilemapLayer", MapComponent);
+componentManager.register("TilemapLayer", TilemapLayer);
 
 export const ActiveRoomComponent = new Map<
 	string,
@@ -41,6 +41,9 @@ componentManager.register("Dashing", DashingComponent);
 
 export const PowerInUse = new Map<string, boolean>();
 componentManager.register("PowerInUse", PowerInUse);
+
+export const InvinciblePlayerEffect = new Map<string, boolean>();
+componentManager.register("InvinciblePlayerEffect", InvinciblePlayerEffect);
 
 export const MovingPlatform = new Map<string, Platform>();
 componentManager.register("MovingPlatform", MovingPlatform);
