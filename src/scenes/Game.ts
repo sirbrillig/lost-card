@@ -3225,7 +3225,7 @@ export class Game extends Scene {
 		anims.create({
 			key: "white_fire_circle",
 			frames: anims.generateFrameNumbers("white_fire_circle"),
-			frameRate: 20,
+			frameRate: 35,
 			repeat: 2,
 			showOnStart: true,
 			hideOnComplete: true,
@@ -4571,8 +4571,8 @@ export class Game extends Scene {
 		if (
 			!this.canPlayerMove() &&
 			// I don't fully grok why but if the player can't move while on a
-			// platform, they stop moving with the platform and fall off.
-			!this.#isPlayerOnPlatform()
+			// platform, when attacking, they stop moving with the platform and fall off.
+			!this.isPlayerAttacking()
 		) {
 			this.walkSound.stop();
 			return;
