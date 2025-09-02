@@ -12445,7 +12445,7 @@
   <object id="2065" x="1216" y="2016">
    <polyline points="0,0 0,48 -32,48 -32,-32 -48,-32 -48,48 -80,48"/>
   </object>
-  <object id="2075" gid="1838" x="912" y="1936" width="16" height="16">
+  <object id="2075" gid="1838" x="912" y="1952" width="16" height="16">
    <properties>
     <property name="isMovingPlatform" type="bool" value="true"/>
     <property name="platformDestination" type="object" value="2076"/>

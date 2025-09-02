@@ -20,6 +20,7 @@ export class Platform {
 	#speed: number = config.movingPlatformSpeed;
 	#currentDirection: SpriteDirection | undefined;
 	#pausingTimer: Phaser.Time.TimerEvent | undefined;
+	#active: boolean = false;
 
 	constructor(sprite: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody) {
 		this.sprite = sprite;
@@ -37,9 +38,8 @@ export class Platform {
 	}
 
 	start(): void {
-		this.#incrementPoint();
-		this.#moveToCurrentPoint();
 		MainEvents.on(Events.LeavingRoom, () => {
+			this.#active = false;
 			this.stop();
 			this.sprite.setPosition(this.#originalPoint.x, this.#originalPoint.y);
 		});
@@ -48,6 +48,11 @@ export class Platform {
 				this.start();
 			}
 		});
+		if (this.#isInActiveRoom()) {
+			this.#incrementPoint();
+			this.#active = true;
+			this.#moveToCurrentPoint();
+		}
 	}
 
 	stop(): void {
@@ -61,6 +66,9 @@ export class Platform {
 			return;
 		}
 		if (!this.sprite.body) {
+			return;
+		}
+		if (!this.#active) {
 			return;
 		}
 		const player = getPlayerOrThrow();
