@@ -2,7 +2,7 @@ export const config = {
 	pixelsPerPotion: 8,
 	characterSpeed: 100,
 	cloudCardSpeed: 450,
-	shieldCardChargeTime: 1000,
+	shieldCardTime: 1500,
 	postAttackCooldown: 150,
 	postPowerCooldown: 600,
 	clockCardCooldown: 450,

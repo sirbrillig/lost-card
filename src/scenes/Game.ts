@@ -1178,6 +1178,16 @@ export class Game extends Scene {
 
 	activateAttack() {
 		this.#resetShield();
+		if (!this.shieldTimer && isAuraActive(this.registry, "ShieldCard")) {
+			InvinciblePlayerEffect.set("shielded", true);
+			this.shieldTimer = this.time.addEvent({
+				delay: config.shieldCardTime,
+				callback: () => {
+					this.#resetShield();
+				},
+			});
+		}
+
 		const player = getPlayerOrThrow();
 		player.body.setVelocity(0);
 		const sword = getPhysicsSpriteOrThrow("sword");
@@ -4602,15 +4612,6 @@ export class Game extends Scene {
 			player.body.setVelocity(0);
 		}
 
-		if (!this.shieldTimer && isAuraActive(this.registry, "ShieldCard")) {
-			this.shieldTimer = this.time.addEvent({
-				delay: config.shieldCardChargeTime,
-				callback: () => {
-					InvinciblePlayerEffect.set("shielded", true);
-				},
-			});
-		}
-
 		switch (nextDirection) {
 			case SpriteLeft:
 				player.body.setVelocityX(-this.getPlayerSpeed());
@@ -4706,7 +4707,7 @@ export class Game extends Scene {
 			return;
 		}
 		if (InvinciblePlayerEffect.get("shielded")) {
-			player.setTint(0xC0C0C0);
+			player.setTint(0xc0c0c0);
 			return;
 		}
 		player.clearTint();

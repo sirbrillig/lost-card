@@ -1205,7 +1205,7 @@ export function getAuraDescription(card: Auras): string {
 		case "SwordCard":
 			return "Your sword will deal more damage per hit.";
 		case "ShieldCard":
-			return "You can block attacks if you stand still.";
+			return "You can block attacks when you are attacking.";
 		case "RangeCard":
 			return "Your attacks will reach further.";
 	}
