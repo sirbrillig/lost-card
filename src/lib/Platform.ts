@@ -31,34 +31,34 @@ export class Platform {
 		if (speed) {
 			this.#speed = speed;
 		}
+		MainEvents.on(Events.LeavingRoom, () => {
+			this.stop();
+			this.#restoreOriginalPosition();
+		});
+		MainEvents.on(Events.EnteredRoom, () => {
+			this.startIfActiveRoom();
+		});
 	}
 
 	addPoint(point: Phaser.Types.Math.Vector2Like): void {
 		this.points.push(point);
 	}
 
-	start(): void {
-		MainEvents.on(Events.LeavingRoom, () => {
-			this.#active = false;
-			this.stop();
-			this.sprite.setPosition(this.#originalPoint.x, this.#originalPoint.y);
-		});
-		MainEvents.on(Events.EnteredRoom, () => {
-			if (this.#isInActiveRoom()) {
-				this.start();
-			}
-		});
+	startIfActiveRoom(): void {
 		if (this.#isInActiveRoom()) {
-			this.#incrementPoint();
-			this.#active = true;
-			this.#moveToCurrentPoint();
+			this.start();
 		}
 	}
 
+	start(): void {
+		this.#incrementPoint();
+		this.#active = true;
+		this.#moveToCurrentPoint();
+	}
+
 	stop(): void {
-		this.sprite.body?.setVelocity(0, 0);
-		this.#pausingTimer?.remove();
-		this.#pausingTimer = undefined;
+		this.#active = false;
+		this.#stopMoving();
 	}
 
 	update(): void {
@@ -82,7 +82,7 @@ export class Platform {
 			player.data.remove(DataKeys.IsOnMovingPlatform);
 		}
 		if (this.#hasReachedPoint()) {
-			this.stop();
+			this.#stopMoving();
 			if (this.#isAtEnd()) {
 				this.#pausingTimer = this.sprite.scene.time.addEvent({
 					delay: config.movingPlatformPauseTime,
@@ -113,6 +113,16 @@ export class Platform {
 			this.sprite.body.center.y,
 			activeRoom
 		);
+	}
+
+	#stopMoving(): void {
+		this.sprite.body?.setVelocity(0, 0);
+		this.#pausingTimer?.remove();
+		this.#pausingTimer = undefined;
+	}
+
+	#restoreOriginalPosition(): void {
+		this.sprite.setPosition(this.#originalPoint.x, this.#originalPoint.y);
 	}
 
 	#hasReachedPoint(): boolean {

@@ -180,35 +180,12 @@ export class Game extends Scene {
 		this.isGameOver = false;
 
 		this.cameras.main.fadeIn(config.sceneStartFadeTime);
-		const map = this.make.tilemap({ key: "map" });
-		MapComponent.set("map", map);
-		const tilesetTile = map.addTilesetImage("Dungeon_Tiles", "dungeon_tiles");
-		const tilesetSprite = map.addTilesetImage(
-			"Dungeon_Tiles_Sprites",
-			"dungeon_tiles_sprites"
-		);
-		if (!tilesetTile || !tilesetSprite) {
-			throw new Error("Could not make tileset");
-		}
+		this.#setUpTileMap();
+		this.#setUpDungeonSprites();
+		this.#setUpVisibilityMask();
 
-		this.setUpVisibilityMask();
-
-		const spawnPoint = this.getSpawnPoint();
-		const tempSpawnPoint = this.getTempSpawnPoint();
-		const playerCoordinates = (() => {
-			if (tempSpawnPoint) {
-				return tempSpawnPoint;
-			}
-			if (saveData) {
-				return getPlayerCoordinates(saveData, map);
-			}
-			return spawnPoint;
-		})();
-		this.createPlayer(
-			playerCoordinates?.x ?? spawnPoint.x,
-			playerCoordinates?.y ?? spawnPoint.y
-		);
-		const player = getPlayerOrThrow();
+		const playerCoordinates = this.#getInitialPlayerCoordinates(saveData);
+		this.#createPlayerAt(playerCoordinates.x, playerCoordinates.y);
 		this.#saveLastPlayerPosition();
 
 		this.enemyManager = new EnemyManager(this);
@@ -218,269 +195,28 @@ export class Game extends Scene {
 			this.saveGame.bind(this)
 		);
 
-		MainEvents.on(Events.TeleportToLantern, (roomName: string) => {
-			const point = getLanternRespawnPosition(getMap(), roomName);
-			if (!point) {
-				return;
-			}
-			this.respawnRegion(getRegionFromRoomName(roomName));
-			MainEvents.emit(Events.LeavingRoom);
-			this.#movePlayerToPoint(point.x, point.y);
-			MainEvents.emit(Events.EnteredRoom);
-			this.playMusicForRegion(getRegionFromRoomName(roomName));
-		});
-
-		MainEvents.on(
-			Events.MonsterDying,
-			(monster: { body: { center: { x: number; y: number } } }) => {
-				if (
-					this.getPotionTotalCount() === 0 ||
-					this.getPotionCount() === this.getPotionTotalCount()
-				) {
-					return;
-				}
-				const randomNumber = Phaser.Math.Between(1, 100);
-				if (randomNumber <= config.chanceToDropPotion) {
-					this.addPotionVialAt(monster.body.center.x, monster.body.center.y);
-				}
-			}
-		);
-
-		this.landLayer = this.createTileLayer(
-			"Background",
-			tilesetTile,
-			config.backgroundDepth
-		);
-
-		// Handle tiles that hurt the player
-		this.physics.add.collider(
-			this.landLayer,
-			player,
-			(_, tile) => {
-				if (!isTileWithPropertiesObject(tile)) {
-					return;
-				}
-				if (tile.properties.hurts) {
-					this.enemyHitPlayer({ source: undefined, damage: 1 });
-				}
-				if (tile.properties.deadly) {
-					this.enemyHitPlayer({ source: undefined, damage: 15 });
-				}
-			},
-			(tile) => {
-				if (
-					isTileWithPropertiesObject(tile) &&
-					(tile.properties.isWater || tile.properties.isLava) &&
-					isAuraActive(this.registry, "FishCard")
-				) {
-					return false;
-				}
-				if (
-					isTileWithPropertiesObject(tile) &&
-					tile.properties.affectedBySpiritCard &&
-					this.isPlayerUsingPower() &&
-					this.getActivePower() === "SpiritCard"
-				) {
-					return false;
-				}
-				if (player.data.get(DataKeys.IsPlantCardGrappleActive)) {
-					return false;
-				}
-				return true;
-			}
-		);
-
-		this.physics.add.collider(
-			this.landLayer,
-			this.enemyManager.enemies,
-			undefined,
-			(enemy, tile) => {
-				if (!isDynamicSprite(enemy)) {
-					console.error(enemy);
-					throw new Error("Non-sprite ran into something");
-				}
-				if (!isEnemy(enemy)) {
-					throw new Error("Non-enemy ran into something");
-				}
-				return enemy.doesCollideWithTile(tile);
-			}
-		);
-		this.aboveLayer = this.createTileLayer(
-			"Above",
-			tilesetTile,
-			config.aboveLayerDepth
-		);
-
-		this.stuffLayer = this.createTileLayer(
-			"Stuff",
-			tilesetTile,
-			config.backgroundDepth
-		);
-		this.physics.add.collider(this.stuffLayer, player, undefined, () => {
-			if (this.isPlayerUsingPower() && this.getActivePower() === "SpiritCard") {
-				return false;
-			}
-			if (player.data.get(DataKeys.IsPlantCardGrappleActive)) {
-				return false;
-			}
-			return true;
-		});
-		this.physics.add.collider(
-			this.stuffLayer,
-			this.enemyManager.enemies,
-			undefined,
-			(enemy, tile) => {
-				if (!isDynamicSprite(enemy)) {
-					console.error(enemy);
-					throw new Error("Non-sprite ran into something");
-				}
-				if (!isEnemy(enemy)) {
-					throw new Error("Non-enemy ran into something");
-				}
-				return enemy.doesCollideWithTile(tile);
-			}
-		);
-
+		this.#setUpLanterns();
+		this.#setUpLayers();
+		this.#setUpTerrainCollisions();
 		this.#createDoors();
 		this.#createFinalDoors();
-		this.createAppearingTiles();
-		this.#createMovingPlatforms();
-		this.createItems();
+		this.#createAppearingTiles();
+		this.#createItems();
 		this.#createSavePoints();
 		this.#restoreSwitches();
-
-		MainEvents.on(
-			Events.EnemyHitPlayer,
-			(args: {
-				source: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody | undefined;
-				damage: number;
-			}) => {
-				if (!args?.damage) {
-					throw new Error("EnemyHitPlayer must have a damage amount");
-				}
-				this.enemyHitPlayer(args);
-			}
-		);
-
-		MainEvents.on(Events.ConfusePlayer, () => {
-			if (this.isPlayerInvincible() || this.isPlayerHiddenInvincible()) {
-				return;
-			}
-			this.makePlayerConfused();
-		});
-
-		MainEvents.on(Events.MakeRoomDark, () => {
-			this.enableDarkRoom();
-		});
-		MainEvents.on(Events.MakeRoomLight, () => {
-			this.disableDarkRoom();
-		});
-
-		this.enemyCollider = this.physics.add.collider(
-			player,
-			this.enemyManager.enemies,
-			(player, enemy) => {
-				if (!isDynamicSprite(player) || !isDynamicSprite(enemy)) {
-					return;
-				}
-				const damage = enemy.data.get(DataKeys.EnemyTouchDamage) ?? 1;
-				this.enemyHitPlayer({ source: enemy, damage });
-			},
-			(_, enemy) => {
-				if (!isDynamicSprite(enemy)) {
-					return false;
-				}
-				if (enemy.data.get(DataKeys.IsPlantCardGrappleActive)) {
-					return false;
-				}
-				if (this.isPlayerInvincible() || this.isPlayerHiddenInvincible()) {
-					return false;
-				}
-				if (player.data.get(DataKeys.IsPlantCardGrappleActive)) {
-					return false;
-				}
-				if (!enemy.visible || !enemy.active) {
-					return false;
-				}
-				// Dying enemies should be stunned but that doesn't appear to be true
-				// here for some reason so we check isDying and isStunned here also.
-				if ("isDying" in enemy && enemy.isDying) {
-					return false;
-				}
-				if ("isStunned" in enemy && enemy.isStunned) {
-					return false;
-				}
-				if (enemy.data?.get(DataKeys.Stunned)) {
-					return false;
-				}
-				if (enemy.data?.get(DataKeys.Staggered)) {
-					return false;
-				}
-				if (enemy.data?.get(DataKeys.IsHarmless)) {
-					return false;
-				}
-				return true;
-			}
-		);
-
-		const sword = getPhysicsSpriteOrThrow("sword");
-		this.physics.add.overlap(
-			sword,
-			this.enemyManager.enemies,
-			(_, enemy) => {
-				if (!isDynamicSprite(enemy)) {
-					throw new Error("Enemy sprite is not valid for hitboxing with sword");
-				}
-				this.playerHitEnemy(enemy);
-			},
-			() => {
-				return sword.data.get(DataKeys.SwordAttackActive);
-			}
-		);
-
-		const power = getPhysicsSpriteOrThrow("power");
-		this.physics.add.overlap(power, this.enemyManager.enemies, (_, enemy) => {
-			if (!isDynamicSprite(enemy)) {
-				throw new Error("Enemy sprite is not valid for hitboxing with power");
-			}
-			this.playerHitEnemy(enemy);
-		});
-
-		this.physics.add.overlap(power, this.landLayer, (_, tile) => {
-			if (isTilemapTile(tile)) {
-				this.#handlePowerCollideTile(tile);
-			}
-		});
-		this.physics.add.overlap(power, this.stuffLayer, (_, tile) => {
-			if (isTilemapTile(tile)) {
-				this.#handlePowerCollideTile(tile);
-			}
-		});
-
-		this.createInputs();
-		this.setUpCamera();
-
-		this.hideAllTransientTiles();
-		this.hideHiddenItems();
-
+		this.#setUpEnemyEvents();
+		this.#setUpPlayerConditions();
+		this.#setUpLightAndDarkness();
+		this.#setUpEnemyCollider();
+		this.#setUpSwordAndPowerCollisions();
+		this.#createInputs();
+		this.#setUpCamera();
+		this.#createMovingPlatforms();
+		this.#hideAllTransientTiles();
+		this.#hideHiddenItems();
 		this.#createHitPoints();
-		this.createOverlay();
-
-		MainEvents.on(Events.StunPlayer, (setting: boolean) =>
-			this.setPlayerStunned(setting)
-		);
-
-		MainEvents.on(Events.FreezePlayer, (setting: boolean) => {
-			if (
-				setting === true &&
-				(this.isPlayerInvincible() || this.isPlayerHiddenInvincible())
-			) {
-				return;
-			}
-			this.setPlayerFrozen(setting);
-		});
-
-		this.recordSecretRoomsTotal();
+		this.#createOverlay();
+		this.#recordSecretRoomsTotal();
 	}
 
 	#isPlayerOnPlatform(): boolean {
@@ -511,7 +247,7 @@ export class Game extends Scene {
 		}
 	}
 
-	setUpVisibilityMask() {
+	#setUpVisibilityMask() {
 		this.maskGraphics = this.add.graphics();
 		this.maskGraphics.setDepth(config.maskDepth);
 		this.mask = this.maskGraphics.createGeometryMask();
@@ -696,7 +432,7 @@ export class Game extends Scene {
 		});
 	}
 
-	recordSecretRoomsTotal() {
+	#recordSecretRoomsTotal() {
 		const secretRoomsCount = getRooms(getMap()).filter((room) =>
 			room.name.includes("Secret")
 		).length;
@@ -813,7 +549,7 @@ export class Game extends Scene {
 		);
 	}
 
-	createInputs() {
+	#createInputs() {
 		if (!this.input.keyboard) {
 			throw new Error("No keyboard controls could be found");
 		}
@@ -1430,11 +1166,11 @@ export class Game extends Scene {
 			}
 
 			MovingPlatform.set(objectId, platform);
-			platform.start();
+			platform.startIfActiveRoom();
 		});
 	}
 
-	createAppearingTiles() {
+	#createAppearingTiles() {
 		this.createdTiles = createSpritesFromObjectLayer(getMap(), "Transients", {
 			getTilesetKeyByName: this.getTilesetKeyByName.bind(this),
 			callback: this.recordObjectIdOnSprite.bind(this),
@@ -1445,7 +1181,7 @@ export class Game extends Scene {
 		});
 	}
 
-	createItems() {
+	#createItems() {
 		ItemComponent.clear();
 		createSpritesFromObjectLayer(getMap(), "Items", {
 			filterCallback: this.shouldCreateLayerObject.bind(this),
@@ -1489,7 +1225,295 @@ export class Game extends Scene {
 		return layer;
 	}
 
-	setUpCamera(): void {
+	#setUpLanterns(): void {
+		MainEvents.on(Events.TeleportToLantern, (roomName: string) => {
+			const point = getLanternRespawnPosition(getMap(), roomName);
+			if (!point) {
+				return;
+			}
+			this.respawnRegion(getRegionFromRoomName(roomName));
+			MainEvents.emit(Events.LeavingRoom);
+			this.#movePlayerToPoint(point.x, point.y);
+			MainEvents.emit(Events.EnteredRoom);
+			this.playMusicForRegion(getRegionFromRoomName(roomName));
+		});
+	}
+
+	#setUpTileMap(): void {
+		const map = this.make.tilemap({ key: "map" });
+		MapComponent.set("map", map);
+	}
+
+	#setUpDungeonSprites(): void {
+		const map = MapComponent.get("map");
+		if (!map) {
+			throw new Error("Cannot create layers without map");
+		}
+		const tilesetSprite = map.addTilesetImage(
+			"Dungeon_Tiles_Sprites",
+			"dungeon_tiles_sprites"
+		);
+		if (!tilesetSprite) {
+			throw new Error("Could not make tileset");
+		}
+	}
+
+	#setUpEnemyEvents(): void {
+		MainEvents.on(
+			Events.MonsterDying,
+			(monster: { body: { center: { x: number; y: number } } }) => {
+				if (
+					this.getPotionTotalCount() === 0 ||
+					this.getPotionCount() === this.getPotionTotalCount()
+				) {
+					return;
+				}
+				const randomNumber = Phaser.Math.Between(1, 100);
+				if (randomNumber <= config.chanceToDropPotion) {
+					this.addPotionVialAt(monster.body.center.x, monster.body.center.y);
+				}
+			}
+		);
+		MainEvents.on(
+			Events.EnemyHitPlayer,
+			(args: {
+				source: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody | undefined;
+				damage: number;
+			}) => {
+				if (!args?.damage) {
+					throw new Error("EnemyHitPlayer must have a damage amount");
+				}
+				this.enemyHitPlayer(args);
+			}
+		);
+	}
+
+	#setUpLayers(): void {
+		const map = MapComponent.get("map");
+		if (!map) {
+			throw new Error("Cannot create layers without map");
+		}
+		const tilesetTile = map.addTilesetImage("Dungeon_Tiles", "dungeon_tiles");
+		if (!tilesetTile) {
+			throw new Error("Cannot create layers without tileset");
+		}
+		this.landLayer = this.createTileLayer(
+			"Background",
+			tilesetTile,
+			config.backgroundDepth
+		);
+		this.aboveLayer = this.createTileLayer(
+			"Above",
+			tilesetTile,
+			config.aboveLayerDepth
+		);
+		this.stuffLayer = this.createTileLayer(
+			"Stuff",
+			tilesetTile,
+			config.backgroundDepth
+		);
+	}
+
+	#setUpTerrainCollisions(): void {
+		const player = getPlayerOrThrow();
+
+		// Handle tiles that hurt the player
+		this.physics.add.collider(
+			this.landLayer,
+			player,
+			(_, tile) => {
+				if (!isTileWithPropertiesObject(tile)) {
+					return;
+				}
+				if (tile.properties.hurts) {
+					this.enemyHitPlayer({ source: undefined, damage: 1 });
+				}
+				if (tile.properties.deadly) {
+					this.enemyHitPlayer({ source: undefined, damage: 15 });
+				}
+			},
+			(tile) => {
+				if (
+					isTileWithPropertiesObject(tile) &&
+					(tile.properties.isWater || tile.properties.isLava) &&
+					isAuraActive(this.registry, "FishCard")
+				) {
+					return false;
+				}
+				if (
+					isTileWithPropertiesObject(tile) &&
+					tile.properties.affectedBySpiritCard &&
+					this.isPlayerUsingPower() &&
+					this.getActivePower() === "SpiritCard"
+				) {
+					return false;
+				}
+				if (player.data.get(DataKeys.IsPlantCardGrappleActive)) {
+					return false;
+				}
+				return true;
+			}
+		);
+
+		this.physics.add.collider(
+			this.landLayer,
+			this.enemyManager.enemies,
+			undefined,
+			(enemy, tile) => {
+				if (!isDynamicSprite(enemy)) {
+					console.error(enemy);
+					throw new Error("Non-sprite ran into something");
+				}
+				if (!isEnemy(enemy)) {
+					throw new Error("Non-enemy ran into something");
+				}
+				return enemy.doesCollideWithTile(tile);
+			}
+		);
+
+		this.physics.add.collider(this.stuffLayer, player, undefined, () => {
+			if (this.isPlayerUsingPower() && this.getActivePower() === "SpiritCard") {
+				return false;
+			}
+			if (player.data.get(DataKeys.IsPlantCardGrappleActive)) {
+				return false;
+			}
+			return true;
+		});
+		this.physics.add.collider(
+			this.stuffLayer,
+			this.enemyManager.enemies,
+			undefined,
+			(enemy, tile) => {
+				if (!isDynamicSprite(enemy)) {
+					console.error(enemy);
+					throw new Error("Non-sprite ran into something");
+				}
+				if (!isEnemy(enemy)) {
+					throw new Error("Non-enemy ran into something");
+				}
+				return enemy.doesCollideWithTile(tile);
+			}
+		);
+	}
+
+	#setUpSwordAndPowerCollisions(): void {
+		const sword = getPhysicsSpriteOrThrow("sword");
+		this.physics.add.overlap(
+			sword,
+			this.enemyManager.enemies,
+			(_, enemy) => {
+				if (!isDynamicSprite(enemy)) {
+					throw new Error("Enemy sprite is not valid for hitboxing with sword");
+				}
+				this.playerHitEnemy(enemy);
+			},
+			() => {
+				return sword.data.get(DataKeys.SwordAttackActive);
+			}
+		);
+
+		const power = getPhysicsSpriteOrThrow("power");
+		this.physics.add.overlap(power, this.enemyManager.enemies, (_, enemy) => {
+			if (!isDynamicSprite(enemy)) {
+				throw new Error("Enemy sprite is not valid for hitboxing with power");
+			}
+			this.playerHitEnemy(enemy);
+		});
+
+		this.physics.add.overlap(power, this.landLayer, (_, tile) => {
+			if (isTilemapTile(tile)) {
+				this.#handlePowerCollideTile(tile);
+			}
+		});
+		this.physics.add.overlap(power, this.stuffLayer, (_, tile) => {
+			if (isTilemapTile(tile)) {
+				this.#handlePowerCollideTile(tile);
+			}
+		});
+	}
+
+	#setUpPlayerConditions(): void {
+		MainEvents.on(Events.ConfusePlayer, () => {
+			if (this.isPlayerInvincible() || this.isPlayerHiddenInvincible()) {
+				return;
+			}
+			this.makePlayerConfused();
+		});
+		MainEvents.on(Events.StunPlayer, (setting: boolean) =>
+			this.setPlayerStunned(setting)
+		);
+		MainEvents.on(Events.FreezePlayer, (setting: boolean) => {
+			if (
+				setting === true &&
+				(this.isPlayerInvincible() || this.isPlayerHiddenInvincible())
+			) {
+				return;
+			}
+			this.setPlayerFrozen(setting);
+		});
+	}
+
+	#setUpLightAndDarkness(): void {
+		MainEvents.on(Events.MakeRoomDark, () => {
+			this.enableDarkRoom();
+		});
+		MainEvents.on(Events.MakeRoomLight, () => {
+			this.disableDarkRoom();
+		});
+	}
+
+	#setUpEnemyCollider(): void {
+		const player = getPlayerOrThrow();
+		this.enemyCollider = this.physics.add.collider(
+			player,
+			this.enemyManager.enemies,
+			(player, enemy) => {
+				if (!isDynamicSprite(player) || !isDynamicSprite(enemy)) {
+					return;
+				}
+				const damage = enemy.data.get(DataKeys.EnemyTouchDamage) ?? 1;
+				this.enemyHitPlayer({ source: enemy, damage });
+			},
+			(_, enemy) => {
+				if (!isDynamicSprite(enemy)) {
+					return false;
+				}
+				if (enemy.data.get(DataKeys.IsPlantCardGrappleActive)) {
+					return false;
+				}
+				if (this.isPlayerInvincible() || this.isPlayerHiddenInvincible()) {
+					return false;
+				}
+				if (player.data.get(DataKeys.IsPlantCardGrappleActive)) {
+					return false;
+				}
+				if (!enemy.visible || !enemy.active) {
+					return false;
+				}
+				// Dying enemies should be stunned but that doesn't appear to be true
+				// here for some reason so we check isDying and isStunned here also.
+				if ("isDying" in enemy && enemy.isDying) {
+					return false;
+				}
+				if ("isStunned" in enemy && enemy.isStunned) {
+					return false;
+				}
+				if (enemy.data?.get(DataKeys.Stunned)) {
+					return false;
+				}
+				if (enemy.data?.get(DataKeys.Staggered)) {
+					return false;
+				}
+				if (enemy.data?.get(DataKeys.IsHarmless)) {
+					return false;
+				}
+				return true;
+			}
+		);
+	}
+
+	#setUpCamera(): void {
 		this.cameras.main.setBackgroundColor("black");
 
 		// Focus the camera on the room that the player currently is in.
@@ -2429,7 +2453,7 @@ export class Game extends Scene {
 		}
 	}
 
-	hideHiddenItems() {
+	#hideHiddenItems() {
 		ItemComponent.forEach((item) => {
 			if (item.data.get("hidden")) {
 				// If the item has been previous revealed, do not hide it.
@@ -2506,7 +2530,7 @@ export class Game extends Scene {
 		});
 	}
 
-	hideAllTransientTiles() {
+	#hideAllTransientTiles() {
 		this.createdTiles.forEach((item) => {
 			item.setVisible(false);
 			item.data.set("hidden", true);
@@ -3159,7 +3183,7 @@ export class Game extends Scene {
 		}
 	}
 
-	createOverlay() {
+	#createOverlay() {
 		this.scene.launch("Overlay", { enemyManager: this.enemyManager });
 	}
 
@@ -3445,7 +3469,28 @@ export class Game extends Scene {
 		});
 	}
 
-	getTempSpawnPoint(): undefined | { x: number; y: number } {
+	#getInitialPlayerCoordinates(
+		saveData: SaveData | undefined
+	): Phaser.Types.Math.Vector2Like {
+		const spawnPoint = this.#getSpawnPoint();
+		const tempSpawnPoint = this.#getTempSpawnPoint();
+		if (tempSpawnPoint) {
+			return tempSpawnPoint;
+		}
+		if (saveData) {
+			const map = MapComponent.get("map");
+			if (!map) {
+				throw new Error("Cannot create layers without map");
+			}
+			const savedPoint = getPlayerCoordinates(saveData, map);
+			if (savedPoint) {
+				return savedPoint;
+			}
+		}
+		return spawnPoint;
+	}
+
+	#getTempSpawnPoint(): undefined | { x: number; y: number } {
 		const tempSpawnPoint = getMap().findObject(
 			"MetaObjects",
 			(obj) => obj.name === MapMetaKeys.TempStartPoint
@@ -3459,7 +3504,7 @@ export class Game extends Scene {
 		};
 	}
 
-	getSpawnPoint(): { x: number; y: number } {
+	#getSpawnPoint(): Phaser.Types.Math.Vector2Like {
 		const spawnPoint = getMap().findObject(
 			"MetaObjects",
 			(obj) => obj.name === MapMetaKeys.StartPoint
@@ -3473,7 +3518,7 @@ export class Game extends Scene {
 		};
 	}
 
-	createPlayer(x: number, y: number): void {
+	#createPlayerAt(x: number, y: number): void {
 		const player = this.physics.add.sprite(
 			x,
 			y,

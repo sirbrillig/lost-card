@@ -1035,7 +1035,7 @@ export function savePlayerPositionToRegistry(
 export function getPlayerCoordinates(
 	saveData: SaveDataPlayerPosition,
 	map: Phaser.Tilemaps.Tilemap
-): { x: number; y: number } | undefined {
+): Phaser.Types.Math.Vector2Like | undefined {
 	if (!saveData.playerActiveRoom) {
 		return undefined;
 	}
