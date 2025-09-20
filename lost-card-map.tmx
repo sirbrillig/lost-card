@@ -10488,9 +10488,6 @@
   <object id="1548" name="Darkness" x="3792" y="1232" width="208" height="192"/>
   <object id="1756" name="Darkness" x="3792" y="976" width="352" height="224"/>
   <object id="1767" name="SKJumpTarget" x="3344" y="1376" width="16" height="16"/>
-  <object id="1975" name="Temp Start" x="864" y="1984">
-   <point/>
-  </object>
  </objectgroup>
  <objectgroup id="12" name="Creatures">
   <object id="1509" name="IceMonster" gid="1319" x="2368" y="1792" width="16" height="16"/>

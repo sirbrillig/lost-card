@@ -10432,18 +10432,6 @@
                  "width":16,
                  "x":3344,
                  "y":1376
-                }, 
-                {
-                 "height":0,
-                 "id":1975,
-                 "name":"Temp Start",
-                 "point":true,
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":0,
-                 "x":864,
-                 "y":1984
                 }],
          "opacity":1,
          "properties":[

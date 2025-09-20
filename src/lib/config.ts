@@ -10,7 +10,7 @@ export const config = {
 	mountainCardPostHitPlayerKnockback: 100,
 	postHitEnemyKnockback: 25,
 	postHitInvincibilityTime: 800,
-	cayoteTime: 150,
+	cayoteTime: 130,
 	dashFrameRate: 40,
 	attackFrameRate: 35,
 	attackDelay: 0,
