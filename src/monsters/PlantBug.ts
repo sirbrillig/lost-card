@@ -8,7 +8,7 @@ type AllStates = "wait" | "follow";
 export class PlantBug extends BaseMonster {
 	awareDistance: number = 90;
 	speed: number = 50;
-	hitPoints = 2;
+	hitPoints = 6;
 	primaryColor = 0x97a21a;
 
 	constructor(

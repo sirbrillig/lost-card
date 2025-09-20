@@ -4,7 +4,7 @@ import { EnemyManager } from "../lib/EnemyManager";
 import { BaseMonster } from "./BaseMonster";
 
 export class LavaBlorp extends BaseMonster {
-	hitPoints = 2;
+	hitPoints = 6;
 	timeBeforeBubble = 500;
 	timeBeforeExplode = 600;
 

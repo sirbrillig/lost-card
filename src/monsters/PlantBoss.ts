@@ -21,7 +21,7 @@ import { BaseMonster } from "./BaseMonster";
 import { getMap, getActiveRoom } from "../lib/components";
 
 export class PlantBoss extends BaseMonster {
-	hitPoints: number = 16;
+	hitPoints: number = 64;
 	isBoss = true;
 	primaryColor = 0x97a21a;
 	enemyManager: EnemyManager;

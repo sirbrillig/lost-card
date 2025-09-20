@@ -5,7 +5,7 @@ import { BaseMonster } from "./BaseMonster";
 type AllStates = "randomwalk" | "powerup" | "iceattack";
 
 export class IceMonster extends BaseMonster {
-	hitPoints: number = 2;
+	hitPoints: number = 6;
 	primaryColor: number = 0x39b7e0;
 
 	constructor(

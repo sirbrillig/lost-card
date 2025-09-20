@@ -7,7 +7,7 @@ type AllStates = "wait" | "aim" | "dash";
 export class Snakey extends BaseMonster {
 	awareDistance: number = 80;
 	speed: number = 120;
-	hitPoints = 3;
+	hitPoints = 10;
 	primaryColor = 0x097325;
 	#targetPosition: { x: number; y: number };
 

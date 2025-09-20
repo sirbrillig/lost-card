@@ -11,7 +11,7 @@ import {
 import { BaseMonster } from "./BaseMonster";
 
 export class FireBoss extends BaseMonster {
-	hitPoints: number = 20;
+	hitPoints: number = 80;
 	primaryColor = 0xb80000;
 	isBoss = true;
 	#regularAttackCounter: number = 0;

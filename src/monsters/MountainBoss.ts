@@ -15,7 +15,7 @@ import { BaseMonster } from "./BaseMonster";
 import { MountainMonster } from "./MountainMonster";
 
 export class MountainBoss extends BaseMonster {
-	hitPoints: number = 16;
+	hitPoints: number = 63;
 	isBoss = true;
 	enemyManager: EnemyManager;
 	#attackCount: number = 0;

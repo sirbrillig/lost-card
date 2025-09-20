@@ -7,7 +7,7 @@ type AllStates = "wait" | "burst";
 
 export class Flower extends BaseMonster {
 	awareDistance: number = 60;
-	hitPoints = 3;
+	hitPoints = 10;
 	primaryColor = 0x34c24c;
 
 	constructor(

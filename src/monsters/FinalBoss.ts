@@ -50,7 +50,7 @@ type AllStates =
 	| "attack6";
 
 export class FinalBoss extends BaseMonster {
-	hitPoints: number = 26;
+	hitPoints: number = 100;
 	enemyManager: EnemyManager;
 	primaryColor = 0xb80000;
 	isBoss = true;

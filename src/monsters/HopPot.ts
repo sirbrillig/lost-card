@@ -5,7 +5,7 @@ import { BaseMonster } from "./BaseMonster";
 type AllStates = "idle" | "target" | "leap";
 
 export class HopPot extends BaseMonster {
-	hitPoints: number = 2;
+	hitPoints: number = 6;
 	#targetPosition: { x: number; y: number };
 
 	constructor(

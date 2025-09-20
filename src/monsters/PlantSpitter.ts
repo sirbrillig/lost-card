@@ -7,7 +7,7 @@ import { PlantBug } from "./PlantBug";
 type AllStates = "idle" | "spawn" | "idle2";
 
 export class PlantSpitter extends BaseMonster {
-	hitPoints: number = 3;
+	hitPoints: number = 10;
 	primaryColor = 0x97a21a;
 	#enemyManager;
 

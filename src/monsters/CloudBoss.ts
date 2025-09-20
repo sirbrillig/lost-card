@@ -18,7 +18,7 @@ type AllStates =
 	| "attack3";
 
 export class CloudBoss extends BaseMonster {
-	hitPoints: number = 8;
+	hitPoints: number = 60;
 	primaryColor = 0xe38d2f;
 	isBoss = true;
 

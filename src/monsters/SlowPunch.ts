@@ -15,7 +15,7 @@ export class SlowPunch extends BaseMonster {
 	awareDistance: number = 90;
 	closeDistance: number = 28;
 	speed: number = 15;
-	hitPoints = 7;
+	hitPoints = 28;
 	primaryColor = 0xb80000;
 
 	constructor(

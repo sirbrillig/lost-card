@@ -17,7 +17,7 @@ import { LavaBlorp } from "./LavaBlorp";
 import { BaseMonster } from "./BaseMonster";
 
 export class FireGiant extends BaseMonster {
-	hitPoints: number = 10;
+	hitPoints: number = 40;
 	primaryColor = 0xb80000;
 	#enemyManager: EnemyManager;
 	#previouslySummonedTiles: Phaser.Tilemaps.Tile[] = [];

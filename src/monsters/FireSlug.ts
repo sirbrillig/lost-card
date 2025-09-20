@@ -3,7 +3,7 @@ import { EnemyManager } from "../lib/EnemyManager";
 import { BaseMonster } from "./BaseMonster";
 
 export class FireSlug extends BaseMonster {
-	hitPoints: number = 3;
+	hitPoints: number = 10;
 	primaryColor = 0xb80000;
 
 	constructor(

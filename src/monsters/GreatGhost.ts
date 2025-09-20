@@ -8,7 +8,7 @@ type AllStates = "wait" | "follow" | "spawn";
 export class GreatGhost extends BaseMonster {
 	awareDistance: number = 200;
 	speed: number = 15;
-	hitPoints = 6;
+	hitPoints = 24;
 	primaryColor = 0x23a487;
 	#enemyManager: EnemyManager;
 

@@ -11,7 +11,7 @@ import {
 import { BaseMonster } from "./BaseMonster";
 
 export class IceBoss extends BaseMonster {
-	hitPoints: number = 20;
+	hitPoints: number = 80;
 	primaryColor: number = 0x39b7e0;
 	isBoss = true;
 	#iceAttackCount: number = 0;

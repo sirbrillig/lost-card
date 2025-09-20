@@ -3,7 +3,7 @@ import { EnemyManager } from "../lib/EnemyManager";
 import { BaseMonster } from "./BaseMonster";
 
 export class MountainMonster extends BaseMonster {
-	hitPoints = 2;
+	hitPoints = 6;
 
 	constructor(
 		scene: Phaser.Scene,

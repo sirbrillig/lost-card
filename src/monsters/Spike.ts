@@ -8,7 +8,7 @@ type AllStates = "wait" | "move";
 export class Spike extends BaseMonster {
 	awareDistance: number = 60;
 	speed: number = 74;
-	hitPoints = 4;
+	hitPoints = 16;
 	primaryColor = 0x34c24c;
 
 	constructor(

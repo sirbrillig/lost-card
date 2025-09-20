@@ -8,7 +8,7 @@ type AllStates = "wait" | "follow";
 export class SkyBlob extends BaseMonster {
 	awareDistance: number = 90;
 	speed: number = 60;
-	hitPoints = 2;
+	hitPoints = 6;
 	primaryColor = 0x23a487;
 
 	constructor(

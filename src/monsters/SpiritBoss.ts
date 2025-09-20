@@ -16,7 +16,7 @@ import {
 import { BaseMonster } from "./BaseMonster";
 
 export class SpiritBoss extends BaseMonster {
-	hitPoints: number = 20;
+	hitPoints: number = 80;
 	primaryColor = 0x23a487;
 	isBoss = true;
 	#previousPosition: ObjectWithXandY;
