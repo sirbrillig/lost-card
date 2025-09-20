@@ -74,9 +74,13 @@ export const config = {
 	darkRoomSpotlightRadius: 28,
 	targetSpotlightRadius: 38,
 	playerHitBoxWidth: 8,
-	playerHitBoxHeight: 10,
+	playerHitBoxHeight: 4,
 	playerHitBoxOffsetX: 0,
-	playerHitBoxOffsetY: 5, // Move hitbox closer to feet
+	playerHitBoxOffsetY: 8, // Movement hitbox at bottom
+	playerDamageHitBoxWidth: 8,
+	playerDamageHitBoxHeight: 10,
+	playerDamageHitBoxOffsetX: 0,
+	playerDamageHitBoxOffsetY: 5, // Centered damage hitbox
 	firePowerHitBoxWidth: 8,
 	firePowerHitBoxHeight: 8,
 	playerOriginX: 0.5,

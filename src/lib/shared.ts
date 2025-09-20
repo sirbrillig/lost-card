@@ -641,7 +641,7 @@ export function hideAllRoomsExcept(
 				tile.visible = true;
 			});
 			getItemsInRoom(items, room).forEach((item) => {
-				if (!item.data.get("hidden")) {
+				if (!item.data?.get("hidden")) {
 					item.visible = true;
 				}
 			});

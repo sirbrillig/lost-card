@@ -1465,11 +1465,12 @@ export class Game extends Scene {
 
 	#setUpEnemyCollider(): void {
 		const player = getPlayerOrThrow();
+		const playerDamageHitbox = getPhysicsSpriteOrThrow("playerDamageHitbox");
 		this.enemyCollider = this.physics.add.collider(
-			player,
+			playerDamageHitbox,
 			this.enemyManager.enemies,
-			(player, enemy) => {
-				if (!isDynamicSprite(player) || !isDynamicSprite(enemy)) {
+			(playerDamageHitbox, enemy) => {
+				if (!isDynamicSprite(playerDamageHitbox) || !isDynamicSprite(enemy)) {
 					return;
 				}
 				const damage = enemy.data.get(DataKeys.EnemyTouchDamage) ?? 1;
@@ -2350,6 +2351,7 @@ export class Game extends Scene {
 		tile.data.set("hidden", false);
 		tile.body.pushable = false;
 		const player = getPlayerOrThrow();
+		const playerDamageHitbox = getPhysicsSpriteOrThrow("playerDamageHitbox");
 		this.physics.add.collider(
 			player,
 			tile,
@@ -2427,7 +2429,7 @@ export class Game extends Scene {
 			}
 		});
 
-		if (this.physics.overlap(player, tile)) {
+		if (this.physics.overlap(playerDamageHitbox, tile)) {
 			this.enemyHitPlayer({ source: undefined, damage: 1 });
 		}
 
@@ -3168,6 +3170,22 @@ export class Game extends Scene {
 		);
 	}
 
+	#updatePlayerDamageHitBox() {
+		const playerDamageHitbox = getPhysicsSpriteOrThrow("playerDamageHitbox");
+		const player = getPlayerOrThrow();
+		
+		playerDamageHitbox.body.setSize(
+			config.playerDamageHitBoxWidth,
+			config.playerDamageHitBoxHeight
+		);
+		
+		// Position damage hitbox centered on player
+		playerDamageHitbox.setPosition(
+			player.body.center.x,
+			player.body.center.y + config.playerDamageHitBoxOffsetY - config.playerHitBoxOffsetY
+		);
+	}
+
 	#createHitPoints() {
 		if (
 			getDataFromRegistry(this.registry, "playerTotalHitPoints") === undefined
@@ -3548,6 +3566,22 @@ export class Game extends Scene {
 			config.playerDoorHitBoxHeight
 		);
 		PhysicsSpriteComponent.set("playerDoorHitbox", playerDoorHitbox);
+
+		const playerDamageHitbox = this.physics.add.sprite(
+			x,
+			y,
+			"character",
+			"idle-down-0.png"
+		);
+		playerDamageHitbox.setVisible(false);
+		playerDamageHitbox.setDebugBodyColor(0xff00ff);
+		playerDamageHitbox.setDepth(config.swordDepth);
+		playerDamageHitbox.setPushable(false);
+		playerDamageHitbox.setSize(
+			config.playerDamageHitBoxWidth,
+			config.playerDamageHitBoxHeight
+		);
+		PhysicsSpriteComponent.set("playerDamageHitbox", playerDamageHitbox);
 
 		this.setPlayerHitPoints(config.playerInitialHitPoints);
 
@@ -4885,6 +4919,7 @@ export class Game extends Scene {
 		this.#updateSwordHitBox();
 		this.#updatePowerHitbox();
 		this.#updatePlayerDoorHitBox();
+		this.#updatePlayerDamageHitBox();
 		this.updatePlayerMovement();
 		const direction = player.data.get(DataKeys.PlayerDirection) ?? SpriteDown;
 		this.#playerSensor.setDirections([direction]);

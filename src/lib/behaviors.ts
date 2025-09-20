@@ -38,6 +38,7 @@ import {
 	PhysicsSpriteComponent,
 	TilemapLayer,
 	getPlayerOrThrow,
+	getPlayerDamageHitboxOrThrow,
 	getPhysicsSpriteOrThrow,
 	getMap,
 	getActiveRoom,
@@ -446,7 +447,8 @@ export class Burrow implements Behavior {
 							if (!player) {
 								return;
 							}
-							sprite?.scene.physics.add.overlap(player, shadow, () => {
+							const playerDamageHitbox = getPlayerDamageHitboxOrThrow();
+							sprite?.scene.physics.add.overlap(playerDamageHitbox, shadow, () => {
 								MainEvents.emit(Events.EnemyHitPlayer, {
 									source: sprite,
 									damage: 1,
@@ -1193,7 +1195,8 @@ export class SlashTowardPlayer implements Behavior {
 		this.#effect.anims.play("slash-effect", true);
 		sprite.scene.sound.play("attack");
 
-		sprite.scene.physics.add.overlap(player, this.#effect, () => {
+		const playerDamageHitbox = getPlayerDamageHitboxOrThrow();
+		sprite.scene.physics.add.overlap(playerDamageHitbox, this.#effect, () => {
 			MainEvents.emit(Events.EnemyHitPlayer, { source: sprite, damage: 1 });
 		});
 
@@ -1261,8 +1264,8 @@ export class BigSwing implements Behavior {
 		effect.anims.play("slash-effect", true);
 		sprite.scene.sound.play("attack");
 
-		const player = getPlayerOrThrow();
-		sprite.scene.physics.add.overlap(player, effect, () => {
+		const playerDamageHitbox = getPlayerDamageHitboxOrThrow();
+		sprite.scene.physics.add.overlap(playerDamageHitbox, effect, () => {
 			MainEvents.emit(Events.EnemyHitPlayer, { source: sprite, damage: 1 });
 		});
 
@@ -1316,8 +1319,8 @@ export class IceAttack implements Behavior {
 		effect.anims.play("ice_attack", true);
 		sprite.scene.sound.play("ice");
 
-		const player = getPlayerOrThrow();
-		sprite.scene.physics.add.overlap(player, effect, () => {
+		const playerDamageHitbox = getPlayerDamageHitboxOrThrow();
+		sprite.scene.physics.add.overlap(playerDamageHitbox, effect, () => {
 			MainEvents.emit(Events.FreezePlayer, true);
 			sprite?.scene?.time.addEvent({
 				delay: this.#freezePlayerTime,
@@ -1411,7 +1414,8 @@ export class StickyPoison implements Behavior {
 		}
 
 		if (this.#isStuck) {
-			sprite.scene.physics.moveToObject(sprite, player, this.#speed);
+			const playerDamageHitbox = getPlayerDamageHitboxOrThrow();
+			sprite.scene.physics.moveToObject(sprite, playerDamageHitbox, this.#speed);
 		}
 	}
 }
@@ -1453,8 +1457,8 @@ export class Poof implements Behavior {
 				// y += sprite.body.y;
 
 				// If a particle hits the player, then trigger an effect.
-				const player = getPlayerOrThrow();
-				const didHit = player.body?.hitTest(x, y) ?? false;
+				const playerDamageHitbox = getPlayerDamageHitboxOrThrow();
+				const didHit = playerDamageHitbox.body?.hitTest(x, y) ?? false;
 				if (didHit) {
 					MainEvents.emit(Events.ConfusePlayer, true);
 				}
@@ -1576,8 +1580,9 @@ export class WindBlast implements Behavior {
 		effect.body.setVelocity(velocity.x, velocity.y);
 
 		const player = getPlayerOrThrow();
+		const playerDamageHitbox = getPlayerDamageHitboxOrThrow();
 		let didHit = false;
-		sprite.scene.physics.add.overlap(player, effect, () => {
+		sprite.scene.physics.add.overlap(playerDamageHitbox, effect, () => {
 			if (didHit) {
 				return;
 			}
@@ -1653,8 +1658,8 @@ export class LavaExplode implements Behavior {
 		}
 		circle.body.setCircle(this.#hitboxRadius);
 		circle.body.setOffset(-this.#hitboxRadius, -this.#hitboxRadius);
-		const player = getPlayerOrThrow();
-		sprite.scene.physics.add.overlap(player, circle, () => {
+		const playerDamageHitbox = getPlayerDamageHitboxOrThrow();
+		sprite.scene.physics.add.overlap(playerDamageHitbox, circle, () => {
 			MainEvents.emit(Events.EnemyHitPlayer, {
 				source: sprite,
 				damage: this.#damage,
@@ -1915,7 +1920,8 @@ export class DashTowardPlayer implements Behavior {
 			this.#speed
 		);
 
-		sprite.scene.physics.add.overlap(player, sprite, () => {
+		const playerDamageHitbox = getPlayerDamageHitboxOrThrow();
+		sprite.scene.physics.add.overlap(playerDamageHitbox, sprite, () => {
 			MainEvents.emit(Events.EnemyHitPlayer, { source: sprite, damage: 1 });
 		});
 
@@ -1930,12 +1936,13 @@ export class DashTowardPlayer implements Behavior {
 
 	update(sprite: Phaser.GameObjects.Sprite, _: BehaviorCompleteCallback): void {
 		const player = getPlayerOrThrow();
+		const playerDamageHitbox = getPlayerDamageHitboxOrThrow();
 		if (!isDynamicSprite(sprite) || !player.body) {
 			throw new Error("Could not update monster");
 		}
 		const distance = Phaser.Math.Distance.BetweenPoints(
 			sprite.body.center,
-			this.#targetPosition ?? player.body.center
+			this.#targetPosition ?? playerDamageHitbox.body.center
 		);
 
 		// If you hit a wall, the direction will change as moveToObject tries to
@@ -2252,7 +2259,6 @@ export class BlackOrbAttack implements Behavior {
 		sprite: Phaser.GameObjects.Sprite,
 		goToNextState: BehaviorCompleteCallback
 	): void {
-		const player = getPlayerOrThrow();
 		if (!sprite.body || !isDynamicSprite(sprite)) {
 			throw new Error("Could not update monster");
 		}
@@ -2277,9 +2283,10 @@ export class BlackOrbAttack implements Behavior {
 			return;
 		}
 
-		sprite.scene.physics.moveToObject(enemy, player, this.#speed);
+		const playerDamageHitbox = getPlayerDamageHitboxOrThrow();
+		sprite.scene.physics.moveToObject(enemy, playerDamageHitbox, this.#speed);
 
-		sprite.scene.physics.add.overlap(player, enemy, () => {
+		sprite.scene.physics.add.overlap(playerDamageHitbox, enemy, () => {
 			MainEvents.emit(Events.EnemyHitPlayer, { source: sprite, damage: 1 });
 			enemy.emit(Events.MonsterKillRequest);
 		});
@@ -2357,7 +2364,8 @@ export class RangedRockBall implements Behavior {
 
 		if (undefined === this.#forceDirectionDegree) {
 			const player = getPlayerOrThrow();
-			sprite.scene.physics.moveToObject(effect, player, this.#speed);
+			const playerDamageHitbox = getPlayerDamageHitboxOrThrow();
+		sprite.scene.physics.moveToObject(effect, playerDamageHitbox, this.#speed);
 		}
 		if (undefined !== this.#forceDirectionDegree) {
 			const velocity = sprite.scene.physics.velocityFromAngle(
@@ -2407,8 +2415,8 @@ export class RangedRockBall implements Behavior {
 			});
 		}
 
-		const player = getPlayerOrThrow();
-		sprite.scene.physics.add.overlap(player, effect, () => {
+		const playerDamageHitbox = getPlayerDamageHitboxOrThrow();
+		sprite.scene.physics.add.overlap(playerDamageHitbox, effect, () => {
 			MainEvents.emit(Events.EnemyHitPlayer, { source: sprite, damage: 1 });
 			onDestroy();
 		});
@@ -2674,7 +2682,8 @@ export class FireWall implements Behavior {
 			);
 		}
 
-		sprite.scene.physics.add.overlap(player, effect, () => {
+		const playerDamageHitbox = getPlayerDamageHitboxOrThrow();
+		sprite.scene.physics.add.overlap(playerDamageHitbox, effect, () => {
 			MainEvents.emit(Events.EnemyHitPlayer, { source: sprite, damage: 1 });
 		});
 
@@ -2779,7 +2788,8 @@ export class RangedFireBall implements Behavior {
 
 		const player = getPlayerOrThrow();
 		if (undefined === this.#forceDirectionDegree) {
-			sprite.scene.physics.moveToObject(effect, player, this.#speed);
+			const playerDamageHitbox = getPlayerDamageHitboxOrThrow();
+		sprite.scene.physics.moveToObject(effect, playerDamageHitbox, this.#speed);
 		}
 		if (undefined !== this.#forceDirectionDegree) {
 			const velocity = sprite.scene.physics.velocityFromAngle(
@@ -2837,7 +2847,8 @@ export class RangedFireBall implements Behavior {
 			);
 		}
 
-		sprite.scene.physics.add.overlap(player, effect, () => {
+		const playerDamageHitbox = getPlayerDamageHitboxOrThrow();
+		sprite.scene.physics.add.overlap(playerDamageHitbox, effect, () => {
 			fireSound?.stop();
 			MainEvents.emit(Events.EnemyHitPlayer, { source: sprite, damage: 1 });
 			effect.destroy();
@@ -2906,10 +2917,10 @@ export class RangedIceBall implements Behavior {
 		}
 		effect.setDisplaySize(effect.body.width * 0.8, effect.body.height * 0.8);
 		effect.body.setSize(effect.body.width * 0.5, effect.body.height * 0.5);
-		const player = getPlayerOrThrow();
-		sprite.scene.physics.moveToObject(effect, player, this.#speed);
+		const playerDamageHitbox = getPlayerDamageHitboxOrThrow();
+		sprite.scene.physics.moveToObject(effect, playerDamageHitbox, this.#speed);
 
-		sprite.scene.physics.add.overlap(player, effect, () => {
+		sprite.scene.physics.add.overlap(playerDamageHitbox, effect, () => {
 			sprite?.scene?.sound.stopByKey("ice");
 			MainEvents.emit(Events.EnemyHitPlayer, { source: sprite, damage: 1 });
 			effect.destroy();
@@ -3038,7 +3049,8 @@ export class WalkWithFire implements Behavior {
 
 		const player = getPlayerOrThrow();
 
-		sprite.scene.physics.add.overlap(player, effect, () => {
+		const playerDamageHitbox = getPlayerDamageHitboxOrThrow();
+		sprite.scene.physics.add.overlap(playerDamageHitbox, effect, () => {
 			MainEvents.emit(Events.EnemyHitPlayer, { source: sprite, damage: 1 });
 		});
 
@@ -3123,8 +3135,8 @@ export class IceBeam implements Behavior {
 		}
 		effect.setDisplaySize(effect.body.width * 0.8, effect.body.height * 0.8);
 		effect.body.setSize(effect.body.width * 0.5, effect.body.height * 0.5);
-		const player = getPlayerOrThrow();
-		sprite.scene.physics.moveToObject(effect, player, this.attackSpeed);
+		const playerDamageHitbox = getPlayerDamageHitboxOrThrow();
+		sprite.scene.physics.moveToObject(effect, playerDamageHitbox, this.attackSpeed);
 
 		const landLayer = getMap().getLayer("Background");
 		if (!landLayer) {
@@ -3141,7 +3153,7 @@ export class IceBeam implements Behavior {
 			}
 		);
 
-		sprite.scene.physics.add.overlap(player, effect, () => {
+		sprite.scene.physics.add.overlap(playerDamageHitbox, effect, () => {
 			sprite.scene?.sound.stopByKey("freeze");
 			MainEvents.emit(Events.EnemyHitPlayer, { source: sprite, damage: 1 });
 			effect.destroy();
@@ -3584,8 +3596,8 @@ class Seeker extends Phaser.Physics.Arcade.Sprite {
 		this.setDisplaySize(this.body.width * 0.8, this.body.height * 0.8);
 		this.body.setSize(this.body.width * 0.5, this.body.height * 0.5);
 
-		const player = getPlayerOrThrow();
-		this.scene.physics.add.overlap(player, this, () => {
+		const playerDamageHitbox = getPlayerDamageHitboxOrThrow();
+		this.scene.physics.add.overlap(playerDamageHitbox, this, () => {
 			this.scene?.sound?.stopByKey("fire-loop");
 			MainEvents.emit(Events.EnemyHitPlayer, { source: sprite, damage: 1 });
 			this.destroy();
@@ -3631,8 +3643,8 @@ class Seeker extends Phaser.Physics.Arcade.Sprite {
 		if (this.#beingDestroyed) {
 			return;
 		}
-		const player = getPlayerOrThrow();
-		this.scene?.physics.moveToObject(this, player, this.#speed);
+		const playerDamageHitbox = getPlayerDamageHitboxOrThrow();
+		this.scene?.physics.moveToObject(this, playerDamageHitbox, this.#speed);
 	}
 }
 
@@ -3679,11 +3691,11 @@ export class ThrowRocks implements Behavior {
 	}
 
 	createRock() {
-		const player = getPlayerOrThrow();
+		const playerDamageHitbox = getPlayerDamageHitboxOrThrow();
 		this.#sprite.anims.play("throwrock");
 		const rock = this.#sprite.scene.add.sprite(
-			player.body.center.x,
-			player.body.center.y,
+			playerDamageHitbox.body.center.x,
+			playerDamageHitbox.body.center.y,
 			"dungeon_tiles_sprites",
 			865
 		);
@@ -3741,7 +3753,8 @@ export class ThrowRocks implements Behavior {
 		tile.body.pushable = false;
 
 		const player = getPlayerOrThrow();
-		if (this.#sprite.scene?.physics.overlap(player, tile)) {
+		const playerDamageHitbox = getPlayerDamageHitboxOrThrow();
+		if (this.#sprite.scene?.physics.overlap(playerDamageHitbox, tile)) {
 			MainEvents.emit(Events.EnemyHitPlayer, {
 				source: this.#sprite,
 				damage: 1,

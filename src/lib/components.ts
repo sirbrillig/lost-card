@@ -57,6 +57,10 @@ export function getPlayerOrThrow(): Phaser.Types.Physics.Arcade.SpriteWithDynami
 	return getPhysicsSpriteOrThrow("player");
 }
 
+export function getPlayerDamageHitboxOrThrow(): Phaser.Types.Physics.Arcade.SpriteWithDynamicBody {
+	return getPhysicsSpriteOrThrow("playerDamageHitbox");
+}
+
 export function getPhysicsSpriteOrThrow(
 	entity: string
 ): Phaser.Types.Physics.Arcade.SpriteWithDynamicBody {
