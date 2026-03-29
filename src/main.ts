@@ -33,6 +33,7 @@ const config: Types.Core.GameConfig = {
 		arcade: {
 			gravity: { y: 0, x: 0 },
 			debug: false,
+			fps: 120,
 		},
 	},
 	scene: [
