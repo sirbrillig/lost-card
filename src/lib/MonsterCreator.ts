@@ -33,6 +33,7 @@ import { PlantBoss } from "../monsters/PlantBoss";
 import { SpiritBoss } from "../monsters/SpiritBoss";
 import { CloudBoss } from "../monsters/CloudBoss";
 import { FireBoss } from "../monsters/FireBoss";
+import { EvilFog } from "../monsters/EvilFog";
 import {
 	DataKeys,
 	Events,
@@ -107,6 +108,7 @@ MonsterRegistry.register("PlantBoss", PlantBoss);
 MonsterRegistry.register("CloudBoss", CloudBoss);
 MonsterRegistry.register("SpiritBoss", SpiritBoss);
 MonsterRegistry.register("FireBoss", FireBoss);
+MonsterRegistry.register("EvilFog", EvilFog);
 
 const monstersThatSaveAfterDefeat = [
 	"MountainBoss",
@@ -155,6 +157,10 @@ export class MonsterCreator {
 		}
 		if (properties?.facing && isSpriteDirection(properties.facing)) {
 			monster.facing = properties.facing;
+		}
+		if (properties?.moveUpDown !== undefined && "moveUpDown" in monster) {
+			(monster as unknown as { moveUpDown: boolean }).moveUpDown =
+				properties.moveUpDown;
 		}
 		monster.once(Events.MonsterDefeated, () => {
 			if (monster.doNotRespawn) {

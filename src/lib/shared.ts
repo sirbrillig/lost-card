@@ -1415,6 +1415,7 @@ export interface MapMonsterProperties {
 	timeBeforeActivate?: number;
 	isMiniBoss?: boolean;
 	facing?: number;
+	moveUpDown?: boolean;
 }
 
 export interface TiledObjectProperty {
@@ -1442,6 +1443,9 @@ export function getPropertiesFromPoint(
 		}
 		if (property.name === "facing") {
 			result.facing = parseInt(String(property.value));
+		}
+		if (property.name === "moveUpDown") {
+			result.moveUpDown = Boolean(property.value);
 		}
 	});
 	return result;

@@ -448,12 +448,16 @@ export class Burrow implements Behavior {
 								return;
 							}
 							const playerDamageHitbox = getPlayerDamageHitboxOrThrow();
-							sprite?.scene.physics.add.overlap(playerDamageHitbox, shadow, () => {
-								MainEvents.emit(Events.EnemyHitPlayer, {
-									source: sprite,
-									damage: 1,
-								});
-							});
+							sprite?.scene.physics.add.overlap(
+								playerDamageHitbox,
+								shadow,
+								() => {
+									MainEvents.emit(Events.EnemyHitPlayer, {
+										source: sprite,
+										damage: 1,
+									});
+								}
+							);
 						}
 						shadow?.destroy();
 						sprite?.data?.set(DataKeys.IsHarmless, harmless);
@@ -1415,7 +1419,11 @@ export class StickyPoison implements Behavior {
 
 		if (this.#isStuck) {
 			const playerDamageHitbox = getPlayerDamageHitboxOrThrow();
-			sprite.scene.physics.moveToObject(sprite, playerDamageHitbox, this.#speed);
+			sprite.scene.physics.moveToObject(
+				sprite,
+				playerDamageHitbox,
+				this.#speed
+			);
 		}
 	}
 }
@@ -2363,9 +2371,12 @@ export class RangedRockBall implements Behavior {
 		}
 
 		if (undefined === this.#forceDirectionDegree) {
-			const player = getPlayerOrThrow();
 			const playerDamageHitbox = getPlayerDamageHitboxOrThrow();
-		sprite.scene.physics.moveToObject(effect, playerDamageHitbox, this.#speed);
+			sprite.scene.physics.moveToObject(
+				effect,
+				playerDamageHitbox,
+				this.#speed
+			);
 		}
 		if (undefined !== this.#forceDirectionDegree) {
 			const velocity = sprite.scene.physics.velocityFromAngle(
@@ -2636,7 +2647,6 @@ export class FireWall implements Behavior {
 			},
 		});
 
-		const player = getPlayerOrThrow();
 		if (this.#hitsWalls) {
 			// Often the sprite will be right next to a wall and the effect will hit
 			// the wall immediately, so we make it ignore walls for a brief moment
@@ -2786,10 +2796,13 @@ export class RangedFireBall implements Behavior {
 			effect.setTint(this.#colorTint);
 		}
 
-		const player = getPlayerOrThrow();
 		if (undefined === this.#forceDirectionDegree) {
 			const playerDamageHitbox = getPlayerDamageHitboxOrThrow();
-		sprite.scene.physics.moveToObject(effect, playerDamageHitbox, this.#speed);
+			sprite.scene.physics.moveToObject(
+				effect,
+				playerDamageHitbox,
+				this.#speed
+			);
 		}
 		if (undefined !== this.#forceDirectionDegree) {
 			const velocity = sprite.scene.physics.velocityFromAngle(
@@ -3047,8 +3060,6 @@ export class WalkWithFire implements Behavior {
 		effect.setDisplaySize(effect.body.width * 0.5, effect.body.height * 0.5);
 		effect.body.setSize(effect.body.width * 0.4, effect.body.height * 0.4);
 
-		const player = getPlayerOrThrow();
-
 		const playerDamageHitbox = getPlayerDamageHitboxOrThrow();
 		sprite.scene.physics.add.overlap(playerDamageHitbox, effect, () => {
 			MainEvents.emit(Events.EnemyHitPlayer, { source: sprite, damage: 1 });
@@ -3136,7 +3147,11 @@ export class IceBeam implements Behavior {
 		effect.setDisplaySize(effect.body.width * 0.8, effect.body.height * 0.8);
 		effect.body.setSize(effect.body.width * 0.5, effect.body.height * 0.5);
 		const playerDamageHitbox = getPlayerDamageHitboxOrThrow();
-		sprite.scene.physics.moveToObject(effect, playerDamageHitbox, this.attackSpeed);
+		sprite.scene.physics.moveToObject(
+			effect,
+			playerDamageHitbox,
+			this.attackSpeed
+		);
 
 		const landLayer = getMap().getLayer("Background");
 		if (!landLayer) {
