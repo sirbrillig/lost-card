@@ -39,6 +39,7 @@ export class CloudBoss extends BaseMonster {
 		this.setOrigin(0.5, 0.75);
 		this.data.set(DataKeys.Freezable, false);
 		this.data.set(DataKeys.Pushable, false);
+		this.data.set(DataKeys.Flying, true);
 	}
 
 	getInitialState(): AllStates {
